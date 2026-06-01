@@ -93,6 +93,51 @@ export const PLAYER_CAREER_METRICS = PLAYER_MATCH_METRICS.filter((metric) =>
   ["goals", "assists", "shots", "xg"].includes(metric.id)
 );
 
+export type TeamMatchStatRow = {
+  goals: number;
+  shots: number;
+  xg: number;
+  passes: number;
+  passAccuracy: number | null;
+  carries: number;
+  dribbles: number;
+  successfulDribbles: number;
+};
+
+export type TeamMatchStatChipId =
+  | "goals"
+  | "shots"
+  | "xg"
+  | "passes"
+  | "passAccuracy"
+  | "carries"
+  | "dribbles";
+
+export type TeamMatchStatChipDef = {
+  id: TeamMatchStatChipId;
+  label: string;
+  format: (row: TeamMatchStatRow) => string;
+};
+
+/** Full titles for team totals on the match details panel (not abbreviated player-table headers). */
+export const TEAM_MATCH_STAT_CHIPS: TeamMatchStatChipDef[] = [
+  { id: "goals", label: "Goals", format: (row) => String(row.goals) },
+  { id: "shots", label: "Shots", format: (row) => String(row.shots) },
+  { id: "xg", label: "Expected goals", format: (row) => row.xg.toFixed(2) },
+  { id: "passes", label: "Passes", format: (row) => String(row.passes) },
+  {
+    id: "passAccuracy",
+    label: "Pass accuracy",
+    format: (row) => (row.passAccuracy == null ? "n/a" : `${row.passAccuracy}%`)
+  },
+  { id: "carries", label: "Carries", format: (row) => String(row.carries) },
+  {
+    id: "dribbles",
+    label: "Dribbles completed",
+    format: (row) => `${row.successfulDribbles}/${row.dribbles}`
+  }
+];
+
 export function formatPlayerMetric(
   metricId: PlayerMetricId,
   values: { goals: number; assists: number; shots: number; xg: number }
