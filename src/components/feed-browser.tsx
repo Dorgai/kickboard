@@ -785,59 +785,34 @@ function PastEventsPanel({
           {selectedMatch ? (
             <div
               className={`knockout-widgets-row knockout-widgets-row--match-split${
-                matchDetail ? " knockout-widgets-row--with-squads" : ""
+                matchDetail ? " knockout-widgets-row--with-lineups" : ""
               }`}
             >
-              <article className="data-card surface-muted match-focus-col match-detail-widget">
-                <header className="match-focus-scoreline">
-                  <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
-                  <MatchTeamsLine
-                    awayScore={selectedMatch.awayScore}
-                    awayTeam={selectedMatch.awayTeam}
-                    homeScore={selectedMatch.homeScore}
-                    homeTeam={selectedMatch.homeTeam}
-                    layout="inline"
-                    size="sm"
-                  />
-                  <p className="match-focus-meta">
-                    {selectedMatch.date}
-                    {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
-                  </p>
-                </header>
-
-                {!matchDetail ? (
-                  <p className="inline-status">Loading team stats…</p>
-                ) : (
-                  <MatchTeamStatsGrid columns={orderedTeamStats} />
-                )}
-              </article>
-
               {matchDetail ? (
-                <div className="knockout-widgets-row knockout-widgets-row--squads-pair">
-                  <article className="data-card surface-muted match-focus-col match-lineups-column" id="squads">
-                    <div className="section-heading compact match-lineups-heading">
-                      <div>
-                        <h3>Lineups</h3>
-                      </div>
-                      <input
-                        aria-label="Search lineup"
-                        className="lineup-search feed-control-input"
-                        placeholder="Filter"
-                        type="search"
-                        value={lineupSearch}
-                        onChange={(event) => setLineupSearch(event.target.value)}
+                <div className="knockout-widgets-row knockout-widgets-row--stats-pair">
+                  <article className="data-card surface-muted match-focus-col match-detail-widget">
+                    <header className="match-focus-scoreline">
+                      <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
+                      <MatchTeamsLine
+                        awayScore={selectedMatch.awayScore}
+                        awayTeam={selectedMatch.awayTeam}
+                        homeScore={selectedMatch.homeScore}
+                        homeTeam={selectedMatch.homeTeam}
+                        layout="inline"
+                        size="sm"
                       />
-                    </div>
-                    <MatchLineupList
-                      compact
-                      layout={filteredLineups.length === 2 ? "paired" : "stacked"}
-                      selectedPlayerId={selectedPlayerId}
-                      teams={filteredLineups}
-                      onSelectPlayer={setSelectedPlayerId}
-                    />
+                      <p className="match-focus-meta">
+                        {selectedMatch.date}
+                        {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+                      </p>
+                    </header>
+                    <MatchTeamStatsGrid columns={orderedTeamStats} />
                   </article>
 
-                  <article className="data-card surface-muted match-focus-col match-player-stats-column" id="players">
+                  <article
+                    className="data-card surface-muted match-focus-col match-player-stats-column"
+                    id="players"
+                  >
                     {matchDetail.playerStats.length > 0 ? (
                       <PlayerStatsPanel
                         compact
@@ -864,6 +839,51 @@ function PastEventsPanel({
                     <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
                   </article>
                 </div>
+              ) : (
+                <article className="data-card surface-muted match-focus-col match-detail-widget">
+                  <header className="match-focus-scoreline">
+                    <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
+                    <MatchTeamsLine
+                      awayScore={selectedMatch.awayScore}
+                      awayTeam={selectedMatch.awayTeam}
+                      homeScore={selectedMatch.homeScore}
+                      homeTeam={selectedMatch.homeTeam}
+                      layout="inline"
+                      size="sm"
+                    />
+                    <p className="match-focus-meta">
+                      {selectedMatch.date}
+                      {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+                    </p>
+                  </header>
+                  <p className="inline-status">Loading match stats…</p>
+                </article>
+              )}
+
+              {matchDetail ? (
+                <article className="data-card surface-muted match-focus-col match-lineups-column" id="squads">
+                  <div className="section-heading compact match-lineups-heading">
+                    <div>
+                      <h3>Lineups</h3>
+                      <p className="match-lineups-note">Select a player to view stats above.</p>
+                    </div>
+                    <input
+                      aria-label="Search lineup"
+                      className="lineup-search feed-control-input"
+                      placeholder="Filter"
+                      type="search"
+                      value={lineupSearch}
+                      onChange={(event) => setLineupSearch(event.target.value)}
+                    />
+                  </div>
+                  <MatchLineupList
+                    compact
+                    layout={filteredLineups.length === 2 ? "paired" : "stacked"}
+                    selectedPlayerId={selectedPlayerId}
+                    teams={filteredLineups}
+                    onSelectPlayer={setSelectedPlayerId}
+                  />
+                </article>
               ) : null}
             </div>
           ) : null}

@@ -1776,12 +1776,12 @@ h3 {
 }
 
 .knockout-widgets-row--match-split,
-.knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
+.knockout-widgets-row--match-split.knockout-widgets-row--with-lineups {
   align-items: stretch;
   grid-template-columns: minmax(0, 1fr);
 }
 
-.knockout-widgets-row--squads-pair {
+.knockout-widgets-row--stats-pair {
   display: grid;
   gap: 10px;
   grid-column: 1 / -1;
@@ -1790,10 +1790,20 @@ h3 {
 }
 
 @media (min-width: 900px) {
-  .knockout-widgets-row--squads-pair {
+  .knockout-widgets-row--stats-pair {
     align-items: start;
-    grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+    grid-template-columns: minmax(0, 1.05fr) minmax(240px, 0.95fr);
   }
+}
+
+.knockout-widgets-row--match-split .match-lineups-column {
+  grid-column: 1 / -1;
+  min-height: 0;
+}
+
+.knockout-widgets-row--stats-pair .match-detail-widget,
+.knockout-widgets-row--stats-pair .match-player-stats-column {
+  min-height: 0;
 }
 
 .knockout-widgets--below-strip {
