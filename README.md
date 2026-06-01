@@ -1,10 +1,10 @@
-# KickStats / Kickboard
+# Kickboard
 
-Railway-ready greenfield scaffold for the KickStats World Cup fan and analytics platform.
+Railway-ready greenfield scaffold for the Kickboard World Cup fan and analytics platform.
 
 The initial implementation is intentionally focused on safe foundations:
 
-- Next.js app router frontend with responsive KickStats UI sections
+- Next.js app router frontend with responsive Kickboard UI sections
 - Railway deploy config and health check route
 - Explicit service plan for web, Postgres, Redis, worker and analytics boundaries
 - Starter PostgreSQL schema based on the uploaded data model

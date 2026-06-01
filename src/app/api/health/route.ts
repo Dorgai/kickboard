@@ -6,7 +6,7 @@ export function GET() {
   return NextResponse.json(
     {
       ok: true,
-      service: "kickstats-web",
+      service: "kickboard",
       timestamp: new Date().toISOString()
     },
     {

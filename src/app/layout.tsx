@@ -2,10 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "KickStats | World Cup fan and analytics platform",
+  title: "Kickboard | World Cup fan and analytics platform",
   description:
-    "A Railway-ready KickStats scaffold for live match widgets, squad building, predictions, social features and safe analytics.",
-  applicationName: "KickStats"
+    "A Railway-ready Kickboard scaffold for live match widgets, squad building, predictions, social features and safe analytics.",
+  applicationName: "Kickboard"
 };
 
 export const viewport: Viewport = {

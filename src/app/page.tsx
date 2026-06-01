@@ -16,7 +16,7 @@ import {
   safetyPillars,
   tiers,
   widgets
-} from "@/lib/kickstats-data";
+} from "@/lib/kickboard-data";
 
 const groups = ["A", "B", "C", "D", "E", "F"];
 
@@ -28,7 +28,7 @@ export default function Home() {
         <section className="hero section">
           <div className="hero-copy">
             <p className="eyebrow">Railway-ready greenfield scaffold</p>
-            <h1>Build KickStats as a safe, real-time World Cup fan platform.</h1>
+            <h1>Build Kickboard as a safe, real-time World Cup fan platform.</h1>
             <p className="hero-text">
               This first implementation turns the uploaded UI, functional and data-model specs into a
               deployable Next.js foundation with health checks, service boundaries and safety constraints
@@ -265,7 +265,7 @@ export default function Home() {
       </main>
       <footer className="site-footer">
         <Sparkles size={18} aria-hidden="true" />
-        KickStats scaffold based on UI, functional and data model specs v1.0.
+        Kickboard scaffold based on UI, functional and data model specs v1.0.
       </footer>
     </>
   );

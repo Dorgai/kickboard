@@ -1,7 +1,7 @@
 {
   "name": "kickboard",
   "version": "1.0.0",
-  "description": "KickStats World Cup fan and analytics platform scaffold.",
+  "description": "Kickboard World Cup fan and analytics platform scaffold.",
   "private": true,
   "engines": {
     "node": ">=22.0.0"
@@ -18,7 +18,7 @@
     "url": "git+https://github.com/Dorgai/kickboard.git"
   },
   "keywords": [
-    "kickstats",
+    "kickboard",
     "world-cup",
     "railway",
     "nextjs"

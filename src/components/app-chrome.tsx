@@ -1,15 +1,15 @@
 import { Bell, ChevronDown, Search, ShieldCheck } from "lucide-react";
-import { navigation } from "@/lib/kickstats-data";
+import { navigation } from "@/lib/kickboard-data";
 
 export function AppChrome() {
   return (
     <header className="app-header">
       <div className="nav-shell" aria-label="Primary navigation">
-        <a className="brand" href="#main-content" aria-label="KickStats home">
+        <a className="brand" href="#main-content" aria-label="Kickboard home">
           <span className="brand-mark" aria-hidden="true">
-            KS
+            KB
           </span>
-          <span>KICKSTATS</span>
+          <span>KICKBOARD</span>
         </a>
 
         <button className="tournament-switcher" type="button">

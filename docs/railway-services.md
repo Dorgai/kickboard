@@ -1,6 +1,6 @@
 # Railway service plan
 
-KickStats should start on Railway with a small set of services and grow only when code needs the
+Kickboard should start on Railway with a small set of services and grow only when code needs the
 separation. The first deploy can be run with one web service plus managed Postgres and Redis.
 
 ## Create now
@@ -8,7 +8,7 @@ separation. The first deploy can be run with one web service plus managed Postgr
 ### 1. Next.js Web
 
 - **Railway type:** service from this GitHub repository
-- **Build:** Nixpacks, using `npm ci && npm run build`
+- **Build:** Nixpacks, using `npm run build` after dependency installation
 - **Start:** `npm run start -- --hostname 0.0.0.0 --port ${PORT:-3000}`
 - **Health check:** `/api/health`
 - **Purpose:** SSR/PWA frontend, route handlers, early backend-for-frontend endpoints

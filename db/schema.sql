@@ -1,4 +1,4 @@
--- KickStats starter schema for Railway Postgres.
+-- Kickboard starter schema for Railway Postgres.
 -- This is intentionally conservative: it establishes core domains, enums,
 -- safety constraints and indexes before app code starts writing production data.
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getConfigReadiness } from "@/lib/kickstats-data";
+import { getConfigReadiness } from "@/lib/kickboard-data";
 
 export const dynamic = "force-dynamic";
 
