@@ -62,3 +62,9 @@ curl -sS "$BASE/" | grep -c feed-status-grid || true                            
 ```
 
 If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production target**, regenerate the token under **kickboard project → Settings → Tokens** and update the `RAILWAY_TOKEN` repo secret, or add `RAILWAY_PROJECT_ID` + `RAILWAY_SERVICE_ID` secrets. Dashboard **Redeploy** only updates production when the service source is connected to `Dorgai/kickboard` branch **`main`**.
+
+### Feed UI flags and typography
+
+- Country flags load from `flagcdn.com` via native `<img>` in `team-label.tsx` (not `next/image`); the Next image optimizer on Railway returned **400** for external flag URLs.
+- Marketing `h1`/`h2` sizes are overridden inside `.feed-browser` in `globals.css` so bracket/match/player sections stay readable.
+- Knockout bracket cards use stacked `MatchTeamsLine` with **sm** flags so logos match the match detail panel.
