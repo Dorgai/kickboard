@@ -52,11 +52,11 @@ After that, each merge to `main` deploys automatically. To push env vars from Gi
 |----------|---------|
 | `NEXT_PUBLIC_APP_URL` | Production URL for post-deploy checks (default: `https://kickboard-production.up.railway.app`) |
 
-**If CI logs show `Unauthorized`**
+**If CI logs show `Unauthorized` on `railway project list`**
 
-1. Revoke the old token in Railway and create a new one under the **kickboard** project (**Settings → Tokens**).
-2. Update the GitHub secret `RAILWAY_TOKEN` (no extra spaces or quotes).
-3. Re-run the deploy workflow.
+That is expected with a **project token** — project tokens can run `railway up` but cannot list all projects. The GitHub workflow deploys with `RAILWAY_TOKEN` only (no project list). Use a kickboard **project → Settings → Tokens** token as `RAILWAY_TOKEN`.
+
+If deploy still fails, regenerate the token and update the GitHub secret (no extra spaces or quotes), then re-run the workflow.
 
 **Bypass name lookup** (if the token cannot list projects but can deploy)
 

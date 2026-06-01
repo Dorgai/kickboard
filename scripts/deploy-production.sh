@@ -9,10 +9,13 @@ cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=scripts/railway-target.sh
 source scripts/railway-target.sh
 
-RAILWAY_BIN="${RAILWAY_BIN:-npx @railway/cli}"
-
 echo "Uploading workspace to kickboard production..."
-"$RAILWAY_BIN" up --detach "${RAILWAY_TARGET_ARGS[@]}"
+if [ -n "${RAILWAY_PROJECT_ID:-}" ] && [ -n "${RAILWAY_SERVICE_ID:-}" ]; then
+  railway_cli up --detach "${RAILWAY_TARGET_ARGS[@]}"
+else
+  # Project tokens are scoped to one project/environment; no project list needed.
+  railway_cli up --detach
+fi
 
 if [ "${VERIFY_DEPLOY:-1}" = "1" ]; then
   BASE="${NEXT_PUBLIC_APP_URL:-https://kickboard-production.up.railway.app}"

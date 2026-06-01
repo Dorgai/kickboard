@@ -39,39 +39,29 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Resolve kickboard production target
-        id: target
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_NAME: ${{ vars.RAILWAY_PROJECT_NAME }}
-          RAILWAY_SERVICE_NAME: ${{ vars.RAILWAY_SERVICE_NAME }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
-        run: |
-          if [ -z "$RAILWAY_TOKEN" ]; then
-            echo "::error::Add GitHub secret RAILWAY_TOKEN (kickboard project → Settings → Tokens), then re-run this workflow."
-            exit 1
-          fi
-          npm install -g @railway/cli
-          chmod +x scripts/railway-target.sh
-          source scripts/railway-target.sh
-          if [ -z "$RAILWAY_PROJECT_ID" ] || [ -z "$RAILWAY_SERVICE_ID" ]; then
-            echo "::error::Could not resolve kickboard project/service. Regenerate RAILWAY_TOKEN from the kickboard project (Settings → Tokens), or add RAILWAY_PROJECT_ID + RAILWAY_SERVICE_ID secrets."
-            exit 1
-          fi
-          echo "project_id=$RAILWAY_PROJECT_ID" >> "$GITHUB_OUTPUT"
-          echo "service_id=$RAILWAY_SERVICE_ID" >> "$GITHUB_OUTPUT"
-          echo "environment=$RAILWAY_ENVIRONMENT" >> "$GITHUB_OUTPUT"
-
       - name: Deploy to kickboard production
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
+          set -euo pipefail
+          if [ -z "${RAILWAY_TOKEN:-}" ]; then
+            echo "::error::Add GitHub secret RAILWAY_TOKEN (kickboard project → Settings → Tokens)."
+            exit 1
+          fi
           npm install -g @railway/cli
-          railway up --detach \
-            --project "${{ steps.target.outputs.project_id }}" \
-            --service "${{ steps.target.outputs.service_id }}" \
-            --environment "${{ steps.target.outputs.environment }}"
+          DEPLOY_ARGS=(--detach)
+          # Project tokens cannot call `railway project list`; they deploy via RAILWAY_TOKEN alone.
+          # Optional secrets override when you have multiple services or use an account token flow.
+          if [ -n "${{ secrets.RAILWAY_PROJECT_ID }}" ] && [ -n "${{ secrets.RAILWAY_SERVICE_ID }}" ]; then
+            DEPLOY_ARGS+=(--project "${{ secrets.RAILWAY_PROJECT_ID }}" --service "${{ secrets.RAILWAY_SERVICE_ID }}" --environment production)
+            echo "Deploying with RAILWAY_PROJECT_ID + RAILWAY_SERVICE_ID."
+          elif [ -n "${{ secrets.RAILWAY_SERVICE_ID }}" ]; then
+            DEPLOY_ARGS+=(--service "${{ secrets.RAILWAY_SERVICE_ID }}")
+            echo "Deploying with RAILWAY_SERVICE_ID."
+          else
+            echo "Deploying with kickboard project token (scoped to production)."
+          fi
+          railway up "${DEPLOY_ARGS[@]}"
 
       - name: Sync Railway variables (optional)
         if: >-
@@ -79,8 +69,8 @@ jobs:
           inputs.sync_variables == true
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ steps.target.outputs.project_id }}
-          RAILWAY_SERVICE_ID: ${{ steps.target.outputs.service_id }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
           SKIP_FINAL_REDEPLOY: "1"
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
