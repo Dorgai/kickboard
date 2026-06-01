@@ -904,54 +904,6 @@ function PastEventsPanel({
                 </div>
               </article>
 
-              <article className="data-card surface-muted match-detail-widget">
-                {!selectedMatch ? (
-                  <div className="match-detail-widget-empty">
-                    <h2>Match details</h2>
-                    <p className="inline-status">
-                      Choose a fixture on the left to load team stats, squads, and player data here.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <header className="match-focus-scoreline">
-                      <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
-                      <MatchTeamsLine
-                        awayScore={selectedMatch.awayScore}
-                        awayTeam={selectedMatch.awayTeam}
-                        homeScore={selectedMatch.homeScore}
-                        homeTeam={selectedMatch.homeTeam}
-                        layout="stacked"
-                        size="md"
-                      />
-                      <p className="match-focus-meta">
-                        {selectedMatch.date}
-                        {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
-                      </p>
-                    </header>
-
-                    {!matchDetail ? (
-                      <p className="inline-status">Loading team stats…</p>
-                    ) : (
-                      <div className="match-focus-team-stats">
-                        {orderedTeamStats.map((team) => (
-                          <section className="team-stat-card compact" key={team.team}>
-                            <h4>
-                              <TeamLabel name={team.team} size="sm" />
-                            </h4>
-                            <div className="stat-chip-grid">
-                              {TEAM_MATCH_STAT_CHIPS.map((stat) => (
-                                <StatChip key={stat.id} label={stat.label} value={stat.format(team)} />
-                              ))}
-                            </div>
-                          </section>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </article>
-
               {selectedMatch && matchDetail ? (
                 <article className="data-card surface-muted match-squads-players-column">
                   <section className="match-detail-section match-squads-section" id="squads">
@@ -1020,6 +972,54 @@ function PastEventsPanel({
                   </div>
                 </article>
               ) : null}
+
+              <article className="data-card surface-muted match-detail-widget">
+                {!selectedMatch ? (
+                  <div className="match-detail-widget-empty">
+                    <h2>Match details</h2>
+                    <p className="inline-status">
+                      Choose a fixture on the left to load team stats, squads, and player data here.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <header className="match-focus-scoreline">
+                      <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
+                      <MatchTeamsLine
+                        awayScore={selectedMatch.awayScore}
+                        awayTeam={selectedMatch.awayTeam}
+                        homeScore={selectedMatch.homeScore}
+                        homeTeam={selectedMatch.homeTeam}
+                        layout="stacked"
+                        size="md"
+                      />
+                      <p className="match-focus-meta">
+                        {selectedMatch.date}
+                        {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+                      </p>
+                    </header>
+
+                    {!matchDetail ? (
+                      <p className="inline-status">Loading team stats…</p>
+                    ) : (
+                      <div className="match-focus-team-stats">
+                        {orderedTeamStats.map((team) => (
+                          <section className="team-stat-card compact" key={team.team}>
+                            <h4>
+                              <TeamLabel name={team.team} size="sm" />
+                            </h4>
+                            <div className="stat-chip-grid">
+                              {TEAM_MATCH_STAT_CHIPS.map((stat) => (
+                                <StatChip key={stat.id} label={stat.label} value={stat.format(team)} />
+                              ))}
+                            </div>
+                          </section>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </article>
             </div>
           ) : null}
         </div>
