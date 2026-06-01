@@ -8,6 +8,9 @@ import {
   Sparkles
 } from "lucide-react";
 import { AppChrome } from "@/components/app-chrome";
+import { FeedStatusPanel } from "@/components/interactive/feed-status-panel";
+import { LiveMatchPanel } from "@/components/interactive/live-match-panel";
+import { MatchDataPanel } from "@/components/interactive/match-data-panel";
 import { UserStatCard } from "@/components/user-stat-card";
 import {
   demoDashboardWidgets,
@@ -52,41 +55,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="live-card" aria-label="Live match preview">
-            <div className="live-card-header">
-              <span className="live-dot" aria-hidden="true" />
-              {demoLiveMatch.minute}' {demoLiveMatch.status}
-            </div>
-            <div className="score-row">
-              <span>{demoLiveMatch.homeTeam.name}</span>
-              <strong>
-                {demoLiveMatch.homeTeam.score} - {demoLiveMatch.awayTeam.score}
-              </strong>
-              <span>{demoLiveMatch.awayTeam.name}</span>
-            </div>
-            <p className="match-venue">{demoLiveMatch.venue}</p>
-            <div className="match-stat-grid">
-              {demoLiveMatch.stats.map((stat) => (
-                <div className="match-stat" key={stat.label}>
-                  <span>{stat.home}</span>
-                  <strong>{stat.label}</strong>
-                  <span>{stat.away}</span>
-                </div>
-              ))}
-            </div>
-            <div className="timeline">
-              {demoLiveMatch.events.map((event) => (
-                <div className="timeline-item" data-tone={event.tone} key={`${event.minute}-${event.type}`}>
-                  <span>{event.minute}</span>
-                  <div>
-                    <strong>{event.type}</strong>
-                    <p>{event.detail}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <LiveMatchPanel match={demoLiveMatch} />
         </section>
+
+        <FeedStatusPanel />
 
         <section className="section dashboard-section" id="home">
           <div className="section-heading">
@@ -143,67 +115,12 @@ export default function Home() {
               API-Football polling data once ingestion is implemented.
             </p>
           </div>
-          <div className="data-grid">
-            <article className="data-card">
-              <h3>Fixtures</h3>
-              {demoMatches.map((match) => (
-                <div className="fixture-row" key={match.id}>
-                  <div>
-                    <strong>
-                      {match.homeTeam} vs {match.awayTeam}
-                    </strong>
-                    <p>{match.venue}</p>
-                  </div>
-                  <span>
-                    {match.score ? `${match.score} ${match.status}` : `${match.kickoff} ${match.status}`}
-                  </span>
-                </div>
-              ))}
-            </article>
-            <article className="data-card">
-              <h3>Top scorers</h3>
-              {demoTopScorers.map((player, index) => (
-                <div className="table-row" key={player.name}>
-                  <span>{index + 1}</span>
-                  <strong>{player.name}</strong>
-                  <span>{player.team}</span>
-                  <span>{player.goals} goals</span>
-                </div>
-              ))}
-            </article>
-            <article className="data-card">
-              <h3>Prediction leaderboard</h3>
-              {demoLeaderboard.map((user) => (
-                <div className="table-row" key={user.username}>
-                  <span>#{user.rank}</span>
-                  <strong>{user.username}</strong>
-                  <span>{user.points} pts</span>
-                  <span>{user.accuracy}</span>
-                </div>
-              ))}
-            </article>
-          </div>
-        </section>
-
-        <section className="section split-section" id="squads">
-          <div className="section-heading">
-            <p className="eyebrow">Squad builder</p>
-            <h2>{demoSquad.name}</h2>
-            <p>
-              Seed formation: {demoSquad.formation}. These player rows show how real roster data will
-              populate the drag-and-drop pitch.
-            </p>
-          </div>
-          <div className="squad-card" aria-label="Squad preview">
-            {demoSquad.players.map((player) => (
-              <div className="squad-player-row" key={`${player.slot}-${player.name}`}>
-                <span>{player.slot}</span>
-                <strong>{player.name}</strong>
-                <small>{player.team}</small>
-                <em>{player.rating}</em>
-              </div>
-            ))}
-          </div>
+          <MatchDataPanel
+            leaderboard={demoLeaderboard}
+            matches={demoMatches}
+            squad={demoSquad}
+            topScorers={demoTopScorers}
+          />
         </section>
 
         <section className="section" id="players">

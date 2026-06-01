@@ -11,6 +11,7 @@ The initial implementation is intentionally focused on safe foundations:
 - Product safety guardrails for child accounts, predictions, wallet points and moderation
 - Gap closure docs for data ingestion, widget isolation, portraits, legal language, and stat-card sharing
 - Curated demo data rendered on the homepage and exposed at `/api/demo`
+- Interactive demo controls for prediction entry, tactical voting, fixture filtering, scorer sorting, leaderboard sorting, squad search, and feed-status checks
 
 ## Run locally
 
@@ -52,6 +53,12 @@ Details are in [`docs/railway-services.md`](docs/railway-services.md).
 - [`docs/portrait-pipeline.md`](docs/portrait-pipeline.md) - SDXL prompt, frame, review, and CDN pipeline.
 - [`docs/predictions-legal.md`](docs/predictions-legal.md) - draft legal intent for free-to-play prediction points.
 - [`docs/user-stat-card.md`](docs/user-stat-card.md) - profile/share card requirements and data sources.
+
+## Feed endpoints
+
+- `/api/feeds/status` - reports which feeds and infrastructure variables are actually configured.
+- `/api/feeds/historical` - checks the public StatsBomb Open Data competitions feed.
+- `/api/feeds/realtime` - reports API-Football worker readiness. This remains inactive until `API_FOOTBALL_KEY` and a running worker service are configured.
 
 ## Important safety constraints
 
