@@ -817,6 +817,9 @@ h3 {
 }
 
 .feed-browser {
+  --feed-control-height: 40px;
+  --feed-control-gap: 8px;
+  --feed-control-radius: 10px;
   margin: 0 auto;
   max-width: var(--max-page);
   padding: 64px 24px;
@@ -855,6 +858,95 @@ h3 {
 .feed-browser .eyebrow {
   font-size: 12px;
   margin-bottom: 6px;
+}
+
+.feed-browser .feed-control-field {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+
+.feed-browser .feed-control-field > span,
+.feed-browser .feed-control-field > label {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.feed-browser select,
+.feed-browser .feed-control-input {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--feed-control-radius);
+  box-sizing: border-box;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: 600;
+  max-width: 100%;
+  min-height: var(--feed-control-height);
+  min-width: 0;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.feed-browser .feed-control-bar {
+  display: grid;
+  gap: var(--feed-control-gap);
+  grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
+  margin: 0 0 var(--feed-control-gap);
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+
+.feed-browser .feed-control-bar button {
+  border-radius: var(--feed-control-radius);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  min-height: var(--feed-control-height);
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.feed-browser .bracket-tree-card .feed-control-bar,
+.feed-browser .bracket-tree-card .feed-control-field,
+.feed-browser .match-fixtures-widget .feed-control-bar,
+.feed-browser .match-fixtures-widget .feed-control-field,
+.feed-browser .match-lineups-column .feed-control-input,
+.feed-browser .match-explorer-list .feed-control-field {
+  box-sizing: border-box;
+  max-width: 100%;
+  width: 100%;
+}
+
+.feed-browser .knockout-workspace .bracket-tree-card .section-heading.compact {
+  align-items: stretch;
+  flex-direction: column;
+  gap: var(--feed-control-gap);
+}
+
+.feed-browser .knockout-workspace .bracket-tree-card .section-heading.compact .button {
+  justify-content: center;
+  min-height: var(--feed-control-height);
+  width: 100%;
+}
+
+.feed-browser .match-lineups-heading {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.feed-browser .match-lineups-heading .feed-control-input {
+  max-width: 100%;
+  width: 100%;
 }
 
 .section-anchor,
@@ -1291,25 +1383,8 @@ h3 {
 
 .bracket-competition-picker {
   color: var(--color-text-secondary);
-  display: grid;
   font-size: 13px;
   font-weight: 800;
-  gap: 6px;
-  margin: 0;
-  min-width: min(100%, 340px);
-}
-
-.bracket-competition-picker select {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  color: var(--color-text-primary);
-  font: inherit;
-  font-weight: 600;
-  min-height: 44px;
-  min-width: 0;
-  padding: 0 12px;
-  width: 100%;
 }
 
 .knockout-widgets {
@@ -1400,12 +1475,6 @@ h3 {
   font-size: 10px;
   font-weight: 500;
   margin: 0 0 2px;
-}
-
-.match-stage-tabs.feed-tab-bar button {
-  font-size: 11px;
-  min-height: 30px;
-  padding: 0 10px;
 }
 
 .match-stage-fixtures {
@@ -1507,8 +1576,7 @@ h3 {
 }
 
 .match-lineups-column .lineup-search {
-  min-width: 120px;
-  width: min(100%, 160px);
+  max-width: 100%;
 }
 
 .match-lineups-note {
@@ -2169,13 +2237,7 @@ h3 {
 }
 
 .match-list-search input {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
   font: inherit;
-  min-height: 36px;
-  min-width: 180px;
-  padding: 0 10px;
 }
 
 .bracket-tree-card .section-heading.compact p {
@@ -2367,13 +2429,7 @@ h3 {
 }
 
 .lineup-search {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
   font: inherit;
-  max-width: 180px;
-  min-height: 36px;
-  padding: 0 10px;
 }
 
 .text-button {

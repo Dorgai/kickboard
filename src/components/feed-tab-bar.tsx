@@ -18,7 +18,7 @@ export function FeedTabBar({ tabs, value, onChange, ariaLabel, className = "" }:
 
   return (
     <div
-      className={`feed-tab-bar ${className}`.trim()}
+      className={`feed-tab-bar feed-control-bar ${className}`.trim()}
       role="tablist"
       aria-label={ariaLabel}
     >

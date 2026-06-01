@@ -654,7 +654,7 @@ function PastEventsPanel({
       <div className="knockout-workspace" id="group-stage">
         <section className="bracket-tree-card surface-muted" id="bracket">
           <div className="section-heading compact">
-            <label className="bracket-competition-picker">
+            <label className="bracket-competition-picker feed-control-field">
               Tournament
               <select value={selectedCompetition} onChange={(event) => setSelectedCompetition(event.target.value)}>
                 {competitions.map((competition) => (
@@ -724,7 +724,7 @@ function PastEventsPanel({
                     <h2>All matches</h2>
                     <p>{filteredMatches.length} in feed</p>
                   </div>
-                  <label className="match-list-search">
+                  <label className="match-list-search feed-control-field">
                     Search
                     <input
                       aria-label="Search matches"
@@ -901,7 +901,7 @@ function PastEventsPanel({
                       </div>
                       <input
                         aria-label="Search lineup"
-                        className="lineup-search"
+                        className="lineup-search feed-control-input"
                         placeholder="Filter"
                         type="search"
                         value={lineupSearch}
