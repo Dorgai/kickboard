@@ -364,6 +364,7 @@ export function FeedBrowser() {
           competitions={competitions}
           filteredMatches={filteredMatches}
           groupStageMatches={groupStageMatches}
+          matches={matches}
           stageFilter={stageFilter}
           lineupSearch={lineupSearch}
           matchDetail={matchDetail}
@@ -513,6 +514,7 @@ type PastEventsPanelProps = {
   competitions: WorldCupCompetition[];
   filteredMatches: Match[];
   groupStageMatches: Match[];
+  matches: Match[];
   lineupSearch: string;
   matchDetail: MatchDetail | null;
   matchSearch: string;
@@ -539,6 +541,7 @@ function PastEventsPanel({
   competitions,
   filteredMatches,
   groupStageMatches,
+  matches,
   lineupSearch,
   matchDetail,
   matchSearch,
@@ -593,7 +596,50 @@ function PastEventsPanel({
     )
   }));
 
+  const selectedRoundMatches = useMemo(() => {
+    if (!selectedMatch?.stage) return [];
+    if (selectedMatch.stage === "Group Stage") {
+      const letter =
+        teamToGroup.get(selectedMatch.homeTeam) ?? teamToGroup.get(selectedMatch.awayTeam);
+      if (!letter) return [];
+      return groupBuckets.find((bucket) => bucket.letter === letter)?.matches ?? [];
+    }
+    const stageKey = activeKnockoutStage || selectedMatch.stage;
+    const round = bracketRounds.find((round) => round.stage === stageKey);
+    if (!round) return [];
+    return round.clusters?.length
+      ? round.clusters.flatMap((cluster) => cluster.matches)
+      : round.matches;
+  }, [activeKnockoutStage, bracketRounds, groupBuckets, selectedMatch, teamToGroup]);
+
+  const selectedClusterLabel = useMemo(() => {
+    if (!selectedMatch?.stage || selectedMatch.stage === "Group Stage") return null;
+    const round = bracketRounds.find((round) => round.stage === selectedMatch.stage);
+    const cluster = round?.clusters?.find((entry) =>
+      entry.matches.some((match) => match.matchId === selectedMatch.matchId)
+    );
+    return cluster?.label ?? null;
+  }, [bracketRounds, selectedMatch]);
+
+  const orderedTeamStats = useMemo(() => {
+    if (!matchDetail || !selectedMatch) return matchDetail?.teamStats ?? [];
+    const home = matchDetail.teamStats.find((team) => team.team === selectedMatch.homeTeam);
+    const away = matchDetail.teamStats.find((team) => team.team === selectedMatch.awayTeam);
+    const rest = matchDetail.teamStats.filter(
+      (team) => team.team !== selectedMatch.homeTeam && team.team !== selectedMatch.awayTeam
+    );
+    return [home, away, ...rest].filter((team): team is NonNullable<typeof home> => Boolean(team));
+  }, [matchDetail, selectedMatch]);
+
   function selectMatch(matchId: number) {
+    const match = matches.find((entry) => entry.matchId === matchId);
+    if (match?.stage && match.stage !== "Group Stage") {
+      setActiveKnockoutStage(match.stage);
+    }
+    if (match?.stage === "Group Stage") {
+      const letter = teamToGroup.get(match.homeTeam) ?? teamToGroup.get(match.awayTeam);
+      if (letter) setActiveGroupLetter(letter);
+    }
     setSelectedMatchId(matchId);
     setSelectedPlayerId(null);
     window.requestAnimationFrame(() => {
@@ -692,7 +738,11 @@ function PastEventsPanel({
             <div>
               <p className="eyebrow">Knockout tree</p>
               <h2>Route to the final</h2>
-              <p>Select a match — stats, squads, and player data appear in the panels below.</p>
+              <p>
+                {selectedMatch
+                  ? "Stage fixtures and team stats appear together below."
+                  : "Select a match — stats, squads, and player data appear in the panels below."}
+              </p>
             </div>
             <button
               className="button secondary"
@@ -715,7 +765,7 @@ function PastEventsPanel({
                 value={activeKnockoutStage}
                 onChange={setActiveKnockoutStage}
               />
-              {activeKnockoutRound ? (
+              {!selectedMatch && activeKnockoutRound ? (
                 <div className="bracket-stage-panel">
                   {activeKnockoutRound.clusters?.length ? (
                     activeKnockoutRound.clusters.map((cluster) => (
@@ -806,12 +856,45 @@ function PastEventsPanel({
                 <h2>Select a match</h2>
                 <p>Pick a fixture in the knockout tree to view team stats, squads, and lineups below.</p>
               </article>
-            ) : (
-              <article className="data-card widget-elevated match-summary-card">
-                <div className="section-heading compact">
-                  <div>
+            ) : null}
+          </div>
+
+          {selectedMatch ? (
+            <div className="knockout-widgets-row knockout-widgets-row--match-focus">
+              <article className="data-card surface-muted match-focus-block">
+                <div className="match-focus-layout">
+                  <aside className="match-stage-rail">
                     <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
-                    <div className="match-title-line">
+                    {selectedClusterLabel && selectedMatch.stage === activeKnockoutStage ? (
+                      <p className="match-stage-cluster">{selectedClusterLabel}</p>
+                    ) : null}
+                    {selectedMatch.stage !== "Group Stage" && bracketRounds.length ? (
+                      <FeedTabBar
+                        ariaLabel="Knockout stage"
+                        className="match-stage-tabs"
+                        tabs={bracketRounds.map((round) => ({
+                          id: round.stage,
+                          label: round.stage.replace("Round of ", "R")
+                        }))}
+                        value={activeKnockoutStage}
+                        onChange={setActiveKnockoutStage}
+                      />
+                    ) : null}
+                    <p className="match-stage-rail-caption">Fixtures in this stage</p>
+                    <div className="match-stage-fixtures">
+                      {selectedRoundMatches.map((match) => (
+                        <BracketMatchButton
+                          key={match.matchId}
+                          match={match}
+                          selectedMatchId={selectedMatchId}
+                          onSelect={selectMatch}
+                        />
+                      ))}
+                    </div>
+                  </aside>
+
+                  <div className="match-focus-main">
+                    <header className="match-focus-scoreline">
                       <MatchTeamsLine
                         awayScore={selectedMatch.awayScore}
                         awayTeam={selectedMatch.awayTeam}
@@ -820,46 +903,49 @@ function PastEventsPanel({
                         layout="stacked"
                         size="md"
                       />
-                    </div>
-                    <p>
-                      {selectedMatch.date}
-                      {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
-                    </p>
+                      <p className="match-focus-meta">
+                        {selectedMatch.date}
+                        {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+                      </p>
+                    </header>
+
+                    {!matchDetail ? (
+                      <p className="inline-status">Loading team stats…</p>
+                    ) : (
+                      <div className="match-focus-team-stats">
+                        {orderedTeamStats.map((team) => (
+                          <section className="team-stat-card compact" key={team.team}>
+                            <h4>
+                              <TeamLabel name={team.team} size="sm" />
+                            </h4>
+                            <div className="stat-chip-grid">
+                              <StatChip label="G" value={team.goals} />
+                              <StatChip label="Sh" value={team.shots} />
+                              <StatChip label="xG" value={team.xg} />
+                              <StatChip label="Pass" value={team.passes} />
+                              <StatChip
+                                label="Acc"
+                                value={team.passAccuracy ? `${team.passAccuracy}%` : "n/a"}
+                              />
+                              <StatChip label="Car" value={team.carries} />
+                              <StatChip
+                                label="Drib"
+                                value={`${team.successfulDribbles}/${team.dribbles}`}
+                              />
+                            </div>
+                          </section>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-                {!matchDetail ? <p className="inline-status">Loading match data…</p> : null}
               </article>
-            )}
-          </div>
+            </div>
+          ) : null}
 
           {selectedMatch && matchDetail ? (
             <>
               <div className="knockout-widgets-row knockout-widgets-row--match-data">
-                <section className="data-card surface-muted match-detail-section">
-                  <h3>Team stats</h3>
-                  <div className="team-stat-grid compact">
-                    {matchDetail.teamStats.map((team) => (
-                      <div className="team-stat-card compact" key={team.team}>
-                        <h4>
-                          <TeamLabel name={team.team} size="sm" />
-                        </h4>
-                        <div className="stat-chip-grid">
-                          <StatChip label="G" value={team.goals} />
-                          <StatChip label="Sh" value={team.shots} />
-                          <StatChip label="xG" value={team.xg} />
-                          <StatChip label="Pass" value={team.passes} />
-                          <StatChip
-                            label="Acc"
-                            value={team.passAccuracy ? `${team.passAccuracy}%` : "n/a"}
-                          />
-                          <StatChip label="Car" value={team.carries} />
-                          <StatChip label="Drib" value={`${team.successfulDribbles}/${team.dribbles}`} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
                 <section className="data-card surface-muted match-detail-section" id="squads">
                   <div className="section-heading compact">
                     <h3>Squads & lineups</h3>
