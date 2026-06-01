@@ -1721,9 +1721,10 @@ h3 {
 
 .player-focus-metric-label {
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.25;
+  text-transform: none;
 }
 
 .player-focus-metric-caption,
@@ -1854,12 +1855,13 @@ h3 {
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 600;
   gap: 4px;
-  letter-spacing: 0.04em;
+  letter-spacing: normal;
+  line-height: 1.25;
   padding: 0;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .player-stat-sort.active {
@@ -2128,7 +2130,7 @@ h3 {
 }
 
 .match-detail-widget .stat-chip-grid {
-  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
 }
 
 .match-detail-widget .stat-chip span {

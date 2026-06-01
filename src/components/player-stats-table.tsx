@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { type PlayerStatRow } from "@/lib/player-stat-metrics";
+import { MATCH_STAT_LABELS, type PlayerStatRow } from "@/lib/player-stat-metrics";
 import { TeamLabel } from "@/components/team-label";
 
 export type { PlayerStatRow };
@@ -43,56 +43,56 @@ const COLUMNS: ColumnDef[] = [
   },
   {
     id: "goals",
-    label: "G",
+    label: MATCH_STAT_LABELS.goals,
     caption: "Goals in this match.",
     kind: "number",
     value: (row) => row.goals
   },
   {
     id: "assists",
-    label: "A",
+    label: MATCH_STAT_LABELS.assists,
     caption: "Assists in this match.",
     kind: "number",
     value: (row) => row.assists
   },
   {
     id: "shots",
-    label: "Sh",
+    label: MATCH_STAT_LABELS.shots,
     caption: "Shots in this match.",
     kind: "number",
     value: (row) => row.shots
   },
   {
     id: "xg",
-    label: "xG",
+    label: MATCH_STAT_LABELS.xg,
     caption: "Expected goals in this match.",
     kind: "number",
     value: (row) => row.xg
   },
   {
     id: "passes",
-    label: "Ps",
+    label: MATCH_STAT_LABELS.passes,
     caption: "Passes attempted.",
     kind: "number",
     value: (row) => row.passes
   },
   {
     id: "passAccuracy",
-    label: "Acc%",
+    label: MATCH_STAT_LABELS.passAccuracy,
     caption: "Pass completion % when tracked.",
     kind: "number",
     value: (row) => row.passAccuracy
   },
   {
     id: "carries",
-    label: "Car",
+    label: MATCH_STAT_LABELS.carries,
     caption: "Carries in this match.",
     kind: "number",
     value: (row) => row.carries
   },
   {
     id: "dribbles",
-    label: "Dr",
+    label: MATCH_STAT_LABELS.dribbles,
     caption: "Dribbles attempted.",
     kind: "number",
     value: (row) => row.dribbles
