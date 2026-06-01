@@ -374,20 +374,16 @@ export function FeedBrowser() {
   );
 }
 
+const CURRENT_KNOCKOUT_STAGES = [
+  "Round of 32",
+  "Round of 16",
+  "Quarter-finals",
+  "Semi-finals",
+  "Final"
+] as const;
+
 function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldCup | null }) {
-  const scheduleFixtures = useMemo(() => {
-    if (!currentWorldCup?.groups?.length) return [];
-    return currentWorldCup.groups
-      .flatMap((group) =>
-        group.fixtures.map((fixture) => ({
-          group: group.group,
-          homeTeam: fixture.homeTeam,
-          awayTeam: fixture.awayTeam,
-          date: fixture.date
-        }))
-      )
-      .sort((left, right) => (left.date ?? "").localeCompare(right.date ?? ""));
-  }, [currentWorldCup?.groups]);
+  const qualifiedCount = currentWorldCup?.qualifiedTeams.length ?? 0;
 
   return (
     <section className="current-world-cup-card">
@@ -404,67 +400,66 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
         <SummaryTile label="Teams" value={currentWorldCup?.summary.teams ?? "Unavailable"} />
         <SummaryTile label="Venues" value={currentWorldCup?.summary.venueCount ?? "Unavailable"} />
       </div>
-      {currentWorldCup?.qualifiedTeams.length ? (
-        <div className="qualified-team-list">
-          {currentWorldCup.qualifiedTeams.slice(0, 48).map((team) => (
-            <span className="qualified-team-pill" key={team}>
-              <TeamLabel name={team} size="xs" />
-            </span>
-          ))}
-        </div>
+
+      {qualifiedCount > 0 ? (
+        <details className="qualified-team-disclosure">
+          <summary>
+            {qualifiedCount} qualified {qualifiedCount === 1 ? "nation" : "nations"}
+          </summary>
+          <div className="qualified-team-list qualified-team-list--compact">
+            {currentWorldCup!.qualifiedTeams.map((team) => (
+              <span className="qualified-team-chip" key={team}>
+                {team}
+              </span>
+            ))}
+          </div>
+        </details>
       ) : (
         <p className="inline-status">Qualified-team table was not available from the public source.</p>
       )}
-      {currentWorldCup?.groups?.length ? (
-        <div className="current-group-grid">
-          {currentWorldCup.groups.map((group) => (
-            <article className="current-group-card" key={group.group}>
-              <h3>Group {group.group}</h3>
-              {group.teams.map((team) => (
-                <p key={`${group.group}-${team}`}>
-                  <TeamLabel name={team} size="xs" />
-                </p>
-              ))}
-              <div className="current-fixture-list">
-                {group.fixtures.slice(0, 6).map((fixture) => (
-                  <span className="fixture-teams" key={`${group.group}-${fixture.homeTeam}-${fixture.awayTeam}`}>
-                    <MatchTeamsLine awayTeam={fixture.awayTeam} homeTeam={fixture.homeTeam} size="xs" />
-                    {fixture.date ? ` · ${fixture.date}` : ""}
-                  </span>
-                ))}
-              </div>
-            </article>
+
+      <section className="bracket-tree-card surface-muted current-event-bracket" id="bracket">
+        <div className="section-heading compact">
+          <div>
+            <p className="eyebrow">Tournament path</p>
+            <h2>Route to the final</h2>
+            <p>Group columns list squads only. Knockout slots stay empty until live fixtures are connected.</p>
+          </div>
+        </div>
+        <div className="bracket-tree">
+          <div className="bracket-round bracket-round--groups">
+            <h3>Group stage</h3>
+            {currentWorldCup?.groups?.length ? (
+              currentWorldCup.groups.map((group) => (
+                <div className="bracket-cluster" key={group.group}>
+                  <h4>Group {group.group}</h4>
+                  <div className="bracket-cluster-teams">
+                    {group.teams.map((team) => (
+                      <div className="bracket-team-slot" key={`${group.group}-${team}`}>
+                        <TeamLabel name={team} size="xs" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <button className="bracket-tbd-slot" disabled type="button">
+                <strong>Groups A–L</strong>
+                <span>Loading from public feed</span>
+              </button>
+            )}
+          </div>
+          {CURRENT_KNOCKOUT_STAGES.map((stage) => (
+            <div className="bracket-round" key={stage}>
+              <h3>{stage}</h3>
+              <button className="bracket-tbd-slot" disabled type="button">
+                <strong>Pairings TBD</strong>
+                <span>{stage === "Final" ? "July 19, 2026" : "Live feed pending"}</span>
+              </button>
+            </div>
           ))}
         </div>
-      ) : null}
-
-      {scheduleFixtures.length ? (
-        <section className="data-card surface-muted current-schedule-card">
-          <div className="section-heading compact">
-            <div>
-              <p className="eyebrow">Group stage schedule</p>
-              <h2>Published fixtures from public feed</h2>
-              <p>{scheduleFixtures.length} fixtures across groups A–L (sample from Wikipedia infobox).</p>
-            </div>
-          </div>
-          <div className="current-schedule-grid">
-            {scheduleFixtures.map((fixture) => (
-              <article
-                className="current-schedule-item"
-                key={`${fixture.group}-${fixture.homeTeam}-${fixture.awayTeam}-${fixture.date ?? "tbd"}`}
-              >
-                <span className="current-schedule-group">Group {fixture.group}</span>
-                <MatchTeamsLine awayTeam={fixture.awayTeam} homeTeam={fixture.homeTeam} size="sm" />
-                <span className="current-schedule-date">{fixture.date ?? "Date TBD"}</span>
-              </article>
-            ))}
-          </div>
-          <p className="inline-status">
-            Knockout bracket slots will populate from API-Football when the worker is active; no fabricated
-            knockout pairings are shown.
-          </p>
-        </section>
-      ) : null}
+      </section>
     </section>
   );
 }

@@ -1016,6 +1016,51 @@ h3 {
   padding: 6px 10px;
 }
 
+.qualified-team-disclosure {
+  margin: 0 0 16px;
+}
+
+.qualified-team-disclosure summary {
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  list-style: none;
+  user-select: none;
+}
+
+.qualified-team-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.qualified-team-disclosure summary::before {
+  content: "▸ ";
+}
+
+.qualified-team-disclosure[open] summary::before {
+  content: "▾ ";
+}
+
+.qualified-team-list--compact {
+  gap: 4px;
+  margin-top: 8px;
+  max-height: 112px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.qualified-team-chip {
+  background: color-mix(in srgb, var(--color-brand) 8%, var(--color-bg));
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  padding: 2px 7px;
+}
+
 .current-group-grid {
   display: grid;
   gap: 12px;
@@ -1211,6 +1256,53 @@ h3 {
 .bracket-round button.selected {
   border-color: var(--color-brand);
   box-shadow: var(--shadow-elevation-2), inset 0 0 0 1px var(--color-brand);
+}
+
+.current-event-bracket {
+  margin-top: 4px;
+}
+
+.current-event-bracket .bracket-round--groups {
+  max-width: 220px;
+  min-width: 200px;
+}
+
+.bracket-cluster-teams {
+  display: grid;
+  gap: 4px;
+}
+
+.bracket-team-slot {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 5px 8px;
+}
+
+.bracket-tbd-slot {
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+  display: grid;
+  font: inherit;
+  gap: 6px;
+  line-height: 1.35;
+  min-height: 76px;
+  opacity: 0.92;
+  padding: 12px 14px;
+  text-align: left;
+  width: 100%;
+}
+
+.bracket-tbd-slot strong {
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.bracket-tbd-slot span {
+  font-size: 12px;
 }
 
 .feed-list,
