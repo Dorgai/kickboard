@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { buildKnockoutBracket } from "@/lib/world-cup-bracket";
 import { getMatches, getWorldCupCompetitions } from "@/lib/statsbomb";
-
-const STAGE_ORDER = [
-  "Round of 16",
-  "Quarter-finals",
-  "Semi-finals",
-  "3rd Place Final",
-  "Final"
-];
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,26 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     const matches = await getMatches(competitionId, seasonId);
-    const knockoutMatches = matches
-      .filter((match) => {
-        const stage = match.competition_stage?.name ?? "";
-        return stage && stage !== "Group Stage";
-      })
-      .map((match) => ({
-        matchId: match.match_id,
-        date: match.match_date,
-        stage: match.competition_stage?.name ?? "Unknown",
-        homeTeam: match.home_team.home_team_name,
-        awayTeam: match.away_team.away_team_name,
-        homeScore: match.home_score,
-        awayScore: match.away_score,
-        stadium: match.stadium?.name ?? null
-      }));
-
-    const rounds = STAGE_ORDER.map((stage) => ({
-      stage,
-      matches: knockoutMatches.filter((match) => match.stage === stage)
-    })).filter((round) => round.matches.length > 0);
+    const rounds = buildKnockoutBracket(matches);
 
     return NextResponse.json(
       {

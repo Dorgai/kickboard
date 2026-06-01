@@ -67,9 +67,16 @@ type MatchDetail = {
   playerStats: PlayerStat[];
 };
 
+type BracketCluster = {
+  label: string;
+  groups: [string, string];
+  matches: Match[];
+};
+
 type BracketRound = {
   stage: string;
   matches: Match[];
+  clusters?: BracketCluster[];
 };
 
 type CurrentWorldCup = {
@@ -476,23 +483,32 @@ function PastEventsPanel({
           {bracketRounds.map((round) => (
             <div className="bracket-round" key={round.stage}>
               <h3>{round.stage}</h3>
-              {round.matches.map((match) => (
-                <button
-                  className={selectedMatchId === match.matchId ? "selected" : ""}
-                  key={match.matchId}
-                  type="button"
-                  onClick={() => selectMatch(match.matchId)}
-                >
-                  <MatchTeamsLine
-                    awayScore={match.awayScore}
-                    awayTeam={match.awayTeam}
-                    homeScore={match.homeScore}
-                    homeTeam={match.homeTeam}
-                    size="xs"
+              {round.clusters?.length ? (
+                round.clusters.map((cluster) => (
+                  <div className="bracket-cluster" key={cluster.groups.join("-")}>
+                    <h4>{cluster.label}</h4>
+                    <div className="bracket-cluster-matches">
+                      {cluster.matches.map((match) => (
+                        <BracketMatchButton
+                          key={match.matchId}
+                          match={match}
+                          selectedMatchId={selectedMatchId}
+                          onSelect={selectMatch}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                round.matches.map((match) => (
+                  <BracketMatchButton
+                    key={match.matchId}
+                    match={match}
+                    selectedMatchId={selectedMatchId}
+                    onSelect={selectMatch}
                   />
-                  <span>{match.date}</span>
-                </button>
-              ))}
+                ))
+              )}
             </div>
           ))}
         </div>
@@ -654,6 +670,33 @@ function PastEventsPanel({
         </div>
       </section>
     </>
+  );
+}
+
+function BracketMatchButton({
+  match,
+  onSelect,
+  selectedMatchId
+}: {
+  match: Match;
+  onSelect: (matchId: number) => void;
+  selectedMatchId: number | null;
+}) {
+  return (
+    <button
+      className={selectedMatchId === match.matchId ? "selected" : ""}
+      type="button"
+      onClick={() => onSelect(match.matchId)}
+    >
+      <MatchTeamsLine
+        awayScore={match.awayScore}
+        awayTeam={match.awayTeam}
+        homeScore={match.homeScore}
+        homeTeam={match.homeTeam}
+        size="xs"
+      />
+      <span>{match.date}</span>
+    </button>
   );
 }
 
