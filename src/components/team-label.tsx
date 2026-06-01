@@ -83,7 +83,9 @@ export function MatchTeamsLine({
   const hasScore = homeScore !== undefined && awayScore !== undefined;
 
   return (
-    <span className={`match-teams-line match-teams-line-${layout} ${className}`.trim()}>
+    <span
+      className={`match-teams-line${layout === "stacked" ? " match-teams-line-stacked" : ""} ${className}`.trim()}
+    >
       <TeamLabel name={homeTeam} size={size} />
       {hasScore ? <span className="match-score-pill">{homeScore}–{awayScore}</span> : null}
       <TeamLabel name={awayTeam} size={size} />

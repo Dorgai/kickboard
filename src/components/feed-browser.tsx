@@ -698,6 +698,7 @@ function PastEventsPanel({
                         match={match}
                         selectedMatchId={selectedMatchId}
                         showDate={false}
+                        teamsLayout="stacked"
                         onSelect={selectMatch}
                       />
                     ))}
@@ -738,7 +739,9 @@ function PastEventsPanel({
                 <div className="feed-list compact-list match-list-grid">
                   {filteredMatches.map((match) => (
                     <button
-                      className={`match-fixture-btn${selectedMatchId === match.matchId ? " selected" : ""}`}
+                      className={`match-fixture-btn match-fixture-btn--teams-stacked${
+                        selectedMatchId === match.matchId ? " selected" : ""
+                      }`}
                       key={match.matchId}
                       type="button"
                       onClick={() => selectMatch(match.matchId)}
@@ -748,7 +751,7 @@ function PastEventsPanel({
                         awayTeam={match.awayTeam}
                         homeScore={match.homeScore}
                         homeTeam={match.homeTeam}
-                        layout="inline"
+                        layout="stacked"
                         size="xs"
                       />
                       <span>
@@ -824,6 +827,7 @@ function PastEventsPanel({
                       }
                       match={match}
                       selectedMatchId={selectedMatchId}
+                      teamsLayout="stacked"
                       onSelect={selectMatch}
                     />
                   ))}
@@ -945,17 +949,19 @@ function BracketMatchButton({
   match,
   onSelect,
   selectedMatchId,
-  showDate = true
+  showDate = true,
+  teamsLayout = "inline"
 }: {
   clusterLabel?: string;
   match: Match;
   onSelect: (matchId: number) => void;
   selectedMatchId: number | null;
   showDate?: boolean;
+  teamsLayout?: "inline" | "stacked";
 }) {
   return (
     <button
-      className={`match-fixture-btn match-fixture-btn--compact${
+      className={`match-fixture-btn match-fixture-btn--compact match-fixture-btn--teams-${teamsLayout}${
         clusterLabel ? " match-fixture-btn--with-cluster" : ""
       }${selectedMatchId === match.matchId ? " selected" : ""}`}
       title={[clusterLabel, match.date, match.stadium].filter(Boolean).join(" · ")}
@@ -969,7 +975,7 @@ function BracketMatchButton({
           awayTeam={match.awayTeam}
           homeScore={match.homeScore}
           homeTeam={match.homeTeam}
-          layout="inline"
+          layout={teamsLayout}
           size="xs"
         />
       </span>
