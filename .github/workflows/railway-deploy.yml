@@ -49,9 +49,9 @@ jobs:
             exit 1
           fi
           npm install -g @railway/cli
+          SERVICE_NAME=$(node -e "console.log(JSON.parse(require('fs').readFileSync('deploy/railway.project.json','utf8')).serviceName)")
           DEPLOY_ARGS=(--detach)
           # Project tokens cannot call `railway project list`; they deploy via RAILWAY_TOKEN alone.
-          # Optional secrets override when you have multiple services or use an account token flow.
           if [ -n "${{ secrets.RAILWAY_PROJECT_ID }}" ] && [ -n "${{ secrets.RAILWAY_SERVICE_ID }}" ]; then
             DEPLOY_ARGS+=(--project "${{ secrets.RAILWAY_PROJECT_ID }}" --service "${{ secrets.RAILWAY_SERVICE_ID }}" --environment production)
             echo "Deploying with RAILWAY_PROJECT_ID + RAILWAY_SERVICE_ID."
@@ -59,7 +59,8 @@ jobs:
             DEPLOY_ARGS+=(--service "${{ secrets.RAILWAY_SERVICE_ID }}")
             echo "Deploying with RAILWAY_SERVICE_ID."
           else
-            echo "Deploying with kickboard project token (scoped to production)."
+            DEPLOY_ARGS+=(--service "$SERVICE_NAME")
+            echo "Deploying service \"$SERVICE_NAME\" with project token (production scope)."
           fi
           railway up "${DEPLOY_ARGS[@]}"
 

@@ -13,8 +13,8 @@ echo "Uploading workspace to kickboard production..."
 if [ -n "${RAILWAY_PROJECT_ID:-}" ] && [ -n "${RAILWAY_SERVICE_ID:-}" ]; then
   railway_cli up --detach "${RAILWAY_TARGET_ARGS[@]}"
 else
-  # Project tokens are scoped to one project/environment; no project list needed.
-  railway_cli up --detach
+  SERVICE_NAME=$(node -e "console.log(JSON.parse(require('fs').readFileSync('deploy/railway.project.json','utf8')).serviceName)")
+  railway_cli up --detach --service "$SERVICE_NAME"
 fi
 
 if [ "${VERIFY_DEPLOY:-1}" = "1" ]; then
