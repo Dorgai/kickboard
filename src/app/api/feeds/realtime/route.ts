@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
+import { fetchApiFootball, getApiFootballConfig, type ApiFootballFixture } from "@/lib/api-football";
 
 export const dynamic = "force-dynamic";
 
-export function GET() {
-  const keyConfigured = Boolean(process.env.API_FOOTBALL_KEY);
-  const workerEnabled = process.env.KICKBOARD_WORKER_ENABLED === "true";
+export async function GET() {
+  const { keyConfigured, workerEnabled } = getApiFootballConfig();
 
   if (!keyConfigured || !workerEnabled) {
     return NextResponse.json(
@@ -15,24 +15,40 @@ export function GET() {
         workerEnabled,
         requiredRailwayVariables: ["API_FOOTBALL_KEY", "KICKBOARD_WORKER_ENABLED=true"],
         message:
-          "Real-time data is not connected yet. The app is using demo data until API-Football credentials and the worker service are configured."
+          "Real-time data is not connected yet. Configure API-Football credentials and the worker service; Kickboard will not fabricate live data."
       },
       { status: 503 }
     );
   }
 
-  return NextResponse.json({
-    connected: true,
-    provider: "API-Football",
-    mode: "adaptive polling",
-    pollingCadence: {
-      preKickoff72h: "once",
-      preKickoff60m: "10m",
-      live: "60s",
-      halfTime: "2m",
-      extraTimeOrPenalties: "30s",
-      fullTimePlus30m: "5m",
-      nextDay: "once"
-    }
-  });
+  try {
+    const liveFixtures = await fetchApiFootball<ApiFootballFixture[]>("/fixtures", { live: "all" });
+
+    return NextResponse.json({
+      connected: true,
+      provider: "API-Football",
+      mode: "adaptive polling",
+      results: liveFixtures.results,
+      fixtures: liveFixtures.response.map((fixture) => ({
+        fixtureId: fixture.fixture.id,
+        date: fixture.fixture.date,
+        status: fixture.fixture.status,
+        league: fixture.league.name,
+        season: fixture.league.season,
+        homeTeam: fixture.teams.home.name,
+        awayTeam: fixture.teams.away.name,
+        homeGoals: fixture.goals.home,
+        awayGoals: fixture.goals.away
+      }))
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        connected: false,
+        provider: "API-Football",
+        error: error instanceof Error ? error.message : "Unknown API-Football error"
+      },
+      { status: 502 }
+    );
+  }
 }

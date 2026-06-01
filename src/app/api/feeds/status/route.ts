@@ -28,7 +28,7 @@ export function GET() {
           message:
             hasApiFootballKey && workerEnabled
               ? "Real-time feed is configured."
-              : "Real-time feed is not active. Configure API_FOOTBALL_KEY and run the worker service."
+              : "Real-time feed is not active. Configure API_FOOTBALL_KEY and run the worker service. No fallback live data is shown."
         },
         storage: {
           postgres: hasDatabase,

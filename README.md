@@ -10,8 +10,9 @@ The initial implementation is intentionally focused on safe foundations:
 - Starter PostgreSQL schema based on the uploaded data model
 - Product safety guardrails for child accounts, predictions, wallet points and moderation
 - Gap closure docs for data ingestion, widget isolation, portraits, legal language, and stat-card sharing
-- Curated demo data rendered on the homepage and exposed at `/api/demo`
-- Interactive demo controls for prediction entry, tactical voting, fixture filtering, scorer sorting, leaderboard sorting, squad search, and feed-status checks
+- Homepage data is read from feed endpoints only; no fabricated match, table, squad, leaderboard, or profile data is rendered.
+- StatsBomb historical feed browser with World Cup seasons, matches, and event timelines.
+- API-Football real-time endpoint and worker foundation; it stays unavailable until provider credentials are configured.
 
 ## Run locally
 
@@ -58,7 +59,23 @@ Details are in [`docs/railway-services.md`](docs/railway-services.md).
 
 - `/api/feeds/status` - reports which feeds and infrastructure variables are actually configured.
 - `/api/feeds/historical` - checks the public StatsBomb Open Data competitions feed.
+- `/api/feeds/historical/matches` - reads matches for a StatsBomb competition/season.
+- `/api/feeds/historical/events` - reads event-level data for a StatsBomb match.
 - `/api/feeds/realtime` - reports API-Football worker readiness. This remains inactive until `API_FOOTBALL_KEY` and a running worker service are configured.
+
+## Worker
+
+Run the API-Football worker with:
+
+```bash
+npm run worker:api-football
+```
+
+Required variables:
+
+- `REDIS_URL`
+- `API_FOOTBALL_KEY`
+- `KICKBOARD_WORKER_ENABLED=true` on the web service when the worker is live
 
 ## Important safety constraints
 
