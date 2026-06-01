@@ -1,0 +1,22 @@
+[project]
+name = "kickboard"
+version = "0.1.0"
+description = "Railway-ready FastAPI starter for the Kickboard app."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "psycopg[binary]",
+    "sqlalchemy",
+    "uvicorn[standard]",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx",
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
