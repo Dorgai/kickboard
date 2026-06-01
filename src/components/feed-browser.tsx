@@ -102,7 +102,6 @@ type CurrentWorldCup = {
 };
 
 type EventTab = "current" | "past";
-type StageFilter = "all" | "group" | "knockout";
 
 const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "community", "analytics"]);
 
@@ -125,7 +124,6 @@ export function FeedBrowser() {
   const [matchSearch, setMatchSearch] = useState("");
   const [lineupSearch, setLineupSearch] = useState("");
   const [showMatchesList, setShowMatchesList] = useState(false);
-  const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -279,12 +277,9 @@ export function FeedBrowser() {
       const matchesSearch = `${match.homeTeam} ${match.awayTeam} ${match.stage ?? ""}`
         .toLowerCase()
         .includes(query);
-      if (!matchesSearch) return false;
-      if (stageFilter === "group") return match.stage === "Group Stage";
-      if (stageFilter === "knockout") return Boolean(match.stage && match.stage !== "Group Stage");
-      return true;
+      return matchesSearch;
     });
-  }, [matchSearch, matches, stageFilter]);
+  }, [matchSearch, matches]);
 
   const groupStageMatches = useMemo(
     () => matches.filter((match) => match.stage === "Group Stage"),
@@ -348,7 +343,6 @@ export function FeedBrowser() {
           filteredMatches={filteredMatches}
           groupStageMatches={groupStageMatches}
           matches={matches}
-          stageFilter={stageFilter}
           lineupSearch={lineupSearch}
           matchDetail={matchDetail}
           matchSearch={matchSearch}
@@ -363,7 +357,6 @@ export function FeedBrowser() {
           setSelectedCompetition={setSelectedCompetition}
           setSelectedMatchId={setSelectedMatchId}
           setSelectedPlayerId={setSelectedPlayerId}
-          setStageFilter={setStageFilter}
           competitionId={selectedCompetitionParts.competitionId}
           seasonId={selectedCompetitionParts.seasonId}
           competitionLabel={selectedCompetitionLabel}
@@ -502,7 +495,6 @@ type PastEventsPanelProps = {
   matchDetail: MatchDetail | null;
   matchSearch: string;
   showMatchesList: boolean;
-  stageFilter: StageFilter;
   selectedCompetition: string;
   selectedMatch: Match | undefined;
   selectedMatchId: number | null;
@@ -513,7 +505,6 @@ type PastEventsPanelProps = {
   setSelectedCompetition: (value: string) => void;
   setSelectedMatchId: (value: number) => void;
   setSelectedPlayerId: (value: number | null) => void;
-  setStageFilter: (value: StageFilter) => void;
   competitionId: number;
   seasonId: number;
   competitionLabel: string;
@@ -529,7 +520,6 @@ function PastEventsPanel({
   matchDetail,
   matchSearch,
   showMatchesList,
-  stageFilter,
   selectedCompetition,
   selectedMatch,
   selectedMatchId,
@@ -540,7 +530,6 @@ function PastEventsPanel({
   setSelectedCompetition,
   setSelectedMatchId,
   setSelectedPlayerId,
-  setStageFilter,
   competitionId,
   seasonId,
   competitionLabel
@@ -661,51 +650,22 @@ function PastEventsPanel({
 
   return (
     <>
-      <section className="feed-control-card surface-muted">
-        <label>
-          Historical World Cup
-          <select value={selectedCompetition} onChange={(event) => setSelectedCompetition(event.target.value)}>
-            {competitions.map((competition) => (
-              <option
-                key={`${competition.competitionId}:${competition.seasonId}`}
-                value={`${competition.competitionId}:${competition.seasonId}`}
-              >
-                {competition.name} {competition.season} ({competition.gender})
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="stage-filter-bar" role="group" aria-label="Match stage filter">
-          {(
-            [
-              ["all", "All stages"],
-              ["group", "Group stage"],
-              ["knockout", "Knockout"]
-            ] as const
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              className={stageFilter === value ? "active" : ""}
-              type="button"
-              onClick={() => setStageFilter(value)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </section>
-
       <div className="knockout-workspace" id="group-stage">
         <section className="bracket-tree-card surface-muted" id="bracket">
           <div className="section-heading compact">
-            <div>
-              <p className="eyebrow">Knockout tree</p>
-              <h2>Route to the final</h2>
-              <p>
-                Pick a stage tab below, then a fixture — match details open in the panel beside it
-                without scrolling the page.
-              </p>
-            </div>
+            <label className="bracket-competition-picker">
+              Tournament
+              <select value={selectedCompetition} onChange={(event) => setSelectedCompetition(event.target.value)}>
+                {competitions.map((competition) => (
+                  <option
+                    key={`${competition.competitionId}:${competition.seasonId}`}
+                    value={`${competition.competitionId}:${competition.seasonId}`}
+                  >
+                    {competition.name} {competition.season} ({competition.gender})
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               className="button secondary"
               type="button"
