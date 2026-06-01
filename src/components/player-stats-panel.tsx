@@ -5,6 +5,7 @@ import {
   formatPlayerMetric,
   PLAYER_CAREER_METRICS,
   PLAYER_MATCH_METRICS,
+  PLAYER_THIS_MATCH_LABELS,
   type CareerAppearance,
   type PlayerStatRow
 } from "@/lib/player-stat-metrics";
@@ -120,7 +121,7 @@ export function PlayerStatsPanel({
         <div>
           <h3>Player stats</h3>
           <p className="player-stats-summary player-stats-summary--caption">
-            Select a player in the lineup above. This panel shows that player&apos;s match line only.
+            Select a player in Squads &amp; lineups. This panel shows that player&apos;s match line only.
           </p>
         </div>
         {selectedPlayerId ? (
@@ -152,12 +153,13 @@ export function PlayerStatsPanel({
                 </p>
               </div>
             </header>
-            <div className="player-focus-metrics">
+            <div className="player-focus-metrics player-focus-metrics--this-match">
               {PLAYER_MATCH_METRICS.map((metric) => (
                 <div className="player-focus-metric" key={metric.id}>
                   <span className="player-focus-metric-value">{metric.format(selectedPlayer)}</span>
-                  <span className="player-focus-metric-label">{metric.label}</span>
-                  <span className="player-focus-metric-caption">{metric.caption}</span>
+                  <span className="player-focus-metric-label">
+                    {PLAYER_THIS_MATCH_LABELS[metric.id]}
+                  </span>
                 </div>
               ))}
             </div>
@@ -169,7 +171,7 @@ export function PlayerStatsPanel({
                 <p className="eyebrow">Tournament record</p>
                 <h4>{competitionLabel}</h4>
                 <p className="player-stats-summary player-stats-summary--caption">
-                  Other matches in this World Cup from StatsBomb lineups and events (excluding this fixture).
+                  Other matches in this tournament, excluding this game.
                 </p>
               </div>
             </div>
@@ -186,10 +188,8 @@ export function PlayerStatsPanel({
                     <div className="player-career-totals">
                       <div className="player-focus-metric player-focus-metric--compact">
                         <span className="player-focus-metric-value">{career.totals.appearances}</span>
-                        <span className="player-focus-metric-label">Apps</span>
-                        <span className="player-focus-metric-caption">
-                          Other tournament matches in the lineup for this competition.
-                        </span>
+                        <span className="player-focus-metric-label">Matches</span>
+                        <span className="player-focus-metric-caption">Other matches played</span>
                       </div>
                       {PLAYER_CAREER_METRICS.map((metric) => (
                         <div className="player-focus-metric player-focus-metric--compact" key={metric.id}>
@@ -197,10 +197,7 @@ export function PlayerStatsPanel({
                             {formatPlayerMetric(metric.id, career.totals)}
                           </span>
                           <span className="player-focus-metric-label">{metric.label}</span>
-                          <span className="player-focus-metric-caption">
-                            Season total across {career.totals.appearances} other{" "}
-                            {career.totals.appearances === 1 ? "match" : "matches"}.
-                          </span>
+                          <span className="player-focus-metric-caption">Total in other matches</span>
                         </div>
                       ))}
                     </div>
@@ -209,19 +206,19 @@ export function PlayerStatsPanel({
                       <div className="player-career-row player-career-row--head" role="row">
                         <span role="columnheader">
                           Date
-                          <span className="player-career-col-caption">Kickoff date (UTC) from StatsBomb.</span>
+                          <span className="player-career-col-caption">Match date</span>
                         </span>
                         <span role="columnheader">
                           Stage
-                          <span className="player-career-col-caption">Competition stage label.</span>
+                          <span className="player-career-col-caption">Stage</span>
                         </span>
                         <span role="columnheader">
                           Opponent
-                          <span className="player-career-col-caption">Opposing national team in that match.</span>
+                          <span className="player-career-col-caption">Opponent</span>
                         </span>
                         <span role="columnheader">
                           Score
-                          <span className="player-career-col-caption">Final score when data is present.</span>
+                          <span className="player-career-col-caption">Result</span>
                         </span>
                         {PLAYER_CAREER_METRICS.map((metric) => (
                           <span key={metric.id} role="columnheader">
