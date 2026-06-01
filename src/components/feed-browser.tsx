@@ -471,6 +471,12 @@ function PastEventsPanel({
   function selectMatch(matchId: number) {
     setSelectedMatchId(matchId);
     setSelectedPlayerId(null);
+    window.requestAnimationFrame(() => {
+      document.getElementById("match-detail-panel")?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+      });
+    });
   }
 
   return (
@@ -494,58 +500,59 @@ function PastEventsPanel({
         </a>
       </section>
 
-      <section className="bracket-tree-card surface-muted" id="bracket">
-        <div className="section-heading compact">
-          <div>
-            <p className="eyebrow">Knockout tree</p>
-            <h2>Route to the final</h2>
-            <p>Select a match to view team stats, squads, and lineups.</p>
-          </div>
-          <button
-            className="button secondary"
-            type="button"
-            aria-pressed={showMatchesList}
-            onClick={() => setShowMatchesList(!showMatchesList)}
-          >
-            {showMatchesList ? "Hide match list" : "Show full match list"}
-          </button>
-        </div>
-        <div className="bracket-tree">
-          {bracketRounds.map((round) => (
-            <div className="bracket-round" key={round.stage}>
-              <h3>{round.stage}</h3>
-              {round.clusters?.length ? (
-                round.clusters.map((cluster) => (
-                  <div className="bracket-cluster" key={cluster.groups.join("-")}>
-                    <h4>{cluster.label}</h4>
-                    <div className="bracket-cluster-matches">
-                      {cluster.matches.map((match) => (
-                        <BracketMatchButton
-                          key={match.matchId}
-                          match={match}
-                          selectedMatchId={selectedMatchId}
-                          onSelect={selectMatch}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                round.matches.map((match) => (
-                  <BracketMatchButton
-                    key={match.matchId}
-                    match={match}
-                    selectedMatchId={selectedMatchId}
-                    onSelect={selectMatch}
-                  />
-                ))
-              )}
+      <div className="knockout-workspace">
+        <section className="bracket-tree-card surface-muted" id="bracket">
+          <div className="section-heading compact">
+            <div>
+              <p className="eyebrow">Knockout tree</p>
+              <h2>Route to the final</h2>
+              <p>Select a match — details appear in the panel beside (desktop) or below (mobile).</p>
             </div>
-          ))}
-        </div>
-      </section>
+            <button
+              className="button secondary"
+              type="button"
+              aria-pressed={showMatchesList}
+              onClick={() => setShowMatchesList(!showMatchesList)}
+            >
+              {showMatchesList ? "Hide match list" : "Show full match list"}
+            </button>
+          </div>
+          <div className="bracket-tree">
+            {bracketRounds.map((round) => (
+              <div className="bracket-round" key={round.stage}>
+                <h3>{round.stage}</h3>
+                {round.clusters?.length ? (
+                  round.clusters.map((cluster) => (
+                    <div className="bracket-cluster" key={cluster.groups.join("-")}>
+                      <h4>{cluster.label}</h4>
+                      <div className="bracket-cluster-matches">
+                        {cluster.matches.map((match) => (
+                          <BracketMatchButton
+                            key={match.matchId}
+                            match={match}
+                            selectedMatchId={selectedMatchId}
+                            onSelect={selectMatch}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  round.matches.map((match) => (
+                    <BracketMatchButton
+                      key={match.matchId}
+                      match={match}
+                      selectedMatchId={selectedMatchId}
+                      onSelect={selectMatch}
+                    />
+                  ))
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <section className={`match-explorer${showMatchesList ? "" : " match-explorer--detail-only"}`}>
+        <section className={`match-explorer${showMatchesList ? "" : " match-explorer--detail-only"}`}>
         {showMatchesList ? (
           <article className="data-card surface-muted match-explorer-list">
             <div className="section-heading compact">
@@ -588,11 +595,11 @@ function PastEventsPanel({
           </article>
         ) : null}
 
-        <div className="match-explorer-detail">
+        <div className="match-explorer-detail" id="match-detail-panel">
           {!selectedMatch ? (
             <article className="data-card surface-flat match-placeholder">
               <h2>Select a match</h2>
-              <p>Pick a fixture in the knockout tree above to view team stats, squads, and lineups.</p>
+              <p>Pick a fixture in the knockout tree to view team stats, squads, and lineups here.</p>
             </article>
           ) : (
             <>
@@ -701,7 +708,8 @@ function PastEventsPanel({
             </>
           )}
         </div>
-      </section>
+        </section>
+      </div>
 
       <section className="data-card surface-flat section-anchor" id="community">
         <h2>Community</h2>
