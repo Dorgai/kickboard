@@ -1108,7 +1108,7 @@ h3 {
 
 .bracket-cluster h4 {
   color: var(--color-text-secondary);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.05em;
   margin: 0;
@@ -1129,11 +1129,20 @@ h3 {
   cursor: pointer;
   display: grid;
   font-size: 14px;
-  gap: 8px;
+  gap: 10px;
   line-height: 1.35;
-  min-height: 76px;
+  min-height: 88px;
   padding: 12px 14px;
   text-align: left;
+}
+
+.bracket-round button .match-teams-line-stacked {
+  gap: 8px;
+  width: 100%;
+}
+
+.bracket-round button .team-label {
+  max-width: 100%;
 }
 
 .bracket-round button > span:last-child {

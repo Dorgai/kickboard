@@ -682,7 +682,7 @@ function PastEventsPanel({
                                   onClick={() => setSelectedPlayerId(player.playerId)}
                                 >
                                   <span>{player.jerseyNumber ?? "–"}</span>
-                                  <TeamLabel countryHint={player.country} name={player.name} size="xs" />
+                                  <TeamLabel countryHint={player.country} name={player.name} size="sm" />
                                 </button>
                               ))}
                             </div>
@@ -743,7 +743,8 @@ function BracketMatchButton({
         awayTeam={match.awayTeam}
         homeScore={match.homeScore}
         homeTeam={match.homeTeam}
-        size="xs"
+        layout="stacked"
+        size="sm"
       />
       <span>{match.date}</span>
     </button>
