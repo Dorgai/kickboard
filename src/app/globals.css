@@ -1346,9 +1346,6 @@ h3 {
       minmax(300px, 1.05fr);
   }
 
-  .knockout-widgets-row--with-squads .match-detail-widget .match-focus-team-stats {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .match-fixtures-widget,
@@ -1417,20 +1414,59 @@ h3 {
   margin: 0;
 }
 
-.match-focus-team-stats {
+.match-team-stats-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin-top: 4px;
+  min-width: 0;
 }
 
-@media (min-width: 720px) {
-  .match-focus-team-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.match-team-stats-grid-row {
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  column-gap: 10px;
+  display: grid;
+  font-size: 12px;
+  line-height: 1.35;
+  min-height: 28px;
+  padding: 5px 0;
 }
 
-.match-focus-team-stats .team-stat-card {
-  margin: 0;
+.match-team-stats-grid-row--head {
+  border-bottom-width: 2px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  min-height: 32px;
+  padding-bottom: 6px;
+}
+
+.match-team-stats-grid-stat {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  min-width: 0;
+  padding-right: 4px;
+}
+
+.match-team-stats-grid-row--head .match-team-stats-grid-stat {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.match-team-stats-grid-team {
+  justify-self: end;
+  min-width: 0;
+  text-align: right;
+}
+
+.match-team-stats-grid-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  justify-self: end;
+  text-align: right;
 }
 
 .match-player-stats-column,
@@ -2279,18 +2315,6 @@ h3 {
 
 .stat-chip strong {
   font-size: 15px;
-}
-
-.match-detail-widget .stat-chip-grid {
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-}
-
-.match-detail-widget .stat-chip span {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: normal;
-  line-height: 1.25;
-  text-transform: none;
 }
 
 .lineup-grid.compact {
