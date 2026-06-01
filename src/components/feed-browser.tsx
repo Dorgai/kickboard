@@ -901,7 +901,9 @@ function PastEventsPanel({
                     <div className="section-heading compact match-lineups-heading">
                       <div>
                         <h3>Lineups</h3>
-                        <p className="match-lineups-note">Starting XI, substitutes, unused</p>
+                        <p className="match-lineups-note">
+                          Grouped by role, then defence, midfield, and attack
+                        </p>
                       </div>
                       <input
                         aria-label="Search lineup"

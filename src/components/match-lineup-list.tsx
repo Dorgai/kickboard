@@ -1,3 +1,8 @@
+import {
+  LINEUP_POSITION_GROUP_LABELS,
+  LINEUP_POSITION_GROUP_ORDER,
+  type LineupPositionGroup
+} from "@/lib/lineup-position-groups";
 import { LINEUP_ROLE_LABELS, LINEUP_ROLE_ORDER, type LineupRole } from "@/lib/lineup-roles";
 import { TeamLabel } from "@/components/team-label";
 
@@ -7,6 +12,8 @@ export type MatchLineupPlayer = {
   jerseyNumber: number | null;
   country: string | null;
   lineupRole: LineupRole;
+  position: string | null;
+  positionGroup: LineupPositionGroup;
 };
 
 export type MatchLineupTeam = {
@@ -57,21 +64,34 @@ export function MatchLineupList({
             return (
               <div className="lineup-role-group" key={`${team.teamName}-${role}`}>
                 <p className="lineup-role-label">{LINEUP_ROLE_LABELS[role]}</p>
-                <div className="lineup-list">
-                  {players.map((player) => (
-                    <button
-                      className={`lineup-row lineup-row--${role}${
-                        selectedPlayerId === player.playerId ? " selected" : ""
-                      }`}
-                      key={`${team.teamName}-${player.playerId}`}
-                      type="button"
-                      onClick={() => onSelectPlayer(player.playerId)}
-                    >
-                      <span>{player.jerseyNumber ?? "–"}</span>
-                      <span className="lineup-row-name">{player.name}</span>
-                    </button>
-                  ))}
-                </div>
+                {LINEUP_POSITION_GROUP_ORDER.map((group) => {
+                  const groupPlayers = sortByJersey(
+                    players.filter((player) => player.positionGroup === group)
+                  );
+                  if (!groupPlayers.length) return null;
+
+                  return (
+                    <div className="lineup-position-group" key={`${team.teamName}-${role}-${group}`}>
+                      <p className="lineup-position-label">{LINEUP_POSITION_GROUP_LABELS[group]}</p>
+                      <div className="lineup-list">
+                        {groupPlayers.map((player) => (
+                          <button
+                            className={`lineup-row lineup-row--${role}${
+                              selectedPlayerId === player.playerId ? " selected" : ""
+                            }`}
+                            key={`${team.teamName}-${player.playerId}`}
+                            title={player.position ?? undefined}
+                            type="button"
+                            onClick={() => onSelectPlayer(player.playerId)}
+                          >
+                            <span>{player.jerseyNumber ?? "–"}</span>
+                            <span className="lineup-row-name">{player.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             );
           })}

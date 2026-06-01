@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { classifyLineupRole } from "@/lib/lineup-roles";
+import {
+  lineupPositionGroupFromSegments,
+  primaryLineupPosition
+} from "@/lib/lineup-position-groups";
 import { buildMatchStats, getEvents, getLineups } from "@/lib/statsbomb";
 
 export async function GET(request: NextRequest) {
@@ -26,7 +30,9 @@ export async function GET(request: NextRequest) {
             fullName: player.player_name,
             jerseyNumber: player.jersey_number ?? null,
             country: player.country?.name ?? null,
-            lineupRole: classifyLineupRole(player.positions)
+            lineupRole: classifyLineupRole(player.positions),
+            position: primaryLineupPosition(player.positions),
+            positionGroup: lineupPositionGroupFromSegments(player.positions)
           }))
         })),
         teamStats: stats.teamStats,
