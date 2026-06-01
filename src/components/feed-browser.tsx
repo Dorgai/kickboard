@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
   competitionId: number;
@@ -335,7 +336,9 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
       {currentWorldCup?.qualifiedTeams.length ? (
         <div className="qualified-team-list">
           {currentWorldCup.qualifiedTeams.slice(0, 48).map((team) => (
-            <span key={team}>{team}</span>
+            <span className="qualified-team-pill" key={team}>
+              <TeamLabel name={team} size="xs" />
+            </span>
           ))}
         </div>
       ) : (
@@ -348,14 +351,14 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
               <h3>Group {group.group}</h3>
               {group.teams.map((team) => (
                 <p key={`${group.group}-${team}`}>
-                  <strong>{team}</strong>
+                  <TeamLabel name={team} size="xs" />
                 </p>
               ))}
               <div className="current-fixture-list">
                 {group.fixtures.slice(0, 6).map((fixture) => (
-                  <span key={`${group.group}-${fixture.homeTeam}-${fixture.awayTeam}`}>
-                    {fixture.homeTeam} vs {fixture.awayTeam}
-                    {fixture.date ? ` - ${fixture.date}` : ""}
+                  <span className="fixture-teams" key={`${group.group}-${fixture.homeTeam}-${fixture.awayTeam}`}>
+                    <MatchTeamsLine awayTeam={fixture.awayTeam} homeTeam={fixture.homeTeam} size="xs" />
+                    {fixture.date ? ` · ${fixture.date}` : ""}
                   </span>
                 ))}
               </div>
@@ -433,7 +436,7 @@ function PastEventsPanel({
 
   return (
     <>
-      <section className="feed-control-card">
+      <section className="feed-control-card surface-muted">
         <label>
           Historical World Cup
           <select value={selectedCompetition} onChange={(event) => setSelectedCompetition(event.target.value)}>
@@ -461,7 +464,7 @@ function PastEventsPanel({
         </a>
       </section>
 
-      <section className="bracket-tree-card">
+      <section className="bracket-tree-card surface-muted">
         <p className="eyebrow">Knockout tree</p>
         <h2>Horizontal route to the final</h2>
         <div className="bracket-tree">
@@ -475,9 +478,13 @@ function PastEventsPanel({
                   type="button"
                   onClick={() => selectMatch(match.matchId)}
                 >
-                  <strong>
-                    {match.homeTeam} {match.homeScore}-{match.awayScore} {match.awayTeam}
-                  </strong>
+                  <MatchTeamsLine
+                    awayScore={match.awayScore}
+                    awayTeam={match.awayTeam}
+                    homeScore={match.homeScore}
+                    homeTeam={match.homeTeam}
+                    size="xs"
+                  />
                   <span>{match.date}</span>
                 </button>
               ))}
@@ -487,7 +494,7 @@ function PastEventsPanel({
       </section>
 
       <section className="match-explorer">
-        <article className="data-card match-explorer-list">
+        <article className="data-card surface-muted match-explorer-list">
           <div className="section-heading compact">
             <h2>Matches</h2>
             <p>{filteredMatches.length} in feed</p>
@@ -500,9 +507,13 @@ function PastEventsPanel({
                 type="button"
                 onClick={() => selectMatch(match.matchId)}
               >
-                <strong>
-                  {match.homeTeam} {match.homeScore}-{match.awayScore} {match.awayTeam}
-                </strong>
+                <MatchTeamsLine
+                  awayScore={match.awayScore}
+                  awayTeam={match.awayTeam}
+                  homeScore={match.homeScore}
+                  homeTeam={match.homeTeam}
+                  size="sm"
+                />
                 <span>
                   {match.date} · {match.stage ?? "Stage unavailable"}
                 </span>
@@ -513,19 +524,25 @@ function PastEventsPanel({
 
         <div className="match-explorer-detail">
           {!selectedMatch ? (
-            <article className="data-card match-placeholder">
+            <article className="data-card surface-flat match-placeholder">
               <h2>Select a match</h2>
               <p>Choose a game from the list or knockout tree to view team stats, squads, and lineups.</p>
             </article>
           ) : (
             <>
-              <article className="data-card match-summary-card">
+              <article className="data-card widget-elevated match-summary-card">
                 <div className="section-heading compact">
                   <div>
                     <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
-                    <h2>
-                      {selectedMatch.homeTeam} {selectedMatch.homeScore}–{selectedMatch.awayScore}{" "}
-                      {selectedMatch.awayTeam}
+                    <h2 className="match-title-line">
+                      <MatchTeamsLine
+                        awayScore={selectedMatch.awayScore}
+                        awayTeam={selectedMatch.awayTeam}
+                        homeScore={selectedMatch.homeScore}
+                        homeTeam={selectedMatch.homeTeam}
+                        layout="stacked"
+                        size="md"
+                      />
                     </h2>
                     <p>
                       {selectedMatch.date}
@@ -543,7 +560,9 @@ function PastEventsPanel({
                       <div className="team-stat-grid compact">
                         {matchDetail.teamStats.map((team) => (
                           <div className="team-stat-card compact" key={team.team}>
-                            <h4>{team.team}</h4>
+                            <h4>
+                              <TeamLabel name={team.team} size="sm" />
+                            </h4>
                             <div className="stat-chip-grid">
                               <StatChip label="G" value={team.goals} />
                               <StatChip label="Sh" value={team.shots} />
@@ -576,7 +595,9 @@ function PastEventsPanel({
                       <div className="lineup-grid compact">
                         {filteredLineups.map((team) => (
                           <div className="lineup-card compact" key={team.teamName}>
-                            <h4>{team.teamName}</h4>
+                            <h4>
+                              <TeamLabel name={team.teamName} size="sm" />
+                            </h4>
                             <div className="lineup-list">
                               {team.players.map((player) => (
                                 <button
@@ -588,8 +609,7 @@ function PastEventsPanel({
                                   onClick={() => setSelectedPlayerId(player.playerId)}
                                 >
                                   <span>{player.jerseyNumber ?? "–"}</span>
-                                  <strong>{player.name}</strong>
-                                  <small>{player.country ?? ""}</small>
+                                  <TeamLabel countryHint={player.country} name={player.name} size="xs" />
                                 </button>
                               ))}
                             </div>
@@ -602,12 +622,18 @@ function PastEventsPanel({
               </article>
 
               {selectedPlayerId && matchDetail ? (
-                <article className="data-card player-detail-card">
+                <article className="data-card widget-elevated player-detail-card">
                   <div className="section-heading compact">
                     <div>
                       <p className="eyebrow">Player stats</p>
                       <h2>{selectedPlayer?.player ?? lineupPlayerName(filteredLineups, selectedPlayerId)}</h2>
-                      <p>{selectedPlayer?.team ?? "—"}</p>
+                      <p className="player-team-line">
+                        {selectedPlayer?.team ? (
+                          <TeamLabel name={selectedPlayer.team} size="sm" />
+                        ) : (
+                          "—"
+                        )}
+                      </p>
                     </div>
                     <button className="text-button" type="button" onClick={() => setSelectedPlayerId(null)}>
                       Clear
@@ -632,7 +658,7 @@ function PastEventsPanel({
                   )}
                 </article>
               ) : selectedMatch && matchDetail ? (
-                <article className="data-card match-placeholder subtle">
+                <article className="data-card surface-flat match-placeholder subtle">
                   <h3>Select a player</h3>
                   <p>Click a name in the lineup to view individual match stats.</p>
                 </article>
