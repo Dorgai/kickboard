@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { FeedStatusPanel } from "@/components/feed-status-panel";
+import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
+import { MatchEventTimeline } from "@/components/match-event-timeline";
 import { PlayerStatsTable } from "@/components/player-stats-table";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
@@ -104,6 +107,7 @@ type CurrentWorldCup = {
 };
 
 type EventTab = "current" | "past";
+type StageFilter = "all" | "group" | "knockout";
 
 const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "community", "analytics"]);
 
@@ -126,6 +130,7 @@ export function FeedBrowser() {
   const [matchSearch, setMatchSearch] = useState("");
   const [lineupSearch, setLineupSearch] = useState("");
   const [showMatchesList, setShowMatchesList] = useState(false);
+  const [stageFilter, setStageFilter] = useState<StageFilter>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -273,14 +278,22 @@ export function FeedBrowser() {
     };
   }, [selectedMatchId]);
 
-  const filteredMatches = useMemo(
-    () =>
-      matches.filter((match) =>
-        `${match.homeTeam} ${match.awayTeam} ${match.stage ?? ""}`
-          .toLowerCase()
-          .includes(matchSearch.toLowerCase())
-      ),
-    [matchSearch, matches]
+  const filteredMatches = useMemo(() => {
+    const query = matchSearch.toLowerCase();
+    return matches.filter((match) => {
+      const matchesSearch = `${match.homeTeam} ${match.awayTeam} ${match.stage ?? ""}`
+        .toLowerCase()
+        .includes(query);
+      if (!matchesSearch) return false;
+      if (stageFilter === "group") return match.stage === "Group Stage";
+      if (stageFilter === "knockout") return Boolean(match.stage && match.stage !== "Group Stage");
+      return true;
+    });
+  }, [matchSearch, matches, stageFilter]);
+
+  const groupStageMatches = useMemo(
+    () => matches.filter((match) => match.stage === "Group Stage"),
+    [matches]
   );
 
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
@@ -310,21 +323,23 @@ export function FeedBrowser() {
             <>
               <h1>Current event: 2026 FIFA World Cup.</h1>
               <p>
-                Current tournament information is read from public tournament pages. Live API-Football
-                data remains unavailable until credentials and the worker are configured.
+                Tournament summary and groups come from public pages. Live scores appear when
+                API-Football and the worker are configured.
               </p>
             </>
           ) : (
             <>
               <h1>Past events: historical World Cup data.</h1>
               <p>
-                Historical matches, squads, player stats, team stats, and knockout trees come from
-                StatsBomb Open Data.
+                Historical matches, event timelines, squads, player stats, team stats, and knockout
+                trees come from StatsBomb Open Data.
               </p>
             </>
           )}
         </div>
       </section>
+
+      <FeedStatusPanel />
 
       {loading ? <p className="inline-status">Loading real feeds...</p> : null}
       {error ? <p className="inline-error">{error}</p> : null}
@@ -336,6 +351,8 @@ export function FeedBrowser() {
           bracketRounds={bracketRounds}
           competitions={competitions}
           filteredMatches={filteredMatches}
+          groupStageMatches={groupStageMatches}
+          stageFilter={stageFilter}
           lineupSearch={lineupSearch}
           matchDetail={matchDetail}
           matchSearch={matchSearch}
@@ -350,6 +367,7 @@ export function FeedBrowser() {
           setSelectedCompetition={setSelectedCompetition}
           setSelectedMatchId={setSelectedMatchId}
           setSelectedPlayerId={setSelectedPlayerId}
+          setStageFilter={setStageFilter}
         />
       )}
     </div>
@@ -357,8 +375,24 @@ export function FeedBrowser() {
 }
 
 function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldCup | null }) {
+  const scheduleFixtures = useMemo(() => {
+    if (!currentWorldCup?.groups?.length) return [];
+    return currentWorldCup.groups
+      .flatMap((group) =>
+        group.fixtures.map((fixture) => ({
+          group: group.group,
+          homeTeam: fixture.homeTeam,
+          awayTeam: fixture.awayTeam,
+          date: fixture.date
+        }))
+      )
+      .sort((left, right) => (left.date ?? "").localeCompare(right.date ?? ""));
+  }, [currentWorldCup?.groups]);
+
   return (
     <section className="current-world-cup-card">
+      <LiveFixturesPanel />
+
       <div>
         <p className="eyebrow">Current World Cup public feed</p>
         <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
@@ -403,21 +437,34 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
           ))}
         </div>
       ) : null}
-      <section className="bracket-tree-card compact-tree">
-        <p className="eyebrow">Current event path</p>
-        <h2>Format through the final</h2>
-        <div className="bracket-tree">
-          {["Group stage", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"].map((stage) => (
-            <div className="bracket-round" key={stage}>
-              <h3>{stage}</h3>
-              <button type="button">
-                <strong>{stage === "Group stage" ? "Groups A-L" : "Qualified teams TBD"}</strong>
-                <span>{stage === "Final" ? "July 19, 2026" : "Driven by current event feed"}</span>
-              </button>
+
+      {scheduleFixtures.length ? (
+        <section className="data-card surface-muted current-schedule-card">
+          <div className="section-heading compact">
+            <div>
+              <p className="eyebrow">Group stage schedule</p>
+              <h2>Published fixtures from public feed</h2>
+              <p>{scheduleFixtures.length} fixtures across groups A–L (sample from Wikipedia infobox).</p>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className="current-schedule-grid">
+            {scheduleFixtures.map((fixture) => (
+              <article
+                className="current-schedule-item"
+                key={`${fixture.group}-${fixture.homeTeam}-${fixture.awayTeam}-${fixture.date ?? "tbd"}`}
+              >
+                <span className="current-schedule-group">Group {fixture.group}</span>
+                <MatchTeamsLine awayTeam={fixture.awayTeam} homeTeam={fixture.homeTeam} size="sm" />
+                <span className="current-schedule-date">{fixture.date ?? "Date TBD"}</span>
+              </article>
+            ))}
+          </div>
+          <p className="inline-status">
+            Knockout bracket slots will populate from API-Football when the worker is active; no fabricated
+            knockout pairings are shown.
+          </p>
+        </section>
+      ) : null}
     </section>
   );
 }
@@ -426,10 +473,12 @@ type PastEventsPanelProps = {
   bracketRounds: BracketRound[];
   competitions: WorldCupCompetition[];
   filteredMatches: Match[];
+  groupStageMatches: Match[];
   lineupSearch: string;
   matchDetail: MatchDetail | null;
   matchSearch: string;
   showMatchesList: boolean;
+  stageFilter: StageFilter;
   selectedCompetition: string;
   selectedMatch: Match | undefined;
   selectedMatchId: number | null;
@@ -440,16 +489,19 @@ type PastEventsPanelProps = {
   setSelectedCompetition: (value: string) => void;
   setSelectedMatchId: (value: number) => void;
   setSelectedPlayerId: (value: number | null) => void;
+  setStageFilter: (value: StageFilter) => void;
 };
 
 function PastEventsPanel({
   bracketRounds,
   competitions,
   filteredMatches,
+  groupStageMatches,
   lineupSearch,
   matchDetail,
   matchSearch,
   showMatchesList,
+  stageFilter,
   selectedCompetition,
   selectedMatch,
   selectedMatchId,
@@ -459,7 +511,8 @@ function PastEventsPanel({
   setShowMatchesList,
   setSelectedCompetition,
   setSelectedMatchId,
-  setSelectedPlayerId
+  setSelectedPlayerId,
+  setStageFilter
 }: PastEventsPanelProps) {
   const filteredLineups = (matchDetail?.lineups ?? []).map((team) => ({
     ...team,
@@ -495,10 +548,59 @@ function PastEventsPanel({
             ))}
           </select>
         </label>
-        <a className="button secondary" href="/api/feeds/realtime">
-          Real-time API status
-        </a>
+        <div className="stage-filter-bar" role="group" aria-label="Match stage filter">
+          {(
+            [
+              ["all", "All stages"],
+              ["group", "Group stage"],
+              ["knockout", "Knockout"]
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              className={stageFilter === value ? "active" : ""}
+              type="button"
+              onClick={() => setStageFilter(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </section>
+
+      {groupStageMatches.length ? (
+        <section className="data-card surface-muted group-stage-explorer" id="group-stage">
+          <div className="section-heading compact">
+            <div>
+              <p className="eyebrow">Group stage</p>
+              <h2>Group stage results</h2>
+              <p>{groupStageMatches.length} matches · select any fixture to open detail below.</p>
+            </div>
+          </div>
+          <div className="group-stage-match-grid">
+            {groupStageMatches.map((match) => (
+              <button
+                className={selectedMatchId === match.matchId ? "selected" : ""}
+                key={match.matchId}
+                type="button"
+                onClick={() => selectMatch(match.matchId)}
+              >
+                <MatchTeamsLine
+                  awayScore={match.awayScore}
+                  awayTeam={match.awayTeam}
+                  homeScore={match.homeScore}
+                  homeTeam={match.homeTeam}
+                  layout="stacked"
+                  size="sm"
+                />
+                <span>
+                  {match.date} · {match.stage ?? "Group Stage"}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <div className="knockout-workspace">
         <section className="bracket-tree-card surface-muted" id="bracket">
@@ -696,6 +798,12 @@ function PastEventsPanel({
                     ))}
                   </div>
                 </section>
+              </div>
+
+              <div className="knockout-widgets-row knockout-widgets-row--timeline">
+                <article className="data-card surface-muted match-event-timeline-card">
+                  <MatchEventTimeline matchId={selectedMatch.matchId} />
+                </article>
               </div>
 
               <div className="knockout-widgets-row knockout-widgets-row--players" id="players">

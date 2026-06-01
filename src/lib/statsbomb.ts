@@ -151,15 +151,49 @@ export async function getLineups(matchId: number) {
   return fetchStatsBomb<StatsBombLineup[]>(`/lineups/${matchId}.json`, 3600);
 }
 
+export type SummarisedEventTone = "goal" | "danger" | "neutral";
+
 export function summariseEvent(event: StatsBombEvent) {
+  const type = event.type.name;
+  let tone: SummarisedEventTone = "neutral";
+  let highlight = false;
+  let description = type;
+
+  if (event.shot?.outcome?.name === "Goal") {
+    tone = "goal";
+    highlight = true;
+    description = `Goal · ${event.player?.name ?? "Unknown"}`;
+  } else if (type === "Shot") {
+    const outcome = event.shot?.outcome?.name;
+    if (outcome && outcome !== "Off T" && outcome !== "Blocked") {
+      highlight = true;
+    }
+    description = `Shot (${outcome ?? "—"}) · ${event.player?.name ?? "Unknown"}`;
+  } else if (type === "Pass" && event.pass?.goal_assist) {
+    highlight = true;
+    description = `Assist · ${event.player?.name ?? "Unknown"}`;
+  } else if (type === "Substitution") {
+    highlight = true;
+    description = `Substitution · ${event.player?.name ?? "Unknown"}`;
+  } else if (/card/i.test(type) || type === "Bad Behaviour" || type === "Foul Committed") {
+    tone = "danger";
+    highlight = true;
+    description = `${type} · ${event.player?.name ?? "Unknown"}`;
+  } else if (event.player?.name) {
+    description = `${type} · ${event.player.name}`;
+  }
+
   return {
     id: event.id,
     minute: event.minute,
     second: event.second,
-    type: event.type.name,
+    type,
     team: event.team?.name ?? null,
     player: event.player?.name ?? null,
-    location: event.location ?? null
+    location: event.location ?? null,
+    description,
+    tone,
+    highlight
   };
 }
 

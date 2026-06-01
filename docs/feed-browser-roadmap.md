@@ -1,0 +1,39 @@
+# Feed browser — requirements vs implementation
+
+This tracks the homepage feed browser against `README.md` and product cards in `src/lib/kickboard-data.ts`.
+
+## Done (feed browser MVP)
+
+| Requirement | Implementation |
+|-------------|----------------|
+| No fabricated data | All UI reads `/api/feeds/*` |
+| Historical competitions & matches | StatsBomb `/api/feeds/historical/*` |
+| Knockout bracket | `/api/feeds/historical/bracket` + full-width layout |
+| Match detail: team & player stats, lineups | `/api/feeds/historical/match-detail` |
+| **Event timelines** | `/api/feeds/historical/events` + `MatchEventTimeline` |
+| Group stage explorer | Group-stage match grid + stage filter |
+| Current event public summary & groups | `/api/feeds/current-world-cup` |
+| Current schedule from public fixtures | `CurrentEventPanel` schedule grid |
+| Live scores when configured | `LiveFixturesPanel` → `/api/feeds/realtime` |
+| User-facing feed status | `FeedStatusPanel` → `/api/feeds/status` |
+| Country flags | `team-label.tsx` + `flagcdn.com` |
+| Admin data sources | `/admin/data-sources` |
+| Railway deploy | GitHub Actions + `npm run railway:deploy` |
+
+## Partial
+
+| Requirement | Gap |
+|-------------|-----|
+| API-Football worker | Fixed 60s poll; no adaptive schedule / `DATA_DELAYED` UI |
+| PostgreSQL / Redis | Schema + env checks only; no app writes |
+| Current knockout bracket | Intentionally not fabricated; needs live fixture mapping |
+| Realtime on Current tab | Live panel added; depends on `API_FOOTBALL_KEY` + worker |
+
+## Later phase (documented, not started)
+
+- Widget dashboard (`docs/widget-contract.md`)
+- Coach Board / community posting
+- Virtual wallet & predictions
+- Pro analytics / FastAPI service
+- User auth, Fan Mode, Stripe tiers
+- UserStatCard export, portrait pipeline
