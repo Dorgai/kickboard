@@ -760,12 +760,13 @@ function PastEventsPanel({
         </section>
 
         <div className="knockout-widgets" id="match-detail-panel">
-          <div
-            className={`knockout-widgets-row knockout-widgets-row--primary${
-              showMatchesList ? " knockout-widgets-row--with-list" : ""
-            }`}
-          >
-            {showMatchesList ? (
+          {showMatchesList || !selectedMatch ? (
+            <div
+              className={`knockout-widgets-row knockout-widgets-row--primary${
+                showMatchesList ? " knockout-widgets-row--with-list" : ""
+              }`}
+            >
+              {showMatchesList ? (
               <article className="data-card surface-muted match-explorer-list">
                 <div className="section-heading compact">
                   <div>
@@ -807,16 +808,21 @@ function PastEventsPanel({
               </article>
             ) : null}
 
-            {!selectedMatch ? (
-              <article className="data-card surface-flat match-placeholder">
-                <h2>Select a match</h2>
-                <p>Pick a fixture in the stage panel to load match details beside it.</p>
-              </article>
-            ) : null}
-          </div>
+              {!selectedMatch ? (
+                <article className="data-card surface-flat match-placeholder">
+                  <h2>Select a match</h2>
+                  <p>Pick a fixture in the stage panel to load match details beside it.</p>
+                </article>
+              ) : null}
+            </div>
+          ) : null}
 
           {railFixtureMode ? (
-            <div className="knockout-widgets-row knockout-widgets-row--match-split" id="match-detail-panel">
+            <div
+              className={`knockout-widgets-row knockout-widgets-row--match-split${
+                selectedMatch && matchDetail ? " knockout-widgets-row--with-squads" : ""
+              }`}
+            >
               <article className="data-card surface-muted match-fixtures-widget">
                 <div className="section-heading compact">
                   <div>
@@ -863,6 +869,77 @@ function PastEventsPanel({
                   ))}
                 </div>
               </article>
+
+              {selectedMatch && matchDetail ? (
+                <article className="data-card surface-muted match-squads-players-column">
+                  <div className="match-squads-players-split">
+                    <section className="match-squads-section" id="squads">
+                      <div className="section-heading compact match-squads-heading">
+                        <h3>Squads</h3>
+                        <input
+                          aria-label="Search lineup"
+                          className="lineup-search"
+                          placeholder="Filter"
+                          type="search"
+                          value={lineupSearch}
+                          onChange={(event) => setLineupSearch(event.target.value)}
+                        />
+                      </div>
+                      <div className="lineup-grid compact match-squads-lineups">
+                        {filteredLineups.map((team) => (
+                          <div className="lineup-card compact" key={team.teamName}>
+                            <h4>
+                              <TeamLabel name={team.teamName} size="xs" />
+                            </h4>
+                            <div className="lineup-list">
+                              {team.players.map((player) => (
+                                <button
+                                  className={
+                                    selectedPlayerId === player.playerId ? "lineup-row selected" : "lineup-row"
+                                  }
+                                  key={`${team.teamName}-${player.playerId}`}
+                                  type="button"
+                                  onClick={() => setSelectedPlayerId(player.playerId)}
+                                >
+                                  <span>{player.jerseyNumber ?? "–"}</span>
+                                  <span className="lineup-row-name">{player.name}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    <div className="match-players-section" id="players">
+                      {matchDetail.playerStats.length > 0 ? (
+                        <PlayerStatsPanel
+                          competitionId={competitionId}
+                          competitionLabel={competitionLabel}
+                          matchMeta={{
+                            matchId: selectedMatch.matchId,
+                            date: selectedMatch.date,
+                            stage: selectedMatch.stage,
+                            homeTeam: selectedMatch.homeTeam,
+                            awayTeam: selectedMatch.awayTeam,
+                            homeScore: selectedMatch.homeScore,
+                            awayScore: selectedMatch.awayScore,
+                            stadium: selectedMatch.stadium
+                          }}
+                          players={matchDetail.playerStats}
+                          seasonId={seasonId}
+                          selectedPlayerId={selectedPlayerId}
+                          onSelectPlayer={setSelectedPlayerId}
+                        />
+                      ) : (
+                        <p className="inline-status">No player stats for this match.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
+                </article>
+              ) : null}
 
               <article className="data-card surface-muted match-detail-widget">
                 {!selectedMatch ? (
@@ -922,79 +999,6 @@ function PastEventsPanel({
                 )}
               </article>
             </div>
-          ) : null}
-
-          {selectedMatch && matchDetail ? (
-            <>
-              <div className="knockout-widgets-row knockout-widgets-row--match-data">
-                <section className="data-card surface-muted match-detail-section" id="squads">
-                  <div className="section-heading compact">
-                    <h3>Squads & lineups</h3>
-                    <input
-                      aria-label="Search lineup"
-                      className="lineup-search"
-                      placeholder="Filter players"
-                      type="search"
-                      value={lineupSearch}
-                      onChange={(event) => setLineupSearch(event.target.value)}
-                    />
-                  </div>
-                  <div className="lineup-grid compact">
-                    {filteredLineups.map((team) => (
-                      <div className="lineup-card compact" key={team.teamName}>
-                        <h4>
-                          <TeamLabel name={team.teamName} size="sm" />
-                        </h4>
-                        <div className="lineup-list">
-                          {team.players.map((player) => (
-                            <button
-                              className={
-                                selectedPlayerId === player.playerId ? "lineup-row selected" : "lineup-row"
-                              }
-                              key={`${team.teamName}-${player.playerId}`}
-                              type="button"
-                              onClick={() => setSelectedPlayerId(player.playerId)}
-                            >
-                              <span>{player.jerseyNumber ?? "–"}</span>
-                              <TeamLabel countryHint={player.country} name={player.name} size="sm" />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
-
-              <div className="knockout-widgets-row knockout-widgets-row--timeline-link">
-                <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
-              </div>
-
-              <div className="knockout-widgets-row knockout-widgets-row--players" id="players">
-                {matchDetail.playerStats.length > 0 && selectedMatch ? (
-                  <PlayerStatsPanel
-                    competitionId={competitionId}
-                    competitionLabel={competitionLabel}
-                    matchMeta={{
-                      matchId: selectedMatch.matchId,
-                      date: selectedMatch.date,
-                      stage: selectedMatch.stage,
-                      homeTeam: selectedMatch.homeTeam,
-                      awayTeam: selectedMatch.awayTeam,
-                      homeScore: selectedMatch.homeScore,
-                      awayScore: selectedMatch.awayScore,
-                      stadium: selectedMatch.stadium
-                    }}
-                    players={matchDetail.playerStats}
-                    seasonId={seasonId}
-                    selectedPlayerId={selectedPlayerId}
-                    onSelectPlayer={setSelectedPlayerId}
-                  />
-                ) : (
-                  <p className="inline-status data-card surface-flat">No player-level event stats for this match.</p>
-                )}
-              </div>
-            </>
           ) : null}
         </div>
       </div>

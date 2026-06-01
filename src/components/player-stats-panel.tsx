@@ -120,7 +120,7 @@ export function PlayerStatsPanel({
         <div>
           <h3>Player stats</h3>
           <p className="player-stats-summary player-stats-summary--caption">
-            Select a player in the lineup above. This panel shows that player&apos;s match line only.
+            Select a player in Squads. This panel shows that player&apos;s match line only.
           </p>
         </div>
         {selectedPlayerId ? (
