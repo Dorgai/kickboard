@@ -94,7 +94,10 @@ jobs:
               healthy=true
             fi
             session_code=$(curl -sS -o /dev/null -w "%{http_code}" "${BASE}/api/admin/session" 2>/dev/null || echo "000")
-            has_old_home=$(curl -sS "${BASE}/" 2>/dev/null | grep -c feed-status-grid || echo 1)
+            has_old_home=0
+            if curl -sS "${BASE}/" 2>/dev/null | grep -q feed-status-grid; then
+              has_old_home=1
+            fi
             if [ "$healthy" = true ] && [ "$session_code" != "404" ] && [ "$has_old_home" = "0" ]; then
               echo "Production matches current main (session=${session_code}, no feed-status-grid)."
               echo "production_url=${BASE}" >> "$GITHUB_ENV"
