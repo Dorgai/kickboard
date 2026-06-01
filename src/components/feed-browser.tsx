@@ -103,7 +103,8 @@ type CurrentWorldCup = {
 
 type EventTab = "current" | "past";
 
-const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "community", "analytics"]);
+const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "analytics"]);
+const CURRENT_EVENT_HASHES = new Set(["community"]);
 
 function hashTarget(): string | null {
   if (typeof window === "undefined") return null;
@@ -130,6 +131,10 @@ export function FeedBrowser() {
   useEffect(() => {
     function syncTabFromHash() {
       const hash = hashTarget();
+      if (hash && CURRENT_EVENT_HASHES.has(hash)) {
+        setActiveTab("current");
+        return;
+      }
       if (hash && PAST_EVENT_HASHES.has(hash)) {
         setActiveTab("past");
       }
@@ -149,6 +154,16 @@ export function FeedBrowser() {
     });
     return () => window.cancelAnimationFrame(frame);
   }, [activeTab, loading, bracketRounds.length, selectedMatchId]);
+
+  useEffect(() => {
+    if (activeTab !== "current" || loading) return;
+    const hash = hashTarget();
+    if (!hash || !CURRENT_EVENT_HASHES.has(hash)) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [activeTab, loading]);
 
   useEffect(() => {
     let cancelled = false;
@@ -480,6 +495,11 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
             </span>
           </button>
         </div>
+      </section>
+
+      <section className="data-card surface-flat section-anchor" id="community">
+        <h2>Community</h2>
+        <p>Coach Board, squads sharing, and social widgets are planned for a later phase.</p>
       </section>
     </section>
   );
@@ -925,10 +945,6 @@ function PastEventsPanel({
         </div>
       </div>
 
-      <section className="data-card surface-flat section-anchor" id="community">
-        <h2>Community</h2>
-        <p>Coach Board, squads sharing, and social widgets are planned for a later phase.</p>
-      </section>
       <section className="data-card surface-flat section-anchor" id="analytics">
         <h2>Analytics</h2>
         <p>Pro heat maps and guided analytics will build on the match and player stats shown above.</p>

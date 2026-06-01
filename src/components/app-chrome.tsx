@@ -9,7 +9,8 @@ type AppChromeProps = {
   activeNav?: "Home" | "Admin";
 };
 
-const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "community", "analytics"]);
+const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "analytics"]);
+const CURRENT_EVENT_HASHES = new Set(["community"]);
 
 export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
   const [hash, setHash] = useState("");
@@ -45,7 +46,9 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
               activeNav === "Home" &&
               (item === "Home"
                 ? !hash || hash === "home"
-                : PAST_EVENT_HASHES.has(hash) && hash === slug);
+                : CURRENT_EVENT_HASHES.has(slug)
+                  ? hash === slug
+                  : PAST_EVENT_HASHES.has(hash) && hash === slug);
             return (
               <Link
                 key={item}

@@ -55,7 +55,7 @@ export default async function AdminDataSourcesPage({
         <SummaryCard label="Last checked" value={new Date(data.generatedAt).toLocaleString()} />
       </section>
 
-      <FeedStatusPanel variant="admin" />
+      <FeedStatusPanel />
 
       <section className="admin-source-grid">
         {data.sources.map((source) => (

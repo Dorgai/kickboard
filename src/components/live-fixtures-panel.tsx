@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MatchTeamsLine } from "@/components/team-label";
 
@@ -23,7 +24,6 @@ type RealtimeResponse = {
   connected: boolean;
   provider?: string;
   message?: string;
-  requiredRailwayVariables?: string[];
   fixtures?: LiveFixture[];
   error?: string;
 };
@@ -64,7 +64,7 @@ export function LiveFixturesPanel({ pollIntervalMs = 60_000 }: LiveFixturesPanel
   }, [pollIntervalMs]);
 
   if (loading && !payload) {
-    return <p className="inline-status">Checking API-Football live feed…</p>;
+    return <p className="inline-status">Checking live scores…</p>;
   }
 
   if (!payload?.connected) {
@@ -73,22 +73,19 @@ export function LiveFixturesPanel({ pollIntervalMs = 60_000 }: LiveFixturesPanel
         <div className="section-heading compact">
           <div>
             <p className="eyebrow">Live scores</p>
-            <h2>API-Football</h2>
-            <p>{payload?.message ?? "Real-time feed is not active."}</p>
+            <h2>Coming soon</h2>
+            <p>
+              {payload?.message ??
+                "Live match scores will appear here when API-Football is configured for this environment."}
+            </p>
           </div>
         </div>
-        {payload?.requiredRailwayVariables?.length ? (
-          <ul className="live-fixtures-requirements">
-            {payload.requiredRailwayVariables.map((variable) => (
-              <li key={variable}>
-                <code>{variable}</code>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <a className="button secondary" href="/api/feeds/realtime">
-          Real-time API status
-        </a>
+        <p className="inline-status">
+          Connection details, API keys, and worker status are managed in Admin.
+        </p>
+        <Link className="button secondary" href="/admin/data-sources">
+          Open admin dashboard
+        </Link>
       </section>
     );
   }
@@ -101,7 +98,9 @@ export function LiveFixturesPanel({ pollIntervalMs = 60_000 }: LiveFixturesPanel
         <div>
           <p className="eyebrow">Live scores</p>
           <h2>{payload.provider ?? "Live fixtures"}</h2>
-          <p>{fixtures.length} live {fixtures.length === 1 ? "match" : "matches"} right now</p>
+          <p>
+            {fixtures.length} live {fixtures.length === 1 ? "match" : "matches"} right now
+          </p>
         </div>
       </div>
       {fixtures.length ? (

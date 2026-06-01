@@ -27,11 +27,7 @@ type FeedStatusPayload = {
   };
 };
 
-type FeedStatusPanelProps = {
-  variant?: "home" | "admin";
-};
-
-export function FeedStatusPanel({ variant = "home" }: FeedStatusPanelProps) {
+export function FeedStatusPanel() {
   const [status, setStatus] = useState<FeedStatusPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,8 +77,8 @@ export function FeedStatusPanel({ variant = "home" }: FeedStatusPanelProps) {
     <section className="feed-status-panel data-card surface-muted" aria-label="Feed status">
       <div className="section-heading compact">
         <div>
-          <p className="eyebrow">{variant === "admin" ? "Infrastructure" : "Feeds"}</p>
-          <h2>{variant === "admin" ? "Feed & infrastructure status" : "Feed status"}</h2>
+          <p className="eyebrow">Infrastructure</p>
+          <h2>Feed &amp; infrastructure status</h2>
           <p className="feed-status-updated">
             Updated {new Date(status.generatedAt).toLocaleString()}
           </p>
