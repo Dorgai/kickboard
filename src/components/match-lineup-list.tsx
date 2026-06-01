@@ -18,6 +18,8 @@ type MatchLineupListProps = {
   teams: MatchLineupTeam[];
   selectedPlayerId: number | null;
   onSelectPlayer: (playerId: number) => void;
+  /** Home and away columns side by side when two teams are present. */
+  layout?: "stacked" | "paired";
 };
 
 function sortByJersey(players: MatchLineupPlayer[]) {
@@ -29,9 +31,14 @@ function sortByJersey(players: MatchLineupPlayer[]) {
   });
 }
 
-export function MatchLineupList({ teams, selectedPlayerId, onSelectPlayer }: MatchLineupListProps) {
+export function MatchLineupList({
+  teams,
+  selectedPlayerId,
+  onSelectPlayer,
+  layout = "stacked"
+}: MatchLineupListProps) {
   return (
-    <div className="match-lineup-teams">
+    <div className={`match-lineup-teams${layout === "paired" ? " match-lineup-teams--paired" : ""}`}>
       {teams.map((team) => (
         <div className="lineup-card compact" key={team.teamName}>
           <h4>

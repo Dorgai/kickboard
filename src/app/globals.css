@@ -1331,9 +1331,19 @@ h3 {
   }
 }
 
-@media (min-width: 900px) {
+@media (min-width: 960px) {
   .knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
-    grid-template-columns: minmax(200px, 0.62fr) minmax(360px, 1.4fr) minmax(220px, 0.85fr);
+    grid-template-columns: minmax(200px, 0.68fr) minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
+    grid-template-columns:
+      minmax(200px, 0.52fr)
+      minmax(240px, 0.68fr)
+      minmax(280px, 1fr)
+      minmax(300px, 1.05fr);
   }
 
   .knockout-widgets-row--with-squads .match-detail-widget .match-focus-team-stats {
@@ -1343,7 +1353,7 @@ h3 {
 
 .match-fixtures-widget,
 .match-detail-widget,
-.match-squads-players-column {
+.match-focus-col {
   display: grid;
   gap: 8px;
   min-height: 160px;
@@ -1423,45 +1433,31 @@ h3 {
   margin: 0;
 }
 
-.match-squads-players-column {
+.match-player-stats-column,
+.match-lineups-column {
   align-content: start;
   gap: 12px;
   max-height: min(88vh, 920px);
   overflow: auto;
-  padding: 14px 16px;
 }
 
-.match-squads-players-split {
+.match-lineups-heading {
   align-items: flex-start;
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  gap: 12px;
-  min-width: 0;
-  width: 100%;
-}
-
-.match-squads-section {
-  flex: 0 0 min(168px, 38%);
-  max-width: 168px;
-  min-width: 132px;
-}
-
-.match-squads-heading {
-  align-items: stretch;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
 
-.match-squads-heading h3 {
+.match-lineups-heading h3 {
   font-size: 14px;
   margin: 0;
 }
 
-.match-squads-section .lineup-search {
-  min-width: 0;
-  width: 100%;
+.match-lineups-column .lineup-search {
+  min-width: 120px;
+  width: min(100%, 160px);
 }
 
 .match-lineups-note {
@@ -1474,6 +1470,17 @@ h3 {
 .match-lineup-teams {
   display: grid;
   gap: 12px;
+}
+
+.match-lineup-teams--paired {
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 719px) {
+  .match-lineup-teams--paired {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .lineup-role-group {
@@ -1503,43 +1510,33 @@ h3 {
   font-style: italic;
 }
 
-.match-squads-section .lineup-card.compact {
+.match-lineups-column .lineup-card.compact {
   padding: 8px 10px;
 }
 
-.match-squads-section .lineup-card.compact h4 {
+.match-lineups-column .lineup-card.compact h4 {
   font-size: 12px;
   margin: 0 0 6px;
 }
 
-.match-squads-section .lineup-list {
+.match-lineups-column .lineup-list {
   max-height: min(380px, 48vh);
 }
 
-.match-squads-section .lineup-row {
+.match-lineups-column .lineup-row {
   font-size: 12px;
   gap: 6px;
   grid-template-columns: 22px minmax(0, 1fr);
   padding: 5px 6px;
 }
 
-.match-squads-section .lineup-row-name {
+.match-lineups-column .lineup-row-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.match-players-section {
-  border-left: 1px solid var(--color-border);
-  flex: 1 1 0;
-  max-height: min(420px, 52vh);
-  min-width: 0;
-  overflow: auto;
-  padding-left: 12px;
-  padding-right: 2px;
-}
-
-.match-squads-players-column .player-stats-panel {
+.match-player-stats-column .player-stats-panel {
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -1547,7 +1544,7 @@ h3 {
   padding: 0;
 }
 
-.match-squads-players-column .player-stats-panel .section-heading.compact {
+.match-player-stats-column .player-stats-panel .section-heading.compact {
   margin-bottom: 8px;
 }
 
