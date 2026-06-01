@@ -1448,27 +1448,23 @@ h3 {
 .bracket-fixture-strip {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 8px;
-  -webkit-overflow-scrolling: touch;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  padding: 2px 2px 8px;
-  scroll-snap-type: x proximity;
+  overflow: visible;
+  padding: 2px 0 4px;
 }
 
 .bracket-fixture-strip .match-fixture-btn--strip-card {
   align-items: stretch;
   display: flex;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   flex-direction: column;
   gap: 4px;
   justify-content: center;
-  max-width: 13.5rem;
+  max-width: 14rem;
   min-height: 36px;
   min-width: 9.75rem;
   padding: 6px 8px;
-  scroll-snap-align: start;
   text-align: left;
   width: auto;
 }
