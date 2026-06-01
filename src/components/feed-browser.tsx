@@ -799,7 +799,11 @@ function PastEventsPanel({
                 <div className="section-heading compact">
                   <div>
                     <p className="eyebrow">Fixtures</p>
-                    <h2>{railFixtureMode === "group" ? "Group stage" : "Knockout stage"}</h2>
+                    <h2>
+                      {railFixtureMode === "group"
+                        ? `Group ${activeGroupLetter}`
+                        : activeKnockoutStage || "Knockout stage"}
+                    </h2>
                     {selectedClusterLabel && selectedMatch && selectedMatch.stage === activeKnockoutStage ? (
                       <p className="match-stage-cluster">{selectedClusterLabel}</p>
                     ) : null}
@@ -815,18 +819,6 @@ function PastEventsPanel({
                     }))}
                     value={activeGroupLetter}
                     onChange={setActiveGroupLetter}
-                  />
-                ) : null}
-                {railFixtureMode === "knockout" && bracketRounds.length ? (
-                  <FeedTabBar
-                    ariaLabel="Knockout stage"
-                    className="match-stage-tabs"
-                    tabs={bracketRounds.map((round) => ({
-                      id: round.stage,
-                      label: round.stage
-                    }))}
-                    value={activeKnockoutStage}
-                    onChange={setActiveKnockoutStage}
                   />
                 ) : null}
                 <p className="match-stage-rail-caption">Select a match</p>
