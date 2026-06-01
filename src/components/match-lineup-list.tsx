@@ -29,6 +29,8 @@ type MatchLineupListProps = {
   onSelectPlayer: (playerId: number) => void;
   /** Home and away columns side by side when two teams are present. */
   layout?: "stacked" | "paired";
+  /** Dense grids with vertical position-group rails (past-events match view). */
+  compact?: boolean;
 };
 
 function sortByJersey(players: MatchLineupPlayer[]) {
@@ -40,16 +42,51 @@ function sortByJersey(players: MatchLineupPlayer[]) {
   });
 }
 
+function LineupPlayerButton({
+  compact,
+  player,
+  role,
+  selectedPlayerId,
+  teamName,
+  onSelect
+}: {
+  compact: boolean;
+  player: MatchLineupPlayer;
+  role: LineupRole;
+  selectedPlayerId: number | null;
+  teamName: string;
+  onSelect: (playerId: number) => void;
+}) {
+  return (
+    <button
+      className={`lineup-row lineup-row--${role}${
+        compact ? " lineup-row--dense" : ""
+      }${selectedPlayerId === player.playerId ? " selected" : ""}`}
+      title={player.position ?? undefined}
+      type="button"
+      onClick={() => onSelect(player.playerId)}
+    >
+      <span className="lineup-row-number">{player.jerseyNumber ?? "–"}</span>
+      <span className="lineup-row-name">{player.name}</span>
+    </button>
+  );
+}
+
 export function MatchLineupList({
   teams,
   selectedPlayerId,
   onSelectPlayer,
-  layout = "stacked"
+  layout = "stacked",
+  compact = false
 }: MatchLineupListProps) {
   return (
-    <div className={`match-lineup-teams${layout === "paired" ? " match-lineup-teams--paired" : ""}`}>
+    <div
+      className={`match-lineup-teams${layout === "paired" ? " match-lineup-teams--paired" : ""}${
+        compact ? " match-lineup-teams--compact" : ""
+      }`}
+    >
       {teams.map((team) => (
-        <div className="lineup-card compact" key={team.teamName}>
+        <div className={`lineup-card compact${compact ? " lineup-card--dense" : ""}`} key={team.teamName}>
           <h4>
             <TeamLabel
               countryHint={team.countryHint ?? team.players.find((player) => player.country)?.country}
@@ -62,36 +99,65 @@ export function MatchLineupList({
             if (!players.length) return null;
 
             return (
-              <div className="lineup-role-group" key={`${team.teamName}-${role}`}>
+              <div className={`lineup-role-group${compact ? " lineup-role-group--dense" : ""}`} key={`${team.teamName}-${role}`}>
                 <p className="lineup-role-label">{LINEUP_ROLE_LABELS[role]}</p>
-                {LINEUP_POSITION_GROUP_ORDER.map((group) => {
-                  const groupPlayers = sortByJersey(
-                    players.filter((player) => player.positionGroup === group)
-                  );
-                  if (!groupPlayers.length) return null;
+                {compact ? (
+                  <div className="lineup-role-bands">
+                    {LINEUP_POSITION_GROUP_ORDER.map((group) => {
+                      const groupPlayers = sortByJersey(
+                        players.filter((player) => player.positionGroup === group)
+                      );
+                      if (!groupPlayers.length) return null;
 
-                  return (
-                    <div className="lineup-position-group" key={`${team.teamName}-${role}-${group}`}>
-                      <p className="lineup-position-label">{LINEUP_POSITION_GROUP_LABELS[group]}</p>
-                      <div className="lineup-list">
-                        {groupPlayers.map((player) => (
-                          <button
-                            className={`lineup-row lineup-row--${role}${
-                              selectedPlayerId === player.playerId ? " selected" : ""
-                            }`}
-                            key={`${team.teamName}-${player.playerId}`}
-                            title={player.position ?? undefined}
-                            type="button"
-                            onClick={() => onSelectPlayer(player.playerId)}
-                          >
-                            <span>{player.jerseyNumber ?? "–"}</span>
-                            <span className="lineup-row-name">{player.name}</span>
-                          </button>
-                        ))}
+                      return (
+                        <div className="lineup-position-band" key={`${team.teamName}-${role}-${group}`}>
+                          <span className="lineup-position-rail" title={LINEUP_POSITION_GROUP_LABELS[group]}>
+                            {LINEUP_POSITION_GROUP_LABELS[group]}
+                          </span>
+                          <div className="lineup-list lineup-list--dense">
+                            {groupPlayers.map((player) => (
+                              <LineupPlayerButton
+                                key={`${team.teamName}-${player.playerId}`}
+                                compact
+                                player={player}
+                                role={role}
+                                selectedPlayerId={selectedPlayerId}
+                                teamName={team.teamName}
+                                onSelect={onSelectPlayer}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  LINEUP_POSITION_GROUP_ORDER.map((group) => {
+                    const groupPlayers = sortByJersey(
+                      players.filter((player) => player.positionGroup === group)
+                    );
+                    if (!groupPlayers.length) return null;
+
+                    return (
+                      <div className="lineup-position-group" key={`${team.teamName}-${role}-${group}`}>
+                        <p className="lineup-position-label">{LINEUP_POSITION_GROUP_LABELS[group]}</p>
+                        <div className="lineup-list">
+                          {groupPlayers.map((player) => (
+                            <LineupPlayerButton
+                              key={`${team.teamName}-${player.playerId}`}
+                              compact={false}
+                              player={player}
+                              role={role}
+                              selectedPlayerId={selectedPlayerId}
+                              teamName={team.teamName}
+                              onSelect={onSelectPlayer}
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             );
           })}

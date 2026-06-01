@@ -1590,6 +1590,21 @@ h3 {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.knockout-widgets-row--squads-pair {
+  display: grid;
+  gap: 10px;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .knockout-widgets-row--squads-pair {
+    align-items: start;
+    grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  }
+}
+
 .knockout-widgets--below-strip {
   margin-top: 4px;
 }
@@ -1832,6 +1847,120 @@ h3 {
   white-space: nowrap;
 }
 
+.match-lineup-teams--compact {
+  gap: 8px;
+}
+
+.match-lineup-teams--compact .lineup-card--dense {
+  padding: 6px 8px;
+}
+
+.match-lineup-teams--compact .lineup-card--dense h4 {
+  font-size: 11px;
+  margin: 0 0 4px;
+}
+
+.match-lineup-teams--compact .lineup-role-group--dense {
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.match-lineup-teams--compact .lineup-role-group--dense:first-of-type {
+  margin-top: 0;
+}
+
+.match-lineup-teams--compact .lineup-role-label {
+  font-size: 9px;
+  margin: 0 0 2px;
+}
+
+.match-lineup-teams--compact .lineup-role-bands {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 520px) {
+  .match-lineup-teams--compact .lineup-role-bands {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.match-lineup-teams--compact .lineup-position-band {
+  align-items: stretch;
+  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.match-lineup-teams--compact .lineup-position-rail {
+  align-items: center;
+  border-right: 1px solid var(--color-border);
+  color: color-mix(in srgb, var(--color-text-secondary) 90%, var(--color-brand));
+  display: flex;
+  flex: 0 0 1.15rem;
+  font-size: 8px;
+  font-weight: 800;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 4px 2px;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+
+.match-lineup-teams--compact .lineup-list--dense {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 2px 4px;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  min-width: 0;
+  padding: 3px 4px;
+}
+
+.match-lineup-teams--compact .lineup-row--dense {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  display: flex;
+  font-size: 10px;
+  gap: 3px;
+  line-height: 1.2;
+  min-height: 0;
+  min-width: 0;
+  padding: 2px 4px;
+  text-align: left;
+  width: 100%;
+}
+
+.match-lineup-teams--compact .lineup-row-number {
+  color: var(--color-text-secondary);
+  flex: 0 0 1.1rem;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+}
+
+.match-lineup-teams--compact .lineup-row--dense .lineup-row-name {
+  flex: 1 1 auto;
+  font-size: 10px;
+  font-weight: 600;
+  max-width: none;
+}
+
+.match-lineup-teams--compact .lineup-row--dense.selected {
+  background: color-mix(in srgb, var(--color-brand) 10%, var(--color-bg));
+  border-color: var(--color-brand);
+}
+
 .match-player-stats-column .player-stats-panel {
   background: transparent;
   border: 0;
@@ -1842,6 +1971,51 @@ h3 {
 
 .match-player-stats-column .player-stats-panel .section-heading.compact {
   margin-bottom: 8px;
+}
+
+.player-stats-panel--compact {
+  gap: 10px;
+}
+
+.player-stats-panel--compact h3 {
+  font-size: 14px;
+}
+
+.player-stats-panel--compact .player-focus-card {
+  gap: 6px;
+}
+
+.player-stats-panel--compact .player-focus-header h4 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.player-stats-panel--compact .player-focus-meta-caption {
+  font-size: 11px;
+  margin: 2px 0 0;
+}
+
+.player-career-disclosure {
+  border-top: 1px solid var(--color-border);
+  margin-top: 4px;
+  padding-top: 6px;
+}
+
+.player-career-disclosure summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  list-style: none;
+}
+
+.player-career-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.player-career-disclosure[open] {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
 }
 
 .knockout-widgets .match-explorer-list {
@@ -2184,6 +2358,28 @@ h3 {
   font-weight: 700;
   justify-self: end;
   text-align: right;
+}
+
+.player-metrics-grid--compact {
+  display: grid;
+  gap: 2px 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.player-metrics-grid--compact .player-metrics-grid-row {
+  border-bottom: 0;
+  gap: 6px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 22px;
+  padding: 2px 0;
+}
+
+.player-metrics-grid--compact .player-metrics-grid-stat {
+  font-size: 10px;
+}
+
+.player-metrics-grid--compact .player-metrics-grid-value {
+  font-size: 11px;
 }
 
 .player-stat-col-caption,

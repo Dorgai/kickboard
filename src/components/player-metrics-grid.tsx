@@ -6,13 +6,14 @@ export type PlayerMetricGridItem = {
 
 type PlayerMetricsGridProps = {
   items: PlayerMetricGridItem[];
+  compact?: boolean;
 };
 
-export function PlayerMetricsGrid({ items }: PlayerMetricsGridProps) {
+export function PlayerMetricsGrid({ items, compact = false }: PlayerMetricsGridProps) {
   if (!items.length) return null;
 
   return (
-    <div className="player-metrics-grid">
+    <div className={`player-metrics-grid${compact ? " player-metrics-grid--compact" : ""}`}>
       {items.map((item) => (
         <div className="player-metrics-grid-row" key={item.id}>
           <span className="player-metrics-grid-stat">{item.label}</span>

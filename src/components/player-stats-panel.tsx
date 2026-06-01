@@ -43,6 +43,8 @@ type PlayerStatsPanelProps = {
   competitionId: number;
   seasonId: number;
   competitionLabel: string;
+  /** Tighter copy and collapsed secondary sections (match focus row). */
+  compact?: boolean;
 };
 
 export function PlayerStatsPanel({
@@ -52,7 +54,8 @@ export function PlayerStatsPanel({
   matchMeta,
   competitionId,
   seasonId,
-  competitionLabel
+  competitionLabel,
+  compact = false
 }: PlayerStatsPanelProps) {
   const [career, setCareer] = useState<TournamentSummary | null>(null);
   const [careerLoading, setCareerLoading] = useState(false);
@@ -141,13 +144,19 @@ export function PlayerStatsPanel({
   }, [career]);
 
   return (
-    <section className="match-detail-section player-stats-section data-card surface-muted player-stats-panel">
+    <section
+      className={`match-detail-section player-stats-section data-card surface-muted player-stats-panel${
+        compact ? " player-stats-panel--compact" : ""
+      }`}
+    >
       <div className="section-heading compact">
         <div>
           <h3>Player stats</h3>
-          <p className="player-stats-summary player-stats-summary--caption">
-            Select a player in Lineups. This panel shows that player&apos;s match line only.
-          </p>
+          {!compact ? (
+            <p className="player-stats-summary player-stats-summary--caption">
+              Select a player in Lineups. This panel shows that player&apos;s match line only.
+            </p>
+          ) : null}
         </div>
         {selectedPlayerId ? (
           <button className="text-button" type="button" onClick={() => onSelectPlayer(null)}>
@@ -158,100 +167,65 @@ export function PlayerStatsPanel({
 
       {!selectedPlayer ? (
         <p className="inline-status player-stats-empty-prompt">
-          No player selected — tap a name in Lineups to view their stats for this match.
+          {compact ? "Select a player in Lineups." : "No player selected — tap a name in Lineups to view their stats for this match."}
         </p>
       ) : (
         <>
           <article className="player-focus-card">
             <header className="player-focus-header">
               <div>
-                <p className="eyebrow">This match</p>
+                {!compact ? <p className="eyebrow">This match</p> : null}
                 <h4>{selectedPlayer.player}</h4>
                 <p className="player-focus-meta-caption">
-                  <TeamLabel name={selectedPlayer.team} size="sm" />
-                  {" · "}
-                  {matchMeta.stage ?? "Stage"} · {matchMeta.date}
-                  {matchMeta.stadium ? ` · ${matchMeta.stadium}` : ""}
+                  <TeamLabel name={selectedPlayer.team} size={compact ? "xs" : "sm"} />
+                  {!compact ? (
+                    <>
+                      {" · "}
+                      {matchMeta.stage ?? "Stage"} · {matchMeta.date}
+                      {matchMeta.stadium ? ` · ${matchMeta.stadium}` : ""}
+                    </>
+                  ) : null}
                 </p>
-                <p className="player-focus-meta-caption">
-                  {matchMeta.homeTeam} {matchMeta.homeScore}–{matchMeta.awayScore} {matchMeta.awayTeam}
-                </p>
+                {!compact ? (
+                  <p className="player-focus-meta-caption">
+                    {matchMeta.homeTeam} {matchMeta.homeScore}–{matchMeta.awayScore} {matchMeta.awayTeam}
+                  </p>
+                ) : null}
               </div>
             </header>
-            <PlayerMetricsGrid items={selectedPlayerMatchMetrics} />
+            <PlayerMetricsGrid compact={compact} items={selectedPlayerMatchMetrics} />
           </article>
 
           <section className="player-career-section">
-            <div className="section-heading compact">
-              <div>
-                <p className="eyebrow">Tournament record</p>
-                <h4>{competitionLabel}</h4>
-                <p className="player-stats-summary player-stats-summary--caption">
-                  Other matches in this World Cup from StatsBomb lineups and events (excluding this fixture).
-                </p>
-              </div>
-            </div>
-
-            {careerLoading ? <p className="inline-status">Loading tournament appearances…</p> : null}
-            {careerError ? <p className="inline-error">{careerError}</p> : null}
-
-            {!careerLoading && !careerError && career ? (
+            {compact ? (
+              <details className="player-career-disclosure">
+                <summary>Tournament record ({competitionLabel})</summary>
+                {careerLoading ? <p className="inline-status">Loading…</p> : null}
+                {careerError ? <p className="inline-error">{careerError}</p> : null}
+                {!careerLoading && !careerError && career ? (
+                  <PlayerCareerBody career={career} careerTotalMetrics={careerTotalMetrics} />
+                ) : null}
+              </details>
+            ) : (
               <>
-                {career.appearances.length === 0 ? (
-                  <p className="inline-status">No other tournament appearances found in the open-data feed.</p>
-                ) : (
-                  <>
-                    <PlayerMetricsGrid items={careerTotalMetrics} />
+                <div className="section-heading compact">
+                  <div>
+                    <p className="eyebrow">Tournament record</p>
+                    <h4>{competitionLabel}</h4>
+                    <p className="player-stats-summary player-stats-summary--caption">
+                      Other matches in this World Cup from StatsBomb lineups and events (excluding this fixture).
+                    </p>
+                  </div>
+                </div>
 
-                    <div className="player-career-table" role="table">
-                      <div className="player-career-row player-career-row--head" role="row">
-                        <span role="columnheader">
-                          Date
-                          <span className="player-career-col-caption">Kickoff date (UTC) from StatsBomb.</span>
-                        </span>
-                        <span role="columnheader">
-                          Stage
-                          <span className="player-career-col-caption">Competition stage label.</span>
-                        </span>
-                        <span role="columnheader">
-                          Opponent
-                          <span className="player-career-col-caption">Opposing national team in that match.</span>
-                        </span>
-                        <span role="columnheader">
-                          Score
-                          <span className="player-career-col-caption">Final score when data is present.</span>
-                        </span>
-                        {PLAYER_CAREER_METRICS.map((metric) => (
-                          <span key={metric.id} role="columnheader">
-                            {metric.label}
-                            <span className="player-career-col-caption">{metric.caption}</span>
-                          </span>
-                        ))}
-                      </div>
-                      {career.appearances.map((appearance) => (
-                        <div className="player-career-row" key={appearance.matchId} role="row">
-                          <span>{appearance.date}</span>
-                          <span>{appearance.stage ?? "—"}</span>
-                          <span>
-                            <TeamLabel name={appearance.opponent} size="xs" />
-                          </span>
-                          <span>
-                            {appearance.homeTeam} {appearance.homeScore}–{appearance.awayScore}{" "}
-                            {appearance.awayTeam}
-                          </span>
-                          {PLAYER_CAREER_METRICS.map((metric) => (
-                            <span key={`${appearance.matchId}-${metric.id}`}>
-                              {formatPlayerMetric(metric.id, appearance)}
-                            </span>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-                {career.note ? <p className="player-career-note">{career.note}</p> : null}
+                {careerLoading ? <p className="inline-status">Loading tournament appearances…</p> : null}
+                {careerError ? <p className="inline-error">{careerError}</p> : null}
+
+                {!careerLoading && !careerError && career ? (
+                  <PlayerCareerBody career={career} careerTotalMetrics={careerTotalMetrics} />
+                ) : null}
               </>
-            ) : null}
+            )}
           </section>
         </>
       )}
@@ -268,5 +242,70 @@ export function PlayerStatsPanel({
         </details>
       ) : null}
     </section>
+  );
+}
+
+function PlayerCareerBody({
+  career,
+  careerTotalMetrics
+}: {
+  career: TournamentSummary;
+  careerTotalMetrics: { id: string; label: string; value: string }[];
+}) {
+  return (
+    <>
+      {career.appearances.length === 0 ? (
+        <p className="inline-status">No other tournament appearances found in the open-data feed.</p>
+      ) : (
+        <>
+          <PlayerMetricsGrid compact items={careerTotalMetrics} />
+
+          <div className="player-career-table" role="table">
+            <div className="player-career-row player-career-row--head" role="row">
+              <span role="columnheader">
+                Date
+                <span className="player-career-col-caption">Kickoff date (UTC) from StatsBomb.</span>
+              </span>
+              <span role="columnheader">
+                Stage
+                <span className="player-career-col-caption">Competition stage label.</span>
+              </span>
+              <span role="columnheader">
+                Opponent
+                <span className="player-career-col-caption">Opposing national team in that match.</span>
+              </span>
+              <span role="columnheader">
+                Score
+                <span className="player-career-col-caption">Final score when data is present.</span>
+              </span>
+              {PLAYER_CAREER_METRICS.map((metric) => (
+                <span key={metric.id} role="columnheader">
+                  {metric.label}
+                  <span className="player-career-col-caption">{metric.caption}</span>
+                </span>
+              ))}
+            </div>
+            {career.appearances.map((appearance) => (
+              <div className="player-career-row" key={appearance.matchId} role="row">
+                <span>{appearance.date}</span>
+                <span>{appearance.stage ?? "—"}</span>
+                <span>
+                  <TeamLabel name={appearance.opponent} size="xs" />
+                </span>
+                <span>
+                  {appearance.homeTeam} {appearance.homeScore}–{appearance.awayScore} {appearance.awayTeam}
+                </span>
+                {PLAYER_CAREER_METRICS.map((metric) => (
+                  <span key={`${appearance.matchId}-${metric.id}`}>
+                    {formatPlayerMetric(metric.id, appearance)}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      {career.note ? <p className="player-career-note">{career.note}</p> : null}
+    </>
   );
 }

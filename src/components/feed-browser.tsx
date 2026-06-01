@@ -819,10 +819,34 @@ function PastEventsPanel({
               </article>
 
               {matchDetail ? (
-                <>
+                <div className="knockout-widgets-row knockout-widgets-row--squads-pair">
+                  <article className="data-card surface-muted match-focus-col match-lineups-column" id="squads">
+                    <div className="section-heading compact match-lineups-heading">
+                      <div>
+                        <h3>Lineups</h3>
+                      </div>
+                      <input
+                        aria-label="Search lineup"
+                        className="lineup-search feed-control-input"
+                        placeholder="Filter"
+                        type="search"
+                        value={lineupSearch}
+                        onChange={(event) => setLineupSearch(event.target.value)}
+                      />
+                    </div>
+                    <MatchLineupList
+                      compact
+                      layout={filteredLineups.length === 2 ? "paired" : "stacked"}
+                      selectedPlayerId={selectedPlayerId}
+                      teams={filteredLineups}
+                      onSelectPlayer={setSelectedPlayerId}
+                    />
+                  </article>
+
                   <article className="data-card surface-muted match-focus-col match-player-stats-column" id="players">
                     {matchDetail.playerStats.length > 0 ? (
                       <PlayerStatsPanel
+                        compact
                         competitionId={competitionId}
                         competitionLabel={competitionLabel}
                         matchMeta={{
@@ -845,32 +869,7 @@ function PastEventsPanel({
                     )}
                     <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
                   </article>
-
-                  <article className="data-card surface-muted match-focus-col match-lineups-column" id="squads">
-                    <div className="section-heading compact match-lineups-heading">
-                      <div>
-                        <h3>Lineups</h3>
-                        <p className="match-lineups-note">
-                          Grouped by role, then defence, midfield, and attack
-                        </p>
-                      </div>
-                      <input
-                        aria-label="Search lineup"
-                        className="lineup-search feed-control-input"
-                        placeholder="Filter"
-                        type="search"
-                        value={lineupSearch}
-                        onChange={(event) => setLineupSearch(event.target.value)}
-                      />
-                    </div>
-                    <MatchLineupList
-                      layout={filteredLineups.length === 2 ? "paired" : "stacked"}
-                      selectedPlayerId={selectedPlayerId}
-                      teams={filteredLineups}
-                      onSelectPlayer={setSelectedPlayerId}
-                    />
-                  </article>
-                </>
+                </div>
               ) : null}
             </div>
           ) : null}
