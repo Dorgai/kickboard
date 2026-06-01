@@ -1,8 +1,9 @@
 import { cookies, headers } from "next/headers";
 import { AdminAccessGate } from "@/components/admin-access-gate";
 import { CommunityModerationPanel } from "@/components/community-moderation-panel";
+import { CommunitySetupPanel } from "@/components/community-setup-panel";
 import { FeedStatusPanel } from "@/components/feed-status-panel";
-import { isDatabaseConfigured } from "@/lib/db";
+import { getCommunityHealth } from "@/lib/community/health";
 import { ADMIN_COOKIE, getAdminAuthStatus, readAdminToken } from "@/lib/admin/auth";
 import { buildAdminDataSources } from "@/lib/admin/data-sources";
 
@@ -38,6 +39,8 @@ export default async function AdminDataSourcesPage({
   }
 
   const data = await buildAdminDataSources();
+  const communityHealth = await getCommunityHealth();
+  const adminTokenConfigured = Boolean(process.env.ADMIN_DATA_SOURCES_TOKEN?.trim());
 
   return (
     <main className="admin-page" id="main-content">
@@ -59,7 +62,9 @@ export default async function AdminDataSourcesPage({
 
       <FeedStatusPanel />
 
-      {isDatabaseConfigured() && token ? <CommunityModerationPanel adminToken={token} /> : null}
+      <CommunitySetupPanel adminTokenConfigured={adminTokenConfigured} health={communityHealth} />
+
+      {communityHealth.schemaReady && token ? <CommunityModerationPanel adminToken={token} /> : null}
 
       <section className="admin-source-grid">
         {data.sources.map((source) => (

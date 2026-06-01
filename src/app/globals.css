@@ -1541,6 +1541,47 @@ h3 {
   margin-bottom: 24px;
 }
 
+.admin-community-overall {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+.admin-community-overall--ok {
+  color: color-mix(in srgb, var(--color-brand) 75%, var(--color-text-primary));
+  font-weight: 600;
+}
+
+.admin-community-setup-steps {
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.admin-community-setup-steps h3 {
+  font-size: 13px;
+  margin: 0;
+}
+
+.admin-code-block {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 12px;
+  margin: 0;
+  overflow-x: auto;
+  padding: 10px 12px;
+}
+
+.admin-community-setup-note {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+}
+
 .feed-hero,
 .feed-control-card,
 .current-world-cup-card,

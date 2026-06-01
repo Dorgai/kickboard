@@ -48,6 +48,7 @@ export async function getCommunityHealth(): Promise<CommunityHealth> {
   try {
     await query("SELECT 1 FROM users LIMIT 0");
     await query("SELECT 1 FROM posts LIMIT 0");
+    await query("SELECT 1 FROM content_reports LIMIT 0");
     return {
       database: true,
       jwt: true,
