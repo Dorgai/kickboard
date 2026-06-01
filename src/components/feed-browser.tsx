@@ -570,12 +570,24 @@ function PastEventsPanel({
 
   const activeKnockoutRound = bracketRounds.find((round) => round.stage === activeKnockoutStage);
 
-  const filteredLineups = (matchDetail?.lineups ?? []).map((team) => ({
-    ...team,
-    players: team.players.filter((player) =>
-      `${player.name} ${player.country ?? ""}`.toLowerCase().includes(lineupSearch.toLowerCase())
-    )
-  }));
+  const filteredLineups = useMemo(() => {
+    const teams = (matchDetail?.lineups ?? []).map((team) => ({
+      ...team,
+      players: team.players.filter((player) =>
+        `${player.name} ${player.country ?? ""}`.toLowerCase().includes(lineupSearch.toLowerCase())
+      )
+    }));
+
+    if (!selectedMatch) return teams;
+
+    const home = teams.find((team) => team.teamName === selectedMatch.homeTeam);
+    const away = teams.find((team) => team.teamName === selectedMatch.awayTeam);
+    const rest = teams.filter(
+      (team) => team.teamName !== selectedMatch.homeTeam && team.teamName !== selectedMatch.awayTeam
+    );
+
+    return [home, away, ...rest].filter((team): team is LineupTeam => Boolean(team));
+  }, [lineupSearch, matchDetail?.lineups, selectedMatch]);
 
   const railFixtureMode = useMemo((): "group" | "knockout" | null => {
     if (selectedMatch?.stage === "Group Stage") return "group";
@@ -802,7 +814,7 @@ function PastEventsPanel({
                 selectedMatch && matchDetail ? " knockout-widgets-row--with-squads" : ""
               }`}
             >
-              <article className="data-card surface-muted match-fixtures-widget">
+              <article className="data-card surface-muted match-focus-col match-fixtures-widget">
                 <div className="section-heading compact">
                   <div>
                     <p className="eyebrow">Fixtures</p>
@@ -857,67 +869,12 @@ function PastEventsPanel({
                 </div>
               </article>
 
-              {selectedMatch && matchDetail ? (
-                <article className="data-card surface-muted match-squads-players-column">
-                  <div className="match-squads-players-split">
-                    <section className="match-squads-section" id="squads">
-                      <div className="section-heading compact match-squads-heading">
-                        <div>
-                          <h3>Lineups</h3>
-                          <p className="match-lineups-note">Starting XI, substitutes, and unused squad</p>
-                        </div>
-                        <input
-                          aria-label="Search lineup"
-                          className="lineup-search"
-                          placeholder="Filter"
-                          type="search"
-                          value={lineupSearch}
-                          onChange={(event) => setLineupSearch(event.target.value)}
-                        />
-                      </div>
-                      <MatchLineupList
-                        selectedPlayerId={selectedPlayerId}
-                        teams={filteredLineups}
-                        onSelectPlayer={setSelectedPlayerId}
-                      />
-                    </section>
-
-                    <div className="match-players-section" id="players">
-                      {matchDetail.playerStats.length > 0 ? (
-                        <PlayerStatsPanel
-                          competitionId={competitionId}
-                          competitionLabel={competitionLabel}
-                          matchMeta={{
-                            matchId: selectedMatch.matchId,
-                            date: selectedMatch.date,
-                            stage: selectedMatch.stage,
-                            homeTeam: selectedMatch.homeTeam,
-                            awayTeam: selectedMatch.awayTeam,
-                            homeScore: selectedMatch.homeScore,
-                            awayScore: selectedMatch.awayScore,
-                            stadium: selectedMatch.stadium
-                          }}
-                          players={matchDetail.playerStats}
-                          seasonId={seasonId}
-                          selectedPlayerId={selectedPlayerId}
-                          onSelectPlayer={setSelectedPlayerId}
-                        />
-                      ) : (
-                        <p className="inline-status">No player stats for this match.</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
-                </article>
-              ) : null}
-
-              <article className="data-card surface-muted match-detail-widget">
+              <article className="data-card surface-muted match-focus-col match-detail-widget">
                 {!selectedMatch ? (
                   <div className="match-detail-widget-empty">
                     <h2>Match details</h2>
                     <p className="inline-status">
-                      Choose a fixture on the left to load team stats, squads, and player data here.
+                      Choose a fixture beside this panel to load team stats, player data, and lineups.
                     </p>
                   </div>
                 ) : (
@@ -959,6 +916,59 @@ function PastEventsPanel({
                   </>
                 )}
               </article>
+
+              {selectedMatch && matchDetail ? (
+                <>
+                  <article className="data-card surface-muted match-focus-col match-player-stats-column" id="players">
+                    {matchDetail.playerStats.length > 0 ? (
+                      <PlayerStatsPanel
+                        competitionId={competitionId}
+                        competitionLabel={competitionLabel}
+                        matchMeta={{
+                          matchId: selectedMatch.matchId,
+                          date: selectedMatch.date,
+                          stage: selectedMatch.stage,
+                          homeTeam: selectedMatch.homeTeam,
+                          awayTeam: selectedMatch.awayTeam,
+                          homeScore: selectedMatch.homeScore,
+                          awayScore: selectedMatch.awayScore,
+                          stadium: selectedMatch.stadium
+                        }}
+                        players={matchDetail.playerStats}
+                        seasonId={seasonId}
+                        selectedPlayerId={selectedPlayerId}
+                        onSelectPlayer={setSelectedPlayerId}
+                      />
+                    ) : (
+                      <p className="inline-status">No player stats for this match.</p>
+                    )}
+                    <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
+                  </article>
+
+                  <article className="data-card surface-muted match-focus-col match-lineups-column" id="squads">
+                    <div className="section-heading compact match-lineups-heading">
+                      <div>
+                        <h3>Lineups</h3>
+                        <p className="match-lineups-note">Starting XI, substitutes, unused</p>
+                      </div>
+                      <input
+                        aria-label="Search lineup"
+                        className="lineup-search"
+                        placeholder="Filter"
+                        type="search"
+                        value={lineupSearch}
+                        onChange={(event) => setLineupSearch(event.target.value)}
+                      />
+                    </div>
+                    <MatchLineupList
+                      layout={filteredLineups.length === 2 ? "paired" : "stacked"}
+                      selectedPlayerId={selectedPlayerId}
+                      teams={filteredLineups}
+                      onSelectPlayer={setSelectedPlayerId}
+                    />
+                  </article>
+                </>
+              ) : null}
             </div>
           ) : null}
         </div>
