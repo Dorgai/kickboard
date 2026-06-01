@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { PlayerStatsTable } from "@/components/player-stats-table";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
@@ -245,10 +246,6 @@ export function FeedBrowser() {
   );
 
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
-  const selectedPlayer = (matchDetail?.playerStats ?? []).find(
-    (player) => player.playerId === selectedPlayerId
-  );
-
   return (
     <div className="feed-browser">
       <nav className="event-tab-bar" aria-label="Tournament event selector">
@@ -308,7 +305,6 @@ export function FeedBrowser() {
           selectedCompetition={selectedCompetition}
           selectedMatch={selectedMatch}
           selectedMatchId={selectedMatchId}
-          selectedPlayer={selectedPlayer}
           selectedPlayerId={selectedPlayerId}
           setLineupSearch={setLineupSearch}
           setMatchSearch={setMatchSearch}
@@ -399,7 +395,6 @@ type PastEventsPanelProps = {
   selectedCompetition: string;
   selectedMatch: Match | undefined;
   selectedMatchId: number | null;
-  selectedPlayer: PlayerStat | undefined;
   selectedPlayerId: number | null;
   setLineupSearch: (value: string) => void;
   setMatchSearch: (value: string) => void;
@@ -420,7 +415,6 @@ function PastEventsPanel({
   selectedCompetition,
   selectedMatch,
   selectedMatchId,
-  selectedPlayer,
   selectedPlayerId,
   setLineupSearch,
   setMatchSearch,
@@ -463,10 +457,6 @@ function PastEventsPanel({
       </section>
 
       <section className="bracket-tree-card surface-muted">
-<<<<<<< HEAD
-        <p className="eyebrow">Knockout tree</p>
-        <h2>Horizontal route to the final</h2>
-=======
         <div className="section-heading compact">
           <div>
             <p className="eyebrow">Knockout tree</p>
@@ -482,7 +472,6 @@ function PastEventsPanel({
             {showMatchesList ? "Hide match list" : "Show full match list"}
           </button>
         </div>
->>>>>>> 836f340 (Add country flags beside teams and tiered widget shadows)
         <div className="bracket-tree">
           {bracketRounds.map((round) => (
             <div className="bracket-round" key={round.stage}>
@@ -647,66 +636,25 @@ function PastEventsPanel({
                         ))}
                       </div>
                     </section>
+
+                    {matchDetail.playerStats.length > 0 ? (
+                      <PlayerStatsTable
+                        players={matchDetail.playerStats}
+                        selectedPlayerId={selectedPlayerId}
+                        onSelectPlayer={setSelectedPlayerId}
+                      />
+                    ) : (
+                      <p className="inline-status">No player-level event stats for this match.</p>
+                    )}
                   </div>
                 )}
               </article>
-
-              {selectedPlayerId && matchDetail ? (
-                <article className="data-card widget-elevated player-detail-card">
-                  <div className="section-heading compact">
-                    <div>
-                      <p className="eyebrow">Player stats</p>
-                      <h2>{selectedPlayer?.player ?? lineupPlayerName(filteredLineups, selectedPlayerId)}</h2>
-                      <p className="player-team-line">
-                        {selectedPlayer?.team ? (
-                          <TeamLabel name={selectedPlayer.team} size="sm" />
-                        ) : (
-                          "—"
-                        )}
-                      </p>
-                    </div>
-                    <button className="text-button" type="button" onClick={() => setSelectedPlayerId(null)}>
-                      Clear
-                    </button>
-                  </div>
-                  {selectedPlayer ? (
-                    <div className="player-stat-chip-grid">
-                      <StatChip label="Goals" value={selectedPlayer.goals} />
-                      <StatChip label="Assists" value={selectedPlayer.assists} />
-                      <StatChip label="Shots" value={selectedPlayer.shots} />
-                      <StatChip label="xG" value={selectedPlayer.xg} />
-                      <StatChip label="Passes" value={selectedPlayer.passes} />
-                      <StatChip
-                        label="Pass acc"
-                        value={selectedPlayer.passAccuracy ? `${selectedPlayer.passAccuracy}%` : "n/a"}
-                      />
-                      <StatChip label="Carries" value={selectedPlayer.carries} />
-                      <StatChip label="Dribbles" value={selectedPlayer.dribbles} />
-                    </div>
-                  ) : (
-                    <p className="inline-status">No event-level stats recorded for this player in this match.</p>
-                  )}
-                </article>
-              ) : selectedMatch && matchDetail ? (
-                <article className="data-card surface-flat match-placeholder subtle">
-                  <h3>Select a player</h3>
-                  <p>Click a name in the lineup to view individual match stats.</p>
-                </article>
-              ) : null}
             </>
           )}
         </div>
       </section>
     </>
   );
-}
-
-function lineupPlayerName(lineups: LineupTeam[], playerId: number) {
-  for (const team of lineups) {
-    const player = team.players.find((entry) => entry.playerId === playerId);
-    if (player) return player.name;
-  }
-  return "Selected player";
 }
 
 function SummaryTile({ label, value }: { label: string; value: string }) {
