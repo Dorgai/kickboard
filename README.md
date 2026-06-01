@@ -63,6 +63,17 @@ Details are in [`docs/railway-services.md`](docs/railway-services.md).
 - `/api/feeds/historical/events` - reads event-level data for a StatsBomb match.
 - `/api/feeds/realtime` - reports API-Football worker readiness. This remains inactive until `API_FOOTBALL_KEY` and a running worker service are configured.
 
+## Admin data source dashboard
+
+The data-source operations dashboard is protected by `ADMIN_DATA_SOURCES_TOKEN` until user auth and
+admin roles are implemented.
+
+- Page: `/admin/data-sources?token=<ADMIN_DATA_SOURCES_TOKEN>`
+- API: `/api/admin/data-sources` with `Authorization: Bearer <ADMIN_DATA_SOURCES_TOKEN>` or `x-admin-token`
+
+It shows which sources are connected, last checked/refreshed metadata, refresh cadence, and what data
+each source updates.
+
 ## Worker
 
 Run the API-Football worker with:
@@ -76,6 +87,7 @@ Required variables:
 - `REDIS_URL`
 - `API_FOOTBALL_KEY`
 - `KICKBOARD_WORKER_ENABLED=true` on the web service when the worker is live
+- `ADMIN_DATA_SOURCES_TOKEN` for the admin-only data source dashboard
 
 ## Important safety constraints
 

@@ -988,6 +988,146 @@ h3 {
   padding: 10px 12px;
 }
 
+.admin-page {
+  margin: 0 auto;
+  max-width: var(--max-page);
+  padding: 64px 24px;
+}
+
+.admin-hero {
+  margin-bottom: 24px;
+  max-width: 840px;
+}
+
+.admin-hero p,
+.admin-source-card p,
+.admin-source-meta dt,
+.admin-record-grid span {
+  color: var(--color-text-secondary);
+}
+
+.admin-summary-grid,
+.admin-source-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-summary-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 24px;
+}
+
+.admin-source-grid {
+  grid-template-columns: 1fr;
+}
+
+.admin-source-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-elevation-2);
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.admin-source-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.admin-source-heading h2 {
+  margin: 8px 0;
+}
+
+.admin-source-heading > strong,
+.admin-status {
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 9px;
+  text-transform: uppercase;
+}
+
+.admin-source-heading > strong {
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+}
+
+.admin-status-online,
+.admin-status-configured {
+  background: color-mix(in srgb, var(--color-live) 20%, transparent);
+  color: var(--color-live);
+}
+
+.admin-status-not_configured,
+.admin-status-degraded {
+  background: color-mix(in srgb, var(--color-goal) 24%, transparent);
+  color: #92400e;
+}
+
+.admin-status-offline {
+  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  color: var(--color-danger);
+}
+
+.admin-source-meta,
+.admin-record-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-source-meta {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+}
+
+.admin-source-meta div,
+.admin-record-grid div {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.admin-source-meta dt,
+.admin-record-grid span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-source-meta dd {
+  font-weight: 800;
+  margin: 6px 0 0;
+}
+
+.admin-record-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-update-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-update-list h3 {
+  flex-basis: 100%;
+}
+
+.admin-update-list span {
+  background: var(--color-brand-light);
+  border-radius: 9999px;
+  color: var(--color-brand);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
 .feed-status-grid {
   display: grid;
   gap: 12px;
@@ -1497,7 +1637,10 @@ code {
   .current-group-grid,
   .team-stat-grid,
   .lineup-grid,
-  .feed-content-grid.wide {
+  .feed-content-grid.wide,
+  .admin-summary-grid,
+  .admin-source-meta,
+  .admin-record-grid {
     grid-template-columns: 1fr;
   }
 
