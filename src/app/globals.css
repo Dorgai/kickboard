@@ -918,8 +918,6 @@ h3 {
 
 .feed-browser .bracket-tree-card .feed-control-bar,
 .feed-browser .bracket-tree-card .feed-control-field,
-.feed-browser .match-fixtures-widget .feed-control-bar,
-.feed-browser .match-fixtures-widget .feed-control-field,
 .feed-browser .match-lineups-column .feed-control-input,
 .feed-browser .match-explorer-list .feed-control-field {
   box-sizing: border-box;
@@ -1532,28 +1530,26 @@ h3 {
 }
 
 @media (min-width: 960px) {
-  .knockout-widgets-row--match-split {
-    grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1fr);
-  }
-}
-
-@media (min-width: 960px) {
   .knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
-    grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.72fr);
   }
 }
 
 @media (min-width: 1100px) {
   .knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
     grid-template-columns:
-      minmax(280px, 0.82fr)
-      minmax(220px, 0.62fr)
+      minmax(240px, 0.72fr)
       minmax(200px, 0.5fr)
       minmax(260px, 0.92fr);
   }
 }
 
-.match-fixtures-widget,
+.bracket-group-stage {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 .match-detail-widget,
 .match-focus-col {
   display: grid;

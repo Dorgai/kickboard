@@ -599,52 +599,18 @@ function PastEventsPanel({
     return [home, away, ...rest].filter((team): team is LineupTeam => Boolean(team));
   }, [lineupSearch, matchDetail?.lineups, selectedMatch]);
 
-  const railFixtureMode = useMemo((): "group" | "knockout" | null => {
-    if (selectedMatch?.stage === "Group Stage") return "group";
-    if (bracketRounds.length > 0) return "knockout";
-    if (groupBuckets.length > 0) return "group";
-    return null;
-  }, [bracketRounds.length, groupBuckets.length, selectedMatch?.stage]);
-
-  const railFixtures = useMemo(() => {
-    if (railFixtureMode === "group") {
-      const letter =
-        selectedMatch?.stage === "Group Stage"
-          ? (teamToGroup.get(selectedMatch.homeTeam) ?? teamToGroup.get(selectedMatch.awayTeam))
-          : activeGroupLetter;
-      if (!letter) return [];
-      return groupBuckets.find((bucket) => bucket.letter === letter)?.matches ?? [];
+  const activeKnockoutFixtures = useMemo(() => {
+    if (!activeKnockoutRound) return [];
+    if (activeKnockoutRound.clusters?.length) {
+      return activeKnockoutRound.clusters.flatMap((cluster) => cluster.matches);
     }
-    if (railFixtureMode === "knockout") {
-      const stageKey =
-        selectedMatch?.stage && selectedMatch.stage !== "Group Stage"
-          ? activeKnockoutStage || selectedMatch.stage
-          : activeKnockoutStage;
-      const round = bracketRounds.find((round) => round.stage === stageKey);
-      if (!round) return [];
-      return round.clusters?.length
-        ? round.clusters.flatMap((cluster) => cluster.matches)
-        : round.matches;
-    }
-    return [];
-  }, [
-    activeGroupLetter,
-    activeKnockoutStage,
-    bracketRounds,
-    groupBuckets,
-    railFixtureMode,
-    selectedMatch,
-    teamToGroup
-  ]);
+    return activeKnockoutRound.matches;
+  }, [activeKnockoutRound]);
 
-  const selectedClusterLabel = useMemo(() => {
-    if (!selectedMatch?.stage || selectedMatch.stage === "Group Stage") return null;
-    const round = bracketRounds.find((round) => round.stage === selectedMatch.stage);
-    const cluster = round?.clusters?.find((entry) =>
-      entry.matches.some((match) => match.matchId === selectedMatch.matchId)
-    );
-    return cluster?.label ?? null;
-  }, [bracketRounds, selectedMatch]);
+  const activeGroupFixtures = useMemo(
+    () => groupBuckets.find((bucket) => bucket.letter === activeGroupLetter)?.matches ?? [],
+    [activeGroupLetter, groupBuckets]
+  );
 
   const orderedTeamStats = useMemo(() => {
     if (!matchDetail || !selectedMatch) return matchDetail?.teamStats ?? [];
@@ -698,6 +664,17 @@ function PastEventsPanel({
                 value={activeKnockoutStage}
                 onChange={setActiveKnockoutStage}
               />
+            ) : groupBuckets.length ? (
+              <FeedTabBar
+                ariaLabel="Group stage groups"
+                className="bracket-stage-tabs"
+                tabs={groupBuckets.map((bucket) => ({
+                  id: bucket.letter,
+                  label: `Group ${bucket.letter}`
+                }))}
+                value={activeGroupLetter}
+                onChange={setActiveGroupLetter}
+              />
             ) : null}
             <button
               className="button secondary bracket-controls-action"
@@ -709,28 +686,77 @@ function PastEventsPanel({
             </button>
           </div>
           {bracketRounds.length ? (
-            <>
-              {!selectedMatch && activeKnockoutRound ? (
+            activeKnockoutFixtures.length ? (
+              <div className="bracket-stage-panel">
+                <div className="bracket-fixture-grid match-stage-fixtures">
+                  {activeKnockoutFixtures.map((match) => (
+                    <BracketMatchButton
+                      key={match.matchId}
+                      clusterLabel={knockoutClusterLabel(activeKnockoutRound, match.matchId)}
+                      match={match}
+                      selectedMatchId={selectedMatchId}
+                      showDate={false}
+                      teamsLayout="inline"
+                      onSelect={selectMatch}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="inline-status">No fixtures for this knockout stage.</p>
+            )
+          ) : groupBuckets.length ? (
+            activeGroupFixtures.length ? (
+              <div className="bracket-stage-panel">
+                <div className="bracket-fixture-grid match-stage-fixtures">
+                  {activeGroupFixtures.map((match) => (
+                    <BracketMatchButton
+                      key={match.matchId}
+                      match={match}
+                      selectedMatchId={selectedMatchId}
+                      showDate={false}
+                      teamsLayout="inline"
+                      onSelect={selectMatch}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="inline-status">No fixtures for this group.</p>
+            )
+          ) : (
+            <p className="inline-status">No knockout rounds in this feed.</p>
+          )}
+          {bracketRounds.length && groupBuckets.length ? (
+            <div className="bracket-group-stage">
+              <FeedTabBar
+                ariaLabel="Group stage groups"
+                className="bracket-stage-tabs"
+                tabs={groupBuckets.map((bucket) => ({
+                  id: bucket.letter,
+                  label: `Group ${bucket.letter}`
+                }))}
+                value={activeGroupLetter}
+                onChange={setActiveGroupLetter}
+              />
+              {activeGroupFixtures.length ? (
                 <div className="bracket-stage-panel">
-                  <div className="bracket-fixture-grid">
-                    {activeKnockoutRound.matches.map((match) => (
+                  <div className="bracket-fixture-grid match-stage-fixtures">
+                    {activeGroupFixtures.map((match) => (
                       <BracketMatchButton
                         key={match.matchId}
-                        clusterLabel={knockoutClusterLabel(activeKnockoutRound, match.matchId)}
                         match={match}
                         selectedMatchId={selectedMatchId}
                         showDate={false}
-                        teamsLayout="stacked"
+                        teamsLayout="inline"
                         onSelect={selectMatch}
                       />
                     ))}
                   </div>
                 </div>
               ) : null}
-            </>
-          ) : (
-            <p className="inline-status">No knockout rounds in this feed.</p>
-          )}
+            </div>
+          ) : null}
         </section>
 
         <div className="knockout-widgets" id="match-detail-panel">
@@ -784,102 +810,42 @@ function PastEventsPanel({
             <div className="knockout-widgets-row knockout-widgets-row--primary">
               <article className="data-card surface-flat match-placeholder">
                 <h2>Select a match</h2>
-                <p>Pick a fixture in the stage panel to load match details beside it.</p>
+                <p>Pick a fixture above to load match details below.</p>
               </article>
             </div>
           ) : null}
 
-          {railFixtureMode ? (
+          {selectedMatch ? (
             <div
               className={`knockout-widgets-row knockout-widgets-row--match-split${
-                selectedMatch && matchDetail ? " knockout-widgets-row--with-squads" : ""
+                matchDetail ? " knockout-widgets-row--with-squads" : ""
               }`}
             >
-              <article className="data-card surface-muted match-focus-col match-fixtures-widget">
-                <div className="section-heading compact">
-                  <div>
-                    <p className="eyebrow">Fixtures</p>
-                    <h2>
-                      {railFixtureMode === "group"
-                        ? `Group ${activeGroupLetter}`
-                        : activeKnockoutStage || "Knockout stage"}
-                    </h2>
-                    {selectedClusterLabel && selectedMatch && selectedMatch.stage === activeKnockoutStage ? (
-                      <p className="match-stage-cluster">{selectedClusterLabel}</p>
-                    ) : null}
-                  </div>
-                </div>
-                {railFixtureMode === "group" && groupBuckets.length ? (
-                  <FeedTabBar
-                    ariaLabel="Group stage groups"
-                    className="match-stage-tabs"
-                    tabs={groupBuckets.map((bucket) => ({
-                      id: bucket.letter,
-                      label: `Group ${bucket.letter}`
-                    }))}
-                    value={activeGroupLetter}
-                    onChange={setActiveGroupLetter}
-                  />
-                ) : null}
-                <p className="match-stage-rail-caption">Select a match</p>
-                <div className="bracket-fixture-grid match-stage-fixtures">
-                  {railFixtures.map((match) => (
-                    <BracketMatchButton
-                      key={match.matchId}
-                      clusterLabel={
-                        railFixtureMode === "knockout"
-                          ? knockoutClusterLabel(
-                              bracketRounds.find((round) => round.stage === activeKnockoutStage),
-                              match.matchId
-                            )
-                          : undefined
-                      }
-                      match={match}
-                      selectedMatchId={selectedMatchId}
-                      showDate={false}
-                      teamsLayout="inline"
-                      onSelect={selectMatch}
-                    />
-                  ))}
-                </div>
-              </article>
-
               <article className="data-card surface-muted match-focus-col match-detail-widget">
-                {!selectedMatch ? (
-                  <div className="match-detail-widget-empty">
-                    <h2>Match details</h2>
-                    <p className="inline-status">
-                      Choose a fixture beside this panel to load team stats, player data, and lineups.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <header className="match-focus-scoreline">
-                      <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
-                      <MatchTeamsLine
-                        awayScore={selectedMatch.awayScore}
-                        awayTeam={selectedMatch.awayTeam}
-                        homeScore={selectedMatch.homeScore}
-                        homeTeam={selectedMatch.homeTeam}
-                        layout="stacked"
-                        size="md"
-                      />
-                      <p className="match-focus-meta">
-                        {selectedMatch.date}
-                        {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
-                      </p>
-                    </header>
+                <header className="match-focus-scoreline">
+                  <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
+                  <MatchTeamsLine
+                    awayScore={selectedMatch.awayScore}
+                    awayTeam={selectedMatch.awayTeam}
+                    homeScore={selectedMatch.homeScore}
+                    homeTeam={selectedMatch.homeTeam}
+                    layout="stacked"
+                    size="md"
+                  />
+                  <p className="match-focus-meta">
+                    {selectedMatch.date}
+                    {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+                  </p>
+                </header>
 
-                    {!matchDetail ? (
-                      <p className="inline-status">Loading team stats…</p>
-                    ) : (
-                      <MatchTeamStatsGrid columns={orderedTeamStats} />
-                    )}
-                  </>
+                {!matchDetail ? (
+                  <p className="inline-status">Loading team stats…</p>
+                ) : (
+                  <MatchTeamStatsGrid columns={orderedTeamStats} />
                 )}
               </article>
 
-              {selectedMatch && matchDetail ? (
+              {matchDetail ? (
                 <>
                   <article className="data-card surface-muted match-focus-col match-player-stats-column" id="players">
                     {matchDetail.playerStats.length > 0 ? (
