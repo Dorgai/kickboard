@@ -6,6 +6,7 @@ import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
 import { groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
 import { TEAM_MATCH_STAT_CHIPS } from "@/lib/player-stat-metrics";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
+import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
@@ -29,15 +30,7 @@ type Match = {
   stadium: string | null;
 };
 
-type LineupTeam = {
-  teamName: string;
-  players: Array<{
-    playerId: number;
-    name: string;
-    jerseyNumber: number | null;
-    country: string | null;
-  }>;
-};
+type LineupTeam = MatchLineupTeam;
 
 type TeamStat = {
   team: string;
@@ -877,7 +870,10 @@ function PastEventsPanel({
                   <div className="match-squads-players-split">
                     <section className="match-squads-section" id="squads">
                       <div className="section-heading compact match-squads-heading">
-                        <h3>Squads</h3>
+                        <div>
+                          <h3>Lineups</h3>
+                          <p className="match-lineups-note">Starting XI, substitutes, and unused squad</p>
+                        </div>
                         <input
                           aria-label="Search lineup"
                           className="lineup-search"
@@ -887,30 +883,11 @@ function PastEventsPanel({
                           onChange={(event) => setLineupSearch(event.target.value)}
                         />
                       </div>
-                      <div className="lineup-grid compact match-squads-lineups">
-                        {filteredLineups.map((team) => (
-                          <div className="lineup-card compact" key={team.teamName}>
-                            <h4>
-                              <TeamLabel name={team.teamName} size="xs" />
-                            </h4>
-                            <div className="lineup-list">
-                              {team.players.map((player) => (
-                                <button
-                                  className={
-                                    selectedPlayerId === player.playerId ? "lineup-row selected" : "lineup-row"
-                                  }
-                                  key={`${team.teamName}-${player.playerId}`}
-                                  type="button"
-                                  onClick={() => setSelectedPlayerId(player.playerId)}
-                                >
-                                  <span>{player.jerseyNumber ?? "–"}</span>
-                                  <span className="lineup-row-name">{player.name}</span>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <MatchLineupList
+                        selectedPlayerId={selectedPlayerId}
+                        teams={filteredLineups}
+                        onSelectPlayer={setSelectedPlayerId}
+                      />
                     </section>
 
                     <div className="match-players-section" id="players">

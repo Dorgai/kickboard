@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { classifyLineupRole } from "@/lib/lineup-roles";
 import { buildMatchStats, getEvents, getLineups } from "@/lib/statsbomb";
 
 export async function GET(request: NextRequest) {
@@ -24,7 +25,8 @@ export async function GET(request: NextRequest) {
             name: player.player_nickname || player.player_name,
             fullName: player.player_name,
             jerseyNumber: player.jersey_number ?? null,
-            country: player.country?.name ?? null
+            country: player.country?.name ?? null,
+            lineupRole: classifyLineupRole(player.positions)
           }))
         })),
         teamStats: stats.teamStats,

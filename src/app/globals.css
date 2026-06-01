@@ -1419,9 +1419,43 @@ h3 {
   width: 100%;
 }
 
-.match-squads-lineups {
-  gap: 10px;
-  grid-template-columns: minmax(0, 1fr);
+.match-lineups-note {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
+  margin: 4px 0 0;
+}
+
+.match-lineup-teams {
+  display: grid;
+  gap: 12px;
+}
+
+.lineup-role-group {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.lineup-role-group:first-of-type {
+  margin-top: 0;
+}
+
+.lineup-role-label {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.lineup-row--unused {
+  opacity: 0.72;
+}
+
+.lineup-row--unused .lineup-row-name {
+  font-style: italic;
 }
 
 .match-squads-section .lineup-card.compact {

@@ -91,6 +91,17 @@ export type StatsBombEvent = {
   };
 };
 
+export type StatsBombLineupPosition = {
+  position_id?: number;
+  position?: string;
+  from?: string;
+  to?: string | null;
+  from_period?: number;
+  to_period?: number | null;
+  start_reason?: string | null;
+  end_reason?: string | null;
+};
+
 export type StatsBombLineupPlayer = {
   player_id: number;
   player_name: string;
@@ -100,6 +111,7 @@ export type StatsBombLineupPlayer = {
     id: number;
     name: string;
   };
+  positions?: StatsBombLineupPosition[];
 };
 
 export type StatsBombLineup = {
