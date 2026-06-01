@@ -332,28 +332,17 @@ export function FeedBrowser() {
         </button>
       </nav>
 
-      <section className="feed-hero">
-        <div>
-          <p className="eyebrow">Feed-driven data</p>
-          {activeTab === "current" ? (
-            <>
-              <h1>Current event: 2026 FIFA World Cup.</h1>
-              <p>
-                Tournament summary and groups come from public pages. Live scores appear when
-                API-Football and the worker are configured.
-              </p>
-            </>
-          ) : (
-            <>
-              <h1>Past events: historical World Cup data.</h1>
-              <p>
-                Historical matches, event timelines, squads, player stats, team stats, and knockout
-                trees come from StatsBomb Open Data.
-              </p>
-            </>
-          )}
-        </div>
-      </section>
+      {activeTab === "current" ? (
+        <section className="feed-hero">
+          <div>
+            <h1>Current event: 2026 FIFA World Cup.</h1>
+            <p>
+              Tournament summary and groups come from public pages. Live scores appear when
+              API-Football and the worker are configured.
+            </p>
+          </div>
+        </section>
+      ) : null}
 
       {loading ? <p className="inline-status">Loading real feeds...</p> : null}
       {error ? <p className="inline-error">{error}</p> : null}
