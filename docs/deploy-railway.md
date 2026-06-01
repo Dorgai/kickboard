@@ -1,5 +1,16 @@
 # Deploy Kickboard to Railway
 
+## Not seeing a deploy in the kickboard project?
+
+Use this checklist:
+
+1. **Service is linked to GitHub** — In the kickboard project, the web service must be **Deploy from GitHub repo** → `Dorgai/kickboard`, not an empty service with no repo.
+2. **Branch is `main`** — Settings → Source → Branch **`main`** (older setups may still point at an empty initial commit).
+3. **Root directory** — `/` (repository root, where `package.json` and `railway.json` live).
+4. **Redeploy** — Deployments → **Deploy** / **Redeploy** on the latest `main` commit (message should **not** be only "Initial commit").
+5. **Build logs** — Open the failed deployment; common fixes: Node 22 (see `nixpacks.toml`), health check `/api/health`.
+6. **GitHub Actions (optional)** — Workflow `.github/workflows/railway-deploy.yml` only runs on **`main`** and needs repo secret **`RAILWAY_TOKEN`** (optional **`RAILWAY_SERVICE_ID`**). Without the token, use Railway’s native GitHub deploy (step 1).
+
 ## Option A: GitHub deploy (recommended)
 
 1. Open [Railway](https://railway.com) and create a **New Project**.
@@ -31,7 +42,7 @@
    ./scripts/configure-railway-variables.sh
    ```
 
-   **GitHub Actions:** add repository secrets `RAILWAY_TOKEN`, optional `JWT_SECRET`, `ADMIN_DATA_SOURCES_TOKEN`, `DATABASE_URL`, `REDIS_URL`, and variable `NEXT_PUBLIC_APP_URL`. Pushes to `main` run `.github/workflows/railway-deploy.yml`.
+   **GitHub Actions:** add repository secrets `RAILWAY_TOKEN` (required for CLI deploy), optional `RAILWAY_SERVICE_ID`, `JWT_SECRET`, `ADMIN_DATA_SOURCES_TOKEN`, `DATABASE_URL`, `REDIS_URL`, and variable `NEXT_PUBLIC_APP_URL`. Pushes to `main` run `.github/workflows/railway-deploy.yml`.
 
 6. Deploy. When the health check passes, open the generated domain.
 
