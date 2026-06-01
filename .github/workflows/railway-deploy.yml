@@ -62,12 +62,12 @@ jobs:
       - name: Deploy to kickboard production
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ steps.target.outputs.project_id }}
-          RAILWAY_SERVICE_ID: ${{ steps.target.outputs.service_id }}
         run: |
           npm install -g @railway/cli
-          source scripts/railway-target.sh
-          railway up --detach "${RAILWAY_TARGET_ARGS[@]}"
+          railway up --detach \
+            --project "${{ steps.target.outputs.project_id }}" \
+            --service "${{ steps.target.outputs.service_id }}" \
+            --environment "${{ steps.target.outputs.environment }}"
 
       - name: Sync Railway variables (optional)
         if: >-

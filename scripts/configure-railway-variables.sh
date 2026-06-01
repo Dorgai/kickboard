@@ -8,8 +8,6 @@ cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=scripts/railway-target.sh
 source scripts/railway-target.sh
 
-RAILWAY_BIN="${RAILWAY_BIN:-npx @railway/cli}"
-
 # Local runs may generate secrets; CI should only push values explicitly provided.
 if [ "${ALLOW_GENERATE_SECRETS:-1}" = "1" ]; then
   JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"
@@ -17,7 +15,7 @@ if [ "${ALLOW_GENERATE_SECRETS:-1}" = "1" ]; then
 fi
 
 set_var() {
-  $RAILWAY_BIN variable set "$1" --skip-deploys "${RAILWAY_TARGET_ARGS[@]}"
+  railway_cli variable set "$1" --skip-deploys "${RAILWAY_TARGET_ARGS[@]}"
 }
 
 # railway-target.sh prints resolved names and IDs
@@ -62,7 +60,7 @@ fi
 
 if [ "${SKIP_FINAL_REDEPLOY:-}" != "1" ]; then
   echo "Redeploying kickboard service..."
-  $RAILWAY_BIN up --detach "${RAILWAY_TARGET_ARGS[@]}"
+  railway_cli up --detach "${RAILWAY_TARGET_ARGS[@]}"
 else
   echo "skip final redeploy (SKIP_FINAL_REDEPLOY=1)"
 fi

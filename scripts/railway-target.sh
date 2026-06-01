@@ -7,7 +7,16 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 CONFIG_FILE="${RAILWAY_CONFIG_FILE:-$ROOT_DIR/deploy/railway.project.json}"
-RAILWAY_BIN="${RAILWAY_BIN:-npx @railway/cli}"
+
+railway_cli() {
+  if [ -n "${RAILWAY_BIN:-}" ]; then
+    "$RAILWAY_BIN" "$@"
+  elif command -v railway >/dev/null 2>&1; then
+    railway "$@"
+  else
+    npx --yes @railway/cli "$@"
+  fi
+}
 
 if [ -z "${RAILWAY_TOKEN:-}" ]; then
   echo "error: RAILWAY_TOKEN is not set" >&2
@@ -50,7 +59,7 @@ resolve_project_id() {
     return
   fi
 
-  "$RAILWAY_BIN" project list --json | node -e "
+  railway_cli project list --json | node -e "
     const target = process.argv[1].toLowerCase();
     const raw = JSON.parse(require('fs').readFileSync(0, 'utf8'));
     const projects = Array.isArray(raw) ? raw : raw.projects ?? [];
@@ -82,7 +91,7 @@ resolve_service_id() {
     return
   fi
 
-  "$RAILWAY_BIN" service list --project "$project_id" --environment "$RAILWAY_ENVIRONMENT" --json | node -e "
+  railway_cli service list --project "$project_id" --environment "$RAILWAY_ENVIRONMENT" --json | node -e "
     const target = process.argv[1].toLowerCase();
     const projectId = process.argv[2];
     const raw = JSON.parse(require('fs').readFileSync(0, 'utf8'));

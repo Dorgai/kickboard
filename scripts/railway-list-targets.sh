@@ -3,7 +3,13 @@
 
 set -euo pipefail
 
-RAILWAY_BIN="${RAILWAY_BIN:-npx @railway/cli}"
+railway_cli() {
+  if command -v railway >/dev/null 2>&1; then
+    railway "$@"
+  else
+    npx --yes @railway/cli "$@"
+  fi
+}
 
 if [ -z "${RAILWAY_TOKEN:-}" ]; then
   echo "error: export RAILWAY_TOKEN first" >&2
@@ -11,7 +17,7 @@ if [ -z "${RAILWAY_TOKEN:-}" ]; then
 fi
 
 echo "Projects:"
-"$RAILWAY_BIN" project list --json | node -e "
+railway_cli project list --json | node -e "
   const raw = JSON.parse(require('fs').readFileSync(0, 'utf8'));
   const projects = Array.isArray(raw) ? raw : raw.projects ?? [];
   for (const project of projects) {
@@ -26,7 +32,7 @@ echo ""
 echo "Services in kickboard production only (deploy target):"
 TARGET_PROJECT=$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).projectName)" "$CONFIG")
 
-"$RAILWAY_BIN" project list --json | node -e "
+railway_cli project list --json | node -e "
   const target = process.argv[1].toLowerCase();
   const raw = JSON.parse(require('fs').readFileSync(0, 'utf8'));
   const projects = Array.isArray(raw) ? raw : raw.projects ?? [];
@@ -42,7 +48,7 @@ TARGET_PROJECT=$(node -e "console.log(JSON.parse(require('fs').readFileSync(proc
     project_name="${line##*__}"
     echo ""
     echo "[$project_name]"
-    "$RAILWAY_BIN" service list --project "$project_id" --environment production --json | node -e "
+    railway_cli service list --project "$project_id" --environment production --json | node -e "
       const raw = JSON.parse(require('fs').readFileSync(0, 'utf8'));
       const services = (Array.isArray(raw) ? raw : raw.services ?? []).map((e) => e.node ?? e);
       for (const service of services) {
