@@ -20,7 +20,7 @@ export function CountryFlag({ code, label, size = "sm" }: CountryFlagProps) {
   }
 
   const dimensions = FLAG_SIZES[size];
-  const src = flagImageUrl(code, dimensions.width * 2);
+  const src = flagImageUrl(code, size);
 
   return (
     <span className={`country-flag country-flag-${size}`}>

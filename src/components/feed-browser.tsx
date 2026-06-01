@@ -412,7 +412,7 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
           <div className="qualified-team-list qualified-team-list--compact">
             {currentWorldCup!.qualifiedTeams.map((team) => (
               <span className="qualified-team-chip" key={team}>
-                {team}
+                <TeamLabel name={team} size="xs" />
               </span>
             ))}
           </div>
@@ -560,12 +560,13 @@ function PastEventsPanel({
   const activeKnockoutRound = bracketRounds.find((round) => round.stage === activeKnockoutStage);
 
   const filteredLineups = useMemo(() => {
-    const teams = (matchDetail?.lineups ?? []).map((team) => ({
-      ...team,
-      players: team.players.filter((player) =>
+    const teams: LineupTeam[] = (matchDetail?.lineups ?? []).map((team) => {
+      const players = team.players.filter((player) =>
         `${player.name} ${player.country ?? ""}`.toLowerCase().includes(lineupSearch.toLowerCase())
-      )
-    }));
+      );
+      const countryHint = players.find((player) => player.country)?.country ?? null;
+      return { ...team, players, countryHint };
+    });
 
     if (!selectedMatch) return teams;
 
