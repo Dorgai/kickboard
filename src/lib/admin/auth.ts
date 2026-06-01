@@ -1,10 +1,29 @@
 import { NextRequest } from "next/server";
 
-function readTokenFromRequest(request: NextRequest) {
-  const authorization = request.headers.get("authorization");
-  const bearerToken = authorization?.startsWith("Bearer ") ? authorization.slice("Bearer ".length) : null;
+export const ADMIN_COOKIE = "kickboard_admin_token";
 
-  return request.headers.get("x-admin-token") ?? bearerToken ?? request.nextUrl.searchParams.get("token");
+export function readAdminToken({
+  authorization,
+  cookieToken,
+  headerToken,
+  queryToken
+}: {
+  authorization?: string | null;
+  cookieToken?: string | null;
+  headerToken?: string | null;
+  queryToken?: string | null;
+}) {
+  const bearerToken = authorization?.startsWith("Bearer ") ? authorization.slice("Bearer ".length) : null;
+  return headerToken ?? bearerToken ?? cookieToken ?? queryToken ?? null;
+}
+
+function readTokenFromRequest(request: NextRequest) {
+  return readAdminToken({
+    authorization: request.headers.get("authorization"),
+    cookieToken: request.cookies.get(ADMIN_COOKIE)?.value,
+    headerToken: request.headers.get("x-admin-token"),
+    queryToken: request.nextUrl.searchParams.get("token")
+  });
 }
 
 export function getAdminAuthStatus() {

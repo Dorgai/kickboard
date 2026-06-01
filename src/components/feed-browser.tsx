@@ -94,19 +94,10 @@ type CurrentWorldCup = {
   note: string;
 };
 
-type FeedStatus = {
-  feeds: {
-    historical: { connected: boolean };
-    realtime: { connected: boolean; message: string };
-    storage: { postgres: boolean; redis: boolean };
-  };
-};
-
 type EventTab = "current" | "past";
 
 export function FeedBrowser() {
   const [activeTab, setActiveTab] = useState<EventTab>("current");
-  const [status, setStatus] = useState<FeedStatus | null>(null);
   const [currentWorldCup, setCurrentWorldCup] = useState<CurrentWorldCup | null>(null);
   const [competitions, setCompetitions] = useState<WorldCupCompetition[]>([]);
   const [selectedCompetition, setSelectedCompetition] = useState("");
@@ -127,23 +118,20 @@ export function FeedBrowser() {
       setLoading(true);
       setError(null);
       try {
-        const [statusResponse, historicalResponse, currentResponse] = await Promise.all([
-          fetch("/api/feeds/status", { cache: "no-store" }),
+        const [historicalResponse, currentResponse] = await Promise.all([
           fetch("/api/feeds/historical", { cache: "no-store" }),
           fetch("/api/feeds/current-world-cup", { cache: "no-store" })
         ]);
 
-        if (!statusResponse.ok || !historicalResponse.ok) {
-          throw new Error("Unable to load feed status or competitions");
+        if (!historicalResponse.ok) {
+          throw new Error("Unable to load competitions");
         }
 
-        const statusJson = (await statusResponse.json()) as FeedStatus;
         const historicalJson = (await historicalResponse.json()) as { worldCups: WorldCupCompetition[] };
         const currentJson = currentResponse.ok ? ((await currentResponse.json()) as CurrentWorldCup) : null;
 
         if (cancelled) return;
 
-        setStatus(statusJson);
         setCurrentWorldCup(currentJson);
         setCompetitions(historicalJson.worldCups);
         const firstCompetition = historicalJson.worldCups[0];
@@ -298,12 +286,6 @@ export function FeedBrowser() {
               </p>
             </>
           )}
-        </div>
-        <div className="feed-status-grid">
-          <FeedStatusTile label="StatsBomb" ok={Boolean(status?.feeds.historical.connected)} />
-          <FeedStatusTile label="API-Football" ok={Boolean(status?.feeds.realtime.connected)} />
-          <FeedStatusTile label="Postgres" ok={Boolean(status?.feeds.storage.postgres)} />
-          <FeedStatusTile label="Redis" ok={Boolean(status?.feeds.storage.redis)} />
         </div>
       </section>
 
@@ -669,15 +651,6 @@ function lineupPlayerName(lineups: LineupTeam[], playerId: number) {
     if (player) return player.name;
   }
   return "Selected player";
-}
-
-function FeedStatusTile({ label, ok }: { label: string; ok: boolean }) {
-  return (
-    <article className={ok ? "feed-tile ok" : "feed-tile missing"}>
-      <span>{ok ? "Connected" : "Not active"}</span>
-      <h3>{label}</h3>
-    </article>
-  );
 }
 
 function SummaryTile({ label, value }: { label: string; value: string }) {
