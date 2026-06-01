@@ -1,9 +1,12 @@
-import { isDatabaseConfigured, query } from "@/lib/db";
+import { getPool, isDatabaseConfigured, query } from "@/lib/db";
+import { formatPgError } from "@/lib/pg-error";
 
 export type CommunityHealth = {
   database: boolean;
   jwt: boolean;
   schemaReady: boolean;
+  writeProbeOk: boolean;
+  writeProbeError: string | null;
   message: string;
 };
 
@@ -27,7 +30,47 @@ export function mapDatabaseError(error: unknown) {
         "Community tables are missing. On Railway Postgres run: npm run db:schema (applies db/schema.sql and db/community-extensions.sql)."
     };
   }
+  const pgMessage = formatPgError(error);
+  if (pgMessage) {
+    return { status: 500, error: pgMessage };
+  }
   return null;
+}
+
+async function hasRequiredExtensions() {
+  const result = await query<{ extname: string }>(
+    `SELECT extname FROM pg_extension WHERE extname = ANY($1::text[])`,
+    [["citext", "uuid-ossp"]]
+  );
+  const names = new Set(result.rows.map((row) => row.extname));
+  return names.has("citext") && names.has("uuid-ossp");
+}
+
+/** Rolled-back insert to verify the DB user can write to users. */
+export async function probeCommunityWrite() {
+  const pool = getPool();
+  if (!pool) {
+    return { ok: false, error: "Database is not configured." };
+  }
+
+  const client = await pool.connect();
+  const probeUsername = `probe_${Date.now().toString(36)}`;
+
+  try {
+    await client.query("BEGIN");
+    await client.query(
+      `INSERT INTO users (email, username, display_name, birth_year, is_child, tier, role)
+       VALUES ($1, $2, $3, $4, false, 'fan', 'user')`,
+      [`${probeUsername}@community.kickboard.local`, probeUsername, "Probe", 1990]
+    );
+    await client.query("ROLLBACK");
+    return { ok: true, error: null };
+  } catch (error) {
+    await client.query("ROLLBACK").catch(() => undefined);
+    return { ok: false, error: formatPgError(error) ?? "Write probe failed." };
+  } finally {
+    client.release();
+  }
 }
 
 export async function getCommunityHealth(): Promise<CommunityHealth> {
@@ -39,6 +82,8 @@ export async function getCommunityHealth(): Promise<CommunityHealth> {
       database,
       jwt,
       schemaReady: false,
+      writeProbeOk: false,
+      writeProbeError: null,
       message: !database
         ? "Attach Railway Postgres and set DATABASE_URL."
         : "Set JWT_SECRET to enable community sessions."
@@ -49,10 +94,36 @@ export async function getCommunityHealth(): Promise<CommunityHealth> {
     await query("SELECT 1 FROM users LIMIT 0");
     await query("SELECT 1 FROM posts LIMIT 0");
     await query("SELECT 1 FROM content_reports LIMIT 0");
+
+    if (!(await hasRequiredExtensions())) {
+      return {
+        database: true,
+        jwt: true,
+        schemaReady: false,
+        writeProbeOk: false,
+        writeProbeError: "Extensions citext and uuid-ossp are required.",
+        message: "Run db/schema.sql (creates citext and uuid-ossp extensions)."
+      };
+    }
+
+    const probe = await probeCommunityWrite();
+    if (!probe.ok) {
+      return {
+        database: true,
+        jwt: true,
+        schemaReady: false,
+        writeProbeOk: false,
+        writeProbeError: probe.error,
+        message: probe.error ?? "Postgres is connected but test registration failed."
+      };
+    }
+
     return {
       database: true,
       jwt: true,
       schemaReady: true,
+      writeProbeOk: true,
+      writeProbeError: null,
       message: "Community posting is available."
     };
   } catch (error) {
@@ -61,6 +132,8 @@ export async function getCommunityHealth(): Promise<CommunityHealth> {
         database: true,
         jwt: true,
         schemaReady: false,
+        writeProbeOk: false,
+        writeProbeError: null,
         message:
           "Postgres is connected but community tables are not installed. Run npm run db:schema against this database."
       };
@@ -70,6 +143,8 @@ export async function getCommunityHealth(): Promise<CommunityHealth> {
       database: true,
       jwt: true,
       schemaReady: false,
+      writeProbeOk: false,
+      writeProbeError: formatPgError(error),
       message: "Postgres is connected but the community schema check failed."
     };
   }

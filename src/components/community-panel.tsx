@@ -24,6 +24,8 @@ type CommunityStatus = {
   database: boolean;
   jwt: boolean;
   schemaReady?: boolean;
+  writeProbeOk?: boolean;
+  writeProbeError?: string | null;
   message: string;
 };
 
@@ -159,9 +161,11 @@ export function CommunityPanel() {
   if (!status?.connected) {
     return (
       <div className="community-setup">
-        <p className="inline-status">{status?.message ?? "Community is not configured yet."}</p>
+        <p className="inline-status">{status?.writeProbeError ?? status?.message ?? "Community is not configured yet."}</p>
         <p className="community-setup-note">
-          {status?.schemaReady === false && status.database ? (
+          {status?.writeProbeError ? (
+            <>{status.writeProbeError} Check Admin → Data sources → Coach Board setup for details.</>
+          ) : status?.schemaReady === false && status.database ? (
             <>
               Postgres is connected but tables are missing. From a machine that can reach your Railway
               database, run <code>npm run db:schema</code> (loads <code>db/schema.sql</code> and{" "}

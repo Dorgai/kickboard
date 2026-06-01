@@ -6,7 +6,8 @@ type CommunitySetupPanelProps = {
 };
 
 export function CommunitySetupPanel({ adminTokenConfigured, health }: CommunitySetupPanelProps) {
-  const ready = health.database && health.jwt && health.schemaReady && adminTokenConfigured;
+  const ready =
+    health.database && health.jwt && health.schemaReady && health.writeProbeOk && adminTokenConfigured;
 
   return (
     <section className="feed-status-panel admin-community-setup data-card surface-muted" aria-label="Community setup">
@@ -35,9 +36,13 @@ export function CommunitySetupPanel({ adminTokenConfigured, health }: CommunityS
           label="JWT_SECRET"
         />
         <SetupTile
-          connected={health.schemaReady}
-          detail="users + posts (+ content_reports)"
-          label="DB schema"
+          connected={health.schemaReady && health.writeProbeOk}
+          detail={
+            health.writeProbeError
+              ? health.writeProbeError
+              : "users + posts + write test"
+          }
+          label="DB schema & write"
         />
         <SetupTile
           connected={adminTokenConfigured}

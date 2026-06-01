@@ -58,6 +58,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Display name is required." }, { status: 400 });
     }
 
+    if (!Number.isInteger(birthYear)) {
+      return NextResponse.json({ error: "Enter a valid birth year." }, { status: 400 });
+    }
+
     if (isChildAccount(birthYear)) {
       return NextResponse.json(
         {
@@ -95,12 +99,21 @@ export async function POST(request: Request) {
           { status: 403 }
         );
       }
+      if (error.message === "USER_INSERT_FAILED") {
+        return NextResponse.json(
+          { error: "Account could not be saved. Check admin Coach Board setup." },
+          { status: 500 }
+        );
+      }
+      if (error.message === "JWT_SECRET_NOT_CONFIGURED") {
+        return NextResponse.json({ error: "JWT_SECRET is not configured." }, { status: 503 });
+      }
     }
 
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
 
-    console.error(error);
+    console.error("community session POST failed", error);
     return NextResponse.json({ error: "Unable to create community session." }, { status: 500 });
   }
 }

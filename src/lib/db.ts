@@ -11,10 +11,18 @@ export function getPool() {
   if (!connectionString) return null;
 
   if (!pool) {
+    const local =
+      connectionString.includes("localhost") || connectionString.includes("127.0.0.1");
+    const needsSsl =
+      !local &&
+      (connectionString.includes("sslmode=require") ||
+        connectionString.includes("railway") ||
+        connectionString.includes("rlwy.net"));
+
     pool = new Pool({
       connectionString,
       max: 8,
-      ssl: connectionString.includes("sslmode=require") ? { rejectUnauthorized: false } : undefined
+      ssl: needsSsl ? { rejectUnauthorized: false } : undefined
     });
   }
 
