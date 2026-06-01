@@ -8,6 +8,7 @@ import {
   type CareerAppearance,
   type PlayerStatRow
 } from "@/lib/player-stat-metrics";
+import { PlayerMetricsGrid } from "@/components/player-metrics-grid";
 import { PlayerStatsTable } from "@/components/player-stats-table";
 import { TeamLabel } from "@/components/team-label";
 
@@ -114,6 +115,31 @@ export function PlayerStatsPanel({
     };
   }, [competitionId, matchMeta.matchId, seasonId, selectedPlayerId]);
 
+  const selectedPlayerMatchMetrics = useMemo(() => {
+    if (!selectedPlayer) return [];
+    return PLAYER_MATCH_METRICS.map((metric) => ({
+      id: metric.id,
+      label: metric.label,
+      value: metric.format(selectedPlayer)
+    }));
+  }, [selectedPlayer]);
+
+  const careerTotalMetrics = useMemo(() => {
+    if (!career) return [];
+    return [
+      {
+        id: "appearances",
+        label: "Matches",
+        value: String(career.totals.appearances)
+      },
+      ...PLAYER_CAREER_METRICS.map((metric) => ({
+        id: metric.id,
+        label: metric.label,
+        value: formatPlayerMetric(metric.id, career.totals)
+      }))
+    ];
+  }, [career]);
+
   return (
     <section className="match-detail-section player-stats-section data-card surface-muted player-stats-panel">
       <div className="section-heading compact">
@@ -152,15 +178,7 @@ export function PlayerStatsPanel({
                 </p>
               </div>
             </header>
-            <div className="player-focus-metrics">
-              {PLAYER_MATCH_METRICS.map((metric) => (
-                <div className="player-focus-metric" key={metric.id}>
-                  <span className="player-focus-metric-value">{metric.format(selectedPlayer)}</span>
-                  <span className="player-focus-metric-label">{metric.label}</span>
-                  <span className="player-focus-metric-caption">{metric.caption}</span>
-                </div>
-              ))}
-            </div>
+            <PlayerMetricsGrid items={selectedPlayerMatchMetrics} />
           </article>
 
           <section className="player-career-section">
@@ -183,27 +201,7 @@ export function PlayerStatsPanel({
                   <p className="inline-status">No other tournament appearances found in the open-data feed.</p>
                 ) : (
                   <>
-                    <div className="player-career-totals">
-                      <div className="player-focus-metric player-focus-metric--compact">
-                        <span className="player-focus-metric-value">{career.totals.appearances}</span>
-                        <span className="player-focus-metric-label">Matches</span>
-                        <span className="player-focus-metric-caption">
-                          Other tournament matches in the lineup for this competition.
-                        </span>
-                      </div>
-                      {PLAYER_CAREER_METRICS.map((metric) => (
-                        <div className="player-focus-metric player-focus-metric--compact" key={metric.id}>
-                          <span className="player-focus-metric-value">
-                            {formatPlayerMetric(metric.id, career.totals)}
-                          </span>
-                          <span className="player-focus-metric-label">{metric.label}</span>
-                          <span className="player-focus-metric-caption">
-                            Season total across {career.totals.appearances} other{" "}
-                            {career.totals.appearances === 1 ? "match" : "matches"}.
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                    <PlayerMetricsGrid items={careerTotalMetrics} />
 
                     <div className="player-career-table" role="table">
                       <div className="player-career-row player-career-row--head" role="row">
