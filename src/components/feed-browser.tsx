@@ -797,7 +797,8 @@ function PastEventsPanel({
                         awayTeam={match.awayTeam}
                         homeScore={match.homeScore}
                         homeTeam={match.homeTeam}
-                        size="sm"
+                        layout="inline"
+                        size="xs"
                       />
                       <span>
                         {match.date} · {match.stage ?? "Stage unavailable"}
@@ -1026,7 +1027,9 @@ function BracketMatchButton({
 }) {
   return (
     <button
-      className={`match-fixture-btn${selectedMatchId === match.matchId ? " selected" : ""}`}
+      className={`match-fixture-btn match-fixture-btn--compact${
+        selectedMatchId === match.matchId ? " selected" : ""
+      }`}
       type="button"
       onClick={() => onSelect(match.matchId)}
     >
@@ -1035,10 +1038,10 @@ function BracketMatchButton({
         awayTeam={match.awayTeam}
         homeScore={match.homeScore}
         homeTeam={match.homeTeam}
-        layout="stacked"
-        size="sm"
+        layout="inline"
+        size="xs"
       />
-      <span>{match.date}</span>
+      <span className="match-fixture-date">{match.date}</span>
     </button>
   );
 }
