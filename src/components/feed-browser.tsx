@@ -113,9 +113,10 @@ export function FeedBrowser() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [bracketRounds, setBracketRounds] = useState<BracketRound[]>([]);
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const [matchDetail, setMatchDetail] = useState<MatchDetail | null>(null);
   const [matchSearch, setMatchSearch] = useState("");
-  const [playerSearch, setPlayerSearch] = useState("");
+  const [lineupSearch, setLineupSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -175,6 +176,7 @@ export function FeedBrowser() {
       setBracketRounds([]);
       setMatchDetail(null);
       setSelectedMatchId(null);
+      setSelectedPlayerId(null);
 
       try {
         const [matchesResponse, bracketResponse] = await Promise.all([
@@ -196,7 +198,6 @@ export function FeedBrowser() {
         if (cancelled) return;
         setMatches(matchesData.matches);
         setBracketRounds(bracketData.rounds);
-        setSelectedMatchId(matchesData.matches[0]?.matchId ?? null);
       } catch (loadError) {
         if (!cancelled) {
           setError(loadError instanceof Error ? loadError.message : "Unknown match load error");
@@ -216,6 +217,7 @@ export function FeedBrowser() {
 
     async function loadMatchDetail() {
       setMatchDetail(null);
+      setSelectedPlayerId(null);
       setError(null);
 
       try {
@@ -253,8 +255,8 @@ export function FeedBrowser() {
   );
 
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
-  const filteredPlayerStats = (matchDetail?.playerStats ?? []).filter((player) =>
-    `${player.player} ${player.team}`.toLowerCase().includes(playerSearch.toLowerCase())
+  const selectedPlayer = (matchDetail?.playerStats ?? []).find(
+    (player) => player.playerId === selectedPlayerId
   );
 
   return (
@@ -315,17 +317,19 @@ export function FeedBrowser() {
           bracketRounds={bracketRounds}
           competitions={competitions}
           filteredMatches={filteredMatches}
-          filteredPlayerStats={filteredPlayerStats}
+          lineupSearch={lineupSearch}
           matchDetail={matchDetail}
           matchSearch={matchSearch}
-          playerSearch={playerSearch}
           selectedCompetition={selectedCompetition}
           selectedMatch={selectedMatch}
           selectedMatchId={selectedMatchId}
+          selectedPlayer={selectedPlayer}
+          selectedPlayerId={selectedPlayerId}
+          setLineupSearch={setLineupSearch}
           setMatchSearch={setMatchSearch}
-          setPlayerSearch={setPlayerSearch}
           setSelectedCompetition={setSelectedCompetition}
           setSelectedMatchId={setSelectedMatchId}
+          setSelectedPlayerId={setSelectedPlayerId}
         />
       )}
     </div>
@@ -400,35 +404,51 @@ type PastEventsPanelProps = {
   bracketRounds: BracketRound[];
   competitions: WorldCupCompetition[];
   filteredMatches: Match[];
-  filteredPlayerStats: PlayerStat[];
+  lineupSearch: string;
   matchDetail: MatchDetail | null;
   matchSearch: string;
-  playerSearch: string;
   selectedCompetition: string;
   selectedMatch: Match | undefined;
   selectedMatchId: number | null;
+  selectedPlayer: PlayerStat | undefined;
+  selectedPlayerId: number | null;
+  setLineupSearch: (value: string) => void;
   setMatchSearch: (value: string) => void;
-  setPlayerSearch: (value: string) => void;
   setSelectedCompetition: (value: string) => void;
   setSelectedMatchId: (value: number) => void;
+  setSelectedPlayerId: (value: number | null) => void;
 };
 
 function PastEventsPanel({
   bracketRounds,
   competitions,
   filteredMatches,
-  filteredPlayerStats,
+  lineupSearch,
   matchDetail,
   matchSearch,
-  playerSearch,
   selectedCompetition,
   selectedMatch,
   selectedMatchId,
+  selectedPlayer,
+  selectedPlayerId,
+  setLineupSearch,
   setMatchSearch,
-  setPlayerSearch,
   setSelectedCompetition,
-  setSelectedMatchId
+  setSelectedMatchId,
+  setSelectedPlayerId
 }: PastEventsPanelProps) {
+  const filteredLineups = (matchDetail?.lineups ?? []).map((team) => ({
+    ...team,
+    players: team.players.filter((player) =>
+      `${player.name} ${player.country ?? ""}`.toLowerCase().includes(lineupSearch.toLowerCase())
+    )
+  }));
+
+  function selectMatch(matchId: number) {
+    setSelectedMatchId(matchId);
+    setSelectedPlayerId(null);
+  }
+
   return (
     <>
       <section className="feed-control-card">
@@ -467,7 +487,12 @@ function PastEventsPanel({
             <div className="bracket-round" key={round.stage}>
               <h3>{round.stage}</h3>
               {round.matches.map((match) => (
-                <button key={match.matchId} type="button" onClick={() => setSelectedMatchId(match.matchId)}>
+                <button
+                  className={selectedMatchId === match.matchId ? "selected" : ""}
+                  key={match.matchId}
+                  type="button"
+                  onClick={() => selectMatch(match.matchId)}
+                >
                   <strong>
                     {match.homeTeam} {match.homeScore}-{match.awayScore} {match.awayTeam}
                   </strong>
@@ -479,109 +504,171 @@ function PastEventsPanel({
         </div>
       </section>
 
-      <section className="feed-content-grid">
-        <article className="data-card">
-          <h2>Matches</h2>
-          <p>{filteredMatches.length} matches from the selected feed.</p>
-          <div className="feed-list">
+      <section className="match-explorer">
+        <article className="data-card match-explorer-list">
+          <div className="section-heading compact">
+            <h2>Matches</h2>
+            <p>{filteredMatches.length} in feed</p>
+          </div>
+          <div className="feed-list compact-list">
             {filteredMatches.map((match) => (
               <button
                 className={selectedMatchId === match.matchId ? "selected" : ""}
                 key={match.matchId}
                 type="button"
-                onClick={() => setSelectedMatchId(match.matchId)}
+                onClick={() => selectMatch(match.matchId)}
               >
                 <strong>
                   {match.homeTeam} {match.homeScore}-{match.awayScore} {match.awayTeam}
                 </strong>
                 <span>
-                  {match.date} - {match.stage ?? "Stage unavailable"}
+                  {match.date} · {match.stage ?? "Stage unavailable"}
                 </span>
               </button>
             ))}
           </div>
         </article>
 
-        <article className="data-card">
-          <h2>Team stats</h2>
-          {selectedMatch ? (
-            <p>
-              {selectedMatch.homeTeam} vs {selectedMatch.awayTeam}
-            </p>
-          ) : null}
-          <div className="team-stat-grid">
-            {(matchDetail?.teamStats ?? []).map((team) => (
-              <div className="team-stat-card" key={team.team}>
-                <h3>{team.team}</h3>
-                <StatLine label="Goals" value={team.goals} />
-                <StatLine label="Shots" value={team.shots} />
-                <StatLine label="xG" value={team.xg} />
-                <StatLine label="Passes" value={team.passes} />
-                <StatLine label="Pass accuracy" value={team.passAccuracy ? `${team.passAccuracy}%` : "n/a"} />
-                <StatLine label="Carries" value={team.carries} />
-                <StatLine label="Dribbles" value={`${team.successfulDribbles}/${team.dribbles}`} />
-              </div>
-            ))}
-          </div>
-        </article>
-      </section>
-
-      <section className="feed-content-grid wide">
-        <article className="data-card">
-          <h2>Squads and lineups</h2>
-          <div className="lineup-grid">
-            {(matchDetail?.lineups ?? []).map((team) => (
-              <div className="lineup-card" key={team.teamName}>
-                <h3>{team.teamName}</h3>
-                {team.players.map((player) => (
-                  <div className="lineup-row" key={`${team.teamName}-${player.playerId}`}>
-                    <span>{player.jerseyNumber ?? "-"}</span>
-                    <strong>{player.name}</strong>
-                    <small>{player.country ?? ""}</small>
+        <div className="match-explorer-detail">
+          {!selectedMatch ? (
+            <article className="data-card match-placeholder">
+              <h2>Select a match</h2>
+              <p>Choose a game from the list or knockout tree to view team stats, squads, and lineups.</p>
+            </article>
+          ) : (
+            <>
+              <article className="data-card match-summary-card">
+                <div className="section-heading compact">
+                  <div>
+                    <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
+                    <h2>
+                      {selectedMatch.homeTeam} {selectedMatch.homeScore}–{selectedMatch.awayScore}{" "}
+                      {selectedMatch.awayTeam}
+                    </h2>
+                    <p>
+                      {selectedMatch.date}
+                      {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+                    </p>
                   </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </article>
+                </div>
 
-        <article className="data-card">
-          <div className="data-card-header">
-            <h2>Player stats</h2>
-            <input
-              aria-label="Search player stats"
-              placeholder="Search player or team"
-              type="search"
-              value={playerSearch}
-              onChange={(event) => setPlayerSearch(event.target.value)}
-            />
-          </div>
-          <div className="player-stat-table">
-            <div className="player-stat-row heading">
-              <span>Player</span>
-              <span>Team</span>
-              <span>G</span>
-              <span>A</span>
-              <span>Sh</span>
-              <span>xG</span>
-              <span>Pass</span>
-            </div>
-            {filteredPlayerStats.slice(0, 80).map((player) => (
-              <div className="player-stat-row" key={`${player.team}-${player.player}-${player.playerId}`}>
-                <strong>{player.player}</strong>
-                <span>{player.team}</span>
-                <span>{player.goals}</span>
-                <span>{player.assists}</span>
-                <span>{player.shots}</span>
-                <span>{player.xg}</span>
-                <span>{player.passAccuracy ? `${player.passAccuracy}%` : "n/a"}</span>
-              </div>
-            ))}
-          </div>
-        </article>
+                {!matchDetail ? (
+                  <p className="inline-status">Loading match data…</p>
+                ) : (
+                  <div className="match-detail-stack">
+                    <section className="match-detail-section">
+                      <h3>Team stats</h3>
+                      <div className="team-stat-grid compact">
+                        {matchDetail.teamStats.map((team) => (
+                          <div className="team-stat-card compact" key={team.team}>
+                            <h4>{team.team}</h4>
+                            <div className="stat-chip-grid">
+                              <StatChip label="G" value={team.goals} />
+                              <StatChip label="Sh" value={team.shots} />
+                              <StatChip label="xG" value={team.xg} />
+                              <StatChip label="Pass" value={team.passes} />
+                              <StatChip
+                                label="Acc"
+                                value={team.passAccuracy ? `${team.passAccuracy}%` : "n/a"}
+                              />
+                              <StatChip label="Car" value={team.carries} />
+                              <StatChip label="Drib" value={`${team.successfulDribbles}/${team.dribbles}`} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    <section className="match-detail-section">
+                      <div className="section-heading compact">
+                        <h3>Squads & lineups</h3>
+                        <input
+                          aria-label="Search lineup"
+                          className="lineup-search"
+                          placeholder="Filter players"
+                          type="search"
+                          value={lineupSearch}
+                          onChange={(event) => setLineupSearch(event.target.value)}
+                        />
+                      </div>
+                      <div className="lineup-grid compact">
+                        {filteredLineups.map((team) => (
+                          <div className="lineup-card compact" key={team.teamName}>
+                            <h4>{team.teamName}</h4>
+                            <div className="lineup-list">
+                              {team.players.map((player) => (
+                                <button
+                                  className={
+                                    selectedPlayerId === player.playerId ? "lineup-row selected" : "lineup-row"
+                                  }
+                                  key={`${team.teamName}-${player.playerId}`}
+                                  type="button"
+                                  onClick={() => setSelectedPlayerId(player.playerId)}
+                                >
+                                  <span>{player.jerseyNumber ?? "–"}</span>
+                                  <strong>{player.name}</strong>
+                                  <small>{player.country ?? ""}</small>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  </div>
+                )}
+              </article>
+
+              {selectedPlayerId && matchDetail ? (
+                <article className="data-card player-detail-card">
+                  <div className="section-heading compact">
+                    <div>
+                      <p className="eyebrow">Player stats</p>
+                      <h2>{selectedPlayer?.player ?? lineupPlayerName(filteredLineups, selectedPlayerId)}</h2>
+                      <p>{selectedPlayer?.team ?? "—"}</p>
+                    </div>
+                    <button className="text-button" type="button" onClick={() => setSelectedPlayerId(null)}>
+                      Clear
+                    </button>
+                  </div>
+                  {selectedPlayer ? (
+                    <div className="player-stat-chip-grid">
+                      <StatChip label="Goals" value={selectedPlayer.goals} />
+                      <StatChip label="Assists" value={selectedPlayer.assists} />
+                      <StatChip label="Shots" value={selectedPlayer.shots} />
+                      <StatChip label="xG" value={selectedPlayer.xg} />
+                      <StatChip label="Passes" value={selectedPlayer.passes} />
+                      <StatChip
+                        label="Pass acc"
+                        value={selectedPlayer.passAccuracy ? `${selectedPlayer.passAccuracy}%` : "n/a"}
+                      />
+                      <StatChip label="Carries" value={selectedPlayer.carries} />
+                      <StatChip label="Dribbles" value={selectedPlayer.dribbles} />
+                    </div>
+                  ) : (
+                    <p className="inline-status">No event-level stats recorded for this player in this match.</p>
+                  )}
+                </article>
+              ) : selectedMatch && matchDetail ? (
+                <article className="data-card match-placeholder subtle">
+                  <h3>Select a player</h3>
+                  <p>Click a name in the lineup to view individual match stats.</p>
+                </article>
+              ) : null}
+            </>
+          )}
+        </div>
       </section>
     </>
   );
+}
+
+function lineupPlayerName(lineups: LineupTeam[], playerId: number) {
+  for (const team of lineups) {
+    const player = team.players.find((entry) => entry.playerId === playerId);
+    if (player) return player.name;
+  }
+  return "Selected player";
 }
 
 function FeedStatusTile({ label, ok }: { label: string; ok: boolean }) {
@@ -602,11 +689,11 @@ function SummaryTile({ label, value }: { label: string; value: string }) {
   );
 }
 
-function StatLine({ label, value }: { label: string; value: string | number }) {
+function StatChip({ label, value }: { label: string; value: string | number }) {
   return (
-    <p className="stat-line">
+    <div className="stat-chip">
       <span>{label}</span>
       <strong>{value}</strong>
-    </p>
+    </div>
   );
 }
