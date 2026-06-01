@@ -109,6 +109,7 @@ export function FeedBrowser() {
   const [matchDetail, setMatchDetail] = useState<MatchDetail | null>(null);
   const [matchSearch, setMatchSearch] = useState("");
   const [lineupSearch, setLineupSearch] = useState("");
+  const [showMatchesList, setShowMatchesList] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -303,6 +304,7 @@ export function FeedBrowser() {
           lineupSearch={lineupSearch}
           matchDetail={matchDetail}
           matchSearch={matchSearch}
+          showMatchesList={showMatchesList}
           selectedCompetition={selectedCompetition}
           selectedMatch={selectedMatch}
           selectedMatchId={selectedMatchId}
@@ -310,6 +312,7 @@ export function FeedBrowser() {
           selectedPlayerId={selectedPlayerId}
           setLineupSearch={setLineupSearch}
           setMatchSearch={setMatchSearch}
+          setShowMatchesList={setShowMatchesList}
           setSelectedCompetition={setSelectedCompetition}
           setSelectedMatchId={setSelectedMatchId}
           setSelectedPlayerId={setSelectedPlayerId}
@@ -392,6 +395,7 @@ type PastEventsPanelProps = {
   lineupSearch: string;
   matchDetail: MatchDetail | null;
   matchSearch: string;
+  showMatchesList: boolean;
   selectedCompetition: string;
   selectedMatch: Match | undefined;
   selectedMatchId: number | null;
@@ -399,6 +403,7 @@ type PastEventsPanelProps = {
   selectedPlayerId: number | null;
   setLineupSearch: (value: string) => void;
   setMatchSearch: (value: string) => void;
+  setShowMatchesList: (value: boolean) => void;
   setSelectedCompetition: (value: string) => void;
   setSelectedMatchId: (value: number) => void;
   setSelectedPlayerId: (value: number | null) => void;
@@ -411,6 +416,7 @@ function PastEventsPanel({
   lineupSearch,
   matchDetail,
   matchSearch,
+  showMatchesList,
   selectedCompetition,
   selectedMatch,
   selectedMatchId,
@@ -418,6 +424,7 @@ function PastEventsPanel({
   selectedPlayerId,
   setLineupSearch,
   setMatchSearch,
+  setShowMatchesList,
   setSelectedCompetition,
   setSelectedMatchId,
   setSelectedPlayerId
@@ -450,23 +457,32 @@ function PastEventsPanel({
             ))}
           </select>
         </label>
-        <label>
-          Search matches
-          <input
-            placeholder="Team or stage"
-            type="search"
-            value={matchSearch}
-            onChange={(event) => setMatchSearch(event.target.value)}
-          />
-        </label>
         <a className="button secondary" href="/api/feeds/realtime">
           Real-time API status
         </a>
       </section>
 
       <section className="bracket-tree-card surface-muted">
+<<<<<<< HEAD
         <p className="eyebrow">Knockout tree</p>
         <h2>Horizontal route to the final</h2>
+=======
+        <div className="section-heading compact">
+          <div>
+            <p className="eyebrow">Knockout tree</p>
+            <h2>Route to the final</h2>
+            <p>Select a match to view team stats, squads, and lineups.</p>
+          </div>
+          <button
+            className="button secondary"
+            type="button"
+            aria-pressed={showMatchesList}
+            onClick={() => setShowMatchesList(!showMatchesList)}
+          >
+            {showMatchesList ? "Hide match list" : "Show full match list"}
+          </button>
+        </div>
+>>>>>>> 836f340 (Add country flags beside teams and tiered widget shadows)
         <div className="bracket-tree">
           {bracketRounds.map((round) => (
             <div className="bracket-round" key={round.stage}>
@@ -493,40 +509,54 @@ function PastEventsPanel({
         </div>
       </section>
 
-      <section className="match-explorer">
-        <article className="data-card surface-muted match-explorer-list">
-          <div className="section-heading compact">
-            <h2>Matches</h2>
-            <p>{filteredMatches.length} in feed</p>
-          </div>
-          <div className="feed-list compact-list">
-            {filteredMatches.map((match) => (
-              <button
-                className={selectedMatchId === match.matchId ? "selected" : ""}
-                key={match.matchId}
-                type="button"
-                onClick={() => selectMatch(match.matchId)}
-              >
-                <MatchTeamsLine
-                  awayScore={match.awayScore}
-                  awayTeam={match.awayTeam}
-                  homeScore={match.homeScore}
-                  homeTeam={match.homeTeam}
-                  size="sm"
+      <section className={`match-explorer${showMatchesList ? "" : " match-explorer--detail-only"}`}>
+        {showMatchesList ? (
+          <article className="data-card surface-muted match-explorer-list">
+            <div className="section-heading compact">
+              <div>
+                <h2>All matches</h2>
+                <p>{filteredMatches.length} in feed</p>
+              </div>
+              <label className="match-list-search">
+                Search
+                <input
+                  aria-label="Search matches"
+                  placeholder="Team or stage"
+                  type="search"
+                  value={matchSearch}
+                  onChange={(event) => setMatchSearch(event.target.value)}
                 />
-                <span>
-                  {match.date} · {match.stage ?? "Stage unavailable"}
-                </span>
-              </button>
-            ))}
-          </div>
-        </article>
+              </label>
+            </div>
+            <div className="feed-list compact-list">
+              {filteredMatches.map((match) => (
+                <button
+                  className={selectedMatchId === match.matchId ? "selected" : ""}
+                  key={match.matchId}
+                  type="button"
+                  onClick={() => selectMatch(match.matchId)}
+                >
+                  <MatchTeamsLine
+                    awayScore={match.awayScore}
+                    awayTeam={match.awayTeam}
+                    homeScore={match.homeScore}
+                    homeTeam={match.homeTeam}
+                    size="sm"
+                  />
+                  <span>
+                    {match.date} · {match.stage ?? "Stage unavailable"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </article>
+        ) : null}
 
         <div className="match-explorer-detail">
           {!selectedMatch ? (
             <article className="data-card surface-flat match-placeholder">
               <h2>Select a match</h2>
-              <p>Choose a game from the list or knockout tree to view team stats, squads, and lineups.</p>
+              <p>Pick a fixture in the knockout tree above to view team stats, squads, and lineups.</p>
             </article>
           ) : (
             <>

@@ -1145,6 +1145,35 @@ h3 {
   margin-bottom: 24px;
 }
 
+.match-explorer--detail-only {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.match-list-search {
+  color: var(--color-text-secondary);
+  display: grid;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 6px;
+}
+
+.match-list-search input {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font: inherit;
+  min-height: 36px;
+  min-width: 180px;
+  padding: 0 10px;
+}
+
+.bracket-tree-card .section-heading.compact p {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  margin: 4px 0 0;
+}
+
 .match-explorer-list {
   align-self: start;
   max-height: calc(100vh - 120px);
