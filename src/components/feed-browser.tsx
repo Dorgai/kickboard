@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
-import { groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
+import { GroupStageStandings } from "@/components/group-stage-standings";
+import { computeGroupStandings, groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
 import { TEAM_MATCH_STAT_CHIPS } from "@/lib/player-stat-metrics";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
@@ -587,6 +588,11 @@ function PastEventsPanel({
   }, [activeKnockoutStage, bracketRounds]);
 
   const activeKnockoutRound = bracketRounds.find((round) => round.stage === activeKnockoutStage);
+  const activeGroupStandings = useMemo(() => {
+    const groupMatches =
+      groupBuckets.find((bucket) => bucket.letter === activeGroupLetter)?.matches ?? [];
+    return computeGroupStandings(groupMatches);
+  }, [activeGroupLetter, groupBuckets]);
 
   const filteredLineups = (matchDetail?.lineups ?? []).map((team) => ({
     ...team,
@@ -701,7 +707,33 @@ function PastEventsPanel({
         </div>
       </section>
 
-      <div className="knockout-workspace" id="group-stage">
+      {groupBuckets.length ? (
+        <section className="data-card surface-muted group-stage-explorer" id="group-stage">
+          <div className="section-heading compact">
+            <div>
+              <p className="eyebrow">Group stage</p>
+              <h2>Group stage results</h2>
+              <p>
+                {groupStageMatches.length} matches · final standings per group; pick a fixture in the
+                panels below for match detail.
+              </p>
+            </div>
+          </div>
+          <FeedTabBar
+            ariaLabel="Group stage groups"
+            className="group-stage-tabs"
+            tabs={groupBuckets.map((bucket) => ({
+              id: bucket.letter,
+              label: `Group ${bucket.letter}`
+            }))}
+            value={activeGroupLetter}
+            onChange={setActiveGroupLetter}
+          />
+          <GroupStageStandings groupLetter={activeGroupLetter} rows={activeGroupStandings} />
+        </section>
+      ) : null}
+
+      <div className="knockout-workspace">
         <section className="bracket-tree-card surface-muted" id="bracket">
           <div className="section-heading compact">
             <div>
