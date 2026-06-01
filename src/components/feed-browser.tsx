@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
 import { groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
-import { TEAM_MATCH_STAT_CHIPS } from "@/lib/player-stat-metrics";
+import { MatchTeamStatsGrid } from "@/components/match-team-stats-grid";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
@@ -898,20 +898,7 @@ function PastEventsPanel({
                     {!matchDetail ? (
                       <p className="inline-status">Loading team stats…</p>
                     ) : (
-                      <div className="match-focus-team-stats">
-                        {orderedTeamStats.map((team) => (
-                          <section className="team-stat-card compact" key={team.team}>
-                            <h4>
-                              <TeamLabel name={team.team} size="sm" />
-                            </h4>
-                            <div className="stat-chip-grid">
-                              {TEAM_MATCH_STAT_CHIPS.map((stat) => (
-                                <StatChip key={stat.id} label={stat.label} value={stat.format(team)} />
-                              ))}
-                            </div>
-                          </section>
-                        ))}
-                      </div>
+                      <MatchTeamStatsGrid columns={orderedTeamStats} />
                     )}
                   </>
                 )}
@@ -1039,11 +1026,3 @@ function SummaryTile({ label, value }: { label: string; value: string }) {
   );
 }
 
-function StatChip({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="stat-chip">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
