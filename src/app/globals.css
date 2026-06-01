@@ -918,8 +918,6 @@ h3 {
 
 .feed-browser .bracket-tree-card .feed-control-bar,
 .feed-browser .bracket-tree-card .feed-control-field,
-.feed-browser .match-fixtures-widget .feed-control-bar,
-.feed-browser .match-fixtures-widget .feed-control-field,
 .feed-browser .match-lineups-column .feed-control-input,
 .feed-browser .match-explorer-list .feed-control-field {
   box-sizing: border-box;
@@ -1078,8 +1076,7 @@ h3 {
   text-align: left;
 }
 
-.match-fixture-btn--compact,
-.match-stage-fixtures .match-fixture-btn {
+.match-fixture-btn--compact.match-fixture-btn--teams-stacked {
   align-items: stretch;
   display: flex;
   flex-direction: column;
@@ -1090,20 +1087,23 @@ h3 {
   width: 100%;
 }
 
-.match-fixture-btn--teams-inline.match-fixture-btn--compact {
+.match-fixture-btn--teams-inline.match-fixture-btn--compact,
+.match-stage-fixtures .match-fixture-btn:not(.match-fixture-btn--strip-card) {
   align-items: center;
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 6px 8px;
   justify-content: space-between;
-  padding: 6px 10px;
+  min-height: 32px;
+  padding: 5px 10px;
+  width: 100%;
 }
 
 .match-fixture-btn--with-cluster {
   min-height: 34px;
 }
 
-.match-fixture-main {
+.match-fixture-btn--teams-stacked .match-fixture-main {
   align-items: stretch;
   display: flex;
   flex: 1 1 auto;
@@ -1113,10 +1113,15 @@ h3 {
   width: 100%;
 }
 
-.match-fixture-btn--teams-inline .match-fixture-main {
+.match-fixture-btn--teams-inline .match-fixture-main,
+.match-stage-fixtures .match-fixture-btn:not(.match-fixture-btn--strip-card) .match-fixture-main {
   align-items: center;
+  display: flex;
+  flex: 1 1 auto;
   flex-direction: row;
   flex-wrap: nowrap;
+  gap: 6px;
+  min-width: 0;
 }
 
 .match-fixture-cluster {
@@ -1130,7 +1135,7 @@ h3 {
 }
 
 .match-fixture-btn--compact .match-teams-line,
-.match-stage-fixtures .match-teams-line {
+.match-stage-fixtures .match-fixture-btn:not(.match-fixture-btn--strip-card) .match-teams-line {
   flex: 1 1 auto;
   gap: 4px 6px;
   min-width: 0;
@@ -1144,29 +1149,59 @@ h3 {
 }
 
 .match-fixture-btn--teams-stacked .match-teams-line,
-.match-fixture-btn--compact.match-fixture-btn--teams-stacked .match-teams-line,
-.match-stage-fixtures .match-teams-line {
+.match-fixture-btn--compact.match-fixture-btn--teams-stacked .match-teams-line {
   align-items: stretch;
   flex-direction: column;
   width: 100%;
 }
 
 .match-fixture-btn--teams-stacked .team-label,
-.match-fixture-btn--compact.match-fixture-btn--teams-stacked .team-label,
-.match-stage-fixtures .team-label {
+.match-fixture-btn--compact.match-fixture-btn--teams-stacked .team-label {
   gap: 8px;
   max-width: 100%;
   width: 100%;
 }
 
-.match-fixture-btn .team-label-text,
-.match-stage-fixtures .team-label-text {
+.match-stage-fixtures .match-fixture-btn:not(.match-fixture-btn--strip-card) .match-teams-line {
+  align-items: center;
+  display: inline-flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 4px 6px;
+  min-width: 0;
+}
+
+.match-stage-fixtures .match-fixture-btn:not(.match-fixture-btn--strip-card) .team-label {
+  flex: 0 1 auto;
+  gap: 6px;
+  min-width: 0;
+  width: auto;
+}
+
+.match-stage-fixtures .match-fixture-btn:not(.match-fixture-btn--strip-card) .team-label-text {
+  font-size: 11px;
+  max-width: 7.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-stage-fixtures .match-fixture-btn:not(.match-fixture-btn--strip-card) .match-fixture-cluster {
+  flex: 0 0 auto;
+  max-width: 4.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-fixture-btn .team-label-text {
   font-size: 12px;
   max-width: none;
 }
 
 .match-fixture-btn--compact .match-score-pill,
-.match-stage-fixtures .match-score-pill {
+.match-stage-fixtures .match-fixture-btn:not(.match-fixture-btn--strip-card) .match-score-pill {
   flex-shrink: 0;
   font-size: 11px;
   padding: 1px 7px;
@@ -1215,12 +1250,72 @@ h3 {
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 }
 
-.match-stage-fixtures.bracket-fixture-grid {
-  grid-template-columns: minmax(0, 1fr);
+.bracket-fixture-strip {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 2px 2px 8px;
+  scroll-snap-type: x proximity;
+}
+
+.bracket-fixture-strip .match-fixture-btn--strip-card {
+  align-items: stretch;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  max-width: 13.5rem;
+  min-height: 36px;
+  min-width: 9.75rem;
+  padding: 6px 8px;
+  scroll-snap-align: start;
+  text-align: left;
+  width: auto;
+}
+
+.bracket-fixture-strip .match-fixture-btn--strip-card.match-fixture-btn--with-cluster {
+  min-height: 44px;
+}
+
+.bracket-fixture-strip .match-fixture-btn--strip-card .match-teams-line {
+  align-items: center;
+  display: grid;
+  flex: 0 0 auto;
+  gap: 4px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  width: 100%;
+}
+
+.bracket-fixture-strip .match-fixture-btn--strip-card .team-label {
+  gap: 4px;
+  min-width: 0;
+}
+
+.bracket-fixture-strip .match-fixture-btn--strip-card .team-label-text {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  max-width: 4.75rem;
+}
+
+.bracket-fixture-strip .match-fixture-btn--strip-card .match-score-pill {
+  font-size: 10px;
+  padding: 1px 6px;
+}
+
+.bracket-fixture-strip .match-fixture-btn--strip-card .match-fixture-cluster {
+  font-size: 9px;
+  line-height: 1.15;
+  max-width: 100%;
 }
 
 @media (min-width: 720px) {
-  .bracket-tree-card .bracket-fixture-grid:not(.match-stage-fixtures) {
+  .bracket-tree-card .bracket-fixture-grid {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 }
@@ -1489,34 +1584,22 @@ h3 {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.knockout-widgets-row--match-split {
-  align-items: start;
+.knockout-widgets-row--match-split,
+.knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
+  align-items: stretch;
   grid-template-columns: minmax(0, 1fr);
 }
 
-@media (min-width: 960px) {
-  .knockout-widgets-row--match-split {
-    grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1fr);
-  }
+.knockout-widgets--below-strip {
+  margin-top: 4px;
 }
 
-@media (min-width: 960px) {
-  .knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
-    grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1fr);
-  }
+.bracket-group-stage {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-@media (min-width: 1100px) {
-  .knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
-    grid-template-columns:
-      minmax(280px, 0.82fr)
-      minmax(220px, 0.62fr)
-      minmax(200px, 0.5fr)
-      minmax(260px, 0.92fr);
-  }
-}
-
-.match-fixtures-widget,
 .match-detail-widget,
 .match-focus-col {
   display: grid;

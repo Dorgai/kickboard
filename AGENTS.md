@@ -65,7 +65,7 @@ If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production ta
 
 ### Feed UI flags and typography
 
-- Country flags load from `flagcdn.com` via native `<img>` in `team-label.tsx` (not `next/image`); the Next image optimizer on Railway returned **400** for external flag URLs.
+- Country flags load from `flagcdn.com` via native `<img>` in `team-label.tsx` (not `next/image`); use fixed `32x24` / `40x30` / `48x36` CDN paths from `flagImageUrl()` — arbitrary widths like `w32` return **404** and show gray fallbacks.
 - Marketing `h1`/`h2` sizes are overridden inside `.feed-browser` in `globals.css` so bracket/match/player sections stay readable.
 - Knockout bracket cards use stacked `MatchTeamsLine` with **sm** flags so logos match the match detail panel.
 - Past-events knockout layout: full-width **Route to the final** bracket on top; match list, summary, team stats/lineups, event timeline, and player stats stack in `.knockout-widgets` rows below (not side-by-side with the tree).
