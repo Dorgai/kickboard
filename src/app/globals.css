@@ -1078,8 +1078,7 @@ h3 {
   text-align: left;
 }
 
-.match-fixture-btn--compact,
-.match-stage-fixtures .match-fixture-btn {
+.match-fixture-btn--compact.match-fixture-btn--teams-stacked {
   align-items: stretch;
   display: flex;
   flex-direction: column;
@@ -1090,20 +1089,23 @@ h3 {
   width: 100%;
 }
 
-.match-fixture-btn--teams-inline.match-fixture-btn--compact {
+.match-fixture-btn--teams-inline.match-fixture-btn--compact,
+.match-stage-fixtures .match-fixture-btn {
   align-items: center;
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 6px 8px;
   justify-content: space-between;
-  padding: 6px 10px;
+  min-height: 32px;
+  padding: 5px 10px;
+  width: 100%;
 }
 
 .match-fixture-btn--with-cluster {
   min-height: 34px;
 }
 
-.match-fixture-main {
+.match-fixture-btn--teams-stacked .match-fixture-main {
   align-items: stretch;
   display: flex;
   flex: 1 1 auto;
@@ -1113,10 +1115,15 @@ h3 {
   width: 100%;
 }
 
-.match-fixture-btn--teams-inline .match-fixture-main {
+.match-fixture-btn--teams-inline .match-fixture-main,
+.match-stage-fixtures .match-fixture-main {
   align-items: center;
+  display: flex;
+  flex: 1 1 auto;
   flex-direction: row;
   flex-wrap: nowrap;
+  gap: 6px;
+  min-width: 0;
 }
 
 .match-fixture-cluster {
@@ -1144,23 +1151,53 @@ h3 {
 }
 
 .match-fixture-btn--teams-stacked .match-teams-line,
-.match-fixture-btn--compact.match-fixture-btn--teams-stacked .match-teams-line,
-.match-stage-fixtures .match-teams-line {
+.match-fixture-btn--compact.match-fixture-btn--teams-stacked .match-teams-line {
   align-items: stretch;
   flex-direction: column;
   width: 100%;
 }
 
 .match-fixture-btn--teams-stacked .team-label,
-.match-fixture-btn--compact.match-fixture-btn--teams-stacked .team-label,
-.match-stage-fixtures .team-label {
+.match-fixture-btn--compact.match-fixture-btn--teams-stacked .team-label {
   gap: 8px;
   max-width: 100%;
   width: 100%;
 }
 
-.match-fixture-btn .team-label-text,
+.match-stage-fixtures .match-teams-line {
+  align-items: center;
+  display: inline-flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 4px 6px;
+  min-width: 0;
+}
+
+.match-stage-fixtures .team-label {
+  flex: 0 1 auto;
+  gap: 6px;
+  min-width: 0;
+  width: auto;
+}
+
 .match-stage-fixtures .team-label-text {
+  font-size: 11px;
+  max-width: 7.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-stage-fixtures .match-fixture-cluster {
+  flex: 0 0 auto;
+  max-width: 4.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-fixture-btn .team-label-text {
   font-size: 12px;
   max-width: none;
 }

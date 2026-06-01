@@ -844,7 +844,8 @@ function PastEventsPanel({
                       }
                       match={match}
                       selectedMatchId={selectedMatchId}
-                      teamsLayout="stacked"
+                      showDate={false}
+                      teamsLayout="inline"
                       onSelect={selectMatch}
                     />
                   ))}
