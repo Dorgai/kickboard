@@ -102,7 +102,10 @@ type FeedStatus = {
   };
 };
 
+type EventTab = "current" | "past";
+
 export function FeedBrowser() {
+  const [activeTab, setActiveTab] = useState<EventTab>("current");
   const [status, setStatus] = useState<FeedStatus | null>(null);
   const [currentWorldCup, setCurrentWorldCup] = useState<CurrentWorldCup | null>(null);
   const [competitions, setCompetitions] = useState<WorldCupCompetition[]>([]);
@@ -256,15 +259,43 @@ export function FeedBrowser() {
 
   return (
     <div className="feed-browser">
+      <nav className="event-tab-bar" aria-label="Tournament event selector">
+        <button
+          className={activeTab === "current" ? "active" : ""}
+          type="button"
+          onClick={() => setActiveTab("current")}
+        >
+          Current event
+        </button>
+        <button
+          className={activeTab === "past" ? "active" : ""}
+          type="button"
+          onClick={() => setActiveTab("past")}
+        >
+          Past events
+        </button>
+      </nav>
+
       <section className="feed-hero">
         <div>
           <p className="eyebrow">Feed-driven data</p>
-          <h1>Kickboard reads real World Cup feeds, stats, squads and brackets.</h1>
-          <p>
-            Historical match, lineup and player-stat data comes from StatsBomb Open Data. Current World Cup
-            info is read from public sources. API-Football real-time stays inactive until credentials and
-            the worker are configured.
-          </p>
+          {activeTab === "current" ? (
+            <>
+              <h1>Current event: 2026 FIFA World Cup.</h1>
+              <p>
+                Current tournament information is read from public tournament pages. Live API-Football
+                data remains unavailable until credentials and the worker are configured.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1>Past events: historical World Cup data.</h1>
+              <p>
+                Historical matches, squads, player stats, team stats, and knockout trees come from
+                StatsBomb Open Data.
+              </p>
+            </>
+          )}
         </div>
         <div className="feed-status-grid">
           <FeedStatusTile label="StatsBomb" ok={Boolean(status?.feeds.historical.connected)} />
@@ -277,51 +308,129 @@ export function FeedBrowser() {
       {loading ? <p className="inline-status">Loading real feeds...</p> : null}
       {error ? <p className="inline-error">{error}</p> : null}
 
-      <section className="current-world-cup-card">
-        <div>
-          <p className="eyebrow">Current World Cup public feed</p>
-          <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
-          <p>{currentWorldCup?.note ?? "Current tournament source is loading or unavailable."}</p>
-        </div>
-        <div className="current-summary-grid">
-          <SummaryTile label="Hosts" value={currentWorldCup?.summary.hostCountries ?? "Unavailable"} />
-          <SummaryTile label="Dates" value={currentWorldCup?.summary.dates ?? "Unavailable"} />
-          <SummaryTile label="Teams" value={currentWorldCup?.summary.teams ?? "Unavailable"} />
-          <SummaryTile label="Venues" value={currentWorldCup?.summary.venueCount ?? "Unavailable"} />
-        </div>
-        {currentWorldCup?.qualifiedTeams.length ? (
-          <div className="qualified-team-list">
-            {currentWorldCup.qualifiedTeams.slice(0, 48).map((team) => (
-              <span key={team}>{team}</span>
-            ))}
-          </div>
-        ) : (
-          <p className="inline-status">Qualified-team table was not available from the public source.</p>
-        )}
-        {currentWorldCup?.groups?.length ? (
-          <div className="current-group-grid">
-            {currentWorldCup.groups.map((group) => (
-              <article className="current-group-card" key={group.group}>
-                <h3>Group {group.group}</h3>
-                {group.teams.map((team) => (
-                  <p key={`${group.group}-${team}`}>
-                    <strong>{team}</strong>
-                  </p>
-                ))}
-                <div className="current-fixture-list">
-                  {group.fixtures.slice(0, 6).map((fixture) => (
-                    <span key={`${group.group}-${fixture.homeTeam}-${fixture.awayTeam}`}>
-                      {fixture.homeTeam} vs {fixture.awayTeam}
-                      {fixture.date ? ` - ${fixture.date}` : ""}
-                    </span>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : null}
-      </section>
+      {activeTab === "current" ? (
+        <CurrentEventPanel currentWorldCup={currentWorldCup} />
+      ) : (
+        <PastEventsPanel
+          bracketRounds={bracketRounds}
+          competitions={competitions}
+          filteredMatches={filteredMatches}
+          filteredPlayerStats={filteredPlayerStats}
+          matchDetail={matchDetail}
+          matchSearch={matchSearch}
+          playerSearch={playerSearch}
+          selectedCompetition={selectedCompetition}
+          selectedMatch={selectedMatch}
+          selectedMatchId={selectedMatchId}
+          setMatchSearch={setMatchSearch}
+          setPlayerSearch={setPlayerSearch}
+          setSelectedCompetition={setSelectedCompetition}
+          setSelectedMatchId={setSelectedMatchId}
+        />
+      )}
+    </div>
+  );
+}
 
+function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldCup | null }) {
+  return (
+    <section className="current-world-cup-card">
+      <div>
+        <p className="eyebrow">Current World Cup public feed</p>
+        <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
+        <p>{currentWorldCup?.note ?? "Current tournament source is loading or unavailable."}</p>
+      </div>
+      <div className="current-summary-grid">
+        <SummaryTile label="Hosts" value={currentWorldCup?.summary.hostCountries ?? "Unavailable"} />
+        <SummaryTile label="Dates" value={currentWorldCup?.summary.dates ?? "Unavailable"} />
+        <SummaryTile label="Teams" value={currentWorldCup?.summary.teams ?? "Unavailable"} />
+        <SummaryTile label="Venues" value={currentWorldCup?.summary.venueCount ?? "Unavailable"} />
+      </div>
+      {currentWorldCup?.qualifiedTeams.length ? (
+        <div className="qualified-team-list">
+          {currentWorldCup.qualifiedTeams.slice(0, 48).map((team) => (
+            <span key={team}>{team}</span>
+          ))}
+        </div>
+      ) : (
+        <p className="inline-status">Qualified-team table was not available from the public source.</p>
+      )}
+      {currentWorldCup?.groups?.length ? (
+        <div className="current-group-grid">
+          {currentWorldCup.groups.map((group) => (
+            <article className="current-group-card" key={group.group}>
+              <h3>Group {group.group}</h3>
+              {group.teams.map((team) => (
+                <p key={`${group.group}-${team}`}>
+                  <strong>{team}</strong>
+                </p>
+              ))}
+              <div className="current-fixture-list">
+                {group.fixtures.slice(0, 6).map((fixture) => (
+                  <span key={`${group.group}-${fixture.homeTeam}-${fixture.awayTeam}`}>
+                    {fixture.homeTeam} vs {fixture.awayTeam}
+                    {fixture.date ? ` - ${fixture.date}` : ""}
+                  </span>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
+      <section className="bracket-tree-card compact-tree">
+        <p className="eyebrow">Current event path</p>
+        <h2>Format through the final</h2>
+        <div className="bracket-tree">
+          {["Group stage", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"].map((stage) => (
+            <div className="bracket-round" key={stage}>
+              <h3>{stage}</h3>
+              <button type="button">
+                <strong>{stage === "Group stage" ? "Groups A-L" : "Qualified teams TBD"}</strong>
+                <span>{stage === "Final" ? "July 19, 2026" : "Driven by current event feed"}</span>
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </section>
+  );
+}
+
+type PastEventsPanelProps = {
+  bracketRounds: BracketRound[];
+  competitions: WorldCupCompetition[];
+  filteredMatches: Match[];
+  filteredPlayerStats: PlayerStat[];
+  matchDetail: MatchDetail | null;
+  matchSearch: string;
+  playerSearch: string;
+  selectedCompetition: string;
+  selectedMatch: Match | undefined;
+  selectedMatchId: number | null;
+  setMatchSearch: (value: string) => void;
+  setPlayerSearch: (value: string) => void;
+  setSelectedCompetition: (value: string) => void;
+  setSelectedMatchId: (value: number) => void;
+};
+
+function PastEventsPanel({
+  bracketRounds,
+  competitions,
+  filteredMatches,
+  filteredPlayerStats,
+  matchDetail,
+  matchSearch,
+  playerSearch,
+  selectedCompetition,
+  selectedMatch,
+  selectedMatchId,
+  setMatchSearch,
+  setPlayerSearch,
+  setSelectedCompetition,
+  setSelectedMatchId
+}: PastEventsPanelProps) {
+  return (
+    <>
       <section className="feed-control-card">
         <label>
           Historical World Cup
@@ -471,7 +580,7 @@ export function FeedBrowser() {
           </div>
         </article>
       </section>
-    </div>
+    </>
   );
 }
 

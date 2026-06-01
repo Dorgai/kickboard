@@ -688,6 +688,38 @@ h3 {
   padding: 64px 24px;
 }
 
+.event-tab-bar {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  box-shadow: var(--shadow-elevation-2);
+  display: inline-flex;
+  gap: 6px;
+  margin: 0 0 28px;
+  padding: 6px;
+  position: sticky;
+  top: 84px;
+  z-index: 15;
+}
+
+.event-tab-bar button {
+  background: transparent;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  min-height: 44px;
+  padding: 0 18px;
+}
+
+.event-tab-bar button.active {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+}
+
 .feed-hero,
 .feed-control-card,
 .current-world-cup-card,
@@ -730,6 +762,11 @@ h3 {
 .bracket-tree-card {
   display: grid;
   gap: 16px;
+}
+
+.bracket-tree-card.compact-tree {
+  box-shadow: none;
+  margin-bottom: 0;
 }
 
 .feed-control-card label,
