@@ -559,8 +559,20 @@ function PastEventsPanel({
     () => groupMatchesByLetter(groupStageMatches, teamToGroup),
     [groupStageMatches, teamToGroup]
   );
+  const groupStageName = "Group Stage";
   const [activeGroupLetter, setActiveGroupLetter] = useState("A");
-  const [activeKnockoutStage, setActiveKnockoutStage] = useState("");
+  const [activeCompetitionStage, setActiveCompetitionStage] = useState("");
+
+  const competitionStageTabs = useMemo(() => {
+    const tabs: Array<{ id: string; label: string }> = [];
+    if (groupBuckets.length) {
+      tabs.push({ id: groupStageName, label: groupStageName });
+    }
+    for (const round of bracketRounds) {
+      tabs.push({ id: round.stage, label: round.stage });
+    }
+    return tabs;
+  }, [bracketRounds, groupBuckets.length, groupStageName]);
 
   useEffect(() => {
     if (groupBuckets.length && !groupBuckets.some((bucket) => bucket.letter === activeGroupLetter)) {
@@ -569,15 +581,17 @@ function PastEventsPanel({
   }, [activeGroupLetter, groupBuckets]);
 
   useEffect(() => {
+    if (!competitionStageTabs.length) return;
     if (
-      bracketRounds.length &&
-      (!activeKnockoutStage || !bracketRounds.some((round) => round.stage === activeKnockoutStage))
+      !activeCompetitionStage ||
+      !competitionStageTabs.some((tab) => tab.id === activeCompetitionStage)
     ) {
-      setActiveKnockoutStage(bracketRounds[0].stage);
+      setActiveCompetitionStage(competitionStageTabs[0].id);
     }
-  }, [activeKnockoutStage, bracketRounds]);
+  }, [activeCompetitionStage, competitionStageTabs]);
 
-  const activeKnockoutRound = bracketRounds.find((round) => round.stage === activeKnockoutStage);
+  const isGroupStageView = activeCompetitionStage === groupStageName;
+  const activeKnockoutRound = bracketRounds.find((round) => round.stage === activeCompetitionStage);
 
   const filteredLineups = useMemo(() => {
     const teams: LineupTeam[] = (matchDetail?.lineups ?? []).map((team) => {
@@ -624,10 +638,10 @@ function PastEventsPanel({
 
   function selectMatch(matchId: number) {
     const match = matches.find((entry) => entry.matchId === matchId);
-    if (match?.stage && match.stage !== "Group Stage") {
-      setActiveKnockoutStage(match.stage);
+    if (match?.stage) {
+      setActiveCompetitionStage(match.stage);
     }
-    if (match?.stage === "Group Stage") {
+    if (match?.stage === groupStageName) {
       const letter = teamToGroup.get(match.homeTeam) ?? teamToGroup.get(match.awayTeam);
       if (letter) setActiveGroupLetter(letter);
     }
@@ -653,27 +667,13 @@ function PastEventsPanel({
                 ))}
               </select>
             </label>
-            {bracketRounds.length ? (
+            {competitionStageTabs.length ? (
               <FeedTabBar
-                ariaLabel="Knockout stages"
+                ariaLabel="Competition stages"
                 className="bracket-stage-tabs"
-                tabs={bracketRounds.map((round) => ({
-                  id: round.stage,
-                  label: round.stage
-                }))}
-                value={activeKnockoutStage}
-                onChange={setActiveKnockoutStage}
-              />
-            ) : groupBuckets.length ? (
-              <FeedTabBar
-                ariaLabel="Group stage groups"
-                className="bracket-stage-tabs"
-                tabs={groupBuckets.map((bucket) => ({
-                  id: bucket.letter,
-                  label: `Group ${bucket.letter}`
-                }))}
-                value={activeGroupLetter}
-                onChange={setActiveGroupLetter}
+                tabs={competitionStageTabs}
+                value={activeCompetitionStage}
+                onChange={setActiveCompetitionStage}
               />
             ) : null}
             <button
@@ -685,35 +685,11 @@ function PastEventsPanel({
               {showMatchesList ? "Hide match list" : "Show full match list"}
             </button>
           </div>
-          {bracketRounds.length ? (
-            activeKnockoutFixtures.length ? (
-              <StageFixtureStrip
-                fixtures={activeKnockoutFixtures}
-                round={activeKnockoutRound}
-                selectedMatchId={selectedMatchId}
-                onSelect={selectMatch}
-              />
-            ) : (
-              <p className="inline-status">No fixtures for this knockout stage.</p>
-            )
-          ) : groupBuckets.length ? (
-            activeGroupFixtures.length ? (
-              <StageFixtureStrip
-                fixtures={activeGroupFixtures}
-                selectedMatchId={selectedMatchId}
-                onSelect={selectMatch}
-              />
-            ) : (
-              <p className="inline-status">No fixtures for this group.</p>
-            )
-          ) : (
-            <p className="inline-status">No knockout rounds in this feed.</p>
-          )}
-          {bracketRounds.length && groupBuckets.length ? (
-            <div className="bracket-group-stage">
+          {isGroupStageView && groupBuckets.length ? (
+            <>
               <FeedTabBar
                 ariaLabel="Group stage groups"
-                className="bracket-stage-tabs"
+                className="bracket-group-tabs bracket-stage-tabs"
                 tabs={groupBuckets.map((bucket) => ({
                   id: bucket.letter,
                   label: `Group ${bucket.letter}`
@@ -727,9 +703,26 @@ function PastEventsPanel({
                   selectedMatchId={selectedMatchId}
                   onSelect={selectMatch}
                 />
-              ) : null}
-            </div>
-          ) : null}
+              ) : (
+                <p className="inline-status">No fixtures for this group.</p>
+              )}
+            </>
+          ) : activeKnockoutRound ? (
+            activeKnockoutFixtures.length ? (
+              <StageFixtureStrip
+                fixtures={activeKnockoutFixtures}
+                round={activeKnockoutRound}
+                selectedMatchId={selectedMatchId}
+                onSelect={selectMatch}
+              />
+            ) : (
+              <p className="inline-status">No fixtures for this stage.</p>
+            )
+          ) : competitionStageTabs.length ? (
+            <p className="inline-status">No fixtures for this stage.</p>
+          ) : (
+            <p className="inline-status">No stages in this feed.</p>
+          )}
         </section>
 
         <div className="knockout-widgets knockout-widgets--below-strip" id="match-detail-panel">

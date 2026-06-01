@@ -136,9 +136,25 @@ export function buildKnockoutBracket(matches: StatsBombMatch[]): BracketRound[] 
     })
     .map(toBracketMatch);
 
-  const stageOrder = ["Round of 16", "Quarter-finals", "Semi-finals", "3rd Place Final", "Final"];
+  const preferredStageOrder = [
+    "Round of 32",
+    "Round of 16",
+    "Quarter-finals",
+    "Semi-finals",
+    "3rd Place Final",
+    "Final"
+  ];
 
-  return stageOrder
+  const presentStages = [...new Set(knockoutMatches.map((match) => match.stage))].sort((left, right) => {
+    const leftIndex = preferredStageOrder.indexOf(left);
+    const rightIndex = preferredStageOrder.indexOf(right);
+    const leftRank = leftIndex === -1 ? preferredStageOrder.length + 1 : leftIndex;
+    const rightRank = rightIndex === -1 ? preferredStageOrder.length + 1 : rightIndex;
+    if (leftRank !== rightRank) return leftRank - rightRank;
+    return left.localeCompare(right);
+  });
+
+  return presentStages
     .map((stage) => {
       const roundMatches = knockoutMatches.filter((match) => match.stage === stage);
       if (!roundMatches.length) return null;

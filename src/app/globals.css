@@ -952,6 +952,35 @@ h3 {
   width: auto;
 }
 
+.feed-browser .bracket-controls-row .bracket-stage-tabs.feed-control-bar {
+  display: flex;
+  flex-wrap: wrap;
+  grid-template-columns: unset;
+}
+
+.feed-browser .bracket-controls-row .bracket-stage-tabs.feed-control-bar button {
+  flex: 0 1 auto;
+  max-width: none;
+  overflow: visible;
+  text-overflow: unset;
+  width: auto;
+}
+
+.feed-browser .bracket-group-tabs.feed-control-bar {
+  display: flex;
+  flex-wrap: wrap;
+  grid-template-columns: unset;
+  margin-top: 0;
+}
+
+.feed-browser .bracket-group-tabs.feed-control-bar button {
+  flex: 0 1 auto;
+  max-width: none;
+  overflow: visible;
+  text-overflow: unset;
+  width: auto;
+}
+
 .feed-browser .bracket-controls-row .bracket-controls-action {
   flex: 0 0 auto;
   justify-content: center;
