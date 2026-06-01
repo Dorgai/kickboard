@@ -1,0 +1,41 @@
+{
+  "name": "kickboard",
+  "version": "1.0.0",
+  "description": "KickStats World Cup fan and analytics platform scaffold.",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dorgai/kickboard.git"
+  },
+  "keywords": [
+    "kickstats",
+    "world-cup",
+    "railway",
+    "nextjs"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Dorgai/kickboard/issues"
+  },
+  "homepage": "https://github.com/Dorgai/kickboard#readme",
+  "dependencies": {
+    "lucide-react": "^1.17.0",
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3"
+  }
+}
