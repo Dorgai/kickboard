@@ -75,13 +75,31 @@ Inside the **kickboard** project (not another project):
 
 Use either dashboard deploy **or** GitHub Actions CLI deploy — not two unrelated projects.
 
-## Local CLI
+## Local CLI deploy (recommended to ship `main` now)
+
+1. Railway → **kickboard** project → **Settings** → **Tokens** → create a token.
+2. From the repo root:
+
+```bash
+export RAILWAY_TOKEN="<paste token>"
+npm run check          # optional: verify build locally
+npm run railway:deploy # uploads repo → kickboard production, waits for /api/health
+```
+
+Target resolution uses [`deploy/railway.project.json`](../deploy/railway.project.json) (`kickboard` / `kickboard` / `production` only).
+
+Optional overrides:
+
+```bash
+export RAILWAY_SERVICE_NAME=exact-service-name   # if service is not named kickboard
+export NEXT_PUBLIC_APP_URL=https://kickboard-production.up.railway.app
+export VERIFY_DEPLOY=0                           # skip post-deploy curl checks
+```
+
+### Sync variables (optional, separate from deploy)
 
 ```bash
 export RAILWAY_TOKEN=...
-# optional overrides:
-# export RAILWAY_SERVICE_NAME=exact-service-name
-
 npm run railway:variables
 ```
 
