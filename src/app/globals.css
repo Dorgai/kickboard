@@ -1230,25 +1230,29 @@ h3 {
   }
 }
 
-.knockout-widgets-row--match-focus {
+.knockout-widgets-row--match-split {
+  align-items: start;
   grid-template-columns: minmax(0, 1fr);
 }
 
-.match-focus-block {
+@media (min-width: 960px) {
+  .knockout-widgets-row--match-split {
+    grid-template-columns: minmax(260px, 0.88fr) minmax(0, 1.12fr);
+  }
+}
+
+.match-fixtures-widget,
+.match-detail-widget {
+  display: grid;
+  gap: 12px;
+  min-height: 220px;
+  min-width: 0;
   padding: 16px 18px;
 }
 
-.match-focus-layout {
-  display: grid;
-  gap: 16px;
-  min-width: 0;
-}
-
-@media (min-width: 960px) {
-  .match-focus-layout {
-    align-items: start;
-    grid-template-columns: minmax(200px, 0.85fr) minmax(0, 1.15fr);
-  }
+.match-detail-widget-empty h2 {
+  font-size: 1.15rem;
+  margin: 0 0 8px;
 }
 
 .match-stage-rail {
