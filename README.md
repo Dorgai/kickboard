@@ -34,7 +34,7 @@ This runs TypeScript checking and a production Next.js build.
 
 ## Deploy to Railway
 
-See [`docs/deploy-railway.md`](docs/deploy-railway.md) for GitHub deploy, CLI, and variable setup (`scripts/configure-railway-variables.sh`).
+See [`docs/deploy-railway.md`](docs/deploy-railway.md) to deploy into the existing **kickboard** Railway project (not a new one). Requires `RAILWAY_PROJECT_ID`, `RAILWAY_SERVICE_ID`, and `RAILWAY_TOKEN`.
 
 ## Railway services to create
 

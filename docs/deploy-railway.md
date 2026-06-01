@@ -1,72 +1,84 @@
-# Deploy Kickboard to Railway
+# Deploy Kickboard to the existing Railway project
 
-## Not seeing a deploy in the kickboard project?
+**Always use your existing `kickboard` Railway project.** Do not run `railway init` or **New Project** in the dashboard — that creates a separate project.
 
-Use this checklist:
+## Find IDs for the kickboard project
 
-1. **Service is linked to GitHub** — In the kickboard project, the web service must be **Deploy from GitHub repo** → `Dorgai/kickboard`, not an empty service with no repo.
-2. **Branch is `main`** — Settings → Source → Branch **`main`** (older setups may still point at an empty initial commit).
-3. **Root directory** — `/` (repository root, where `package.json` and `railway.json` live).
-4. **Redeploy** — Deployments → **Deploy** / **Redeploy** on the latest `main` commit (message should **not** be only "Initial commit").
-5. **Build logs** — Open the failed deployment; common fixes: Node 22 (see `nixpacks.toml`), health check `/api/health`.
-6. **GitHub Actions (optional)** — Workflow `.github/workflows/railway-deploy.yml` only runs on **`main`** and needs repo secret **`RAILWAY_TOKEN`** (optional **`RAILWAY_SERVICE_ID`**). Without the token, use Railway’s native GitHub deploy (step 1).
+1. Open [Railway](https://railway.com) → project **kickboard**.
+2. Click the **web** service (Next.js).
+3. **Settings** → copy **Service ID** → `RAILWAY_SERVICE_ID`.
+4. Project **Settings** → copy **Project ID** → `RAILWAY_PROJECT_ID`.
+5. **Settings** → **Tokens** → create a token → `RAILWAY_TOKEN`.
 
-## Option A: GitHub deploy (recommended)
+## Option A: GitHub repo on the kickboard project (recommended)
 
-1. Open [Railway](https://railway.com) and create a **New Project**.
-2. Choose **Deploy from GitHub repo** and select `Dorgai/kickboard`.
-3. Set the service branch to **`main`** (contains the Next.js app and `railway.json`).
-4. Railway reads `railway.json`:
-   - **Build:** `npm run build` (Nixpacks)
-   - **Start:** `npm run start -- --hostname 0.0.0.0 --port $PORT`
-   - **Health check:** `/api/health`
-5. Add variables (pick one approach):
+Inside the **kickboard** project (not a new project):
 
-   **Dashboard:** service → **Variables** → add:
+1. **+ New** → **GitHub Repo** *or* open the existing service → **Settings** → **Source**.
+2. Repository: **`Dorgai/kickboard`**, branch: **`main`**, root: **`/`**.
+3. If Railway created an extra empty project earlier, delete that project or ignore it — only wire **kickboard**.
+4. **Redeploy** the service. Build uses `railway.json` / `nixpacks.toml`, health check `/api/health`.
+5. **Variables** on this service (minimum):
 
-   | Variable | Example / notes |
-   |----------|-----------------|
-   | `NEXT_PUBLIC_APP_URL` | `https://<your-service>.up.railway.app` |
-   | `ADMIN_DATA_SOURCES_TOKEN` | Strong random string for `/admin/data-sources` |
-   | `JWT_SECRET` | Strong random string |
-   | `DATABASE_URL` | From Railway Postgres plugin (optional for feed browser MVP) |
-   | `REDIS_URL` | From Railway Redis plugin (optional until worker is used) |
+   | Variable | Notes |
+   |----------|--------|
+   | `NEXT_PUBLIC_APP_URL` | `https://<this-service-domain>` |
+   | `JWT_SECRET` | Random string |
+   | `ADMIN_DATA_SOURCES_TOKEN` | Random string |
+   | `DATABASE_URL` | From Postgres plugin in **kickboard** (optional) |
+   | `REDIS_URL` | From Redis plugin in **kickboard** (optional) |
 
-   **CLI (repo script):** after `railway link` and `export RAILWAY_TOKEN=...`:
+## Option B: GitHub Actions → same kickboard service
 
-   ```bash
-   chmod +x scripts/configure-railway-variables.sh
-   cp deploy/railway-variables.env.example deploy/railway-variables.env
-   # edit deploy/railway-variables.env (at least NEXT_PUBLIC_APP_URL after first domain)
-   set -a && source deploy/railway-variables.env && set +a
-   ./scripts/configure-railway-variables.sh
-   ```
+Repo **Settings** → **Secrets and variables** → **Actions**:
 
-   **GitHub Actions:** add repository secrets `RAILWAY_TOKEN` (required for CLI deploy), optional `RAILWAY_SERVICE_ID`, `JWT_SECRET`, `ADMIN_DATA_SOURCES_TOKEN`, `DATABASE_URL`, `REDIS_URL`, and variable `NEXT_PUBLIC_APP_URL`. Pushes to `main` run `.github/workflows/railway-deploy.yml`.
+| Secret | Required |
+|--------|----------|
+| `RAILWAY_TOKEN` | Yes |
+| `RAILWAY_PROJECT_ID` | Yes (kickboard project) |
+| `RAILWAY_SERVICE_ID` | Yes (web service in kickboard) |
 
-6. Deploy. When the health check passes, open the generated domain.
+Optional secrets: `JWT_SECRET`, `ADMIN_DATA_SOURCES_TOKEN`, `DATABASE_URL`, `REDIS_URL`  
+Optional variable: `NEXT_PUBLIC_APP_URL`, `RAILWAY_ENVIRONMENT` (default `production`)
 
-## Option B: Railway CLI
+Pushes to **`main`** run `.github/workflows/railway-deploy.yml`, which runs:
+
+`railway up --project <id> --service <id>`
+
+So deploys never create a second project.
+
+## Option C: CLI (link to kickboard only)
 
 ```bash
-npm install -g @railway/cli
-railway login
-cd kickboard
-railway init          # link or create project
-railway up            # deploy current directory
-railway domain        # optional public URL
+export RAILWAY_TOKEN=...
+export RAILWAY_PROJECT_ID=...   # kickboard project
+export RAILWAY_SERVICE_ID=...   # web service in kickboard
+
+cp deploy/railway-variables.env.example deploy/railway-variables.env
+# fill IDs in railway-variables.env
+set -a && source deploy/railway-variables.env && set +a
+
+npm run railway:variables
 ```
 
-Set the same variables with `railway variables set KEY=value`.
+**Do not use** `railway init` (creates a new project). To link locally once:
 
-## Optional services
+```bash
+railway link --project "$RAILWAY_PROJECT_ID" --environment production
+# pick the existing web service when prompted
+```
 
-See [`docs/railway-services.md`](./railway-services.md) for Postgres, Redis, and the API-Football worker.
+## Not seeing deploys in kickboard?
+
+- Confirm you are in project **kickboard**, not another project name.
+- Source branch must be **`main`** with `package.json` at repo root.
+- Latest deployment commit should not be "Initial commit" only.
+- Check build logs on the **kickboard** service deployment.
 
 ## Verify
 
 ```bash
-curl -fsS https://<your-domain>/api/health
+curl -fsS https://<your-kickboard-domain>/api/health
 ```
 
 Expected: `{"ok":true,"service":"kickboard",...}`

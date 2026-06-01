@@ -46,4 +46,4 @@ Wait for `curl -sf http://localhost:3000/api/health` before browser or API tests
 
 ### Railway deploy
 
-See [`docs/deploy-railway.md`](docs/deploy-railway.md). Minimum variables: `NEXT_PUBLIC_APP_URL`, `JWT_SECRET`, `ADMIN_DATA_SOURCES_TOKEN`. Postgres/Redis are optional for the StatsBomb feed browser MVP.
+Deploy only into the existing **kickboard** Railway project (`RAILWAY_PROJECT_ID` + `RAILWAY_SERVICE_ID`). Never `railway init` or create a new project. See [`docs/deploy-railway.md`](docs/deploy-railway.md).

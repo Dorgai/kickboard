@@ -1,4 +1,4 @@
-name: Deploy to Railway
+name: Deploy to Railway (kickboard project)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: railway-deploy-main
+  group: railway-deploy-kickboard
   cancel-in-progress: true
 
 jobs:
@@ -29,26 +29,35 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Railway
+      - name: Deploy to existing kickboard Railway service
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+          RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
         run: |
-          if [ -z "$RAILWAY_TOKEN" ]; then
-            echo "::warning::RAILWAY_TOKEN is not configured. Skipping CLI deploy."
-            echo "Connect the kickboard Railway service to GitHub branch main, or add RAILWAY_TOKEN to repo secrets."
-            exit 0
+          missing=0
+          for name in RAILWAY_TOKEN RAILWAY_PROJECT_ID RAILWAY_SERVICE_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing GitHub secret: $name (required to deploy into the existing kickboard project, not a new one)"
+              missing=1
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then
+            echo "Add secrets from Railway → kickboard project → Settings / service Settings."
+            exit 1
           fi
           npm install -g @railway/cli
-          if [ -n "$RAILWAY_SERVICE_ID" ]; then
-            railway up --detach --service "$RAILWAY_SERVICE_ID"
-          else
-            railway up --detach
-          fi
+          source scripts/railway-target.sh
+          echo "Deploying to project $RAILWAY_PROJECT_ID, service $RAILWAY_SERVICE_ID"
+          railway up --detach "${RAILWAY_TARGET_ARGS[@]}"
 
       - name: Configure Railway variables
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+          RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           REDIS_URL: ${{ secrets.REDIS_URL }}
@@ -56,8 +65,7 @@ jobs:
           ADMIN_DATA_SOURCES_TOKEN: ${{ secrets.ADMIN_DATA_SOURCES_TOKEN }}
         run: |
           if [ -z "$RAILWAY_TOKEN" ]; then
-            echo "Skipping variable sync (no RAILWAY_TOKEN)."
             exit 0
           fi
-          chmod +x scripts/configure-railway-variables.sh
-          bash scripts/configure-railway-variables.sh || echo "::warning::Variable sync failed (service may need RAILWAY_SERVICE_ID)."
+          chmod +x scripts/configure-railway-variables.sh scripts/railway-target.sh
+          bash scripts/configure-railway-variables.sh
