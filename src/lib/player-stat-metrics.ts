@@ -34,6 +34,18 @@ export const MATCH_STAT_LABELS: Record<PlayerMetricId, string> = {
   dribbles: "Dribbles"
 };
 
+/** Short helper text under each stat in match details. */
+export const MATCH_STAT_CAPTIONS: Record<PlayerMetricId, string> = {
+  goals: "Goals scored",
+  assists: "Assists",
+  shots: "Shots taken",
+  xg: "Expected goals",
+  passes: "Passes attempted",
+  passAccuracy: "Pass completion",
+  carries: "Ball carries",
+  dribbles: "Dribbles attempted"
+};
+
 export type PlayerMetricDef = {
   id: PlayerMetricId;
   label: string;
@@ -46,56 +58,56 @@ export const PLAYER_MATCH_METRICS: PlayerMetricDef[] = [
   {
     id: "goals",
     label: MATCH_STAT_LABELS.goals,
-    caption: "Goals scored in this match (StatsBomb events).",
+    caption: MATCH_STAT_CAPTIONS.goals,
     kind: "number",
     format: (row) => String(row.goals)
   },
   {
     id: "assists",
     label: MATCH_STAT_LABELS.assists,
-    caption: "Assists on goals in this match.",
+    caption: MATCH_STAT_CAPTIONS.assists,
     kind: "number",
     format: (row) => String(row.assists)
   },
   {
     id: "shots",
     label: MATCH_STAT_LABELS.shots,
-    caption: "Shot attempts including goals.",
+    caption: MATCH_STAT_CAPTIONS.shots,
     kind: "number",
     format: (row) => String(row.shots)
   },
   {
     id: "xg",
     label: MATCH_STAT_LABELS.xg,
-    caption: "Expected goals from shot quality in this match.",
+    caption: MATCH_STAT_CAPTIONS.xg,
     kind: "number",
     format: (row) => row.xg.toFixed(2)
   },
   {
     id: "passes",
     label: MATCH_STAT_LABELS.passes,
-    caption: "Passes attempted in this match.",
+    caption: MATCH_STAT_CAPTIONS.passes,
     kind: "number",
     format: (row) => String(row.passes)
   },
   {
     id: "passAccuracy",
     label: MATCH_STAT_LABELS.passAccuracy,
-    caption: "Pass completion rate when outcomes are recorded.",
+    caption: MATCH_STAT_CAPTIONS.passAccuracy,
     kind: "number",
     format: (row) => (row.passAccuracy == null ? "n/a" : `${row.passAccuracy}%`)
   },
   {
     id: "carries",
     label: MATCH_STAT_LABELS.carries,
-    caption: "Ball carries in this match.",
+    caption: MATCH_STAT_CAPTIONS.carries,
     kind: "number",
     format: (row) => String(row.carries)
   },
   {
     id: "dribbles",
     label: MATCH_STAT_LABELS.dribbles,
-    caption: "Dribbles attempted in this match.",
+    caption: MATCH_STAT_CAPTIONS.dribbles,
     kind: "number",
     format: (row) => String(row.dribbles)
   }

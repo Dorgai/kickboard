@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { MATCH_STAT_LABELS, type PlayerStatRow } from "@/lib/player-stat-metrics";
+import { MATCH_STAT_CAPTIONS, MATCH_STAT_LABELS, type PlayerStatRow } from "@/lib/player-stat-metrics";
 import { TeamLabel } from "@/components/team-label";
 
 export type { PlayerStatRow };
@@ -30,70 +30,70 @@ const COLUMNS: ColumnDef[] = [
   {
     id: "player",
     label: "Player",
-    caption: "Name aggregated from StatsBomb match events.",
+    caption: "Player name",
     kind: "text",
     value: (row) => row.player
   },
   {
     id: "team",
     label: "Team",
-    caption: "National team in this match.",
+    caption: "Team",
     kind: "text",
     value: (row) => row.team
   },
   {
     id: "goals",
     label: MATCH_STAT_LABELS.goals,
-    caption: "Goals in this match.",
+    caption: MATCH_STAT_CAPTIONS.goals,
     kind: "number",
     value: (row) => row.goals
   },
   {
     id: "assists",
     label: MATCH_STAT_LABELS.assists,
-    caption: "Assists in this match.",
+    caption: MATCH_STAT_CAPTIONS.assists,
     kind: "number",
     value: (row) => row.assists
   },
   {
     id: "shots",
     label: MATCH_STAT_LABELS.shots,
-    caption: "Shots in this match.",
+    caption: MATCH_STAT_CAPTIONS.shots,
     kind: "number",
     value: (row) => row.shots
   },
   {
     id: "xg",
     label: MATCH_STAT_LABELS.xg,
-    caption: "Expected goals in this match.",
+    caption: MATCH_STAT_CAPTIONS.xg,
     kind: "number",
     value: (row) => row.xg
   },
   {
     id: "passes",
     label: MATCH_STAT_LABELS.passes,
-    caption: "Passes attempted.",
+    caption: MATCH_STAT_CAPTIONS.passes,
     kind: "number",
     value: (row) => row.passes
   },
   {
     id: "passAccuracy",
     label: MATCH_STAT_LABELS.passAccuracy,
-    caption: "Pass completion % when tracked.",
+    caption: MATCH_STAT_CAPTIONS.passAccuracy,
     kind: "number",
     value: (row) => row.passAccuracy
   },
   {
     id: "carries",
     label: MATCH_STAT_LABELS.carries,
-    caption: "Carries in this match.",
+    caption: MATCH_STAT_CAPTIONS.carries,
     kind: "number",
     value: (row) => row.carries
   },
   {
     id: "dribbles",
     label: MATCH_STAT_LABELS.dribbles,
-    caption: "Dribbles attempted.",
+    caption: MATCH_STAT_CAPTIONS.dribbles,
     kind: "number",
     value: (row) => row.dribbles
   }
