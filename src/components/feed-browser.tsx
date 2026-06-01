@@ -687,40 +687,22 @@ function PastEventsPanel({
           </div>
           {bracketRounds.length ? (
             activeKnockoutFixtures.length ? (
-              <div className="bracket-stage-panel">
-                <div className="bracket-fixture-grid match-stage-fixtures">
-                  {activeKnockoutFixtures.map((match) => (
-                    <BracketMatchButton
-                      key={match.matchId}
-                      clusterLabel={knockoutClusterLabel(activeKnockoutRound, match.matchId)}
-                      match={match}
-                      selectedMatchId={selectedMatchId}
-                      showDate={false}
-                      teamsLayout="inline"
-                      onSelect={selectMatch}
-                    />
-                  ))}
-                </div>
-              </div>
+              <StageFixtureStrip
+                fixtures={activeKnockoutFixtures}
+                round={activeKnockoutRound}
+                selectedMatchId={selectedMatchId}
+                onSelect={selectMatch}
+              />
             ) : (
               <p className="inline-status">No fixtures for this knockout stage.</p>
             )
           ) : groupBuckets.length ? (
             activeGroupFixtures.length ? (
-              <div className="bracket-stage-panel">
-                <div className="bracket-fixture-grid match-stage-fixtures">
-                  {activeGroupFixtures.map((match) => (
-                    <BracketMatchButton
-                      key={match.matchId}
-                      match={match}
-                      selectedMatchId={selectedMatchId}
-                      showDate={false}
-                      teamsLayout="inline"
-                      onSelect={selectMatch}
-                    />
-                  ))}
-                </div>
-              </div>
+              <StageFixtureStrip
+                fixtures={activeGroupFixtures}
+                selectedMatchId={selectedMatchId}
+                onSelect={selectMatch}
+              />
             ) : (
               <p className="inline-status">No fixtures for this group.</p>
             )
@@ -740,26 +722,17 @@ function PastEventsPanel({
                 onChange={setActiveGroupLetter}
               />
               {activeGroupFixtures.length ? (
-                <div className="bracket-stage-panel">
-                  <div className="bracket-fixture-grid match-stage-fixtures">
-                    {activeGroupFixtures.map((match) => (
-                      <BracketMatchButton
-                        key={match.matchId}
-                        match={match}
-                        selectedMatchId={selectedMatchId}
-                        showDate={false}
-                        teamsLayout="inline"
-                        onSelect={selectMatch}
-                      />
-                    ))}
-                  </div>
-                </div>
+                <StageFixtureStrip
+                  fixtures={activeGroupFixtures}
+                  selectedMatchId={selectedMatchId}
+                  onSelect={selectMatch}
+                />
               ) : null}
             </div>
           ) : null}
         </section>
 
-        <div className="knockout-widgets" id="match-detail-panel">
+        <div className="knockout-widgets knockout-widgets--below-strip" id="match-detail-panel">
           {showMatchesList ? (
             <article className="data-card surface-muted match-explorer-list match-explorer-list--full-page">
               <div className="match-explorer-list-header section-heading compact">
@@ -829,8 +802,8 @@ function PastEventsPanel({
                     awayTeam={selectedMatch.awayTeam}
                     homeScore={selectedMatch.homeScore}
                     homeTeam={selectedMatch.homeTeam}
-                    layout="stacked"
-                    size="md"
+                    layout="inline"
+                    size="sm"
                   />
                   <p className="match-focus-meta">
                     {selectedMatch.date}
@@ -918,13 +891,43 @@ function knockoutClusterLabel(round: BracketRound | undefined, matchId: number) 
   return cluster?.label;
 }
 
+function StageFixtureStrip({
+  fixtures,
+  onSelect,
+  round,
+  selectedMatchId
+}: {
+  fixtures: Match[];
+  onSelect: (matchId: number) => void;
+  round?: BracketRound;
+  selectedMatchId: number | null;
+}) {
+  return (
+    <div className="bracket-stage-panel">
+      <div aria-label="Fixtures for selected stage" className="bracket-fixture-strip match-stage-fixtures" role="list">
+        {fixtures.map((match) => (
+          <BracketMatchButton
+            key={match.matchId}
+            clusterLabel={round ? knockoutClusterLabel(round, match.matchId) : undefined}
+            match={match}
+            selectedMatchId={selectedMatchId}
+            variant="strip"
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function BracketMatchButton({
   clusterLabel,
   match,
   onSelect,
   selectedMatchId,
   showDate = true,
-  teamsLayout = "inline"
+  teamsLayout = "inline",
+  variant = "default"
 }: {
   clusterLabel?: string;
   match: Match;
@@ -932,13 +935,41 @@ function BracketMatchButton({
   selectedMatchId: number | null;
   showDate?: boolean;
   teamsLayout?: "inline" | "stacked";
+  variant?: "default" | "strip";
 }) {
+  const title = [clusterLabel, match.date, match.stadium].filter(Boolean).join(" · ");
+  const selected = selectedMatchId === match.matchId;
+
+  if (variant === "strip") {
+    return (
+      <button
+        className={`match-fixture-btn match-fixture-btn--strip-card${
+          clusterLabel ? " match-fixture-btn--with-cluster" : ""
+        }${selected ? " selected" : ""}`}
+        role="listitem"
+        title={title}
+        type="button"
+        onClick={() => onSelect(match.matchId)}
+      >
+        {clusterLabel ? <span className="match-fixture-cluster">{clusterLabel}</span> : null}
+        <MatchTeamsLine
+          awayScore={match.awayScore}
+          awayTeam={match.awayTeam}
+          homeScore={match.homeScore}
+          homeTeam={match.homeTeam}
+          layout="inline"
+          size="xs"
+        />
+      </button>
+    );
+  }
+
   return (
     <button
       className={`match-fixture-btn match-fixture-btn--compact match-fixture-btn--teams-${teamsLayout}${
         clusterLabel ? " match-fixture-btn--with-cluster" : ""
-      }${selectedMatchId === match.matchId ? " selected" : ""}`}
-      title={[clusterLabel, match.date, match.stadium].filter(Boolean).join(" · ")}
+      }${selected ? " selected" : ""}`}
+      title={title}
       type="button"
       onClick={() => onSelect(match.matchId)}
     >
