@@ -9,6 +9,7 @@ The initial implementation is intentionally focused on safe foundations:
 - Explicit service plan for web, Postgres, Redis, worker and analytics boundaries
 - Starter PostgreSQL schema based on the uploaded data model
 - Product safety guardrails for child accounts, predictions, wallet points and moderation
+- Gap closure docs for data ingestion, widget isolation, portraits, legal language, and stat-card sharing
 
 ## Run locally
 
@@ -42,6 +43,14 @@ Add these later when their code paths exist:
 5. **Analytics API** - separate FastAPI/Python service for StatsBomb ingestion and Pro/Elite analytics workloads.
 
 Details are in [`docs/railway-services.md`](docs/railway-services.md).
+
+## Product and engineering docs
+
+- [`docs/data-ingestion.md`](docs/data-ingestion.md) - API-Football polling, retries, reconciliation, and StatsBomb sync.
+- [`docs/widget-contract.md`](docs/widget-contract.md) - widget data ownership, isolation, and `widget_layout` schema.
+- [`docs/portrait-pipeline.md`](docs/portrait-pipeline.md) - SDXL prompt, frame, review, and CDN pipeline.
+- [`docs/predictions-legal.md`](docs/predictions-legal.md) - draft legal intent for free-to-play prediction points.
+- [`docs/user-stat-card.md`](docs/user-stat-card.md) - profile/share card requirements and data sources.
 
 ## Important safety constraints
 

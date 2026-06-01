@@ -8,6 +8,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { AppChrome } from "@/components/app-chrome";
+import { UserStatCard } from "@/components/user-stat-card";
 import {
   featureCards,
   matchEvents,
@@ -149,6 +150,33 @@ export default function Home() {
                 </article>
               );
             })}
+          </div>
+        </section>
+
+        <section className="section stat-card-showcase" id="profile">
+          <div className="section-heading">
+            <p className="eyebrow">User profile</p>
+            <h2>UserStatCard is the tournament passport</h2>
+            <p>
+              The profile card surfaces points, rank, accuracy, prediction streak, top player and sharing
+              actions from the new requirements.
+            </p>
+          </div>
+          <div className="stat-card-layout">
+            <UserStatCard />
+            <div className="stat-card-notes">
+              <h3>Share export contract</h3>
+              <p>
+                The full card renders in React today. The 1080x1080 share image should be generated
+                server-side, stored behind a one-hour signed URL and passed to the Web Share API when
+                object storage is configured.
+              </p>
+              <ul>
+                <li>Uses users.points_balance for points.</li>
+                <li>Uses latest leaderboard snapshot for rank.</li>
+                <li>Falls back to a download link when native sharing is unavailable.</li>
+              </ul>
+            </div>
           </div>
         </section>
 

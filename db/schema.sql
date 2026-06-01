@@ -190,6 +190,7 @@ CREATE TABLE IF NOT EXISTS user_preferences (
   notification_channels jsonb NOT NULL DEFAULT '{"push": true, "email": false}'::jsonb,
   display_mode varchar(10) NOT NULL DEFAULT 'auto',
   updated_at timestamptz NOT NULL DEFAULT now(),
+  CHECK (jsonb_typeof(widget_layout) = 'array'),
   CHECK (display_mode IN ('auto', 'light', 'dark'))
 );
 
@@ -247,6 +248,7 @@ CREATE TABLE IF NOT EXISTS matches (
   home_score_pens smallint,
   away_score_pens smallint,
   api_fixture_id varchar(30),
+  statsbomb_match_id integer UNIQUE,
   last_synced_at timestamptz,
   CHECK (stage IN ('group', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final')),
   CHECK (minute IS NULL OR minute BETWEEN 0 AND 130)
@@ -265,6 +267,59 @@ CREATE TABLE IF NOT EXISTS match_events (
   created_at timestamptz NOT NULL DEFAULT now(),
   CHECK (minute BETWEEN 0 AND 130),
   CHECK (extra_minute IS NULL OR extra_minute BETWEEN 1 AND 30)
+);
+
+CREATE TABLE IF NOT EXISTS statsbomb_events (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  statsbomb_event_id uuid NOT NULL UNIQUE,
+  match_id uuid NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
+  statsbomb_match_id integer NOT NULL,
+  player_id uuid REFERENCES players(id),
+  statsbomb_player_id integer,
+  event_type varchar(80) NOT NULL,
+  minute smallint NOT NULL,
+  second smallint,
+  location numeric(6, 3)[],
+  raw_event jsonb NOT NULL,
+  ingested_at timestamptz NOT NULL DEFAULT now(),
+  CHECK (minute BETWEEN 0 AND 130),
+  CHECK (second IS NULL OR second BETWEEN 0 AND 59)
+);
+
+CREATE TABLE IF NOT EXISTS statsbomb_player_mismatches (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  statsbomb_player_id integer NOT NULL,
+  statsbomb_player_name varchar(120) NOT NULL,
+  match_id uuid REFERENCES matches(id) ON DELETE SET NULL,
+  candidate_player_id uuid REFERENCES players(id) ON DELETE SET NULL,
+  confidence numeric(4, 3),
+  review_status varchar(20) NOT NULL DEFAULT 'pending',
+  created_at timestamptz NOT NULL DEFAULT now(),
+  resolved_at timestamptz,
+  CHECK (confidence IS NULL OR confidence BETWEEN 0 AND 1),
+  CHECK (review_status IN ('pending', 'linked', 'ignored'))
+);
+
+CREATE TABLE IF NOT EXISTS portrait_generations (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  player_id uuid NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  prompt text NOT NULL,
+  negative_prompt text NOT NULL,
+  model varchar(80) NOT NULL,
+  lora varchar(120),
+  sampler varchar(80) NOT NULL,
+  steps smallint NOT NULL,
+  cfg_scale numeric(3, 1) NOT NULL,
+  seed bigint NOT NULL,
+  variant_count smallint NOT NULL DEFAULT 4,
+  accepted_variant smallint,
+  cdn_base_url text,
+  generated_at timestamptz NOT NULL DEFAULT now(),
+  reviewed_at timestamptz,
+  CHECK (steps > 0),
+  CHECK (cfg_scale > 0),
+  CHECK (variant_count BETWEEN 1 AND 8),
+  CHECK (accepted_variant IS NULL OR accepted_variant BETWEEN 1 AND variant_count)
 );
 
 CREATE TABLE IF NOT EXISTS squads (
@@ -350,12 +405,27 @@ CREATE TABLE IF NOT EXISTS wallet_ledger (
   CHECK (balance_after >= 0)
 );
 
+CREATE TABLE IF NOT EXISTS user_stat_card_exports (
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  tournament_id uuid NOT NULL REFERENCES tournaments(id) ON DELETE CASCADE,
+  storage_url text NOT NULL,
+  signed_url_expires_at timestamptz NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_stripe_customer ON users(stripe_customer_id);
 CREATE INDEX IF NOT EXISTS idx_matches_tournament_status ON matches(tournament_id, status);
 CREATE INDEX IF NOT EXISTS idx_matches_scheduled_at ON matches USING brin(scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_matches_statsbomb_match_id ON matches(statsbomb_match_id);
 CREATE INDEX IF NOT EXISTS idx_match_events_match_id ON match_events(match_id);
+CREATE INDEX IF NOT EXISTS idx_statsbomb_events_match ON statsbomb_events(match_id, minute, second);
+CREATE INDEX IF NOT EXISTS idx_statsbomb_events_player ON statsbomb_events(player_id) WHERE player_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_statsbomb_events_type ON statsbomb_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_statsbomb_events_raw ON statsbomb_events USING gin(raw_event);
+CREATE INDEX IF NOT EXISTS idx_portrait_generations_player ON portrait_generations(player_id, generated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_posts_author_created ON posts(author_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_connections_pair
@@ -363,3 +433,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_connections_pair
 CREATE INDEX IF NOT EXISTS idx_predictions_user_match ON predictions(user_id, match_id);
 CREATE INDEX IF NOT EXISTS idx_predictions_unresolved ON predictions(match_id) WHERE resolved_at IS NULL;
 CREATE INDEX IF NOT EXISTS idx_wallet_user_created ON wallet_ledger(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_user_stat_card_exports_user ON user_stat_card_exports(user_id, created_at DESC);

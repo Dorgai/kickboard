@@ -40,7 +40,8 @@ separation. The first deploy can be run with one web service plus managed Postgr
 ### 4. Worker
 
 - **Railway type:** second service from the same repository
-- **Purpose:** API-Football polling/webhook processing, prediction settlement, wallet credits, moderation
+- **Runtime:** Node.js worker using BullMQ on Redis
+- **Purpose:** API-Football adaptive polling, prediction settlement, wallet credits, moderation
   processing, GDPR deletion jobs and notification delivery
 - **Why separate:** these jobs should not block Next.js request/response paths and will need independent
   restart/scale settings.
