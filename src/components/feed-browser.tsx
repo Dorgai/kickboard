@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
 import { groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
-import { MatchEventTimeline } from "@/components/match-event-timeline";
+import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
@@ -985,10 +985,8 @@ function PastEventsPanel({
                 </section>
               </div>
 
-              <div className="knockout-widgets-row knockout-widgets-row--timeline">
-                <article className="data-card surface-muted match-event-timeline-card">
-                  <MatchEventTimeline matchId={selectedMatch.matchId} />
-                </article>
+              <div className="knockout-widgets-row knockout-widgets-row--timeline-link">
+                <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
               </div>
 
               <div className="knockout-widgets-row knockout-widgets-row--players" id="players">

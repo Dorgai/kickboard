@@ -26,15 +26,22 @@ type EventsResponse = {
 
 type MatchEventTimelineProps = {
   matchId: number;
+  enabled?: boolean;
+  inModal?: boolean;
 };
 
-export function MatchEventTimeline({ matchId }: MatchEventTimelineProps) {
+export function MatchEventTimeline({
+  matchId,
+  enabled = true,
+  inModal = false
+}: MatchEventTimelineProps) {
   const [data, setData] = useState<EventsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
 
     async function loadEvents() {
@@ -66,7 +73,7 @@ export function MatchEventTimeline({ matchId }: MatchEventTimelineProps) {
     return () => {
       cancelled = true;
     };
-  }, [matchId]);
+  }, [enabled, matchId]);
 
   const visibleEvents = useMemo(() => {
     if (!data?.events.length) return [];
@@ -97,20 +104,34 @@ export function MatchEventTimeline({ matchId }: MatchEventTimelineProps) {
     return <p className="inline-status">Event timeline unavailable for this match.</p>;
   }
 
+  const Tag = inModal ? "div" : "section";
+
   return (
-    <section className="match-detail-section match-event-timeline">
-      <div className="section-heading compact">
-        <div>
-          <h3>Event timeline</h3>
+    <Tag className={`match-detail-section match-event-timeline${inModal ? " match-event-timeline--modal" : ""}`}>
+      {!inModal ? (
+        <div className="section-heading compact">
+          <div>
+            <h3>Event timeline</h3>
+            <p className="match-timeline-summary">
+              {data.count} events in feed · showing {visibleEvents.length}
+              {showAll ? "" : " key moments"}
+            </p>
+          </div>
+          <button className="text-button" type="button" onClick={() => setShowAll((current) => !current)}>
+            {showAll ? "Key moments only" : "Show all events"}
+          </button>
+        </div>
+      ) : (
+        <div className="section-heading compact">
           <p className="match-timeline-summary">
             {data.count} events in feed · showing {visibleEvents.length}
             {showAll ? "" : " key moments"}
           </p>
+          <button className="text-button" type="button" onClick={() => setShowAll((current) => !current)}>
+            {showAll ? "Key moments only" : "Show all events"}
+          </button>
         </div>
-        <button className="text-button" type="button" onClick={() => setShowAll((current) => !current)}>
-          {showAll ? "Key moments only" : "Show all events"}
-        </button>
-      </div>
+      )}
 
       {topTypes.length ? (
         <div className="event-type-chips" aria-label="Event type breakdown">
@@ -123,7 +144,7 @@ export function MatchEventTimeline({ matchId }: MatchEventTimelineProps) {
       ) : null}
 
       {visibleEvents.length ? (
-        <ol className="timeline match-timeline-list">
+        <ol className={`timeline match-timeline-list${inModal ? " match-timeline-list--modal" : ""}`}>
           {visibleEvents.map((event) => (
             <li className="timeline-item" data-tone={event.tone} key={event.id}>
               <span>
@@ -143,6 +164,6 @@ export function MatchEventTimeline({ matchId }: MatchEventTimelineProps) {
       ) : (
         <p className="inline-status">No highlighted events for this filter.</p>
       )}
-    </section>
+    </Tag>
   );
 }
