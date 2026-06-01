@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # shellcheck source=scripts/railway-target.sh
 source scripts/railway-target.sh

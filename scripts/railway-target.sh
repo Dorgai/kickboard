@@ -4,7 +4,8 @@
 
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 CONFIG_FILE="${RAILWAY_CONFIG_FILE:-$ROOT_DIR/deploy/railway.project.json}"
 RAILWAY_BIN="${RAILWAY_BIN:-npx @railway/cli}"
 
