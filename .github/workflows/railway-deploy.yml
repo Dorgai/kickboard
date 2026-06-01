@@ -83,34 +83,25 @@ jobs:
           chmod +x scripts/configure-railway-variables.sh scripts/railway-target.sh
           bash scripts/configure-railway-variables.sh
 
-      - name: Wait for production health
+      - name: Wait for production rollout
         run: |
           BASE="${PRODUCTION_URL:-https://kickboard-production.up.railway.app}"
           BASE="${BASE%/}"
-          echo "Waiting for ${BASE}/api/health ..."
+          echo "Waiting for ${BASE} to serve current main (health + new routes) ..."
           for attempt in $(seq 1 36); do
-            if curl -fsS "${BASE}/api/health" | grep -q '"ok":true'; then
-              echo "Production is healthy."
+            healthy=false
+            if curl -fsS "${BASE}/api/health" 2>/dev/null | grep -q '"ok":true'; then
+              healthy=true
+            fi
+            session_code=$(curl -sS -o /dev/null -w "%{http_code}" "${BASE}/api/admin/session" 2>/dev/null || echo "000")
+            has_old_home=$(curl -sS "${BASE}/" 2>/dev/null | grep -c feed-status-grid || echo 1)
+            if [ "$healthy" = true ] && [ "$session_code" != "404" ] && [ "$has_old_home" = "0" ]; then
+              echo "Production matches current main (session=${session_code}, no feed-status-grid)."
               echo "production_url=${BASE}" >> "$GITHUB_ENV"
               exit 0
             fi
-            echo "Attempt ${attempt}/36 not ready yet; sleeping 10s ..."
+            echo "Attempt ${attempt}/36: health=${healthy} session=${session_code} feed-status-grid=${has_old_home}"
             sleep 10
           done
-          echo "::error::Production did not become healthy within 6 minutes."
+          echo "::error::Production did not roll out current main within 6 minutes."
           exit 1
-
-      - name: Verify latest UI is live
-        run: |
-          BASE="${PRODUCTION_URL:-https://kickboard-production.up.railway.app}"
-          BASE="${BASE%/}"
-          session_code=$(curl -sS -o /dev/null -w "%{http_code}" "${BASE}/api/admin/session")
-          if [ "$session_code" = "404" ]; then
-            echo "::error::${BASE}/api/admin/session returned 404 — production is still on an old build."
-            exit 1
-          fi
-          if curl -sS "${BASE}/" | grep -q feed-status-grid; then
-            echo "::error::Homepage still contains feed-status-grid — deploy did not pick up current main."
-            exit 1
-          fi
-          echo "Production matches current main (admin session route present, feed status grid removed)."
