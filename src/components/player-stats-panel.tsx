@@ -186,7 +186,7 @@ export function PlayerStatsPanel({
                     <div className="player-career-totals">
                       <div className="player-focus-metric player-focus-metric--compact">
                         <span className="player-focus-metric-value">{career.totals.appearances}</span>
-                        <span className="player-focus-metric-label">Apps</span>
+                        <span className="player-focus-metric-label">Matches</span>
                         <span className="player-focus-metric-caption">
                           Other tournament matches in the lineup for this competition.
                         </span>
