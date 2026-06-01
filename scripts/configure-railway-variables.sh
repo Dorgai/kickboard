@@ -17,7 +17,7 @@ set_var() {
   $RAILWAY_BIN variable set "$1" --skip-deploys "${RAILWAY_TARGET_ARGS[@]}"
 }
 
-echo "Targeting kickboard project ${RAILWAY_PROJECT_ID}, service ${RAILWAY_SERVICE_ID}..."
+# railway-target.sh prints resolved names and IDs
 echo "Setting core secrets on Railway..."
 set_var "JWT_SECRET=${JWT_SECRET}"
 set_var "ADMIN_DATA_SOURCES_TOKEN=${ADMIN_DATA_SOURCES_TOKEN}"

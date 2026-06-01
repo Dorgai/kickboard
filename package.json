@@ -13,7 +13,8 @@
     "worker:api-football": "node scripts/api-football-worker.mjs",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run build",
-    "railway:variables": "bash scripts/configure-railway-variables.sh"
+    "railway:variables": "bash scripts/configure-railway-variables.sh",
+    "railway:list": "bash scripts/railway-list-targets.sh"
   },
   "repository": {
     "type": "git",

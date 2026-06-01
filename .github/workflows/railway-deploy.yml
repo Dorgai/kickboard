@@ -29,43 +29,50 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to existing kickboard Railway service
+      - name: Resolve kickboard Railway target
+        id: target
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_NAME: ${{ vars.RAILWAY_PROJECT_NAME }}
+          RAILWAY_SERVICE_NAME: ${{ vars.RAILWAY_SERVICE_NAME }}
+          RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
-          RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
         run: |
-          missing=0
-          for name in RAILWAY_TOKEN RAILWAY_PROJECT_ID RAILWAY_SERVICE_ID; do
-            if [ -z "${!name}" ]; then
-              echo "::error::Missing GitHub secret: $name (required to deploy into the existing kickboard project, not a new one)"
-              missing=1
-            fi
-          done
-          if [ "$missing" -eq 1 ]; then
-            echo "Add secrets from Railway → kickboard project → Settings / service Settings."
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "::error::RAILWAY_TOKEN is required. Create a token in the kickboard Railway project (Settings → Tokens)."
             exit 1
           fi
           npm install -g @railway/cli
+          chmod +x scripts/railway-target.sh
           source scripts/railway-target.sh
-          echo "Deploying to project $RAILWAY_PROJECT_ID, service $RAILWAY_SERVICE_ID"
+          echo "project_id=$RAILWAY_PROJECT_ID" >> "$GITHUB_OUTPUT"
+          echo "service_id=$RAILWAY_SERVICE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to kickboard service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ steps.target.outputs.project_id }}
+          RAILWAY_SERVICE_ID: ${{ steps.target.outputs.service_id }}
+          RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
+        run: |
+          npm install -g @railway/cli
+          source scripts/railway-target.sh
           railway up --detach "${RAILWAY_TARGET_ARGS[@]}"
 
       - name: Configure Railway variables
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+          RAILWAY_PROJECT_ID: ${{ steps.target.outputs.project_id }}
+          RAILWAY_SERVICE_ID: ${{ steps.target.outputs.service_id }}
           RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
+          RAILWAY_PROJECT_NAME: ${{ vars.RAILWAY_PROJECT_NAME }}
+          RAILWAY_SERVICE_NAME: ${{ vars.RAILWAY_SERVICE_NAME }}
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           REDIS_URL: ${{ secrets.REDIS_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           ADMIN_DATA_SOURCES_TOKEN: ${{ secrets.ADMIN_DATA_SOURCES_TOKEN }}
         run: |
-          if [ -z "$RAILWAY_TOKEN" ]; then
-            exit 0
-          fi
           chmod +x scripts/configure-railway-variables.sh scripts/railway-target.sh
           bash scripts/configure-railway-variables.sh
