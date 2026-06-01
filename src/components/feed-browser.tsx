@@ -717,34 +717,18 @@ function PastEventsPanel({
               />
               {!selectedMatch && activeKnockoutRound ? (
                 <div className="bracket-stage-panel">
-                  {activeKnockoutRound.clusters?.length ? (
-                    activeKnockoutRound.clusters.map((cluster) => (
-                      <div className="bracket-cluster" key={cluster.groups.join("-")}>
-                        <h4>{cluster.label}</h4>
-                        <div className="bracket-cluster-matches">
-                          {cluster.matches.map((match) => (
-                            <BracketMatchButton
-                              key={match.matchId}
-                              match={match}
-                              selectedMatchId={selectedMatchId}
-                              onSelect={selectMatch}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="bracket-cluster-matches">
-                      {activeKnockoutRound.matches.map((match) => (
-                        <BracketMatchButton
-                          key={match.matchId}
-                          match={match}
-                          selectedMatchId={selectedMatchId}
-                          onSelect={selectMatch}
-                        />
-                      ))}
-                    </div>
-                  )}
+                  <div className="bracket-fixture-grid">
+                    {activeKnockoutRound.matches.map((match) => (
+                      <BracketMatchButton
+                        key={match.matchId}
+                        clusterLabel={knockoutClusterLabel(activeKnockoutRound, match.matchId)}
+                        match={match}
+                        selectedMatchId={selectedMatchId}
+                        showDate={false}
+                        onSelect={selectMatch}
+                      />
+                    ))}
+                  </div>
                 </div>
               ) : null}
             </>
@@ -853,10 +837,18 @@ function PastEventsPanel({
                   />
                 ) : null}
                 <p className="match-stage-rail-caption">Select a match</p>
-                <div className="match-stage-fixtures">
+                <div className="bracket-fixture-grid match-stage-fixtures">
                   {railFixtures.map((match) => (
                     <BracketMatchButton
                       key={match.matchId}
+                      clusterLabel={
+                        railFixtureMode === "knockout"
+                          ? knockoutClusterLabel(
+                              bracketRounds.find((round) => round.stage === activeKnockoutStage),
+                              match.matchId
+                            )
+                          : undefined
+                      }
                       match={match}
                       selectedMatchId={selectedMatchId}
                       onSelect={selectMatch}
@@ -984,32 +976,46 @@ function PastEventsPanel({
   );
 }
 
+function knockoutClusterLabel(round: BracketRound | undefined, matchId: number) {
+  if (!round?.clusters?.length) return undefined;
+  const cluster = round.clusters.find((entry) => entry.matches.some((match) => match.matchId === matchId));
+  return cluster?.label;
+}
+
 function BracketMatchButton({
+  clusterLabel,
   match,
   onSelect,
-  selectedMatchId
+  selectedMatchId,
+  showDate = true
 }: {
+  clusterLabel?: string;
   match: Match;
   onSelect: (matchId: number) => void;
   selectedMatchId: number | null;
+  showDate?: boolean;
 }) {
   return (
     <button
       className={`match-fixture-btn match-fixture-btn--compact${
-        selectedMatchId === match.matchId ? " selected" : ""
-      }`}
+        clusterLabel ? " match-fixture-btn--with-cluster" : ""
+      }${selectedMatchId === match.matchId ? " selected" : ""}`}
+      title={[clusterLabel, match.date, match.stadium].filter(Boolean).join(" · ")}
       type="button"
       onClick={() => onSelect(match.matchId)}
     >
-      <MatchTeamsLine
-        awayScore={match.awayScore}
-        awayTeam={match.awayTeam}
-        homeScore={match.homeScore}
-        homeTeam={match.homeTeam}
-        layout="inline"
-        size="xs"
-      />
-      <span className="match-fixture-date">{match.date}</span>
+      <span className="match-fixture-main">
+        {clusterLabel ? <span className="match-fixture-cluster">{clusterLabel}</span> : null}
+        <MatchTeamsLine
+          awayScore={match.awayScore}
+          awayTeam={match.awayTeam}
+          homeScore={match.homeScore}
+          homeTeam={match.homeTeam}
+          layout="inline"
+          size="xs"
+        />
+      </span>
+      {showDate ? <span className="match-fixture-date">{match.date}</span> : null}
     </button>
   );
 }

@@ -953,11 +953,37 @@ h3 {
   align-items: center;
   display: flex;
   flex-wrap: nowrap;
-  gap: 8px 10px;
+  gap: 6px 8px;
   justify-content: space-between;
-  min-height: 40px;
-  padding: 6px 10px;
+  min-height: 34px;
+  padding: 4px 8px;
   width: 100%;
+}
+
+.match-fixture-btn--with-cluster {
+  min-height: 34px;
+}
+
+.match-fixture-main {
+  align-items: center;
+  display: inline-flex;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  gap: 4px 6px;
+  min-width: 0;
+}
+
+.match-fixture-cluster {
+  color: var(--color-brand);
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  max-width: 3.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .match-fixture-btn--compact .match-teams-line,
@@ -1015,13 +1041,25 @@ h3 {
 
 .bracket-stage-panel {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
-.bracket-stage-panel .bracket-cluster-matches {
+.bracket-fixture-grid {
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+}
+
+@media (min-width: 720px) {
+  .bracket-fixture-grid {
+    grid-template-columns: repeat(auto-fill, minmax(152px, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .bracket-tree-card .bracket-fixture-grid {
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  }
 }
 
 .bracket-tabbed-section {
@@ -1078,7 +1116,7 @@ h3 {
 .current-world-cup-card,
 .bracket-tree-card {
   display: grid;
-  gap: 16px;
+  gap: 10px;
 }
 
 .bracket-tree-card.compact-tree {
@@ -1236,26 +1274,35 @@ h3 {
 
 .knockout-workspace {
   display: grid;
-  gap: 24px;
+  gap: 10px;
   grid-template-columns: minmax(0, 1fr);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .knockout-workspace .bracket-tree-card {
   grid-column: 1 / -1;
+  margin-bottom: 0;
   width: 100%;
+}
+
+.knockout-workspace .bracket-tree-card .section-heading.compact {
+  margin-bottom: 6px;
+}
+
+.knockout-workspace .bracket-tree-card .section-heading.compact p {
+  font-size: 12px;
 }
 
 .knockout-widgets {
   display: grid;
-  gap: 20px;
+  gap: 10px;
   grid-column: 1 / -1;
   width: 100%;
 }
 
 .knockout-widgets-row {
   display: grid;
-  gap: 16px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -1298,10 +1345,10 @@ h3 {
 .match-detail-widget,
 .match-squads-players-column {
   display: grid;
-  gap: 12px;
-  min-height: 220px;
+  gap: 8px;
+  min-height: 160px;
   min-width: 0;
-  padding: 16px 18px;
+  padding: 12px 14px;
 }
 
 .match-detail-widget-empty h2 {
@@ -1326,7 +1373,7 @@ h3 {
   color: var(--color-text-secondary);
   font-size: 10px;
   font-weight: 500;
-  margin: 0;
+  margin: 0 0 2px;
 }
 
 .match-stage-tabs.feed-tab-bar button {
@@ -1336,11 +1383,9 @@ h3 {
 }
 
 .match-stage-fixtures {
-  display: grid;
-  gap: 6px;
-  max-height: min(420px, 50vh);
+  max-height: min(360px, 48vh);
   overflow: auto;
-  padding-right: 4px;
+  padding-right: 2px;
 }
 
 .match-focus-main {
