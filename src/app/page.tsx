@@ -10,16 +10,23 @@ import {
 import { AppChrome } from "@/components/app-chrome";
 import { UserStatCard } from "@/components/user-stat-card";
 import {
+  demoDashboardWidgets,
+  demoGroups,
+  demoLeaderboard,
+  demoLiveMatch,
+  demoMatches,
+  demoSquad,
+  demoTopScorers,
+  demoTournament,
+  demoUserStatCard
+} from "@/lib/demo-data";
+import {
   featureCards,
-  matchEvents,
   notifications,
   railwayServices,
   safetyPillars,
-  tiers,
-  widgets
+  tiers
 } from "@/lib/kickboard-data";
-
-const groups = ["A", "B", "C", "D", "E", "F"];
 
 export default function Home() {
   return (
@@ -28,20 +35,19 @@ export default function Home() {
       <main id="main-content">
         <section className="hero section">
           <div className="hero-copy">
-            <p className="eyebrow">Railway-ready greenfield scaffold</p>
-            <h1>Build Kickboard as a safe, real-time World Cup fan platform.</h1>
+            <p className="eyebrow">{demoTournament.mode}</p>
+            <h1>{demoTournament.name} data is now visible on Kickboard.</h1>
             <p className="hero-text">
-              This first implementation turns the uploaded UI, functional and data-model specs into a
-              deployable Next.js foundation with health checks, service boundaries and safety constraints
-              visible from day one.
+              {demoTournament.sourceNote} The page now renders seeded matches, standings, scorers,
+              leaderboards and profile data instead of empty placeholders.
             </p>
             <div className="hero-actions">
-              <a className="button primary" href="#railway">
-                Railway services
+              <a className="button primary" href="#matches">
+                View match data
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <a className="button secondary" href="#safety">
-                Safety architecture
+              <a className="button secondary" href="/api/demo">
+                Open demo API
               </a>
             </div>
           </div>
@@ -49,15 +55,27 @@ export default function Home() {
           <div className="live-card" aria-label="Live match preview">
             <div className="live-card-header">
               <span className="live-dot" aria-hidden="true" />
-              73' LIVE
+              {demoLiveMatch.minute}' {demoLiveMatch.status}
             </div>
             <div className="score-row">
-              <span>Team A</span>
-              <strong>2 - 1</strong>
-              <span>Team B</span>
+              <span>{demoLiveMatch.homeTeam.name}</span>
+              <strong>
+                {demoLiveMatch.homeTeam.score} - {demoLiveMatch.awayTeam.score}
+              </strong>
+              <span>{demoLiveMatch.awayTeam.name}</span>
+            </div>
+            <p className="match-venue">{demoLiveMatch.venue}</p>
+            <div className="match-stat-grid">
+              {demoLiveMatch.stats.map((stat) => (
+                <div className="match-stat" key={stat.label}>
+                  <span>{stat.home}</span>
+                  <strong>{stat.label}</strong>
+                  <span>{stat.away}</span>
+                </div>
+              ))}
             </div>
             <div className="timeline">
-              {matchEvents.map((event) => (
+              {demoLiveMatch.events.map((event) => (
                 <div className="timeline-item" data-tone={event.tone} key={`${event.minute}-${event.type}`}>
                   <span>{event.minute}</span>
                   <div>
@@ -75,11 +93,12 @@ export default function Home() {
             <p className="eyebrow">Home dashboard</p>
             <h2>Widget-native from the first commit</h2>
             <p>
-              The layout starts with the default Fan dashboard and keeps child-account restrictions explicit.
+              The layout starts with concrete demo data for the default Fan dashboard and keeps child-account
+              restrictions explicit.
             </p>
           </div>
           <div className="widget-grid">
-            {widgets.map((widget) => (
+            {demoDashboardWidgets.map((widget) => (
               <article className="widget-card" key={widget.title}>
                 <div className="widget-header">
                   <span>{widget.title}</span>
@@ -95,17 +114,19 @@ export default function Home() {
         <section className="section bracket-section" id="bracket">
           <div className="section-heading">
             <p className="eyebrow">Tournament bracket</p>
-            <h2>Group tables now, knockout tree next</h2>
+            <h2>Seeded group tables</h2>
           </div>
           <div className="group-grid">
-            {groups.map((group) => (
-              <article className="group-card" key={group}>
-                <h3>Group {group}</h3>
-                {["Team A", "Team B", "Team C", "Team D"].map((team, index) => (
-                  <div className="standing-row" key={`${group}-${team}`}>
+            {demoGroups.map((group) => (
+              <article className="group-card" key={group.name}>
+                <h3>{group.name}</h3>
+                {group.teams.map((team, index) => (
+                  <div className="standing-row" key={`${group.name}-${team.code}`}>
                     <span>{index + 1}</span>
-                    <strong>{team}</strong>
-                    <span>{7 - index * 2} pts</span>
+                    <strong>
+                      {team.name} <small>{team.code}</small>
+                    </strong>
+                    <span>{team.points} pts</span>
                   </div>
                 ))}
               </article>
@@ -113,21 +134,73 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="section data-section" id="matches">
+          <div className="section-heading">
+            <p className="eyebrow">Match center</p>
+            <h2>Matches, scorers and leaderboard data</h2>
+            <p>
+              This is curated seed data for product validation. The worker service will replace it with
+              API-Football polling data once ingestion is implemented.
+            </p>
+          </div>
+          <div className="data-grid">
+            <article className="data-card">
+              <h3>Fixtures</h3>
+              {demoMatches.map((match) => (
+                <div className="fixture-row" key={match.id}>
+                  <div>
+                    <strong>
+                      {match.homeTeam} vs {match.awayTeam}
+                    </strong>
+                    <p>{match.venue}</p>
+                  </div>
+                  <span>
+                    {match.score ? `${match.score} ${match.status}` : `${match.kickoff} ${match.status}`}
+                  </span>
+                </div>
+              ))}
+            </article>
+            <article className="data-card">
+              <h3>Top scorers</h3>
+              {demoTopScorers.map((player, index) => (
+                <div className="table-row" key={player.name}>
+                  <span>{index + 1}</span>
+                  <strong>{player.name}</strong>
+                  <span>{player.team}</span>
+                  <span>{player.goals} goals</span>
+                </div>
+              ))}
+            </article>
+            <article className="data-card">
+              <h3>Prediction leaderboard</h3>
+              {demoLeaderboard.map((user) => (
+                <div className="table-row" key={user.username}>
+                  <span>#{user.rank}</span>
+                  <strong>{user.username}</strong>
+                  <span>{user.points} pts</span>
+                  <span>{user.accuracy}</span>
+                </div>
+              ))}
+            </article>
+          </div>
+        </section>
+
         <section className="section split-section" id="squads">
           <div className="section-heading">
             <p className="eyebrow">Squad builder</p>
-            <h2>Pitch-first interaction model</h2>
+            <h2>{demoSquad.name}</h2>
             <p>
-              The scaffold establishes the UX target for drag-and-drop squads, keyboard alternatives and
-              match-lock behaviour.
+              Seed formation: {demoSquad.formation}. These player rows show how real roster data will
+              populate the drag-and-drop pitch.
             </p>
           </div>
-          <div className="pitch-card" aria-label="Squad pitch preview">
-            {["FWD", "MID", "DEF", "GK"].map((line) => (
-              <div className="pitch-line" key={line}>
-                {[1, 2, 3].map((slot) => (
-                  <span key={`${line}-${slot}`}>{line}</span>
-                ))}
+          <div className="squad-card" aria-label="Squad preview">
+            {demoSquad.players.map((player) => (
+              <div className="squad-player-row" key={`${player.slot}-${player.name}`}>
+                <span>{player.slot}</span>
+                <strong>{player.name}</strong>
+                <small>{player.team}</small>
+                <em>{player.rating}</em>
               </div>
             ))}
           </div>
@@ -163,7 +236,7 @@ export default function Home() {
             </p>
           </div>
           <div className="stat-card-layout">
-            <UserStatCard />
+            <UserStatCard data={demoUserStatCard} />
             <div className="stat-card-notes">
               <h3>Share export contract</h3>
               <p>

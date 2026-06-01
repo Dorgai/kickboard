@@ -10,6 +10,7 @@ The initial implementation is intentionally focused on safe foundations:
 - Starter PostgreSQL schema based on the uploaded data model
 - Product safety guardrails for child accounts, predictions, wallet points and moderation
 - Gap closure docs for data ingestion, widget isolation, portraits, legal language, and stat-card sharing
+- Curated demo data rendered on the homepage and exposed at `/api/demo`
 
 ## Run locally
 

@@ -44,18 +44,18 @@ export const navigation = [
 ] as const;
 
 export const matchEvents = [
-  { minute: "12'", type: "Goal", detail: "Amina Diallo finishes a low cross", tone: "goal" },
-  { minute: "34'", type: "Yellow card", detail: "Late challenge in midfield", tone: "danger" },
-  { minute: "56'", type: "Substitution", detail: "Fresh legs added on the wing", tone: "brand" },
-  { minute: "73'", type: "Live", detail: "Possession swing: 58% to 42%", tone: "live" }
+  { minute: "12'", type: "Goal", detail: "Vinicius Junior finishes a low Rodrygo cross", tone: "goal" },
+  { minute: "34'", type: "Yellow card", detail: "Aurelien Tchouameni is booked in midfield", tone: "danger" },
+  { minute: "56'", type: "Substitution", detail: "France add pace from the bench", tone: "brand" },
+  { minute: "73'", type: "Live", detail: "Brazil lead possession 58% to 42%", tone: "live" }
 ] as const;
 
 export const widgets = [
   {
     title: "Live Match",
     eyebrow: "73' LIVE",
-    body: "Team A 2-1 Team B",
-    meta: "Prediction: 3-1 -> currently 2 pts"
+    body: "Brazil 2-1 France",
+    meta: "Prediction: Brazil 2-1 -> exact score live"
   },
   {
     title: "Bracket Mini",

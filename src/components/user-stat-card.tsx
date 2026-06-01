@@ -1,4 +1,5 @@
 import { Share2, UserRoundPen } from "lucide-react";
+import { demoUserStatCard } from "@/lib/demo-data";
 
 type Tier = "fan" | "pro" | "elite";
 
@@ -25,25 +26,6 @@ const tierLabels: Record<Tier, string> = {
   fan: "Fan",
   pro: "Pro",
   elite: "Elite"
-};
-
-export const demoUserStatCard: UserStatCardData = {
-  username: "Lazlo",
-  handle: "@kickboarder",
-  tier: "pro",
-  points: "1,284",
-  rank: "#12",
-  accuracy: "41%",
-  streak: [true, true, true, false, false],
-  streakLabel: "3 correct in a row",
-  topPlayer: {
-    name: "Mbappe",
-    rating: "9.2",
-    portraitInitials: "KM"
-  },
-  squadsSubmitted: 14,
-  votesCast: 67,
-  friendsCount: 8
 };
 
 type UserStatCardProps = {
