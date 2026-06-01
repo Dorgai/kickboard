@@ -664,7 +664,7 @@ function PastEventsPanel({
           <div className="group-stage-match-list">
             {activeGroupMatches.map((match) => (
               <button
-                className={selectedMatchId === match.matchId ? "selected" : ""}
+                className={`match-fixture-btn${selectedMatchId === match.matchId ? " selected" : ""}`}
                 key={match.matchId}
                 type="button"
                 onClick={() => selectMatch(match.matchId)}
@@ -780,7 +780,7 @@ function PastEventsPanel({
                 <div className="feed-list compact-list match-list-grid">
                   {filteredMatches.map((match) => (
                     <button
-                      className={selectedMatchId === match.matchId ? "selected" : ""}
+                      className={`match-fixture-btn${selectedMatchId === match.matchId ? " selected" : ""}`}
                       key={match.matchId}
                       type="button"
                       onClick={() => selectMatch(match.matchId)}
@@ -957,7 +957,7 @@ function BracketMatchButton({
 }) {
   return (
     <button
-      className={selectedMatchId === match.matchId ? "selected" : ""}
+      className={`match-fixture-btn${selectedMatchId === match.matchId ? " selected" : ""}`}
       type="button"
       onClick={() => onSelect(match.matchId)}
     >
