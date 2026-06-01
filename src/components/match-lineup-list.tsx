@@ -11,6 +11,8 @@ export type MatchLineupPlayer = {
 
 export type MatchLineupTeam = {
   teamName: string;
+  /** StatsBomb player nationality — improves flag resolution when team name is ambiguous. */
+  countryHint?: string | null;
   players: MatchLineupPlayer[];
 };
 
@@ -42,7 +44,11 @@ export function MatchLineupList({
       {teams.map((team) => (
         <div className="lineup-card compact" key={team.teamName}>
           <h4>
-            <TeamLabel name={team.teamName} size="xs" />
+            <TeamLabel
+              countryHint={team.countryHint ?? team.players.find((player) => player.country)?.country}
+              name={team.teamName}
+              size="xs"
+            />
           </h4>
           {LINEUP_ROLE_ORDER.map((role) => {
             const players = sortByJersey(team.players.filter((player) => player.lineupRole === role));

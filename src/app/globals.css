@@ -1230,12 +1230,14 @@ h3 {
   background: color-mix(in srgb, var(--color-brand) 8%, var(--color-bg));
   border: 1px solid var(--color-border);
   border-radius: 6px;
-  color: var(--color-text-secondary);
-  display: inline-block;
+  display: inline-flex;
+  max-width: 100%;
+  padding: 3px 7px;
+}
+
+.qualified-team-chip .team-label-text {
   font-size: 11px;
   font-weight: 700;
-  line-height: 1.3;
-  padding: 2px 7px;
 }
 
 .current-group-grid {
