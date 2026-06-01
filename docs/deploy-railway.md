@@ -52,6 +52,19 @@ After that, each merge to `main` deploys automatically. To push env vars from Gi
 |----------|---------|
 | `NEXT_PUBLIC_APP_URL` | Production URL for post-deploy checks (default: `https://kickboard-production.up.railway.app`) |
 
+**If CI logs show `Unauthorized`**
+
+1. Revoke the old token in Railway and create a new one under the **kickboard** project (**Settings → Tokens**).
+2. Update the GitHub secret `RAILWAY_TOKEN` (no extra spaces or quotes).
+3. Re-run the deploy workflow.
+
+**Bypass name lookup** (if the token cannot list projects but can deploy)
+
+| Secret | Where to find it |
+|--------|------------------|
+| `RAILWAY_PROJECT_ID` | Railway → kickboard → **Settings** → project ID in URL or settings |
+| `RAILWAY_SERVICE_ID` | kickboard service → **Settings** → service ID |
+
 **Optional overrides** (only if lookup by name fails)
 
 | Secret / variable | Purpose |
@@ -77,7 +90,7 @@ Use either dashboard deploy **or** GitHub Actions CLI deploy — not two unrelat
 
 ## Local CLI deploy (recommended to ship `main` now)
 
-1. Railway → **kickboard** project → **Settings** → **Tokens** → create a token.
+1. Railway → **kickboard** project (not another project) → **Settings** → **Tokens** → create a **project** token with deploy access. Account-only tokens that cannot list projects will fail with `Unauthorized` in CI.
 2. From the repo root:
 
 ```bash

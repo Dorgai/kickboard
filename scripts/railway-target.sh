@@ -3,6 +3,7 @@
 # Optional secrets RAILWAY_PROJECT_ID / RAILWAY_SERVICE_ID override lookup when set.
 
 set -euo pipefail
+set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -121,6 +122,13 @@ resolve_service_id() {
 
 export RAILWAY_PROJECT_ID="$(resolve_project_id)"
 export RAILWAY_SERVICE_ID="$(resolve_service_id "$RAILWAY_PROJECT_ID")"
+
+if [ -z "$RAILWAY_PROJECT_ID" ] || [ -z "$RAILWAY_SERVICE_ID" ]; then
+  echo "error: could not resolve Railway project/service IDs." >&2
+  echo "  - Use a kickboard **project** token (Railway → kickboard → Settings → Tokens)." >&2
+  echo "  - Or set GitHub secrets RAILWAY_PROJECT_ID and RAILWAY_SERVICE_ID from the Railway dashboard." >&2
+  exit 1
+fi
 
 export RAILWAY_TARGET_ARGS=(
   --project "$RAILWAY_PROJECT_ID"
