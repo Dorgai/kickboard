@@ -1,16 +1,21 @@
 import { Bell, ChevronDown, Search, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { navigation } from "@/lib/kickboard-data";
 
-export function AppChrome() {
+type AppChromeProps = {
+  activeNav?: "Home" | "Admin";
+};
+
+export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
   return (
     <header className="app-header">
       <div className="nav-shell" aria-label="Primary navigation">
-        <a className="brand" href="#main-content" aria-label="Kickboard home">
+        <Link className="brand" href="/" aria-label="Kickboard home">
           <span className="brand-mark" aria-hidden="true">
             KB
           </span>
           <span>KICKBOARD</span>
-        </a>
+        </Link>
 
         <button className="tournament-switcher" type="button">
           FIFA World Cup 2026
@@ -19,10 +24,17 @@ export function AppChrome() {
 
         <nav className="nav-tabs">
           {navigation.map((item) => (
-            <a key={item} className={item === "Home" ? "active" : ""} href={`#${item.toLowerCase()}`}>
+            <Link
+              key={item}
+              className={activeNav === "Home" && item === "Home" ? "active" : ""}
+              href={item === "Home" ? "/" : `/#${item.toLowerCase()}`}
+            >
               {item}
-            </a>
+            </Link>
           ))}
+          <Link className={activeNav === "Admin" ? "active" : ""} href="/admin/data-sources">
+            Admin
+          </Link>
         </nav>
 
         <div className="nav-actions">

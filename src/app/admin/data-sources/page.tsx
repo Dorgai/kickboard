@@ -1,5 +1,6 @@
-import { headers } from "next/headers";
-import { notFound } from "next/navigation";
+import { cookies, headers } from "next/headers";
+import { AdminAccessGate } from "@/components/admin-access-gate";
+import { ADMIN_COOKIE, getAdminAuthStatus, readAdminToken } from "@/lib/admin/auth";
 import { buildAdminDataSources } from "@/lib/admin/data-sources";
 
 export const dynamic = "force-dynamic";
@@ -19,14 +20,18 @@ export default async function AdminDataSourcesPage({
 }) {
   const params = await searchParams;
   const headerStore = await headers();
-  const headerToken = headerStore.get("x-admin-token");
-  const bearerToken = headerStore.get("authorization")?.startsWith("Bearer ")
-    ? headerStore.get("authorization")?.slice("Bearer ".length)
-    : null;
-  const token = params.token ?? headerToken ?? bearerToken ?? null;
+  const cookieStore = await cookies();
+  const token = readAdminToken({
+    authorization: headerStore.get("authorization"),
+    cookieToken: cookieStore.get(ADMIN_COOKIE)?.value,
+    headerToken: headerStore.get("x-admin-token"),
+    queryToken: params.token ?? null
+  });
+
+  const { configured } = getAdminAuthStatus();
 
   if (!isPageAuthorized(token)) {
-    notFound();
+    return <AdminAccessGate adminConfigured={configured} />;
   }
 
   const data = await buildAdminDataSources();

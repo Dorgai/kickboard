@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { PlayerStatsTable } from "@/components/player-stats-table";
+import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
   competitionId: number;
@@ -65,9 +67,16 @@ type MatchDetail = {
   playerStats: PlayerStat[];
 };
 
+type BracketCluster = {
+  label: string;
+  groups: [string, string];
+  matches: Match[];
+};
+
 type BracketRound = {
   stage: string;
   matches: Match[];
+  clusters?: BracketCluster[];
 };
 
 type CurrentWorldCup = {
@@ -94,28 +103,21 @@ type CurrentWorldCup = {
   note: string;
 };
 
-type FeedStatus = {
-  feeds: {
-    historical: { connected: boolean };
-    realtime: { connected: boolean; message: string };
-    storage: { postgres: boolean; redis: boolean };
-  };
-};
-
 type EventTab = "current" | "past";
 
 export function FeedBrowser() {
   const [activeTab, setActiveTab] = useState<EventTab>("current");
-  const [status, setStatus] = useState<FeedStatus | null>(null);
   const [currentWorldCup, setCurrentWorldCup] = useState<CurrentWorldCup | null>(null);
   const [competitions, setCompetitions] = useState<WorldCupCompetition[]>([]);
   const [selectedCompetition, setSelectedCompetition] = useState("");
   const [matches, setMatches] = useState<Match[]>([]);
   const [bracketRounds, setBracketRounds] = useState<BracketRound[]>([]);
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const [matchDetail, setMatchDetail] = useState<MatchDetail | null>(null);
   const [matchSearch, setMatchSearch] = useState("");
-  const [playerSearch, setPlayerSearch] = useState("");
+  const [lineupSearch, setLineupSearch] = useState("");
+  const [showMatchesList, setShowMatchesList] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -126,23 +128,20 @@ export function FeedBrowser() {
       setLoading(true);
       setError(null);
       try {
-        const [statusResponse, historicalResponse, currentResponse] = await Promise.all([
-          fetch("/api/feeds/status", { cache: "no-store" }),
+        const [historicalResponse, currentResponse] = await Promise.all([
           fetch("/api/feeds/historical", { cache: "no-store" }),
           fetch("/api/feeds/current-world-cup", { cache: "no-store" })
         ]);
 
-        if (!statusResponse.ok || !historicalResponse.ok) {
-          throw new Error("Unable to load feed status or competitions");
+        if (!historicalResponse.ok) {
+          throw new Error("Unable to load competitions");
         }
 
-        const statusJson = (await statusResponse.json()) as FeedStatus;
         const historicalJson = (await historicalResponse.json()) as { worldCups: WorldCupCompetition[] };
         const currentJson = currentResponse.ok ? ((await currentResponse.json()) as CurrentWorldCup) : null;
 
         if (cancelled) return;
 
-        setStatus(statusJson);
         setCurrentWorldCup(currentJson);
         setCompetitions(historicalJson.worldCups);
         const firstCompetition = historicalJson.worldCups[0];
@@ -175,6 +174,7 @@ export function FeedBrowser() {
       setBracketRounds([]);
       setMatchDetail(null);
       setSelectedMatchId(null);
+      setSelectedPlayerId(null);
 
       try {
         const [matchesResponse, bracketResponse] = await Promise.all([
@@ -196,7 +196,6 @@ export function FeedBrowser() {
         if (cancelled) return;
         setMatches(matchesData.matches);
         setBracketRounds(bracketData.rounds);
-        setSelectedMatchId(matchesData.matches[0]?.matchId ?? null);
       } catch (loadError) {
         if (!cancelled) {
           setError(loadError instanceof Error ? loadError.message : "Unknown match load error");
@@ -216,6 +215,7 @@ export function FeedBrowser() {
 
     async function loadMatchDetail() {
       setMatchDetail(null);
+      setSelectedPlayerId(null);
       setError(null);
 
       try {
@@ -253,10 +253,6 @@ export function FeedBrowser() {
   );
 
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
-  const filteredPlayerStats = (matchDetail?.playerStats ?? []).filter((player) =>
-    `${player.player} ${player.team}`.toLowerCase().includes(playerSearch.toLowerCase())
-  );
-
   return (
     <div className="feed-browser">
       <nav className="event-tab-bar" aria-label="Tournament event selector">
@@ -297,12 +293,6 @@ export function FeedBrowser() {
             </>
           )}
         </div>
-        <div className="feed-status-grid">
-          <FeedStatusTile label="StatsBomb" ok={Boolean(status?.feeds.historical.connected)} />
-          <FeedStatusTile label="API-Football" ok={Boolean(status?.feeds.realtime.connected)} />
-          <FeedStatusTile label="Postgres" ok={Boolean(status?.feeds.storage.postgres)} />
-          <FeedStatusTile label="Redis" ok={Boolean(status?.feeds.storage.redis)} />
-        </div>
       </section>
 
       {loading ? <p className="inline-status">Loading real feeds...</p> : null}
@@ -315,17 +305,20 @@ export function FeedBrowser() {
           bracketRounds={bracketRounds}
           competitions={competitions}
           filteredMatches={filteredMatches}
-          filteredPlayerStats={filteredPlayerStats}
+          lineupSearch={lineupSearch}
           matchDetail={matchDetail}
           matchSearch={matchSearch}
-          playerSearch={playerSearch}
+          showMatchesList={showMatchesList}
           selectedCompetition={selectedCompetition}
           selectedMatch={selectedMatch}
           selectedMatchId={selectedMatchId}
+          selectedPlayerId={selectedPlayerId}
+          setLineupSearch={setLineupSearch}
           setMatchSearch={setMatchSearch}
-          setPlayerSearch={setPlayerSearch}
+          setShowMatchesList={setShowMatchesList}
           setSelectedCompetition={setSelectedCompetition}
           setSelectedMatchId={setSelectedMatchId}
+          setSelectedPlayerId={setSelectedPlayerId}
         />
       )}
     </div>
@@ -349,7 +342,9 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
       {currentWorldCup?.qualifiedTeams.length ? (
         <div className="qualified-team-list">
           {currentWorldCup.qualifiedTeams.slice(0, 48).map((team) => (
-            <span key={team}>{team}</span>
+            <span className="qualified-team-pill" key={team}>
+              <TeamLabel name={team} size="xs" />
+            </span>
           ))}
         </div>
       ) : (
@@ -362,14 +357,14 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
               <h3>Group {group.group}</h3>
               {group.teams.map((team) => (
                 <p key={`${group.group}-${team}`}>
-                  <strong>{team}</strong>
+                  <TeamLabel name={team} size="xs" />
                 </p>
               ))}
               <div className="current-fixture-list">
                 {group.fixtures.slice(0, 6).map((fixture) => (
-                  <span key={`${group.group}-${fixture.homeTeam}-${fixture.awayTeam}`}>
-                    {fixture.homeTeam} vs {fixture.awayTeam}
-                    {fixture.date ? ` - ${fixture.date}` : ""}
+                  <span className="fixture-teams" key={`${group.group}-${fixture.homeTeam}-${fixture.awayTeam}`}>
+                    <MatchTeamsLine awayTeam={fixture.awayTeam} homeTeam={fixture.homeTeam} size="xs" />
+                    {fixture.date ? ` · ${fixture.date}` : ""}
                   </span>
                 ))}
               </div>
@@ -400,38 +395,56 @@ type PastEventsPanelProps = {
   bracketRounds: BracketRound[];
   competitions: WorldCupCompetition[];
   filteredMatches: Match[];
-  filteredPlayerStats: PlayerStat[];
+  lineupSearch: string;
   matchDetail: MatchDetail | null;
   matchSearch: string;
-  playerSearch: string;
+  showMatchesList: boolean;
   selectedCompetition: string;
   selectedMatch: Match | undefined;
   selectedMatchId: number | null;
+  selectedPlayerId: number | null;
+  setLineupSearch: (value: string) => void;
   setMatchSearch: (value: string) => void;
-  setPlayerSearch: (value: string) => void;
+  setShowMatchesList: (value: boolean) => void;
   setSelectedCompetition: (value: string) => void;
   setSelectedMatchId: (value: number) => void;
+  setSelectedPlayerId: (value: number | null) => void;
 };
 
 function PastEventsPanel({
   bracketRounds,
   competitions,
   filteredMatches,
-  filteredPlayerStats,
+  lineupSearch,
   matchDetail,
   matchSearch,
-  playerSearch,
+  showMatchesList,
   selectedCompetition,
   selectedMatch,
   selectedMatchId,
+  selectedPlayerId,
+  setLineupSearch,
   setMatchSearch,
-  setPlayerSearch,
+  setShowMatchesList,
   setSelectedCompetition,
-  setSelectedMatchId
+  setSelectedMatchId,
+  setSelectedPlayerId
 }: PastEventsPanelProps) {
+  const filteredLineups = (matchDetail?.lineups ?? []).map((team) => ({
+    ...team,
+    players: team.players.filter((player) =>
+      `${player.name} ${player.country ?? ""}`.toLowerCase().includes(lineupSearch.toLowerCase())
+    )
+  }));
+
+  function selectMatch(matchId: number) {
+    setSelectedMatchId(matchId);
+    setSelectedPlayerId(null);
+  }
+
   return (
     <>
-      <section className="feed-control-card">
+      <section className="feed-control-card surface-muted">
         <label>
           Historical World Cup
           <select value={selectedCompetition} onChange={(event) => setSelectedCompetition(event.target.value)}>
@@ -445,151 +458,245 @@ function PastEventsPanel({
             ))}
           </select>
         </label>
-        <label>
-          Search matches
-          <input
-            placeholder="Team or stage"
-            type="search"
-            value={matchSearch}
-            onChange={(event) => setMatchSearch(event.target.value)}
-          />
-        </label>
         <a className="button secondary" href="/api/feeds/realtime">
           Real-time API status
         </a>
       </section>
 
-      <section className="bracket-tree-card">
-        <p className="eyebrow">Knockout tree</p>
-        <h2>Horizontal route to the final</h2>
+      <section className="bracket-tree-card surface-muted">
+        <div className="section-heading compact">
+          <div>
+            <p className="eyebrow">Knockout tree</p>
+            <h2>Route to the final</h2>
+            <p>Select a match to view team stats, squads, and lineups.</p>
+          </div>
+          <button
+            className="button secondary"
+            type="button"
+            aria-pressed={showMatchesList}
+            onClick={() => setShowMatchesList(!showMatchesList)}
+          >
+            {showMatchesList ? "Hide match list" : "Show full match list"}
+          </button>
+        </div>
         <div className="bracket-tree">
           {bracketRounds.map((round) => (
             <div className="bracket-round" key={round.stage}>
               <h3>{round.stage}</h3>
-              {round.matches.map((match) => (
-                <button key={match.matchId} type="button" onClick={() => setSelectedMatchId(match.matchId)}>
-                  <strong>
-                    {match.homeTeam} {match.homeScore}-{match.awayScore} {match.awayTeam}
-                  </strong>
-                  <span>{match.date}</span>
-                </button>
-              ))}
+              {round.clusters?.length ? (
+                round.clusters.map((cluster) => (
+                  <div className="bracket-cluster" key={cluster.groups.join("-")}>
+                    <h4>{cluster.label}</h4>
+                    <div className="bracket-cluster-matches">
+                      {cluster.matches.map((match) => (
+                        <BracketMatchButton
+                          key={match.matchId}
+                          match={match}
+                          selectedMatchId={selectedMatchId}
+                          onSelect={selectMatch}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                round.matches.map((match) => (
+                  <BracketMatchButton
+                    key={match.matchId}
+                    match={match}
+                    selectedMatchId={selectedMatchId}
+                    onSelect={selectMatch}
+                  />
+                ))
+              )}
             </div>
           ))}
         </div>
       </section>
 
-      <section className="feed-content-grid">
-        <article className="data-card">
-          <h2>Matches</h2>
-          <p>{filteredMatches.length} matches from the selected feed.</p>
-          <div className="feed-list">
-            {filteredMatches.map((match) => (
-              <button
-                className={selectedMatchId === match.matchId ? "selected" : ""}
-                key={match.matchId}
-                type="button"
-                onClick={() => setSelectedMatchId(match.matchId)}
-              >
-                <strong>
-                  {match.homeTeam} {match.homeScore}-{match.awayScore} {match.awayTeam}
-                </strong>
-                <span>
-                  {match.date} - {match.stage ?? "Stage unavailable"}
-                </span>
-              </button>
-            ))}
-          </div>
-        </article>
-
-        <article className="data-card">
-          <h2>Team stats</h2>
-          {selectedMatch ? (
-            <p>
-              {selectedMatch.homeTeam} vs {selectedMatch.awayTeam}
-            </p>
-          ) : null}
-          <div className="team-stat-grid">
-            {(matchDetail?.teamStats ?? []).map((team) => (
-              <div className="team-stat-card" key={team.team}>
-                <h3>{team.team}</h3>
-                <StatLine label="Goals" value={team.goals} />
-                <StatLine label="Shots" value={team.shots} />
-                <StatLine label="xG" value={team.xg} />
-                <StatLine label="Passes" value={team.passes} />
-                <StatLine label="Pass accuracy" value={team.passAccuracy ? `${team.passAccuracy}%` : "n/a"} />
-                <StatLine label="Carries" value={team.carries} />
-                <StatLine label="Dribbles" value={`${team.successfulDribbles}/${team.dribbles}`} />
+      <section className={`match-explorer${showMatchesList ? "" : " match-explorer--detail-only"}`}>
+        {showMatchesList ? (
+          <article className="data-card surface-muted match-explorer-list">
+            <div className="section-heading compact">
+              <div>
+                <h2>All matches</h2>
+                <p>{filteredMatches.length} in feed</p>
               </div>
-            ))}
-          </div>
-        </article>
-      </section>
-
-      <section className="feed-content-grid wide">
-        <article className="data-card">
-          <h2>Squads and lineups</h2>
-          <div className="lineup-grid">
-            {(matchDetail?.lineups ?? []).map((team) => (
-              <div className="lineup-card" key={team.teamName}>
-                <h3>{team.teamName}</h3>
-                {team.players.map((player) => (
-                  <div className="lineup-row" key={`${team.teamName}-${player.playerId}`}>
-                    <span>{player.jerseyNumber ?? "-"}</span>
-                    <strong>{player.name}</strong>
-                    <small>{player.country ?? ""}</small>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="data-card">
-          <div className="data-card-header">
-            <h2>Player stats</h2>
-            <input
-              aria-label="Search player stats"
-              placeholder="Search player or team"
-              type="search"
-              value={playerSearch}
-              onChange={(event) => setPlayerSearch(event.target.value)}
-            />
-          </div>
-          <div className="player-stat-table">
-            <div className="player-stat-row heading">
-              <span>Player</span>
-              <span>Team</span>
-              <span>G</span>
-              <span>A</span>
-              <span>Sh</span>
-              <span>xG</span>
-              <span>Pass</span>
+              <label className="match-list-search">
+                Search
+                <input
+                  aria-label="Search matches"
+                  placeholder="Team or stage"
+                  type="search"
+                  value={matchSearch}
+                  onChange={(event) => setMatchSearch(event.target.value)}
+                />
+              </label>
             </div>
-            {filteredPlayerStats.slice(0, 80).map((player) => (
-              <div className="player-stat-row" key={`${player.team}-${player.player}-${player.playerId}`}>
-                <strong>{player.player}</strong>
-                <span>{player.team}</span>
-                <span>{player.goals}</span>
-                <span>{player.assists}</span>
-                <span>{player.shots}</span>
-                <span>{player.xg}</span>
-                <span>{player.passAccuracy ? `${player.passAccuracy}%` : "n/a"}</span>
-              </div>
-            ))}
-          </div>
-        </article>
+            <div className="feed-list compact-list">
+              {filteredMatches.map((match) => (
+                <button
+                  className={selectedMatchId === match.matchId ? "selected" : ""}
+                  key={match.matchId}
+                  type="button"
+                  onClick={() => selectMatch(match.matchId)}
+                >
+                  <MatchTeamsLine
+                    awayScore={match.awayScore}
+                    awayTeam={match.awayTeam}
+                    homeScore={match.homeScore}
+                    homeTeam={match.homeTeam}
+                    size="sm"
+                  />
+                  <span>
+                    {match.date} · {match.stage ?? "Stage unavailable"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </article>
+        ) : null}
+
+        <div className="match-explorer-detail">
+          {!selectedMatch ? (
+            <article className="data-card surface-flat match-placeholder">
+              <h2>Select a match</h2>
+              <p>Pick a fixture in the knockout tree above to view team stats, squads, and lineups.</p>
+            </article>
+          ) : (
+            <>
+              <article className="data-card widget-elevated match-summary-card">
+                <div className="section-heading compact">
+                  <div>
+                    <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
+                    <h2 className="match-title-line">
+                      <MatchTeamsLine
+                        awayScore={selectedMatch.awayScore}
+                        awayTeam={selectedMatch.awayTeam}
+                        homeScore={selectedMatch.homeScore}
+                        homeTeam={selectedMatch.homeTeam}
+                        layout="stacked"
+                        size="md"
+                      />
+                    </h2>
+                    <p>
+                      {selectedMatch.date}
+                      {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+                    </p>
+                  </div>
+                </div>
+
+                {!matchDetail ? (
+                  <p className="inline-status">Loading match data…</p>
+                ) : (
+                  <div className="match-detail-stack">
+                    <section className="match-detail-section">
+                      <h3>Team stats</h3>
+                      <div className="team-stat-grid compact">
+                        {matchDetail.teamStats.map((team) => (
+                          <div className="team-stat-card compact" key={team.team}>
+                            <h4>
+                              <TeamLabel name={team.team} size="sm" />
+                            </h4>
+                            <div className="stat-chip-grid">
+                              <StatChip label="G" value={team.goals} />
+                              <StatChip label="Sh" value={team.shots} />
+                              <StatChip label="xG" value={team.xg} />
+                              <StatChip label="Pass" value={team.passes} />
+                              <StatChip
+                                label="Acc"
+                                value={team.passAccuracy ? `${team.passAccuracy}%` : "n/a"}
+                              />
+                              <StatChip label="Car" value={team.carries} />
+                              <StatChip label="Drib" value={`${team.successfulDribbles}/${team.dribbles}`} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    <section className="match-detail-section">
+                      <div className="section-heading compact">
+                        <h3>Squads & lineups</h3>
+                        <input
+                          aria-label="Search lineup"
+                          className="lineup-search"
+                          placeholder="Filter players"
+                          type="search"
+                          value={lineupSearch}
+                          onChange={(event) => setLineupSearch(event.target.value)}
+                        />
+                      </div>
+                      <div className="lineup-grid compact">
+                        {filteredLineups.map((team) => (
+                          <div className="lineup-card compact" key={team.teamName}>
+                            <h4>
+                              <TeamLabel name={team.teamName} size="sm" />
+                            </h4>
+                            <div className="lineup-list">
+                              {team.players.map((player) => (
+                                <button
+                                  className={
+                                    selectedPlayerId === player.playerId ? "lineup-row selected" : "lineup-row"
+                                  }
+                                  key={`${team.teamName}-${player.playerId}`}
+                                  type="button"
+                                  onClick={() => setSelectedPlayerId(player.playerId)}
+                                >
+                                  <span>{player.jerseyNumber ?? "–"}</span>
+                                  <TeamLabel countryHint={player.country} name={player.name} size="xs" />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    {matchDetail.playerStats.length > 0 ? (
+                      <PlayerStatsTable
+                        players={matchDetail.playerStats}
+                        selectedPlayerId={selectedPlayerId}
+                        onSelectPlayer={setSelectedPlayerId}
+                      />
+                    ) : (
+                      <p className="inline-status">No player-level event stats for this match.</p>
+                    )}
+                  </div>
+                )}
+              </article>
+            </>
+          )}
+        </div>
       </section>
     </>
   );
 }
 
-function FeedStatusTile({ label, ok }: { label: string; ok: boolean }) {
+function BracketMatchButton({
+  match,
+  onSelect,
+  selectedMatchId
+}: {
+  match: Match;
+  onSelect: (matchId: number) => void;
+  selectedMatchId: number | null;
+}) {
   return (
-    <article className={ok ? "feed-tile ok" : "feed-tile missing"}>
-      <span>{ok ? "Connected" : "Not active"}</span>
-      <h3>{label}</h3>
-    </article>
+    <button
+      className={selectedMatchId === match.matchId ? "selected" : ""}
+      type="button"
+      onClick={() => onSelect(match.matchId)}
+    >
+      <MatchTeamsLine
+        awayScore={match.awayScore}
+        awayTeam={match.awayTeam}
+        homeScore={match.homeScore}
+        homeTeam={match.homeTeam}
+        size="xs"
+      />
+      <span>{match.date}</span>
+    </button>
   );
 }
 
@@ -602,11 +709,11 @@ function SummaryTile({ label, value }: { label: string; value: string }) {
   );
 }
 
-function StatLine({ label, value }: { label: string; value: string | number }) {
+function StatChip({ label, value }: { label: string; value: string | number }) {
   return (
-    <p className="stat-line">
+    <div className="stat-chip">
       <span>{label}</span>
       <strong>{value}</strong>
-    </p>
+    </div>
   );
 }
