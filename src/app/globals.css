@@ -1823,6 +1823,7 @@ h3 {
 }
 
 .knockout-widgets-row--stats-pair {
+  align-items: stretch;
   display: grid;
   gap: 10px;
   grid-column: 1 / -1;
@@ -1832,7 +1833,6 @@ h3 {
 
 @media (min-width: 900px) {
   .knockout-widgets-row--stats-pair {
-    align-items: start;
     grid-template-columns: minmax(0, 1.05fr) minmax(240px, 0.95fr);
   }
 }
@@ -1844,7 +1844,14 @@ h3 {
 
 .knockout-widgets-row--stats-pair .match-detail-widget,
 .knockout-widgets-row--stats-pair .match-player-stats-column {
+  align-self: stretch;
+  box-sizing: border-box;
+  height: 100%;
   min-height: 0;
+}
+
+.knockout-widgets-row--stats-pair .match-player-stats-column .player-stats-panel {
+  min-height: 100%;
 }
 
 .knockout-widgets--below-strip {
