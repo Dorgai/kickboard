@@ -50,7 +50,9 @@ const COUNTRY_CODES: Record<string, string> = {
   japan: "JP",
   jordan: "JO",
   "korea republic": "KR",
+  "korea rep": "KR",
   "south korea": "KR",
+  "republic of korea": "KR",
   "korea dpr": "KP",
   "north korea": "KP",
   kuwait: "KW",
@@ -85,7 +87,9 @@ const COUNTRY_CODES: Record<string, string> = {
   ukraine: "UA",
   "united arab emirates": "AE",
   "united states": "US",
+  "united states of america": "US",
   usa: "US",
+  "u.s.": "US",
   uruguay: "UY",
   venezuela: "VE",
   wales: "GB-WLS",
@@ -119,6 +123,6 @@ export function resolveCountryCode(teamOrCountry: string | null | undefined) {
 }
 
 export function flagImageUrl(code: string, width = 40) {
-  const normalized = code.toLowerCase();
+  const normalized = code.toLowerCase().replace(/_/g, "-");
   return `https://flagcdn.com/w${width}/${normalized}.png`;
 }

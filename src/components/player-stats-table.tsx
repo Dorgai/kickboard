@@ -203,9 +203,8 @@ export function PlayerStatsTable({ players, selectedPlayerId, onSelectPlayer }: 
       <div className="section-heading compact">
         <div>
           <h3>Player stats</h3>
-          <p>
-            {filteredAndSorted.length} of {players.length} players · click a column to sort · filter with inputs
-            below headers
+          <p className="player-stats-summary">
+            {filteredAndSorted.length} of {players.length} players · click a column to sort · filter in header row
           </p>
         </div>
         {selectedPlayerId ? (

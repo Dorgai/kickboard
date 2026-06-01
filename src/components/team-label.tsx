@@ -1,4 +1,5 @@
-import Image from "next/image";
+"use client";
+
 import { flagImageUrl, resolveCountryCode } from "@/lib/country-flags";
 
 type CountryFlagProps = {
@@ -23,13 +24,20 @@ export function CountryFlag({ code, label, size = "sm" }: CountryFlagProps) {
 
   return (
     <span className={`country-flag country-flag-${size}`}>
-      <Image
+      {/* Native img: external flag CDN; avoids Next image optimizer 400s on Railway */}
+      <img
         alt={label ? `Flag of ${label}` : ""}
         className="country-flag-img"
+        decoding="async"
         height={dimensions.height}
+        loading="lazy"
         src={src}
-        unoptimized
         width={dimensions.width}
+        onError={(event) => {
+          const wrapper = event.currentTarget.parentElement;
+          event.currentTarget.remove();
+          wrapper?.classList.add("country-flag-fallback");
+        }}
       />
     </span>
   );

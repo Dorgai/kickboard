@@ -607,7 +607,7 @@ function PastEventsPanel({
                 <div className="section-heading compact">
                   <div>
                     <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
-                    <h2 className="match-title-line">
+                    <div className="match-title-line">
                       <MatchTeamsLine
                         awayScore={selectedMatch.awayScore}
                         awayTeam={selectedMatch.awayTeam}
@@ -616,7 +616,7 @@ function PastEventsPanel({
                         layout="stacked"
                         size="md"
                       />
-                    </h2>
+                    </div>
                     <p>
                       {selectedMatch.date}
                       {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
