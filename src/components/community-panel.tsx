@@ -23,6 +23,7 @@ type CommunityStatus = {
   connected: boolean;
   database: boolean;
   jwt: boolean;
+  schemaReady?: boolean;
   message: string;
 };
 
@@ -160,9 +161,22 @@ export function CommunityPanel() {
       <div className="community-setup">
         <p className="inline-status">{status?.message ?? "Community is not configured yet."}</p>
         <p className="community-setup-note">
-          Attach Postgres on Railway, apply <code>db/schema.sql</code> and{" "}
-          <code>db/community-extensions.sql</code>, and set <code>JWT_SECRET</code>. Moderation stays on the
-          admin dashboard before posts go public.
+          {status?.schemaReady === false && status.database ? (
+            <>
+              Postgres is connected but tables are missing. From a machine that can reach your Railway
+              database, run <code>npm run db:schema</code> (loads <code>db/schema.sql</code> and{" "}
+              <code>db/community-extensions.sql</code>).
+            </>
+          ) : (
+            <>
+              Attach Postgres on Railway, run <code>npm run db:schema</code>, and set{" "}
+              <code>JWT_SECRET</code>. Moderation stays on the admin dashboard before posts go public.
+            </>
+          )}
+        </p>
+        <p className="community-setup-note">
+          There is no community password yet — join uses display name + birth year, then an httpOnly session
+          cookie. Admin moderation uses <code>ADMIN_DATA_SOURCES_TOKEN</code>, not your community login.
         </p>
       </div>
     );
@@ -194,7 +208,8 @@ export function CommunityPanel() {
         <form className="community-join-form" onSubmit={handleJoin}>
           <h3>Join the Coach Board</h3>
           <p className="community-panel-lead">
-            We ask for birth year so accounts under 13 stay in Fan Mode without public posting.
+            No password — pick a display name and birth year. We use a secure browser session cookie after you
+            join. Accounts under 13 cannot post publicly.
           </p>
           <label className="feed-control-field">
             Display name

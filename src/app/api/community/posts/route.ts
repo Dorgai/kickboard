@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { mapDatabaseError } from "@/lib/community/health";
 import { createTextPost, listApprovedPosts } from "@/lib/community/posts";
 import { getCommunitySessionUserId } from "@/lib/community/session";
 import { findUserById } from "@/lib/community/users";
@@ -15,6 +16,8 @@ export async function GET() {
     const posts = await listApprovedPosts();
     return NextResponse.json({ connected: true, posts });
   } catch (error) {
+    const mapped = mapDatabaseError(error);
+    if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
     console.error(error);
     return NextResponse.json({ error: "Unable to load community posts." }, { status: 500 });
   }
@@ -59,6 +62,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Posts are limited to 280 characters." }, { status: 400 });
       }
     }
+
+    const mapped = mapDatabaseError(error);
+    if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
 
     console.error(error);
     return NextResponse.json({ error: "Unable to create post." }, { status: 500 });

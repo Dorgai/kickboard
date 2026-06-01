@@ -1,19 +1,16 @@
 import { NextResponse } from "next/server";
-import { isDatabaseConfigured } from "@/lib/db";
+import { getCommunityHealth } from "@/lib/community/health";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const hasJwt = Boolean(process.env.JWT_SECRET?.trim());
+  const health = await getCommunityHealth();
 
   return NextResponse.json({
-    connected: isDatabaseConfigured() && hasJwt,
-    database: isDatabaseConfigured(),
-    jwt: hasJwt,
-    message: !isDatabaseConfigured()
-      ? "Attach Railway Postgres and run db/schema.sql plus db/community-extensions.sql."
-      : !hasJwt
-        ? "Set JWT_SECRET to enable community sessions."
-        : "Community posting is available."
+    connected: health.database && health.jwt && health.schemaReady,
+    database: health.database,
+    jwt: health.jwt,
+    schemaReady: health.schemaReady,
+    message: health.message
   });
 }

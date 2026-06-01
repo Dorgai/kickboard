@@ -9,18 +9,34 @@ Moderated public posting for the **Current event** tab. Historical match data st
 - Reporting a post hides it (`withheld`) until review.
 - Full user auth, DMs, and child profiles are later phases.
 
+## Authentication (no user password yet)
+
+Community MVP does **not** use email/password login for fans.
+
+| What | Purpose |
+|------|---------|
+| **Join form** | Display name + birth year creates a row in `users` (synthetic `@community.kickboard.local` email). |
+| **`kickboard_community_session` cookie** | HttpOnly cookie signed with server `JWT_SECRET`. This is your session — not shown or copied manually. |
+| **`JWT_SECRET`** | Railway env var used to sign community (and future) sessions. Operators set it; users never see it. |
+| **`ADMIN_DATA_SOURCES_TOKEN`** | Separate secret for `/admin/data-sources` and the moderation API. Not the same as community join. |
+
+Full email/password auth, verification, and password reset are a later phase.
+
 ## Setup
 
 1. Attach **Railway Postgres** and set `DATABASE_URL`.
-2. Set `JWT_SECRET` (same as future auth).
-3. Apply schema:
+2. Set `JWT_SECRET` (random string; same pool as future auth).
+3. Apply schema (**required** — without this, join returns 500):
 
 ```bash
-export DATABASE_URL=postgresql://...
+export DATABASE_URL=postgresql://USER:PASS@HOST:PORT/railway
 npm run db:schema
 ```
 
+Use the **public** Railway Postgres URL from the plugin (Variables → `DATABASE_URL`).
+
 4. Ensure `ADMIN_DATA_SOURCES_TOKEN` is set for the moderation UI.
+5. Check `GET /api/community/status` — `schemaReady` must be `true`.
 
 ## API
 
@@ -38,9 +54,13 @@ npm run db:schema
 - **Current event → Community** (`#community`): feed, join form, compose, report.
 - **Admin → Data sources**: moderation queue when Postgres is configured.
 
-## Next steps
+## Next steps (product)
 
-- Squad share and match-linked posts (`post_type` + `squad_id` / `match_id`)
-- Comments table and reaction counts
-- Redis rate limits and automated moderation hooks
-- Worker jobs for notifications
+1. **Email/password auth** — replace lightweight join with verified accounts and recovery flows.
+2. **Squad share posts** — `post_type = squad_share` linked to saved lineups.
+3. **Match-linked posts** — attach `match_id` when sharing takes from Past events.
+4. **Comments** — `comments` table (schema today only has `comment_count` on posts).
+5. **Reactions** — use `reaction_counts` jsonb on posts.
+6. **Rate limits** — Redis counters on post/report endpoints.
+7. **Moderation worker** — auto-withhold on report thresholds; optional AI screening.
+8. **Notifications** — worker fan-out when posts are approved or replied to.

@@ -5,20 +5,11 @@ import {
   createCommunitySessionToken,
   getCommunitySessionUserId
 } from "@/lib/community/session";
+import { mapDatabaseError } from "@/lib/community/health";
 import { findUserById, isChildAccount, registerCommunityUser } from "@/lib/community/users";
 import { isDatabaseConfigured } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
-
-function databaseErrorResponse(error: unknown) {
-  if (error instanceof Error && error.message === "DATABASE_NOT_CONFIGURED") {
-    return NextResponse.json({ error: "Database is not configured." }, { status: 503 });
-  }
-  if (error instanceof Error && error.message === "JWT_SECRET_NOT_CONFIGURED") {
-    return NextResponse.json({ error: "JWT_SECRET is not configured." }, { status: 503 });
-  }
-  return null;
-}
 
 export async function GET() {
   if (!isDatabaseConfigured()) {
@@ -46,8 +37,8 @@ export async function GET() {
       }
     });
   } catch (error) {
-    const mapped = databaseErrorResponse(error);
-    if (mapped) return mapped;
+    const mapped = mapDatabaseError(error);
+    if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
     console.error(error);
     return NextResponse.json({ error: "Unable to load community session." }, { status: 500 });
   }
@@ -106,8 +97,8 @@ export async function POST(request: Request) {
       }
     }
 
-    const mapped = databaseErrorResponse(error);
-    if (mapped) return mapped;
+    const mapped = mapDatabaseError(error);
+    if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
 
     console.error(error);
     return NextResponse.json({ error: "Unable to create community session." }, { status: 500 });
