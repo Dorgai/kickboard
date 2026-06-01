@@ -32,6 +32,10 @@ npm run check
 
 This runs TypeScript checking and a production Next.js build.
 
+## Deploy to Railway
+
+See [`docs/deploy-railway.md`](docs/deploy-railway.md) for GitHub deploy, CLI, and variable setup (`scripts/configure-railway-variables.sh`).
+
 ## Railway services to create
 
 Create these first:

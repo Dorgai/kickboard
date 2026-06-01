@@ -4,7 +4,7 @@
 
 ### Repository branch note
 
-`main` currently contains only the initial README commit. The runnable Kickboard Next.js application lives on `cursor/railway-kickstats-scaffold-d0a7` until it is merged. Check out that branch (or whichever branch contains `package.json`) before installing dependencies or running the app.
+The runnable Next.js app is on **`main`**. Use `main` for Railway deploys and local development unless working on a feature branch.
 
 ### Services
 
@@ -42,4 +42,8 @@ Wait for `curl -sf http://localhost:3000/api/health` before browser or API tests
 
 ### Admin dashboard (optional)
 
-`/admin/data-sources` requires `ADMIN_DATA_SOURCES_TOKEN` in `.env` (not in `.env.example` by default). Add it locally to test the admin data-source dashboard.
+`/admin/data-sources` requires `ADMIN_DATA_SOURCES_TOKEN` in `.env` (see `.env.example`). On Railway, set the same variable via the dashboard or `npm run railway:variables` with `RAILWAY_TOKEN` exported.
+
+### Railway deploy
+
+See [`docs/deploy-railway.md`](docs/deploy-railway.md). Minimum variables: `NEXT_PUBLIC_APP_URL`, `JWT_SECRET`, `ADMIN_DATA_SOURCES_TOKEN`. Postgres/Redis are optional for the StatsBomb feed browser MVP.
