@@ -793,60 +793,62 @@ function PastEventsPanel({
         </section>
 
         <div className="knockout-widgets" id="match-detail-panel">
-          <div
-            className={`knockout-widgets-row knockout-widgets-row--primary${
-              showMatchesList ? " knockout-widgets-row--with-list" : ""
-            }`}
-          >
-            {showMatchesList ? (
-              <article className="data-card surface-muted match-explorer-list">
-                <div className="section-heading compact">
-                  <div>
-                    <h2>All matches</h2>
-                    <p>{filteredMatches.length} in feed</p>
-                  </div>
-                  <label className="match-list-search">
-                    Search
-                    <input
-                      aria-label="Search matches"
-                      placeholder="Team or stage"
-                      type="search"
-                      value={matchSearch}
-                      onChange={(event) => setMatchSearch(event.target.value)}
-                    />
-                  </label>
-                </div>
-                <div className="feed-list compact-list match-list-grid">
-                  {filteredMatches.map((match) => (
-                    <button
-                      className={`match-fixture-btn${selectedMatchId === match.matchId ? " selected" : ""}`}
-                      key={match.matchId}
-                      type="button"
-                      onClick={() => selectMatch(match.matchId)}
-                    >
-                      <MatchTeamsLine
-                        awayScore={match.awayScore}
-                        awayTeam={match.awayTeam}
-                        homeScore={match.homeScore}
-                        homeTeam={match.homeTeam}
-                        size="sm"
+          {showMatchesList || !selectedMatch ? (
+            <div
+              className={`knockout-widgets-row knockout-widgets-row--primary${
+                showMatchesList ? " knockout-widgets-row--with-list" : ""
+              }`}
+            >
+              {showMatchesList ? (
+                <article className="data-card surface-muted match-explorer-list">
+                  <div className="section-heading compact">
+                    <div>
+                      <h2>All matches</h2>
+                      <p>{filteredMatches.length} in feed</p>
+                    </div>
+                    <label className="match-list-search">
+                      Search
+                      <input
+                        aria-label="Search matches"
+                        placeholder="Team or stage"
+                        type="search"
+                        value={matchSearch}
+                        onChange={(event) => setMatchSearch(event.target.value)}
                       />
-                      <span>
-                        {match.date} · {match.stage ?? "Stage unavailable"}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </article>
-            ) : null}
+                    </label>
+                  </div>
+                  <div className="feed-list compact-list match-list-grid">
+                    {filteredMatches.map((match) => (
+                      <button
+                        className={`match-fixture-btn${selectedMatchId === match.matchId ? " selected" : ""}`}
+                        key={match.matchId}
+                        type="button"
+                        onClick={() => selectMatch(match.matchId)}
+                      >
+                        <MatchTeamsLine
+                          awayScore={match.awayScore}
+                          awayTeam={match.awayTeam}
+                          homeScore={match.homeScore}
+                          homeTeam={match.homeTeam}
+                          size="sm"
+                        />
+                        <span>
+                          {match.date} · {match.stage ?? "Stage unavailable"}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </article>
+              ) : null}
 
-            {!selectedMatch ? (
-              <article className="data-card surface-flat match-placeholder">
-                <h2>Select a match</h2>
-                <p>Pick a fixture in the stage panel to load match details beside it.</p>
-              </article>
-            ) : null}
-          </div>
+              {!selectedMatch ? (
+                <article className="data-card surface-flat match-placeholder">
+                  <h2>Select a match</h2>
+                  <p>Pick a fixture in the stage panel to load match details beside it.</p>
+                </article>
+              ) : null}
+            </div>
+          ) : null}
 
           {railFixtureMode ? (
             <div className="knockout-widgets-row knockout-widgets-row--match-split" id="match-detail-panel">

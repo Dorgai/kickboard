@@ -1234,19 +1234,20 @@ h3 {
 
 .knockout-workspace {
   display: grid;
-  gap: 24px;
+  gap: 12px;
   grid-template-columns: minmax(0, 1fr);
   margin-bottom: 24px;
 }
 
 .knockout-workspace .bracket-tree-card {
   grid-column: 1 / -1;
+  margin-bottom: 0;
   width: 100%;
 }
 
 .knockout-widgets {
   display: grid;
-  gap: 20px;
+  gap: 12px;
   grid-column: 1 / -1;
   width: 100%;
 }
@@ -1990,6 +1991,10 @@ h3 {
   min-height: 36px;
   min-width: 180px;
   padding: 0 10px;
+}
+
+.knockout-workspace .bracket-tree-card .section-heading.compact {
+  margin-bottom: 8px;
 }
 
 .bracket-tree-card .section-heading.compact p {
