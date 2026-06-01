@@ -806,6 +806,15 @@ h3 {
   padding: 64px 24px;
 }
 
+.section-anchor,
+#bracket,
+#squads,
+#players,
+#community,
+#analytics {
+  scroll-margin-top: 120px;
+}
+
 .event-tab-bar {
   align-items: center;
   background: color-mix(in srgb, var(--color-surface) 94%, transparent);
@@ -2202,6 +2211,15 @@ code {
 
   .section {
     padding: 48px 16px;
+  }
+
+  main,
+  .feed-browser {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .event-tab-bar {
+    top: 72px;
   }
 
   .site-footer {

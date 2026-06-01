@@ -105,6 +105,14 @@ type CurrentWorldCup = {
 
 type EventTab = "current" | "past";
 
+const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "community", "analytics"]);
+
+function hashTarget(): string | null {
+  if (typeof window === "undefined") return null;
+  const value = window.location.hash.replace(/^#/, "").trim().toLowerCase();
+  return value || null;
+}
+
 export function FeedBrowser() {
   const [activeTab, setActiveTab] = useState<EventTab>("current");
   const [currentWorldCup, setCurrentWorldCup] = useState<CurrentWorldCup | null>(null);
@@ -120,6 +128,29 @@ export function FeedBrowser() {
   const [showMatchesList, setShowMatchesList] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    function syncTabFromHash() {
+      const hash = hashTarget();
+      if (hash && PAST_EVENT_HASHES.has(hash)) {
+        setActiveTab("past");
+      }
+    }
+
+    syncTabFromHash();
+    window.addEventListener("hashchange", syncTabFromHash);
+    return () => window.removeEventListener("hashchange", syncTabFromHash);
+  }, []);
+
+  useEffect(() => {
+    if (activeTab !== "past" || loading) return;
+    const hash = hashTarget();
+    if (!hash || !PAST_EVENT_HASHES.has(hash)) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [activeTab, loading, bracketRounds.length, selectedMatchId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -463,7 +494,7 @@ function PastEventsPanel({
         </a>
       </section>
 
-      <section className="bracket-tree-card surface-muted">
+      <section className="bracket-tree-card surface-muted" id="bracket">
         <div className="section-heading compact">
           <div>
             <p className="eyebrow">Knockout tree</p>
@@ -615,7 +646,7 @@ function PastEventsPanel({
                       </div>
                     </section>
 
-                    <section className="match-detail-section">
+                    <section className="match-detail-section" id="squads">
                       <div className="section-heading compact">
                         <h3>Squads & lineups</h3>
                         <input
@@ -654,11 +685,13 @@ function PastEventsPanel({
                     </section>
 
                     {matchDetail.playerStats.length > 0 ? (
-                      <PlayerStatsTable
-                        players={matchDetail.playerStats}
-                        selectedPlayerId={selectedPlayerId}
-                        onSelectPlayer={setSelectedPlayerId}
-                      />
+                      <div id="players">
+                        <PlayerStatsTable
+                          players={matchDetail.playerStats}
+                          selectedPlayerId={selectedPlayerId}
+                          onSelectPlayer={setSelectedPlayerId}
+                        />
+                      </div>
                     ) : (
                       <p className="inline-status">No player-level event stats for this match.</p>
                     )}
@@ -668,6 +701,15 @@ function PastEventsPanel({
             </>
           )}
         </div>
+      </section>
+
+      <section className="data-card surface-flat section-anchor" id="community">
+        <h2>Community</h2>
+        <p>Coach Board, squads sharing, and social widgets are planned for a later phase.</p>
+      </section>
+      <section className="data-card surface-flat section-anchor" id="analytics">
+        <h2>Analytics</h2>
+        <p>Pro heat maps and guided analytics will build on the match and player stats shown above.</p>
       </section>
     </>
   );

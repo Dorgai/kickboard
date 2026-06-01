@@ -10,6 +10,29 @@ function normaliseCell(value: string) {
   return value.replace(/\[[^\]]+\]/g, "").replace(/\s+/g, " ").trim();
 }
 
+/** Wikipedia infobox sometimes concatenates host names without separators. */
+function formatHostCountries(raw: string | null | undefined) {
+  if (!raw) return null;
+  const cleaned = normaliseCell(raw);
+  if (!cleaned) return null;
+  if (/[,;]/.test(cleaned) || cleaned.includes(" and ")) {
+    return cleaned;
+  }
+  const knownHosts = ["United States", "Mexico", "Canada"];
+  let formatted = cleaned;
+  for (const host of knownHosts) {
+    formatted = formatted.replace(host, `|${host}|`);
+  }
+  const parts = formatted
+    .split("|")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length > 1) {
+    return parts.join(" · ");
+  }
+  return cleaned.replace(/([a-z])([A-Z])/g, "$1 · $2");
+}
+
 export async function GET() {
   try {
     const response = await fetch(`${SOURCE_URL}?action=render`, {
@@ -130,7 +153,9 @@ export async function GET() {
         source: SOURCE_URL,
         title: "2026 FIFA World Cup",
         summary: {
-          hostCountries: infoboxRows["Host countries"] ?? infoboxRows["Host country"] ?? null,
+          hostCountries: formatHostCountries(
+            infoboxRows["Host countries"] ?? infoboxRows["Host country"] ?? null
+          ),
           dates: infoboxRows["Dates"] ?? null,
           teams: infoboxRows["Teams"] ?? null,
           venueCount: infoboxRows["Venue(s)"] ?? null
