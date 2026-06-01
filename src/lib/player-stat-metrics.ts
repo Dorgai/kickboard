@@ -34,6 +34,18 @@ export const MATCH_STAT_LABELS: Record<PlayerMetricId, string> = {
   dribbles: "Dribbles"
 };
 
+/** Non-abbreviated labels for the player “This match” focus grid. */
+export const PLAYER_THIS_MATCH_LABELS: Record<PlayerMetricId, string> = {
+  goals: "Goals",
+  assists: "Assists",
+  shots: "Shots",
+  xg: "Expected goals",
+  passes: "Passes",
+  passAccuracy: "Pass accuracy",
+  carries: "Carries",
+  dribbles: "Dribbles"
+};
+
 /** Short helper text under each stat in match details. */
 export const MATCH_STAT_CAPTIONS: Record<PlayerMetricId, string> = {
   goals: "Goals scored",

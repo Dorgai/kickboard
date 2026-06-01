@@ -5,6 +5,7 @@ import {
   formatPlayerMetric,
   PLAYER_CAREER_METRICS,
   PLAYER_MATCH_METRICS,
+  PLAYER_THIS_MATCH_LABELS,
   type CareerAppearance,
   type PlayerStatRow
 } from "@/lib/player-stat-metrics";
@@ -152,12 +153,13 @@ export function PlayerStatsPanel({
                 </p>
               </div>
             </header>
-            <div className="player-focus-metrics">
+            <div className="player-focus-metrics player-focus-metrics--this-match">
               {PLAYER_MATCH_METRICS.map((metric) => (
                 <div className="player-focus-metric" key={metric.id}>
                   <span className="player-focus-metric-value">{metric.format(selectedPlayer)}</span>
-                  <span className="player-focus-metric-label">{metric.label}</span>
-                  <span className="player-focus-metric-caption">{metric.caption}</span>
+                  <span className="player-focus-metric-label">
+                    {PLAYER_THIS_MATCH_LABELS[metric.id]}
+                  </span>
                 </div>
               ))}
             </div>
