@@ -1279,12 +1279,23 @@ h3 {
 
 @media (min-width: 960px) {
   .knockout-widgets-row--match-split {
-    grid-template-columns: minmax(260px, 0.88fr) minmax(0, 1.12fr);
+    grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .knockout-widgets-row--match-split.knockout-widgets-row--with-squads {
+    grid-template-columns: minmax(220px, 0.72fr) minmax(0, 0.92fr) minmax(280px, 1.05fr);
+  }
+
+  .knockout-widgets-row--with-squads .match-focus-team-stats {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 .match-fixtures-widget,
-.match-detail-widget {
+.match-detail-widget,
+.match-squads-players-column {
   display: grid;
   gap: 12px;
   min-height: 220px;
@@ -1366,19 +1377,46 @@ h3 {
   margin: 0;
 }
 
-.knockout-widgets-row--match-data,
-.knockout-widgets-row--timeline {
+.match-squads-players-column {
+  align-content: start;
+  gap: 14px;
+  max-height: min(88vh, 920px);
+  overflow: auto;
+  padding: 16px 18px;
+}
+
+.match-squads-players-column .match-detail-section {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+.match-squads-players-column .lineup-grid.compact {
   grid-template-columns: minmax(0, 1fr);
 }
 
-@media (min-width: 960px) {
-  .knockout-widgets-row--match-data {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.match-squads-players-column .lineup-list {
+  max-height: min(200px, 28vh);
 }
 
-.knockout-widgets-row--players {
-  grid-template-columns: minmax(0, 1fr);
+.match-squads-players-column .player-stats-panel {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+.match-squads-players-column .player-stats-panel .section-heading.compact {
+  margin-bottom: 8px;
+}
+
+.match-players-section {
+  border-top: 1px solid var(--color-border);
+  min-width: 0;
+  padding-top: 12px;
 }
 
 .knockout-widgets .match-explorer-list {
