@@ -690,6 +690,8 @@ h3 {
 
 .feed-hero,
 .feed-control-card,
+.current-world-cup-card,
+.bracket-tree-card,
 .feed-content-grid {
   margin-bottom: 24px;
 }
@@ -711,7 +713,9 @@ h3 {
   color: var(--color-text-secondary);
 }
 
-.feed-control-card {
+.feed-control-card,
+.current-world-cup-card,
+.bracket-tree-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
@@ -720,6 +724,12 @@ h3 {
   flex-wrap: wrap;
   gap: 16px;
   padding: 18px;
+}
+
+.current-world-cup-card,
+.bracket-tree-card {
+  display: grid;
+  gap: 16px;
 }
 
 .feed-control-card label,
@@ -733,7 +743,8 @@ h3 {
 
 .feed-control-card select,
 .feed-control-card input,
-.data-card select {
+.data-card select,
+.data-card input {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 10px;
@@ -748,6 +759,111 @@ h3 {
   display: grid;
   gap: 16px;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+.feed-content-grid.wide {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+}
+
+.current-summary-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.summary-tile {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.summary-tile span {
+  color: var(--color-text-secondary);
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.qualified-team-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qualified-team-list span {
+  background: var(--color-brand-light);
+  border-radius: 9999px;
+  color: var(--color-brand);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+.current-group-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.current-group-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.current-group-card p {
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  margin: 0;
+  min-height: 32px;
+}
+
+.current-fixture-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.current-fixture-list span {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.bracket-tree {
+  display: grid;
+  gap: 16px;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 1fr);
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.bracket-round {
+  display: grid;
+  gap: 10px;
+}
+
+.bracket-round h3 {
+  color: var(--color-brand);
+}
+
+.bracket-round button {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  min-height: 72px;
+  padding: 12px;
+  text-align: left;
 }
 
 .feed-list,
@@ -791,6 +907,77 @@ h3 {
   gap: 8px;
   grid-template-columns: 64px 1fr 1fr;
   padding: 10px 12px;
+}
+
+.team-stat-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.team-stat-card,
+.lineup-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.stat-line {
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  min-height: 34px;
+}
+
+.stat-line span {
+  color: var(--color-text-secondary);
+}
+
+.lineup-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lineup-row {
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 32px 1fr auto;
+  min-height: 34px;
+}
+
+.lineup-row span,
+.lineup-row small {
+  color: var(--color-text-secondary);
+}
+
+.player-stat-table {
+  display: grid;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.player-stat-row {
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(160px, 1.3fr) minmax(120px, 1fr) repeat(5, 56px);
+  min-width: 680px;
+  padding: 8px 0;
+}
+
+.player-stat-row.heading {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .inline-error {
@@ -1305,7 +1492,12 @@ code {
   .safety-grid,
   .tier-grid,
   .data-grid,
-  .feed-status-grid {
+  .feed-status-grid,
+  .current-summary-grid,
+  .current-group-grid,
+  .team-stat-grid,
+  .lineup-grid,
+  .feed-content-grid.wide {
     grid-template-columns: 1fr;
   }
 

@@ -65,6 +65,47 @@ export type StatsBombEvent = {
     name: string;
   };
   location?: [number, number];
+  pass?: {
+    recipient?: {
+      id: number;
+      name: string;
+    };
+    outcome?: {
+      id: number;
+      name: string;
+    };
+    goal_assist?: boolean;
+  };
+  shot?: {
+    outcome?: {
+      id: number;
+      name: string;
+    };
+    statsbomb_xg?: number;
+  };
+  dribble?: {
+    outcome?: {
+      id: number;
+      name: string;
+    };
+  };
+};
+
+export type StatsBombLineupPlayer = {
+  player_id: number;
+  player_name: string;
+  player_nickname?: string | null;
+  jersey_number?: number;
+  country?: {
+    id: number;
+    name: string;
+  };
+};
+
+export type StatsBombLineup = {
+  team_id: number;
+  team_name: string;
+  lineup: StatsBombLineupPlayer[];
 };
 
 const BASE_URL = "https://raw.githubusercontent.com/statsbomb/open-data/master/data";
@@ -106,6 +147,10 @@ export async function getEvents(matchId: number) {
   return fetchStatsBomb<StatsBombEvent[]>(`/events/${matchId}.json`, 3600);
 }
 
+export async function getLineups(matchId: number) {
+  return fetchStatsBomb<StatsBombLineup[]>(`/lineups/${matchId}.json`, 3600);
+}
+
 export function summariseEvent(event: StatsBombEvent) {
   return {
     id: event.id,
@@ -115,5 +160,142 @@ export function summariseEvent(event: StatsBombEvent) {
     team: event.team?.name ?? null,
     player: event.player?.name ?? null,
     location: event.location ?? null
+  };
+}
+
+export function buildMatchStats(events: StatsBombEvent[]) {
+  const teamStats = new Map<
+    string,
+    {
+      team: string;
+      passes: number;
+      completedPasses: number;
+      shots: number;
+      goals: number;
+      xg: number;
+      carries: number;
+      dribbles: number;
+      successfulDribbles: number;
+    }
+  >();
+
+  const playerStats = new Map<
+    string,
+    {
+      playerId: number | null;
+      player: string;
+      team: string;
+      passes: number;
+      completedPasses: number;
+      shots: number;
+      goals: number;
+      assists: number;
+      xg: number;
+      carries: number;
+      dribbles: number;
+      successfulDribbles: number;
+    }
+  >();
+
+  function getTeam(teamName: string) {
+    if (!teamStats.has(teamName)) {
+      teamStats.set(teamName, {
+        team: teamName,
+        passes: 0,
+        completedPasses: 0,
+        shots: 0,
+        goals: 0,
+        xg: 0,
+        carries: 0,
+        dribbles: 0,
+        successfulDribbles: 0
+      });
+    }
+    return teamStats.get(teamName)!;
+  }
+
+  function getPlayer(event: StatsBombEvent) {
+    const team = event.team?.name ?? "Unknown team";
+    const player = event.player?.name ?? "Unknown player";
+    const key = `${team}:${player}`;
+
+    if (!playerStats.has(key)) {
+      playerStats.set(key, {
+        playerId: event.player?.id ?? null,
+        player,
+        team,
+        passes: 0,
+        completedPasses: 0,
+        shots: 0,
+        goals: 0,
+        assists: 0,
+        xg: 0,
+        carries: 0,
+        dribbles: 0,
+        successfulDribbles: 0
+      });
+    }
+    return playerStats.get(key)!;
+  }
+
+  for (const event of events) {
+    const teamName = event.team?.name;
+    if (!teamName) continue;
+
+    const team = getTeam(teamName);
+    const player = getPlayer(event);
+
+    if (event.type.name === "Pass") {
+      team.passes += 1;
+      player.passes += 1;
+      if (!event.pass?.outcome) {
+        team.completedPasses += 1;
+        player.completedPasses += 1;
+      }
+      if (event.pass?.goal_assist) {
+        player.assists += 1;
+      }
+    }
+
+    if (event.type.name === "Shot") {
+      const xg = event.shot?.statsbomb_xg ?? 0;
+      team.shots += 1;
+      team.xg += xg;
+      player.shots += 1;
+      player.xg += xg;
+      if (event.shot?.outcome?.name === "Goal") {
+        team.goals += 1;
+        player.goals += 1;
+      }
+    }
+
+    if (event.type.name === "Carry") {
+      team.carries += 1;
+      player.carries += 1;
+    }
+
+    if (event.type.name === "Dribble") {
+      team.dribbles += 1;
+      player.dribbles += 1;
+      if (event.dribble?.outcome?.name === "Complete") {
+        team.successfulDribbles += 1;
+        player.successfulDribbles += 1;
+      }
+    }
+  }
+
+  return {
+    teamStats: Array.from(teamStats.values()).map((team) => ({
+      ...team,
+      xg: Number(team.xg.toFixed(2)),
+      passAccuracy: team.passes ? Number(((team.completedPasses / team.passes) * 100).toFixed(1)) : null
+    })),
+    playerStats: Array.from(playerStats.values())
+      .map((player) => ({
+        ...player,
+        xg: Number(player.xg.toFixed(2)),
+        passAccuracy: player.passes ? Number(((player.completedPasses / player.passes) * 100).toFixed(1)) : null
+      }))
+      .sort((a, b) => b.xg + b.shots + b.goals * 5 - (a.xg + a.shots + a.goals * 5))
   };
 }
