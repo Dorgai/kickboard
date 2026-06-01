@@ -2071,14 +2071,8 @@ h3 {
 
 .match-lineup-teams--compact .lineup-role-bands {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   grid-template-columns: minmax(0, 1fr);
-}
-
-@media (min-width: 520px) {
-  .match-lineup-teams--compact .lineup-role-bands {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 .match-lineup-teams--compact .lineup-position-band {
@@ -2113,10 +2107,10 @@ h3 {
 .match-lineup-teams--compact .lineup-list--dense {
   display: grid;
   flex: 1 1 auto;
-  gap: 2px 4px;
-  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: 3px 6px;
+  grid-template-columns: repeat(auto-fill, minmax(7.25rem, 1fr));
   min-width: 0;
-  padding: 3px 4px;
+  padding: 4px 6px;
 }
 
 .match-lineup-teams--compact .lineup-row--dense {
