@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
 import { groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
+import { TEAM_MATCH_STAT_CHIPS } from "@/lib/player-stat-metrics";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
@@ -911,19 +912,9 @@ function PastEventsPanel({
                               <TeamLabel name={team.team} size="sm" />
                             </h4>
                             <div className="stat-chip-grid">
-                              <StatChip label="G" value={team.goals} />
-                              <StatChip label="Sh" value={team.shots} />
-                              <StatChip label="xG" value={team.xg} />
-                              <StatChip label="Pass" value={team.passes} />
-                              <StatChip
-                                label="Acc"
-                                value={team.passAccuracy ? `${team.passAccuracy}%` : "n/a"}
-                              />
-                              <StatChip label="Car" value={team.carries} />
-                              <StatChip
-                                label="Drib"
-                                value={`${team.successfulDribbles}/${team.dribbles}`}
-                              />
+                              {TEAM_MATCH_STAT_CHIPS.map((stat) => (
+                                <StatChip key={stat.id} label={stat.label} value={stat.format(team)} />
+                              ))}
                             </div>
                           </section>
                         ))}
