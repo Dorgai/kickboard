@@ -30,7 +30,18 @@ IFS=$'\t' read -r CONFIG_PROJECT_NAME CONFIG_SERVICE_NAME CONFIG_ENVIRONMENT < <
 
 RAILWAY_PROJECT_NAME="${RAILWAY_PROJECT_NAME:-$CONFIG_PROJECT_NAME}"
 RAILWAY_SERVICE_NAME="${RAILWAY_SERVICE_NAME:-$CONFIG_SERVICE_NAME}"
-RAILWAY_ENVIRONMENT="${RAILWAY_ENVIRONMENT:-$CONFIG_ENVIRONMENT}"
+
+# Only the kickboard project production environment — never staging/preview/other envs.
+REQUIRED_ENVIRONMENT="production"
+if [ "$CONFIG_ENVIRONMENT" != "$REQUIRED_ENVIRONMENT" ]; then
+  echo "error: deploy/railway.project.json environment must be \"$REQUIRED_ENVIRONMENT\" (got \"$CONFIG_ENVIRONMENT\")" >&2
+  exit 1
+fi
+if [ -n "${RAILWAY_ENVIRONMENT:-}" ] && [ "$RAILWAY_ENVIRONMENT" != "$REQUIRED_ENVIRONMENT" ]; then
+  echo "error: only Railway environment \"$REQUIRED_ENVIRONMENT\" is allowed for kickboard (RAILWAY_ENVIRONMENT=$RAILWAY_ENVIRONMENT)" >&2
+  exit 1
+fi
+export RAILWAY_ENVIRONMENT="$REQUIRED_ENVIRONMENT"
 
 resolve_project_id() {
   if [ -n "${RAILWAY_PROJECT_ID:-}" ]; then
@@ -107,4 +118,4 @@ export RAILWAY_TARGET_ARGS=(
   --environment "$RAILWAY_ENVIRONMENT"
 )
 
-echo "Railway target: project \"$RAILWAY_PROJECT_NAME\" ($RAILWAY_PROJECT_ID), service \"$RAILWAY_SERVICE_NAME\" ($RAILWAY_SERVICE_ID), env $RAILWAY_ENVIRONMENT"
+echo "Railway target: kickboard project \"$RAILWAY_PROJECT_NAME\" ($RAILWAY_PROJECT_ID), service \"$RAILWAY_SERVICE_NAME\" ($RAILWAY_SERVICE_ID), environment $RAILWAY_ENVIRONMENT only"

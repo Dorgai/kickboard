@@ -19,15 +19,23 @@ echo "Projects:"
   }
 "
 
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+CONFIG="$ROOT_DIR/deploy/railway.project.json"
+
 echo ""
-echo "Services per project (production):"
+echo "Services in kickboard production only (deploy target):"
+TARGET_PROJECT=$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).projectName)" "$CONFIG")
+
 "$RAILWAY_BIN" project list --json | node -e "
+  const target = process.argv[1].toLowerCase();
   const raw = JSON.parse(require('fs').readFileSync(0, 'utf8'));
   const projects = Array.isArray(raw) ? raw : raw.projects ?? [];
   for (const project of projects) {
-    console.log('__PROJECT__' + project.id + '__' + project.name);
+    if ((project.name ?? '').toLowerCase() === target) {
+      console.log('__PROJECT__' + project.id + '__' + project.name);
+    }
   }
-" | while IFS= read -r line; do
+" "$TARGET_PROJECT" | while IFS= read -r line; do
   if [[ "$line" == __PROJECT__* ]]; then
     project_id="${line#__PROJECT__}"
     project_id="${project_id%%__*}"

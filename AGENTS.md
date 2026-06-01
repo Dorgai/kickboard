@@ -46,4 +46,4 @@ Wait for `curl -sf http://localhost:3000/api/health` before browser or API tests
 
 ### Railway deploy
 
-Deploy only into the existing **kickboard** Railway project (`RAILWAY_PROJECT_ID` + `RAILWAY_SERVICE_ID`). Never `railway init` or create a new project. See [`docs/deploy-railway.md`](docs/deploy-railway.md).
+Deploy only into **kickboard** / **production** (see `deploy/railway.project.json`). Never other projects or environments. See [`docs/deploy-railway.md`](docs/deploy-railway.md).

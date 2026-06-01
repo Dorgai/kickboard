@@ -1,4 +1,4 @@
-name: Deploy to Railway (kickboard project)
+name: Deploy to Railway (kickboard production)
 
 on:
   push:
@@ -7,12 +7,15 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: railway-deploy-kickboard
+  group: railway-deploy-kickboard-production
   cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      # Locked: kickboard project, production environment only (see deploy/railway.project.json).
+      RAILWAY_ENVIRONMENT: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,18 +32,17 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Resolve kickboard Railway target
+      - name: Resolve kickboard production target
         id: target
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_NAME: ${{ vars.RAILWAY_PROJECT_NAME }}
           RAILWAY_SERVICE_NAME: ${{ vars.RAILWAY_SERVICE_NAME }}
-          RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
         run: |
           if [ -z "$RAILWAY_TOKEN" ]; then
-            echo "::error::RAILWAY_TOKEN is required. Create a token in the kickboard Railway project (Settings → Tokens)."
+            echo "::error::RAILWAY_TOKEN is required (kickboard project → Settings → Tokens)."
             exit 1
           fi
           npm install -g @railway/cli
@@ -48,24 +50,23 @@ jobs:
           source scripts/railway-target.sh
           echo "project_id=$RAILWAY_PROJECT_ID" >> "$GITHUB_OUTPUT"
           echo "service_id=$RAILWAY_SERVICE_ID" >> "$GITHUB_OUTPUT"
+          echo "environment=$RAILWAY_ENVIRONMENT" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy to kickboard service
+      - name: Deploy to kickboard production
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ steps.target.outputs.project_id }}
           RAILWAY_SERVICE_ID: ${{ steps.target.outputs.service_id }}
-          RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
         run: |
           npm install -g @railway/cli
           source scripts/railway-target.sh
           railway up --detach "${RAILWAY_TARGET_ARGS[@]}"
 
-      - name: Configure Railway variables
+      - name: Configure kickboard production variables
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ steps.target.outputs.project_id }}
           RAILWAY_SERVICE_ID: ${{ steps.target.outputs.service_id }}
-          RAILWAY_ENVIRONMENT: ${{ vars.RAILWAY_ENVIRONMENT }}
           RAILWAY_PROJECT_NAME: ${{ vars.RAILWAY_PROJECT_NAME }}
           RAILWAY_SERVICE_NAME: ${{ vars.RAILWAY_SERVICE_NAME }}
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}

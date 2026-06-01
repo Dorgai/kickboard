@@ -1,6 +1,10 @@
 # Deploy to the kickboard Railway project
 
-Deploys must land in the Railway project named **`kickboard`**, service **`kickboard`**, as defined in [`deploy/railway.project.json`](../deploy/railway.project.json).
+Deploys must land in:
+
+- **Project:** `kickboard` (name resolved via [`deploy/railway.project.json`](../deploy/railway.project.json))
+- **Service:** `kickboard` (same file; rename in JSON if your service uses another name)
+- **Environment:** **`production` only** — staging/preview/other environments are rejected
 
 **Do not** run `railway init` or **New Project** — that creates a different project.
 
@@ -30,7 +34,8 @@ If the service name in Railway is not `kickboard`, either:
 | `RAILWAY_SERVICE_ID` | Force a specific service UUID |
 | `RAILWAY_PROJECT_NAME` | Default from `deploy/railway.project.json` (`kickboard`) |
 | `RAILWAY_SERVICE_NAME` | Default from `deploy/railway.project.json` (`kickboard`) |
-| `RAILWAY_ENVIRONMENT` | Default `production` |
+
+Environment is **always `production`** — do not set `RAILWAY_ENVIRONMENT` to another value.
 
 The workflow prints the resolved project and service IDs in the log (**Resolve kickboard Railway target**). Confirm they match the kickboard project in the Railway UI.
 
