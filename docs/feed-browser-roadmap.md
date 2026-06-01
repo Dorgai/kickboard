@@ -11,6 +11,8 @@ This tracks the homepage feed browser against `README.md` and product cards in `
 | Knockout bracket | `/api/feeds/historical/bracket` + full-width layout |
 | Match detail: team & player stats, lineups | `/api/feeds/historical/match-detail` |
 | **Event timelines** | `/api/feeds/historical/events` + `MatchEventTimeline` |
+| **Player stats focus widget** | `PlayerStatsPanel` — selected player match card + tournament career |
+| **Full player table** | Hidden under disclosure in `PlayerStatsPanel` |
 | Group stage explorer | Group-stage match grid + stage filter |
 | Current event public summary & groups | `/api/feeds/current-world-cup` |
 | Current event route-to-final tree | Group columns (teams only) + knockout TBD columns |

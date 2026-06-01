@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FeedStatusPanel } from "@/components/feed-status-panel";
 import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
 import { MatchEventTimeline } from "@/components/match-event-timeline";
-import { PlayerStatsTable } from "@/components/player-stats-table";
+import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
@@ -296,6 +296,19 @@ export function FeedBrowser() {
     [matches]
   );
 
+  const selectedCompetitionParts = useMemo(() => {
+    const [competitionId, seasonId] = selectedCompetition.split(":").map((value) => Number(value));
+    return { competitionId, seasonId };
+  }, [selectedCompetition]);
+
+  const selectedCompetitionLabel = useMemo(() => {
+    const entry = competitions.find(
+      (competition) =>
+        `${competition.competitionId}:${competition.seasonId}` === selectedCompetition
+    );
+    return entry ? `${entry.name} ${entry.season}` : "This tournament";
+  }, [competitions, selectedCompetition]);
+
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
   return (
     <div className="feed-browser">
@@ -368,6 +381,9 @@ export function FeedBrowser() {
           setSelectedMatchId={setSelectedMatchId}
           setSelectedPlayerId={setSelectedPlayerId}
           setStageFilter={setStageFilter}
+          competitionId={selectedCompetitionParts.competitionId}
+          seasonId={selectedCompetitionParts.seasonId}
+          competitionLabel={selectedCompetitionLabel}
         />
       )}
     </div>
@@ -485,6 +501,9 @@ type PastEventsPanelProps = {
   setSelectedMatchId: (value: number) => void;
   setSelectedPlayerId: (value: number | null) => void;
   setStageFilter: (value: StageFilter) => void;
+  competitionId: number;
+  seasonId: number;
+  competitionLabel: string;
 };
 
 function PastEventsPanel({
@@ -507,7 +526,10 @@ function PastEventsPanel({
   setSelectedCompetition,
   setSelectedMatchId,
   setSelectedPlayerId,
-  setStageFilter
+  setStageFilter,
+  competitionId,
+  seasonId,
+  competitionLabel
 }: PastEventsPanelProps) {
   const filteredLineups = (matchDetail?.lineups ?? []).map((team) => ({
     ...team,
@@ -802,9 +824,22 @@ function PastEventsPanel({
               </div>
 
               <div className="knockout-widgets-row knockout-widgets-row--players" id="players">
-                {matchDetail.playerStats.length > 0 ? (
-                  <PlayerStatsTable
+                {matchDetail.playerStats.length > 0 && selectedMatch ? (
+                  <PlayerStatsPanel
+                    competitionId={competitionId}
+                    competitionLabel={competitionLabel}
+                    matchMeta={{
+                      matchId: selectedMatch.matchId,
+                      date: selectedMatch.date,
+                      stage: selectedMatch.stage,
+                      homeTeam: selectedMatch.homeTeam,
+                      awayTeam: selectedMatch.awayTeam,
+                      homeScore: selectedMatch.homeScore,
+                      awayScore: selectedMatch.awayScore,
+                      stadium: selectedMatch.stadium
+                    }}
                     players={matchDetail.playerStats}
+                    seasonId={seasonId}
                     selectedPlayerId={selectedPlayerId}
                     onSelectPlayer={setSelectedPlayerId}
                   />

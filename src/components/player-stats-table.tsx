@@ -1,21 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { type PlayerStatRow } from "@/lib/player-stat-metrics";
 import { TeamLabel } from "@/components/team-label";
 
-export type PlayerStatRow = {
-  playerId: number | null;
-  player: string;
-  team: string;
-  passes: number;
-  passAccuracy: number | null;
-  shots: number;
-  goals: number;
-  assists: number;
-  xg: number;
-  carries: number;
-  dribbles: number;
-};
+export type { PlayerStatRow };
 
 type ColumnId =
   | "player"
@@ -32,7 +21,7 @@ type ColumnId =
 type ColumnDef = {
   id: ColumnId;
   label: string;
-  tooltip: string;
+  caption: string;
   kind: "text" | "number";
   value: (row: PlayerStatRow) => string | number | null;
 };
@@ -41,70 +30,70 @@ const COLUMNS: ColumnDef[] = [
   {
     id: "player",
     label: "Player",
-    tooltip: "Player name aggregated from StatsBomb match events.",
+    caption: "Name aggregated from StatsBomb match events.",
     kind: "text",
     value: (row) => row.player
   },
   {
     id: "team",
     label: "Team",
-    tooltip: "National team the player represented in this match.",
+    caption: "National team in this match.",
     kind: "text",
     value: (row) => row.team
   },
   {
     id: "goals",
     label: "G",
-    tooltip: "Goals scored in this match.",
+    caption: "Goals in this match.",
     kind: "number",
     value: (row) => row.goals
   },
   {
     id: "assists",
     label: "A",
-    tooltip: "Goal assists recorded in this match.",
+    caption: "Assists in this match.",
     kind: "number",
     value: (row) => row.assists
   },
   {
     id: "shots",
     label: "Sh",
-    tooltip: "Shot attempts including goals.",
+    caption: "Shots in this match.",
     kind: "number",
     value: (row) => row.shots
   },
   {
     id: "xg",
     label: "xG",
-    tooltip: "Expected goals total from shot quality in this match.",
+    caption: "Expected goals in this match.",
     kind: "number",
     value: (row) => row.xg
   },
   {
     id: "passes",
     label: "Ps",
-    tooltip: "Passes attempted in this match.",
+    caption: "Passes attempted.",
     kind: "number",
     value: (row) => row.passes
   },
   {
     id: "passAccuracy",
     label: "Acc%",
-    tooltip: "Pass completion rate when pass outcomes are available.",
+    caption: "Pass completion % when tracked.",
     kind: "number",
     value: (row) => row.passAccuracy
   },
   {
     id: "carries",
     label: "Car",
-    tooltip: "Ball carries in this match.",
+    caption: "Carries in this match.",
     kind: "number",
     value: (row) => row.carries
   },
   {
     id: "dribbles",
     label: "Dr",
-    tooltip: "Dribbles attempted in this match.",
+    caption: "Dribbles attempted.",
     kind: "number",
     value: (row) => row.dribbles
   }
@@ -122,9 +111,15 @@ type PlayerStatsTableProps = {
   players: PlayerStatRow[];
   selectedPlayerId: number | null;
   onSelectPlayer: (playerId: number | null) => void;
+  embedded?: boolean;
 };
 
-export function PlayerStatsTable({ players, selectedPlayerId, onSelectPlayer }: PlayerStatsTableProps) {
+export function PlayerStatsTable({
+  players,
+  selectedPlayerId,
+  onSelectPlayer,
+  embedded = false
+}: PlayerStatsTableProps) {
   const [sort, setSort] = useState<SortState>({ column: "goals", direction: "desc" });
   const [filters, setFilters] = useState<Partial<Record<ColumnId, string>>>({});
 
@@ -156,7 +151,9 @@ export function PlayerStatsTable({ players, selectedPlayerId, onSelectPlayer }: 
           const b = column.value(right);
 
           if (column.kind === "text") {
-            const comparison = String(a ?? "").localeCompare(String(b ?? ""), undefined, { sensitivity: "base" });
+            const comparison = String(a ?? "").localeCompare(String(b ?? ""), undefined, {
+              sensitivity: "base"
+            });
             return sort.direction === "asc" ? comparison : -comparison;
           }
 
@@ -198,86 +195,86 @@ export function PlayerStatsTable({ players, selectedPlayerId, onSelectPlayer }: 
     return value ?? (column.kind === "number" ? 0 : "—");
   }
 
+  const table = (
+    <div className="player-stat-table" style={{ ["--player-stat-columns" as string]: GRID_TEMPLATE }}>
+      <div className="player-stat-row heading" role="row">
+        {COLUMNS.map((column) => {
+          const active = sort?.column === column.id;
+          const direction = active ? sort?.direction : null;
+          return (
+            <div className="player-stat-header-cell" key={column.id} role="columnheader">
+              <button
+                className={`player-stat-sort${active ? " active" : ""}`}
+                type="button"
+                onClick={() => toggleSort(column.id)}
+              >
+                <span className="col-tooltip" tabIndex={0} title={column.caption}>
+                  {column.label}
+                </span>
+                {direction ? <span className="sort-indicator">{direction === "asc" ? "↑" : "↓"}</span> : null}
+              </button>
+              <span className="player-stat-col-caption">{column.caption}</span>
+              <input
+                aria-label={`Filter ${column.label}`}
+                className="player-stat-filter"
+                placeholder={column.kind === "text" ? "Contains…" : "Min"}
+                type={column.kind === "number" ? "number" : "search"}
+                value={filters[column.id] ?? ""}
+                onChange={(event) => updateFilter(column.id, event.target.value)}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {filteredAndSorted.length === 0 ? (
+        <p className="inline-status player-stat-empty">No players match the current column filters.</p>
+      ) : (
+        filteredAndSorted.map((row) => {
+          const rowKey = `${row.team}-${row.player}-${row.playerId}`;
+          const isSelected = row.playerId !== null && row.playerId === selectedPlayerId;
+
+          return (
+            <button
+              className={`player-stat-row player-stat-data-row${isSelected ? " selected" : ""}`}
+              key={rowKey}
+              type="button"
+              onClick={() => onSelectPlayer(row.playerId)}
+              role="row"
+            >
+              {COLUMNS.map((column) => (
+                <span key={`${rowKey}-${column.id}`}>
+                  {column.id === "team" ? (
+                    <TeamLabel name={row.team} size="xs" />
+                  ) : column.id === "player" ? (
+                    <strong>{row.player}</strong>
+                  ) : (
+                    formatCell(column, row)
+                  )}
+                </span>
+              ))}
+            </button>
+          );
+        })
+      )}
+    </div>
+  );
+
+  if (embedded) {
+    return <div className="player-stat-table-embedded">{table}</div>;
+  }
+
   return (
     <section className="match-detail-section player-stats-section">
       <div className="section-heading compact">
         <div>
           <h3>Player stats</h3>
-          <p className="player-stats-summary">
-            {filteredAndSorted.length} of {players.length} players · click a column to sort · filter in header row
+          <p className="player-stats-summary player-stats-summary--caption">
+            {filteredAndSorted.length} of {players.length} players
           </p>
         </div>
-        {selectedPlayerId ? (
-          <button className="text-button" type="button" onClick={() => onSelectPlayer(null)}>
-            Clear selection
-          </button>
-        ) : null}
       </div>
-
-      <div className="player-stat-table" style={{ ["--player-stat-columns" as string]: GRID_TEMPLATE }}>
-        <div className="player-stat-row heading" role="row">
-          {COLUMNS.map((column) => {
-            const active = sort?.column === column.id;
-            const direction = active ? sort?.direction : null;
-            return (
-              <div className="player-stat-header-cell" key={column.id} role="columnheader">
-                <button
-                  className={`player-stat-sort${active ? " active" : ""}`}
-                  type="button"
-                  onClick={() => toggleSort(column.id)}
-                >
-                  <span className="col-tooltip" tabIndex={0} title={column.tooltip}>
-                    {column.label}
-                    <span className="col-tooltip-bubble" role="tooltip">
-                      {column.tooltip}
-                    </span>
-                  </span>
-                  {direction ? <span className="sort-indicator">{direction === "asc" ? "↑" : "↓"}</span> : null}
-                </button>
-                <input
-                  aria-label={`Filter ${column.label}`}
-                  className="player-stat-filter"
-                  placeholder={column.kind === "text" ? "Contains…" : "Min"}
-                  type={column.kind === "number" ? "number" : "search"}
-                  value={filters[column.id] ?? ""}
-                  onChange={(event) => updateFilter(column.id, event.target.value)}
-                />
-              </div>
-            );
-          })}
-        </div>
-
-        {filteredAndSorted.length === 0 ? (
-          <p className="inline-status player-stat-empty">No players match the current column filters.</p>
-        ) : (
-          filteredAndSorted.map((row) => {
-            const rowKey = `${row.team}-${row.player}-${row.playerId}`;
-            const isSelected = row.playerId !== null && row.playerId === selectedPlayerId;
-
-            return (
-              <button
-                className={`player-stat-row player-stat-data-row${isSelected ? " selected" : ""}`}
-                key={rowKey}
-                type="button"
-                onClick={() => onSelectPlayer(row.playerId)}
-                role="row"
-              >
-                {COLUMNS.map((column) => (
-                  <span key={`${rowKey}-${column.id}`}>
-                    {column.id === "team" ? (
-                      <TeamLabel name={row.team} size="xs" />
-                    ) : column.id === "player" ? (
-                      <strong>{row.player}</strong>
-                    ) : (
-                      formatCell(column, row)
-                    )}
-                  </span>
-                ))}
-              </button>
-            );
-          })
-        )}
-      </div>
+      {table}
     </section>
   );
 }

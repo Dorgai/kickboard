@@ -1409,6 +1409,164 @@ h3 {
   margin: 0;
 }
 
+.player-stats-summary--caption {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.player-stats-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.player-stats-empty-prompt {
+  margin: 0;
+}
+
+.player-focus-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  display: grid;
+  gap: 14px;
+  padding: 14px 16px;
+}
+
+.player-focus-header h4 {
+  font-size: 18px;
+  margin: 0 0 4px;
+}
+
+.player-focus-meta-caption {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 4px 0 0;
+}
+
+.player-focus-metrics,
+.player-career-totals {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+}
+
+.player-focus-metric {
+  background: color-mix(in srgb, var(--color-brand) 6%, var(--color-bg));
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+}
+
+.player-focus-metric--compact {
+  padding: 6px 8px;
+}
+
+.player-focus-metric-value {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.player-focus-metric--compact .player-focus-metric-value {
+  font-size: 16px;
+}
+
+.player-focus-metric-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.player-focus-metric-caption,
+.player-stat-col-caption,
+.player-career-col-caption,
+.player-career-note {
+  color: var(--color-text-secondary);
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.player-career-section {
+  display: grid;
+  gap: 12px;
+}
+
+.player-career-section h4 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.player-career-table {
+  display: grid;
+  gap: 0;
+  overflow-x: auto;
+}
+
+.player-career-row {
+  align-items: start;
+  border-bottom: 1px solid var(--color-border);
+  display: grid;
+  font-size: 13px;
+  gap: 8px;
+  grid-template-columns: 88px 100px minmax(120px, 1fr) minmax(140px, 1.2fr) repeat(4, minmax(44px, 0.5fr));
+  min-width: 720px;
+  padding: 8px 4px;
+}
+
+.player-career-row--head {
+  background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+  font-size: 12px;
+  font-weight: 800;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.player-career-row--head span {
+  display: grid;
+  gap: 2px;
+}
+
+.player-stats-full-table-disclosure {
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+.player-stats-full-table-disclosure summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  list-style: none;
+  user-select: none;
+}
+
+.player-stats-full-table-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.player-stats-full-table-disclosure summary::before {
+  content: "▸ ";
+}
+
+.player-stats-full-table-disclosure[open] summary::before {
+  content: "▾ ";
+}
+
+.player-stat-table-embedded {
+  margin-top: 12px;
+}
+
+.player-stat-col-caption {
+  margin: 2px 0 4px;
+}
+
 .player-stat-table {
   display: grid;
   gap: 4px;
