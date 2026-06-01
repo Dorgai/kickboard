@@ -927,16 +927,54 @@ h3 {
   width: 100%;
 }
 
-.feed-browser .knockout-workspace .bracket-tree-card .section-heading.compact {
-  align-items: stretch;
-  flex-direction: column;
+.feed-browser .bracket-controls-row {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--feed-control-gap);
+  margin-bottom: var(--feed-control-gap);
+  width: 100%;
 }
 
-.feed-browser .knockout-workspace .bracket-tree-card .section-heading.compact .button {
+.feed-browser .bracket-controls-row .feed-control-field {
+  max-width: 360px;
+  width: auto;
+}
+
+.feed-browser .bracket-controls-row .bracket-competition-picker {
+  flex: 0 1 280px;
+  min-width: min(100%, 220px);
+}
+
+.feed-browser .bracket-controls-row .feed-control-bar {
+  flex: 1 1 280px;
+  margin: 0;
+  max-width: none;
+  min-width: min(100%, 320px);
+  width: auto;
+}
+
+.feed-browser .bracket-controls-row .bracket-controls-action {
+  flex: 0 0 auto;
   justify-content: center;
+  margin-left: auto;
   min-height: var(--feed-control-height);
-  width: 100%;
+  white-space: nowrap;
+}
+
+@media (max-width: 719px) {
+  .feed-browser .bracket-controls-row .bracket-controls-action {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .feed-browser .bracket-controls-row .bracket-competition-picker,
+  .feed-browser .bracket-controls-row .feed-control-bar {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
 }
 
 .feed-browser .match-lineups-heading {

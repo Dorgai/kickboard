@@ -653,7 +653,7 @@ function PastEventsPanel({
     <>
       <div className="knockout-workspace" id="group-stage">
         <section className="bracket-tree-card surface-muted" id="bracket">
-          <div className="section-heading compact">
+          <div className="bracket-controls-row feed-control-toolbar">
             <label className="bracket-competition-picker feed-control-field">
               Tournament
               <select value={selectedCompetition} onChange={(event) => setSelectedCompetition(event.target.value)}>
@@ -667,17 +667,7 @@ function PastEventsPanel({
                 ))}
               </select>
             </label>
-            <button
-              className="button secondary"
-              type="button"
-              aria-pressed={showMatchesList}
-              onClick={() => setShowMatchesList(!showMatchesList)}
-            >
-              {showMatchesList ? "Hide match list" : "Show full match list"}
-            </button>
-          </div>
-          {bracketRounds.length ? (
-            <>
+            {bracketRounds.length ? (
               <FeedTabBar
                 ariaLabel="Knockout stages"
                 className="bracket-stage-tabs"
@@ -688,6 +678,18 @@ function PastEventsPanel({
                 value={activeKnockoutStage}
                 onChange={setActiveKnockoutStage}
               />
+            ) : null}
+            <button
+              className="button secondary bracket-controls-action"
+              type="button"
+              aria-pressed={showMatchesList}
+              onClick={() => setShowMatchesList(!showMatchesList)}
+            >
+              {showMatchesList ? "Hide match list" : "Show full match list"}
+            </button>
+          </div>
+          {bracketRounds.length ? (
+            <>
               {!selectedMatch && activeKnockoutRound ? (
                 <div className="bracket-stage-panel">
                   <div className="bracket-fixture-grid">
