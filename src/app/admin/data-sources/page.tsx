@@ -1,6 +1,8 @@
 import { cookies, headers } from "next/headers";
 import { AdminAccessGate } from "@/components/admin-access-gate";
+import { CommunityModerationPanel } from "@/components/community-moderation-panel";
 import { FeedStatusPanel } from "@/components/feed-status-panel";
+import { isDatabaseConfigured } from "@/lib/db";
 import { ADMIN_COOKIE, getAdminAuthStatus, readAdminToken } from "@/lib/admin/auth";
 import { buildAdminDataSources } from "@/lib/admin/data-sources";
 
@@ -56,6 +58,8 @@ export default async function AdminDataSourcesPage({
       </section>
 
       <FeedStatusPanel />
+
+      {isDatabaseConfigured() && token ? <CommunityModerationPanel adminToken={token} /> : null}
 
       <section className="admin-source-grid">
         {data.sources.map((source) => (

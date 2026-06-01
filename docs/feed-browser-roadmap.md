@@ -32,10 +32,22 @@ This tracks the homepage feed browser against `README.md` and product cards in `
 | Current knockout pairings | TBD slots until live fixture mapping from API-Football |
 | Realtime on Current tab | Live panel added; depends on `API_FOOTBALL_KEY` + worker |
 
+## Community (in progress)
+
+| Feature | Status |
+|---------|--------|
+| Coach Board feed (approved posts) | `CommunityPanel` + `/api/community/posts` |
+| Join / session (birth year gate) | `/api/community/session` |
+| Moderation-first posting | New posts default `withheld`; admin approve |
+| Report post | `/api/community/posts/[id]/report` |
+| Admin moderation queue | `/admin/data-sources` + `/api/admin/community/posts` |
+
+Requires Postgres (`db/schema.sql`, `db/community-extensions.sql`) and `JWT_SECRET`. See [`docs/community.md`](community.md).
+
 ## Later phase (documented, not started)
 
 - Widget dashboard (`docs/widget-contract.md`)
-- Coach Board / community posting
+- Squad share post type, comments, reactions
 - Virtual wallet & predictions
 - Pro analytics / FastAPI service
 - User auth, Fan Mode, Stripe tiers

@@ -8,6 +8,7 @@ import { MatchTeamStatsGrid } from "@/components/match-team-stats-grid";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
+import { CommunityPanel } from "@/components/community-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
@@ -497,9 +498,9 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
         </div>
       </section>
 
-      <section className="data-card surface-flat section-anchor" id="community">
+      <section className="data-card surface-flat section-anchor community-section" id="community">
         <h2>Community</h2>
-        <p>Coach Board, squads sharing, and social widgets are planned for a later phase.</p>
+        <CommunityPanel />
       </section>
     </section>
   );

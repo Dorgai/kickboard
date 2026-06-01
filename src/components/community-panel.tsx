@@ -1,0 +1,282 @@
+"use client";
+
+import { FormEvent, useCallback, useEffect, useState } from "react";
+
+type CommunityUser = {
+  id: string;
+  username: string;
+  displayName: string;
+  isChild: boolean;
+};
+
+type CommunityPost = {
+  id: string;
+  postType: string;
+  body: string | null;
+  authorDisplayName: string;
+  authorUsername: string;
+  createdAt: string;
+  commentCount: number;
+};
+
+type CommunityStatus = {
+  connected: boolean;
+  database: boolean;
+  jwt: boolean;
+  message: string;
+};
+
+export function CommunityPanel() {
+  const [status, setStatus] = useState<CommunityStatus | null>(null);
+  const [user, setUser] = useState<CommunityUser | null>(null);
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const [displayName, setDisplayName] = useState("");
+  const [birthYear, setBirthYear] = useState(String(new Date().getFullYear() - 18));
+  const [draft, setDraft] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const refresh = useCallback(async () => {
+    setError(null);
+    try {
+      const [statusResponse, sessionResponse, postsResponse] = await Promise.all([
+        fetch("/api/community/status", { cache: "no-store" }),
+        fetch("/api/community/session", { cache: "no-store" }),
+        fetch("/api/community/posts", { cache: "no-store" })
+      ]);
+
+      const statusPayload = (await statusResponse.json()) as CommunityStatus;
+      const sessionPayload = (await sessionResponse.json()) as { user: CommunityUser | null };
+      const postsPayload = (await postsResponse.json()) as { posts: CommunityPost[] };
+
+      setStatus(statusPayload);
+      setUser(sessionPayload.user ?? null);
+      setPosts(postsPayload.posts ?? []);
+    } catch {
+      setError("Unable to load community feed.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  async function handleJoin(event: FormEvent) {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    setNotice(null);
+
+    try {
+      const response = await fetch("/api/community/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayName, birthYear: Number(birthYear) })
+      });
+      const payload = (await response.json()) as { error?: string; user?: CommunityUser };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Unable to join.");
+      }
+
+      setUser(payload.user ?? null);
+      setNotice("You can post on the Coach Board. Posts are reviewed before they go live.");
+      await refresh();
+    } catch (joinError) {
+      setError(joinError instanceof Error ? joinError.message : "Unable to join.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handlePost(event: FormEvent) {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    setNotice(null);
+
+    try {
+      const response = await fetch("/api/community/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: draft })
+      });
+      const payload = (await response.json()) as { error?: string; message?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Unable to post.");
+      }
+
+      setDraft("");
+      setNotice(payload.message ?? "Post submitted for moderation.");
+    } catch (postError) {
+      setError(postError instanceof Error ? postError.message : "Unable to post.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleReport(postId: string) {
+    setError(null);
+    setNotice(null);
+
+    try {
+      const response = await fetch(`/api/community/posts/${postId}/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "other" })
+      });
+      const payload = (await response.json()) as { error?: string; message?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Unable to report.");
+      }
+
+      setNotice(payload.message ?? "Report submitted.");
+      await refresh();
+    } catch (reportError) {
+      setError(reportError instanceof Error ? reportError.message : "Unable to report.");
+    }
+  }
+
+  async function handleSignOut() {
+    await fetch("/api/community/session", { method: "DELETE" });
+    setUser(null);
+    setNotice(null);
+    await refresh();
+  }
+
+  if (loading) {
+    return <p className="inline-status">Loading community…</p>;
+  }
+
+  if (!status?.connected) {
+    return (
+      <div className="community-setup">
+        <p className="inline-status">{status?.message ?? "Community is not configured yet."}</p>
+        <p className="community-setup-note">
+          Attach Postgres on Railway, apply <code>db/schema.sql</code> and{" "}
+          <code>db/community-extensions.sql</code>, and set <code>JWT_SECRET</code>. Moderation stays on the
+          admin dashboard before posts go public.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="community-panel">
+      <header className="community-panel-header">
+        <div>
+          <p className="eyebrow">Coach Board</p>
+          <p className="community-panel-lead">
+            Share match takes and squad ideas. Every post is held for moderation before it appears here.
+          </p>
+        </div>
+        {user ? (
+          <div className="community-session-chip">
+            <span>{user.displayName}</span>
+            <button className="text-button" type="button" onClick={handleSignOut}>
+              Sign out
+            </button>
+          </div>
+        ) : null}
+      </header>
+
+      {error ? <p className="inline-error">{error}</p> : null}
+      {notice ? <p className="inline-status community-notice">{notice}</p> : null}
+
+      {!user ? (
+        <form className="community-join-form" onSubmit={handleJoin}>
+          <h3>Join the Coach Board</h3>
+          <p className="community-panel-lead">
+            We ask for birth year so accounts under 13 stay in Fan Mode without public posting.
+          </p>
+          <label className="feed-control-field">
+            Display name
+            <input
+              className="feed-control-input"
+              maxLength={60}
+              required
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+            />
+          </label>
+          <label className="feed-control-field">
+            Birth year
+            <input
+              className="feed-control-input"
+              inputMode="numeric"
+              max={new Date().getFullYear()}
+              min={1900}
+              required
+              type="number"
+              value={birthYear}
+              onChange={(event) => setBirthYear(event.target.value)}
+            />
+          </label>
+          <button className="button" disabled={submitting} type="submit">
+            {submitting ? "Joining…" : "Join community"}
+          </button>
+        </form>
+      ) : (
+        <form className="community-compose-form" onSubmit={handlePost}>
+          <label className="feed-control-field">
+            New post
+            <textarea
+              className="feed-control-input community-compose-input"
+              maxLength={280}
+              placeholder="Share a match take (280 characters max)"
+              required
+              rows={3}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+            />
+          </label>
+          <div className="community-compose-footer">
+            <span className="community-char-count">{draft.length}/280</span>
+            <button className="button" disabled={submitting} type="submit">
+              {submitting ? "Submitting…" : "Submit for review"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="community-feed" role="feed">
+        {posts.length === 0 ? (
+          <p className="inline-status">No approved posts yet. Be the first after moderation.</p>
+        ) : (
+          posts.map((post) => (
+            <article className="community-post-card" key={post.id}>
+              <header className="community-post-header">
+                <strong>{post.authorDisplayName}</strong>
+                <time dateTime={post.createdAt}>{formatRelative(post.createdAt)}</time>
+              </header>
+              <p className="community-post-body">{post.body}</p>
+              <footer className="community-post-footer">
+                <button className="text-button" type="button" onClick={() => handleReport(post.id)}>
+                  Report
+                </button>
+              </footer>
+            </article>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function formatRelative(iso: string) {
+  const date = new Date(iso);
+  const deltaMs = Date.now() - date.getTime();
+  const minutes = Math.round(deltaMs / 60000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 48) return `${hours}h ago`;
+  return date.toLocaleDateString();
+}

@@ -12,6 +12,7 @@
     "start": "next start",
     "worker:api-football": "node scripts/api-football-worker.mjs",
     "typecheck": "tsc --noEmit",
+    "db:schema": "sh -c 'test -n \"$DATABASE_URL\" && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/schema.sql -f db/community-extensions.sql'",
     "check": "npm run typecheck && npm run build",
     "railway:deploy": "bash scripts/deploy-production.sh",
     "railway:variables": "bash scripts/configure-railway-variables.sh",
@@ -39,11 +40,13 @@
     "ioredis": "^5.11.0",
     "lucide-react": "^1.17.0",
     "next": "^16.2.6",
+    "pg": "^8.21.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "typescript": "^6.0.3"
