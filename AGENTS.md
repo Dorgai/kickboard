@@ -51,3 +51,14 @@ Deploy only into **kickboard** / **production** (see `deploy/railway.project.jso
 Automated deploys need GitHub Actions secret **`RAILWAY_TOKEN`** (kickboard project token). Without it, pushes to `main` build in CI but production stays stale.
 
 CLI deploy (same token): `export RAILWAY_TOKEN=... && npm run railway:deploy`
+
+### Production deploy status (verify after any deploy)
+
+```bash
+BASE=https://kickboard-production.up.railway.app
+curl -fsS "$BASE/api/health"
+curl -sS -o /dev/null -w "admin/session: %{http_code}\n" "$BASE/api/admin/session"   # expect not 404 on current main
+curl -sS "$BASE/" | grep -c feed-status-grid || true                                 # expect 0 on current main
+```
+
+If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production target**, regenerate the token under **kickboard project → Settings → Tokens** and update the `RAILWAY_TOKEN` repo secret, or add `RAILWAY_PROJECT_ID` + `RAILWAY_SERVICE_ID` secrets. Dashboard **Redeploy** only updates production when the service source is connected to `Dorgai/kickboard` branch **`main`**.
