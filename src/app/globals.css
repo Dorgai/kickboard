@@ -1223,8 +1223,6 @@ h3 {
 .qualified-team-list--compact {
   gap: 4px;
   margin-top: 8px;
-  max-height: 112px;
-  overflow: auto;
   padding-right: 4px;
 }
 
@@ -1409,8 +1407,6 @@ h3 {
 }
 
 .match-stage-fixtures {
-  max-height: min(360px, 48vh);
-  overflow: auto;
   padding-right: 2px;
 }
 
@@ -1492,8 +1488,6 @@ h3 {
 .match-lineups-column {
   align-content: start;
   gap: 12px;
-  max-height: min(88vh, 920px);
-  overflow: auto;
 }
 
 .match-lineups-heading {
@@ -1575,7 +1569,8 @@ h3 {
 }
 
 .match-lineups-column .lineup-list {
-  max-height: min(380px, 48vh);
+  max-height: none;
+  overflow: visible;
 }
 
 .match-lineups-column .lineup-row {
@@ -1604,7 +1599,6 @@ h3 {
 }
 
 .knockout-widgets .match-explorer-list {
-  max-height: min(420px, 50vh);
   position: static;
 }
 
@@ -1612,8 +1606,6 @@ h3 {
   display: grid;
   gap: 8px;
   grid-template-columns: 1fr;
-  max-height: min(360px, 45vh);
-  overflow: auto;
 }
 
 @media (min-width: 720px) {
@@ -1754,8 +1746,6 @@ h3 {
 .event-list {
   display: grid;
   gap: 8px;
-  max-height: 640px;
-  overflow: auto;
   padding-right: 4px;
 }
 
@@ -2195,9 +2185,7 @@ h3 {
 
 .match-explorer-list {
   align-self: start;
-  max-height: calc(100vh - 120px);
-  position: sticky;
-  top: 140px;
+  position: static;
 }
 
 .knockout-widgets .match-explorer-list {
@@ -2269,7 +2257,8 @@ h3 {
 }
 
 .feed-list.compact-list {
-  max-height: min(520px, 55vh);
+  max-height: none;
+  overflow: visible;
 }
 
 .feed-list.compact-list button {
@@ -2335,8 +2324,6 @@ h3 {
 .lineup-list {
   display: grid;
   gap: 4px;
-  max-height: 320px;
-  overflow: auto;
   padding-right: 4px;
 }
 
@@ -2774,8 +2761,6 @@ h3 {
 .match-timeline-list {
   list-style: none;
   margin: 0;
-  max-height: min(480px, 55vh);
-  overflow: auto;
   padding: 0;
 }
 
@@ -2804,7 +2789,6 @@ h3 {
 .timeline-modal {
   border: 0;
   margin: auto;
-  max-height: min(90vh, 800px);
   max-width: min(640px, 94vw);
   padding: 0;
   width: 100%;
@@ -2820,9 +2804,8 @@ h3 {
   border-radius: var(--radius-modal);
   box-shadow: var(--shadow-elevation-3);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  max-height: min(90vh, 800px);
-  overflow: hidden;
+  gap: 0;
+  grid-template-rows: auto auto;
 }
 
 .timeline-modal-header {
@@ -2841,8 +2824,6 @@ h3 {
 }
 
 .timeline-modal-body {
-  min-height: 0;
-  overflow: auto;
   padding: 12px 18px 18px;
 }
 
