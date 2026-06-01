@@ -10,17 +10,30 @@ source scripts/railway-target.sh
 
 RAILWAY_BIN="${RAILWAY_BIN:-npx @railway/cli}"
 
-JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"
-ADMIN_DATA_SOURCES_TOKEN="${ADMIN_DATA_SOURCES_TOKEN:-$(openssl rand -hex 24)}"
+# Local runs may generate secrets; CI should only push values explicitly provided.
+if [ "${ALLOW_GENERATE_SECRETS:-1}" = "1" ]; then
+  JWT_SECRET="${JWT_SECRET:-$(openssl rand -hex 32)}"
+  ADMIN_DATA_SOURCES_TOKEN="${ADMIN_DATA_SOURCES_TOKEN:-$(openssl rand -hex 24)}"
+fi
 
 set_var() {
   $RAILWAY_BIN variable set "$1" --skip-deploys "${RAILWAY_TARGET_ARGS[@]}"
 }
 
 # railway-target.sh prints resolved names and IDs
-echo "Setting core secrets on Railway..."
-set_var "JWT_SECRET=${JWT_SECRET}"
-set_var "ADMIN_DATA_SOURCES_TOKEN=${ADMIN_DATA_SOURCES_TOKEN}"
+if [ -n "${JWT_SECRET:-}" ]; then
+  echo "Setting JWT_SECRET..."
+  set_var "JWT_SECRET=${JWT_SECRET}"
+else
+  echo "skip JWT_SECRET (set in env or ALLOW_GENERATE_SECRETS=1 for local generate)"
+fi
+
+if [ -n "${ADMIN_DATA_SOURCES_TOKEN:-}" ]; then
+  echo "Setting ADMIN_DATA_SOURCES_TOKEN..."
+  set_var "ADMIN_DATA_SOURCES_TOKEN=${ADMIN_DATA_SOURCES_TOKEN}"
+else
+  echo "skip ADMIN_DATA_SOURCES_TOKEN"
+fi
 
 if [ -n "${DATABASE_URL:-}" ]; then
   echo "Setting DATABASE_URL..."
@@ -47,7 +60,11 @@ if [ -n "${API_FOOTBALL_KEY:-}" ]; then
   set_var "API_FOOTBALL_KEY=${API_FOOTBALL_KEY}"
 fi
 
-echo "Redeploying kickboard service..."
-$RAILWAY_BIN up --detach "${RAILWAY_TARGET_ARGS[@]}"
+if [ "${SKIP_FINAL_REDEPLOY:-}" != "1" ]; then
+  echo "Redeploying kickboard service..."
+  $RAILWAY_BIN up --detach "${RAILWAY_TARGET_ARGS[@]}"
+else
+  echo "skip final redeploy (SKIP_FINAL_REDEPLOY=1)"
+fi
 
 echo "Done."

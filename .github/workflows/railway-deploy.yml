@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      sync_variables:
+        description: Sync optional secrets/vars to Railway (only set values present in GitHub secrets)
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: railway-deploy-kickboard-production
@@ -16,6 +22,7 @@ jobs:
     env:
       # Locked: kickboard project, production environment only (see deploy/railway.project.json).
       RAILWAY_ENVIRONMENT: production
+      PRODUCTION_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,7 +49,7 @@ jobs:
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
         run: |
           if [ -z "$RAILWAY_TOKEN" ]; then
-            echo "::error::RAILWAY_TOKEN is required (kickboard project → Settings → Tokens)."
+            echo "::error::Add GitHub secret RAILWAY_TOKEN (kickboard project → Settings → Tokens), then re-run this workflow."
             exit 1
           fi
           npm install -g @railway/cli
@@ -62,13 +69,15 @@ jobs:
           source scripts/railway-target.sh
           railway up --detach "${RAILWAY_TARGET_ARGS[@]}"
 
-      - name: Configure kickboard production variables
+      - name: Sync Railway variables (optional)
+        if: >-
+          github.event_name == 'workflow_dispatch' &&
+          inputs.sync_variables == true
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ steps.target.outputs.project_id }}
           RAILWAY_SERVICE_ID: ${{ steps.target.outputs.service_id }}
-          RAILWAY_PROJECT_NAME: ${{ vars.RAILWAY_PROJECT_NAME }}
-          RAILWAY_SERVICE_NAME: ${{ vars.RAILWAY_SERVICE_NAME }}
+          SKIP_FINAL_REDEPLOY: "1"
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           REDIS_URL: ${{ secrets.REDIS_URL }}
@@ -77,3 +86,35 @@ jobs:
         run: |
           chmod +x scripts/configure-railway-variables.sh scripts/railway-target.sh
           bash scripts/configure-railway-variables.sh
+
+      - name: Wait for production health
+        run: |
+          BASE="${PRODUCTION_URL:-https://kickboard-production.up.railway.app}"
+          BASE="${BASE%/}"
+          echo "Waiting for ${BASE}/api/health ..."
+          for attempt in $(seq 1 36); do
+            if curl -fsS "${BASE}/api/health" | grep -q '"ok":true'; then
+              echo "Production is healthy."
+              echo "production_url=${BASE}" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            echo "Attempt ${attempt}/36 not ready yet; sleeping 10s ..."
+            sleep 10
+          done
+          echo "::error::Production did not become healthy within 6 minutes."
+          exit 1
+
+      - name: Verify latest UI is live
+        run: |
+          BASE="${PRODUCTION_URL:-https://kickboard-production.up.railway.app}"
+          BASE="${BASE%/}"
+          session_code=$(curl -sS -o /dev/null -w "%{http_code}" "${BASE}/api/admin/session")
+          if [ "$session_code" = "404" ]; then
+            echo "::error::${BASE}/api/admin/session returned 404 — production is still on an old build."
+            exit 1
+          fi
+          if curl -sS "${BASE}/" | grep -q feed-status-grid; then
+            echo "::error::Homepage still contains feed-status-grid — deploy did not pick up current main."
+            exit 1
+          fi
+          echo "Production matches current main (admin session route present, feed status grid removed)."

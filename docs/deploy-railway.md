@@ -18,13 +18,39 @@ If the service name in Railway is not `kickboard`, either:
 - Set GitHub variable `RAILWAY_SERVICE_NAME` to the real service name, or  
 - Edit `serviceName` in `deploy/railway.project.json`.
 
-## GitHub Actions (CLI deploy)
+## GitHub Actions (automated deploy)
+
+Every push to **`main`** runs [`.github/workflows/railway-deploy.yml`](../.github/workflows/railway-deploy.yml): build, deploy to kickboard **production**, then verify `/api/health`, `/api/admin/session`, and that the homepage no longer includes `feed-status-grid`.
+
+### One-time setup (required)
+
+1. Railway → **kickboard** project → **Settings** → **Tokens** → create a project token.
+2. GitHub → `Dorgai/kickboard` → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
+   - Name: `RAILWAY_TOKEN`
+   - Value: the token from step 1
+3. **Actions** → **Deploy to Railway (kickboard production)** → **Run workflow** (branch `main`).
+
+After that, each merge to `main` deploys automatically. To push env vars from GitHub without rotating unset secrets, run the workflow manually with **Sync Railway variables** enabled (only secrets you configured in GitHub are written).
 
 **Required secret**
 
 | Secret | Where |
 |--------|--------|
 | `RAILWAY_TOKEN` | kickboard project → **Settings** → **Tokens** |
+
+**Optional GitHub secret** (variable sync only; not required for deploy)
+
+| Secret | Purpose |
+|--------|---------|
+| `JWT_SECRET` | Admin session signing (leave unset on Railway if already configured) |
+| `ADMIN_DATA_SOURCES_TOKEN` | Admin data-sources gate |
+| `DATABASE_URL` / `REDIS_URL` | Only if syncing from GitHub instead of Railway plugins |
+
+**Optional GitHub variable**
+
+| Variable | Purpose |
+|----------|---------|
+| `NEXT_PUBLIC_APP_URL` | Production URL for post-deploy checks (default: `https://kickboard-production.up.railway.app`) |
 
 **Optional overrides** (only if lookup by name fails)
 

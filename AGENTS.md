@@ -47,3 +47,5 @@ Wait for `curl -sf http://localhost:3000/api/health` before browser or API tests
 ### Railway deploy
 
 Deploy only into **kickboard** / **production** (see `deploy/railway.project.json`). Never other projects or environments. See [`docs/deploy-railway.md`](docs/deploy-railway.md).
+
+Automated deploys need GitHub Actions secret **`RAILWAY_TOKEN`** (kickboard project token). Without it, pushes to `main` build in CI but production stays stale.
