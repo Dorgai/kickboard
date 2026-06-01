@@ -811,7 +811,8 @@ h3 {
 #squads,
 #players,
 #community,
-#analytics {
+#analytics,
+#match-detail-panel {
   scroll-margin-top: 120px;
 }
 
@@ -994,6 +995,37 @@ h3 {
 .current-fixture-list span {
   color: var(--color-text-secondary);
   font-size: 13px;
+}
+
+.knockout-workspace {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 1100px) {
+  .knockout-workspace {
+    align-items: start;
+    grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+  }
+
+  .knockout-workspace .bracket-tree-card {
+    margin-bottom: 0;
+  }
+
+  .knockout-workspace .match-explorer {
+    margin-bottom: 0;
+    max-height: calc(100vh - 132px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    position: sticky;
+    top: 96px;
+  }
+
+  .knockout-workspace .match-explorer-list {
+    max-height: 240px;
+    position: static;
+  }
 }
 
 .bracket-tree {
