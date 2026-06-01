@@ -70,3 +70,4 @@ If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production ta
 - Knockout bracket cards use stacked `MatchTeamsLine` with **sm** flags so logos match the match detail panel.
 - Past-events knockout layout: full-width **Route to the final** bracket on top; match list, summary, team stats/lineups, event timeline, and player stats stack in `.knockout-widgets` rows below (not side-by-side with the tree).
 - Gap tracker: [`docs/feed-browser-roadmap.md`](docs/feed-browser-roadmap.md).
+- Feed & infrastructure status (`FeedStatusPanel`) lives on `/admin/data-sources`, not the public homepage.

@@ -18,7 +18,7 @@ This tracks the homepage feed browser against `README.md` and product cards in `
 | Current event route-to-final tree | Group columns (teams only) + knockout TBD columns |
 | Qualified nations list | Collapsible compact text chips (not full flag grid) |
 | Live scores when configured | `LiveFixturesPanel` → `/api/feeds/realtime` |
-| User-facing feed status | `FeedStatusPanel` → `/api/feeds/status` |
+| Feed & infrastructure status | `FeedStatusPanel` on `/admin/data-sources` only |
 | Country flags | `team-label.tsx` + `flagcdn.com` |
 | Admin data sources | `/admin/data-sources` |
 | Railway deploy | GitHub Actions + `npm run railway:deploy` |

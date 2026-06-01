@@ -1,5 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { AdminAccessGate } from "@/components/admin-access-gate";
+import { FeedStatusPanel } from "@/components/feed-status-panel";
 import { ADMIN_COOKIE, getAdminAuthStatus, readAdminToken } from "@/lib/admin/auth";
 import { buildAdminDataSources } from "@/lib/admin/data-sources";
 
@@ -53,6 +54,8 @@ export default async function AdminDataSourcesPage({
         <SummaryCard label="Not configured" value={data.summary.notConfigured} />
         <SummaryCard label="Last checked" value={new Date(data.generatedAt).toLocaleString()} />
       </section>
+
+      <FeedStatusPanel variant="admin" />
 
       <section className="admin-source-grid">
         {data.sources.map((source) => (

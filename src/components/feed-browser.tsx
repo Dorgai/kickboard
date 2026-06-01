@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { FeedStatusPanel } from "@/components/feed-status-panel";
+import { FeedTabBar } from "@/components/feed-tab-bar";
 import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
+import { groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
 import { MatchEventTimeline } from "@/components/match-event-timeline";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
@@ -352,8 +353,6 @@ export function FeedBrowser() {
         </div>
       </section>
 
-      <FeedStatusPanel />
-
       {loading ? <p className="inline-status">Loading real feeds...</p> : null}
       {error ? <p className="inline-error">{error}</p> : null}
 
@@ -400,6 +399,17 @@ const CURRENT_KNOCKOUT_STAGES = [
 
 function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldCup | null }) {
   const qualifiedCount = currentWorldCup?.qualifiedTeams.length ?? 0;
+  const groups = currentWorldCup?.groups ?? [];
+  const [activeGroupLetter, setActiveGroupLetter] = useState(groups[0]?.group ?? "A");
+  const [activeKnockoutStage, setActiveKnockoutStage] = useState<string>(CURRENT_KNOCKOUT_STAGES[0]);
+
+  useEffect(() => {
+    if (groups.length && !groups.some((group) => group.group === activeGroupLetter)) {
+      setActiveGroupLetter(groups[0].group);
+    }
+  }, [activeGroupLetter, groups]);
+
+  const activeGroup = groups.find((group) => group.group === activeGroupLetter);
 
   return (
     <section className="current-world-cup-card">
@@ -439,41 +449,59 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
           <div>
             <p className="eyebrow">Tournament path</p>
             <h2>Route to the final</h2>
-            <p>Group columns list squads only. Knockout slots stay empty until live fixtures are connected.</p>
+            <p>Use tabs to browse groups and knockout stages. Knockout pairings appear when live data connects.</p>
           </div>
         </div>
-        <div className="bracket-tree">
-          <div className="bracket-round bracket-round--groups">
-            <h3>Group stage</h3>
-            {currentWorldCup?.groups?.length ? (
-              currentWorldCup.groups.map((group) => (
-                <div className="bracket-cluster" key={group.group}>
-                  <h4>Group {group.group}</h4>
+
+        <div className="bracket-tabbed-section">
+          <h3 className="bracket-tabbed-heading">Group stage</h3>
+          {groups.length ? (
+            <>
+              <FeedTabBar
+                ariaLabel="Group stage groups"
+                className="bracket-stage-tabs"
+                tabs={groups.map((group) => ({
+                  id: group.group,
+                  label: `Group ${group.group}`
+                }))}
+                value={activeGroupLetter}
+                onChange={setActiveGroupLetter}
+              />
+              {activeGroup ? (
+                <div className="bracket-cluster">
                   <div className="bracket-cluster-teams">
-                    {group.teams.map((team) => (
-                      <div className="bracket-team-slot" key={`${group.group}-${team}`}>
+                    {activeGroup.teams.map((team) => (
+                      <div className="bracket-team-slot" key={`${activeGroup.group}-${team}`}>
                         <TeamLabel name={team} size="xs" />
                       </div>
                     ))}
                   </div>
                 </div>
-              ))
-            ) : (
-              <button className="bracket-tbd-slot" disabled type="button">
-                <strong>Groups A–L</strong>
-                <span>Loading from public feed</span>
-              </button>
-            )}
-          </div>
-          {CURRENT_KNOCKOUT_STAGES.map((stage) => (
-            <div className="bracket-round" key={stage}>
-              <h3>{stage}</h3>
-              <button className="bracket-tbd-slot" disabled type="button">
-                <strong>Pairings TBD</strong>
-                <span>{stage === "Final" ? "July 19, 2026" : "Live feed pending"}</span>
-              </button>
-            </div>
-          ))}
+              ) : null}
+            </>
+          ) : (
+            <button className="bracket-tbd-slot" disabled type="button">
+              <strong>Groups A–L</strong>
+              <span>Loading from public feed</span>
+            </button>
+          )}
+        </div>
+
+        <div className="bracket-tabbed-section">
+          <h3 className="bracket-tabbed-heading">Knockout</h3>
+          <FeedTabBar
+            ariaLabel="Knockout stages"
+            className="bracket-stage-tabs"
+            tabs={CURRENT_KNOCKOUT_STAGES.map((stage) => ({ id: stage, label: stage }))}
+            value={activeKnockoutStage}
+            onChange={setActiveKnockoutStage}
+          />
+          <button className="bracket-tbd-slot" disabled type="button">
+            <strong>Pairings TBD</strong>
+            <span>
+              {activeKnockoutStage === "Final" ? "July 19, 2026" : "Live feed pending"} · {activeKnockoutStage}
+            </span>
+          </button>
         </div>
       </section>
     </section>
@@ -531,6 +559,33 @@ function PastEventsPanel({
   seasonId,
   competitionLabel
 }: PastEventsPanelProps) {
+  const teamToGroup = useMemo(() => inferTeamToGroup(groupStageMatches), [groupStageMatches]);
+  const groupBuckets = useMemo(
+    () => groupMatchesByLetter(groupStageMatches, teamToGroup),
+    [groupStageMatches, teamToGroup]
+  );
+  const [activeGroupLetter, setActiveGroupLetter] = useState("A");
+  const [activeKnockoutStage, setActiveKnockoutStage] = useState("");
+
+  useEffect(() => {
+    if (groupBuckets.length && !groupBuckets.some((bucket) => bucket.letter === activeGroupLetter)) {
+      setActiveGroupLetter(groupBuckets[0].letter);
+    }
+  }, [activeGroupLetter, groupBuckets]);
+
+  useEffect(() => {
+    if (
+      bracketRounds.length &&
+      (!activeKnockoutStage || !bracketRounds.some((round) => round.stage === activeKnockoutStage))
+    ) {
+      setActiveKnockoutStage(bracketRounds[0].stage);
+    }
+  }, [activeKnockoutStage, bracketRounds]);
+
+  const activeGroupMatches =
+    groupBuckets.find((bucket) => bucket.letter === activeGroupLetter)?.matches ?? [];
+  const activeKnockoutRound = bracketRounds.find((round) => round.stage === activeKnockoutStage);
+
   const filteredLineups = (matchDetail?.lineups ?? []).map((team) => ({
     ...team,
     players: team.players.filter((player) =>
@@ -585,17 +640,29 @@ function PastEventsPanel({
         </div>
       </section>
 
-      {groupStageMatches.length ? (
+      {groupBuckets.length ? (
         <section className="data-card surface-muted group-stage-explorer" id="group-stage">
           <div className="section-heading compact">
             <div>
               <p className="eyebrow">Group stage</p>
               <h2>Group stage results</h2>
-              <p>{groupStageMatches.length} matches · select any fixture to open detail below.</p>
+              <p>
+                {groupStageMatches.length} matches · pick a group tab, then a fixture for detail below.
+              </p>
             </div>
           </div>
-          <div className="group-stage-match-grid">
-            {groupStageMatches.map((match) => (
+          <FeedTabBar
+            ariaLabel="Group stage groups"
+            className="group-stage-tabs"
+            tabs={groupBuckets.map((bucket) => ({
+              id: bucket.letter,
+              label: `Group ${bucket.letter}`
+            }))}
+            value={activeGroupLetter}
+            onChange={setActiveGroupLetter}
+          />
+          <div className="group-stage-match-list">
+            {activeGroupMatches.map((match) => (
               <button
                 className={selectedMatchId === match.matchId ? "selected" : ""}
                 key={match.matchId}
@@ -636,39 +703,54 @@ function PastEventsPanel({
               {showMatchesList ? "Hide match list" : "Show full match list"}
             </button>
           </div>
-          <div className="bracket-tree">
-            {bracketRounds.map((round) => (
-              <div className="bracket-round" key={round.stage}>
-                <h3>{round.stage}</h3>
-                {round.clusters?.length ? (
-                  round.clusters.map((cluster) => (
-                    <div className="bracket-cluster" key={cluster.groups.join("-")}>
-                      <h4>{cluster.label}</h4>
-                      <div className="bracket-cluster-matches">
-                        {cluster.matches.map((match) => (
-                          <BracketMatchButton
-                            key={match.matchId}
-                            match={match}
-                            selectedMatchId={selectedMatchId}
-                            onSelect={selectMatch}
-                          />
-                        ))}
+          {bracketRounds.length ? (
+            <>
+              <FeedTabBar
+                ariaLabel="Knockout stages"
+                className="bracket-stage-tabs"
+                tabs={bracketRounds.map((round) => ({
+                  id: round.stage,
+                  label: round.stage
+                }))}
+                value={activeKnockoutStage}
+                onChange={setActiveKnockoutStage}
+              />
+              {activeKnockoutRound ? (
+                <div className="bracket-stage-panel">
+                  {activeKnockoutRound.clusters?.length ? (
+                    activeKnockoutRound.clusters.map((cluster) => (
+                      <div className="bracket-cluster" key={cluster.groups.join("-")}>
+                        <h4>{cluster.label}</h4>
+                        <div className="bracket-cluster-matches">
+                          {cluster.matches.map((match) => (
+                            <BracketMatchButton
+                              key={match.matchId}
+                              match={match}
+                              selectedMatchId={selectedMatchId}
+                              onSelect={selectMatch}
+                            />
+                          ))}
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="bracket-cluster-matches">
+                      {activeKnockoutRound.matches.map((match) => (
+                        <BracketMatchButton
+                          key={match.matchId}
+                          match={match}
+                          selectedMatchId={selectedMatchId}
+                          onSelect={selectMatch}
+                        />
+                      ))}
                     </div>
-                  ))
-                ) : (
-                  round.matches.map((match) => (
-                    <BracketMatchButton
-                      key={match.matchId}
-                      match={match}
-                      selectedMatchId={selectedMatchId}
-                      onSelect={selectMatch}
-                    />
-                  ))
-                )}
-              </div>
-            ))}
-          </div>
+                  )}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <p className="inline-status">No knockout rounds in this feed.</p>
+          )}
         </section>
 
         <div className="knockout-widgets" id="match-detail-panel">
