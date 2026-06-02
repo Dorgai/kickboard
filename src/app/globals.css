@@ -21,6 +21,8 @@
   --radius-card: 12px;
   --radius-modal: 16px;
   --max-page: 1280px;
+  --page-gutter: 24px;
+  --page-padding-y: 64px;
 }
 
 [data-theme="dark"] {
@@ -42,6 +44,8 @@
   --shadow-elevation-1: var(--shadow-surface);
   --shadow-elevation-2: var(--shadow-surface);
   --shadow-elevation-3: 0 8px 20px rgba(0, 0, 0, 0.35), 0 20px 48px rgba(0, 0, 0, 0.45);
+  --page-gutter: 24px;
+  --page-padding-y: 64px;
 }
 
 * {
@@ -50,6 +54,12 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -118,7 +128,7 @@ button:disabled {
   margin: 0 auto;
   max-width: var(--max-page);
   min-height: 72px;
-  padding: 0 24px;
+  padding-inline: var(--page-gutter);
 }
 
 .brand,
@@ -416,7 +426,7 @@ button:disabled {
 .section {
   margin: 0 auto;
   max-width: var(--max-page);
-  padding: 64px 24px;
+  padding: var(--page-padding-y) var(--page-gutter);
 }
 
 .hero {
@@ -1067,7 +1077,9 @@ h3 {
   --feed-control-radius: 10px;
   margin: 0 auto;
   max-width: var(--max-page);
-  padding: 64px 24px;
+  min-width: 0;
+  padding: var(--page-padding-y) var(--page-gutter);
+  width: 100%;
 }
 
 /* Feed UI type scale (overrides global marketing-sized h1/h2) */
@@ -6987,7 +6999,8 @@ code {
   justify-content: space-between;
   margin: 0 auto;
   max-width: var(--max-page);
-  padding: 0 24px;
+  padding-inline: var(--page-gutter);
+  width: 100%;
 }
 
 .site-footer-copy {
@@ -7010,7 +7023,8 @@ code {
 .legal-page {
   margin: 0 auto;
   max-width: var(--max-page);
-  padding: 48px 24px 64px;
+  padding: 48px var(--page-gutter) 64px;
+  width: 100%;
 }
 
 .legal-document {
@@ -7170,8 +7184,72 @@ code {
     grid-column: auto;
   }
 
+  :root,
+  [data-theme="light"],
+  [data-theme="dark"] {
+    --page-gutter: 8px;
+    --page-padding-y: 16px;
+  }
+
+  .nav-shell {
+    padding-inline: max(var(--page-gutter), env(safe-area-inset-left, 0px))
+      max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  }
+
+  .feed-browser {
+    padding-inline: max(var(--page-gutter), env(safe-area-inset-left, 0px))
+      max(var(--page-gutter), env(safe-area-inset-right, 0px));
+    padding-top: max(12px, env(safe-area-inset-top, 0px));
+  }
+
   .section {
-    padding: 48px 16px;
+    padding: 32px max(var(--page-gutter), env(safe-area-inset-left, 0px))
+      32px max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  }
+
+  .current-world-cup-card,
+  .bracket-tree-card,
+  .feed-control-card,
+  .data-card,
+  .match-coach-row,
+  .fixture-predictions-form,
+  .predictions-results-board,
+  .predictions-overview-card,
+  .saved-squads-bar,
+  .squad-team-bench {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .current-world-cup-card,
+  .bracket-tree-card {
+    padding: 10px 12px;
+  }
+
+  .data-card,
+  .match-coach-row,
+  .fixture-predictions-form,
+  .predictions-results-board {
+    padding: 12px;
+  }
+
+  .current-event-section-tabs.event-tab-bar {
+    max-width: none;
+    width: 100%;
+  }
+
+  .site-footer {
+    padding: 16px max(var(--page-gutter), env(safe-area-inset-left, 0px))
+      calc(64px + env(safe-area-inset-bottom, 0px)) max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  }
+
+  .site-footer-inner {
+    padding-inline: 0;
+  }
+
+  .legal-page {
+    padding-inline: max(var(--page-gutter), env(safe-area-inset-left, 0px))
+      max(var(--page-gutter), env(safe-area-inset-right, 0px));
   }
 
   main,
