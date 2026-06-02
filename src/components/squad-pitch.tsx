@@ -169,8 +169,8 @@ export function SquadPitch({
     <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
       {!readOnly ? (
         <p className="squad-pitch-hint squad-pitch-hint--compact">
-          Drag from a team bench onto their half. Drag a player from the pitch into that team&apos;s bench
-          to remove them (or press Delete while selected).
+          Drag from the bench above or below onto that team&apos;s half. Drop back on their bench to remove
+          (or press Delete while selected).
         </p>
       ) : null}
       <div

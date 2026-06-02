@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
 import { SquadPitch } from "@/components/squad-pitch";
-import { SquadPlayerPool } from "@/components/squad-player-pool";
+import { SquadTeamBench } from "@/components/squad-player-pool";
 import {
   countFilledBySide,
   defaultMatchFormations,
@@ -254,43 +254,52 @@ export function SquadBuilder({
 
       {loadState === "loading" ? <p className="inline-status">Loading your squad…</p> : null}
 
-      <div className="squad-builder-layout">
-        <SquadPlayerPool
-          awayFormation={formations.away}
-          awayPlayers={awayPlayers}
-          awayTeam={awayTeam}
-          error={poolError}
-          homeFormation={formations.home}
-          homePlayers={homePlayers}
-          homeTeam={homeTeam}
-          lineup={lineup}
-          loading={poolLoading}
-          onAwayFormationChange={changeAwayFormation}
-          onHomeFormationChange={changeHomeFormation}
-          onRemoveFromPitch={removeFromPitch}
-          sourceLabel={poolLabel}
-        />
-
-        <div className="squad-builder-pitch-column">
-          <div className="squad-builder-pitch-stage">
-            <SquadPitch
-              awayTeam={awayTeam}
-              homeTeam={homeTeam}
-              lineup={lineup}
-              selectedSlot={selectedSlot}
-              onLineupChange={setLineup}
-              onSelectSlot={setSelectedSlot}
-            />
+      <div className="squad-builder-layout squad-builder-layout--stacked">
+        <div className="squad-builder-pitch-stack">
+          {poolLabel ? <p className="squad-team-benches-source">{poolLabel}</p> : null}
+          <SquadTeamBench
+            error={poolError}
+            formation={formations.home}
+            lineup={lineup}
+            loading={poolLoading}
+            players={homePlayers}
+            side="home"
+            teamName={homeTeam}
+            onFormationChange={changeHomeFormation}
+            onRemoveFromPitch={removeFromPitch}
+          />
+          <div className="squad-builder-pitch-column">
+            <div className="squad-builder-pitch-stage">
+              <SquadPitch
+                awayTeam={awayTeam}
+                homeTeam={homeTeam}
+                lineup={lineup}
+                selectedSlot={selectedSlot}
+                onLineupChange={setLineup}
+                onSelectSlot={setSelectedSlot}
+              />
+            </div>
+            <aside className="squad-builder-predictions" aria-label="Predictions for this match">
+              <h4 className="squad-builder-predictions-title">Predictions for this match</h4>
+              <FixturePredictionPick
+                awayTeam={awayTeam}
+                fixtureKey={fixtureKey}
+                homeTeam={homeTeam}
+                coachBoard
+              />
+            </aside>
           </div>
-          <aside className="squad-builder-predictions" aria-label="Predictions for this match">
-            <h4 className="squad-builder-predictions-title">Predictions for this match</h4>
-            <FixturePredictionPick
-              awayTeam={awayTeam}
-              fixtureKey={fixtureKey}
-              homeTeam={homeTeam}
-              coachBoard
-            />
-          </aside>
+          <SquadTeamBench
+            error={poolError}
+            formation={formations.away}
+            lineup={lineup}
+            loading={poolLoading}
+            players={awayPlayers}
+            side="away"
+            teamName={awayTeam}
+            onFormationChange={changeAwayFormation}
+            onRemoveFromPitch={removeFromPitch}
+          />
         </div>
       </div>
 

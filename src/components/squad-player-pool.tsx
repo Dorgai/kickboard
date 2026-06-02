@@ -12,6 +12,7 @@ import {
   type PitchDragPlayer
 } from "@/lib/squads/drag-player";
 import { teamsMatch } from "@/lib/squads/team-names";
+import { teamKitInlineStyle } from "@/lib/team-kit-colors";
 
 type SquadPlayerPoolProps = {
   homePlayers: SquadPoolPlayer[];
@@ -31,10 +32,12 @@ type SquadPlayerPoolProps = {
 
 function PlayerChip({
   player,
+  side,
   onPitch,
   onRemoveFromPitch
 }: {
   player: SquadPoolPlayer;
+  side: "home" | "away";
   onPitch: boolean;
   onRemoveFromPitch: (playerId: number) => void;
 }) {
@@ -46,8 +49,8 @@ function PlayerChip({
         type="button"
         title={
           onPitch
-            ? "Drag into this team's bench below to remove from the pitch"
-            : "Drag onto your team's half of the pitch"
+            ? `Drag into the bench ${side === "home" ? "above" : "below"} to remove from the pitch`
+            : `Drag onto the ${side === "home" ? "top" : "bottom"} half of the pitch`
         }
         onClick={() => {
           if (onPitch) onRemoveFromPitch(player.playerId);
@@ -76,7 +79,7 @@ function PlayerChip({
   );
 }
 
-function SquadTeamPlayerPool({
+export function SquadTeamBench({
   teamName,
   side,
   formation,
@@ -149,6 +152,7 @@ function SquadTeamPlayerPool({
     <aside
       className={`squad-team-bench squad-team-bench--${side}${benchDragOver ? " squad-team-bench--drag-over" : ""}`}
       aria-label={`${teamName} bench`}
+      style={teamKitInlineStyle(teamName, side)}
       onDragEnter={handleBenchDragEnter}
       onDragLeave={handleBenchDragLeave}
       onDragOver={handleBenchDragOver}
@@ -186,6 +190,7 @@ function SquadTeamPlayerPool({
             onPitch={onPitchIds.has(player.playerId)}
             onRemoveFromPitch={onRemoveFromPitch}
             player={player}
+            side={side}
           />
         ))}
       </ul>
@@ -196,48 +201,49 @@ function SquadTeamPlayerPool({
   );
 }
 
-export function SquadPlayerPool({
-  homePlayers,
-  awayPlayers,
-  homeFormation,
-  awayFormation,
-  lineup,
-  homeTeam,
-  awayTeam,
-  sourceLabel,
-  loading,
-  error,
-  onHomeFormationChange,
-  onAwayFormationChange,
-  onRemoveFromPitch
-}: SquadPlayerPoolProps) {
+/** @deprecated Use SquadTeamBench in pitch-stack layout from squad-builder. */
+export function SquadPlayerPool(props: SquadPlayerPoolProps) {
+  const {
+    homePlayers,
+    awayPlayers,
+    homeFormation,
+    awayFormation,
+    lineup,
+    homeTeam,
+    awayTeam,
+    sourceLabel,
+    loading,
+    error,
+    onHomeFormationChange,
+    onAwayFormationChange,
+    onRemoveFromPitch
+  } = props;
+
   return (
-    <div className="squad-team-benches" aria-label="Team benches">
+    <div className="squad-builder-pitch-stack" aria-label="Team benches and pitch">
       {sourceLabel ? <p className="squad-team-benches-source">{sourceLabel}</p> : null}
-      <div className="squad-team-benches-grid">
-        <SquadTeamPlayerPool
-          error={error}
-          formation={homeFormation}
-          lineup={lineup}
-          loading={loading}
-          players={homePlayers}
-          side="home"
-          teamName={homeTeam}
-          onFormationChange={onHomeFormationChange}
-          onRemoveFromPitch={onRemoveFromPitch}
-        />
-        <SquadTeamPlayerPool
-          error={error}
-          formation={awayFormation}
-          lineup={lineup}
-          loading={loading}
-          players={awayPlayers}
-          side="away"
-          teamName={awayTeam}
-          onFormationChange={onAwayFormationChange}
-          onRemoveFromPitch={onRemoveFromPitch}
-        />
-      </div>
+      <SquadTeamBench
+        error={error}
+        formation={homeFormation}
+        lineup={lineup}
+        loading={loading}
+        players={homePlayers}
+        side="home"
+        teamName={homeTeam}
+        onFormationChange={onHomeFormationChange}
+        onRemoveFromPitch={onRemoveFromPitch}
+      />
+      <SquadTeamBench
+        error={error}
+        formation={awayFormation}
+        lineup={lineup}
+        loading={loading}
+        players={awayPlayers}
+        side="away"
+        teamName={awayTeam}
+        onFormationChange={onAwayFormationChange}
+        onRemoveFromPitch={onRemoveFromPitch}
+      />
     </div>
   );
 }

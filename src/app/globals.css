@@ -2265,13 +2265,17 @@ h3 {
 .squad-builder-layout {
   display: grid;
   gap: 12px;
-  grid-template-columns: minmax(11.5rem, 14rem) minmax(0, 1fr);
+  min-width: 0;
 }
 
-@media (max-width: 820px) {
-  .squad-builder-layout {
-    grid-template-columns: 1fr;
-  }
+.squad-builder-layout--stacked {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.squad-builder-pitch-stack {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
 }
 
 .squad-team-benches {
@@ -2287,34 +2291,66 @@ h3 {
   margin: 0;
 }
 
-.squad-team-benches-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr 1fr;
-  min-width: 0;
-}
-
-@media (max-width: 1100px) {
-  .squad-team-benches-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .squad-team-bench {
-  background: var(--color-surface);
-  border: 1px solid color-mix(in srgb, var(--color-text-primary) 16%, var(--color-border));
+  background: color-mix(in srgb, var(--pitch-kit-primary, var(--color-surface)) 8%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--pitch-kit-secondary, var(--color-border)) 55%, var(--color-border));
   border-radius: 12px;
   box-shadow: var(--shadow-surface);
   color: var(--color-text-primary);
   display: grid;
   gap: 8px;
-  max-height: min(32rem, 70vh);
   min-width: 0;
-  overflow: auto;
   padding: 10px 12px;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
+}
+
+.squad-builder-pitch-stack .squad-team-bench {
+  max-height: none;
+  overflow: visible;
+}
+
+.squad-builder-pitch-stack .squad-team-bench-header {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  justify-content: space-between;
+}
+
+.squad-builder-pitch-stack .squad-team-bench-title {
+  flex: 1 1 auto;
+  min-width: 8rem;
+}
+
+.squad-builder-pitch-stack .squad-team-bench-formation {
+  flex: 0 0 auto;
+}
+
+.squad-builder-pitch-stack .squad-team-bench-lead {
+  flex: 1 1 100%;
+}
+
+.squad-builder-pitch-stack .squad-team-bench-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  max-height: min(11.5rem, 24vh);
+  overflow: auto;
+  padding: 2px 0;
+}
+
+.squad-builder-pitch-stack .squad-team-bench-list > li {
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+
+.squad-builder-pitch-stack .squad-player-chip {
+  min-width: 7.25rem;
+  width: auto;
 }
 
 .squad-team-bench--drag-over {
@@ -2326,11 +2362,11 @@ h3 {
 }
 
 .squad-team-bench--home {
-  border-top: 3px solid color-mix(in srgb, var(--color-accent) 75%, var(--color-border));
+  border-top: 3px solid var(--pitch-kit-secondary, color-mix(in srgb, var(--color-accent) 75%, var(--color-border)));
 }
 
 .squad-team-bench--away {
-  border-top: 3px solid color-mix(in srgb, var(--color-brand) 55%, var(--color-text-secondary));
+  border-top: 3px solid var(--pitch-kit-secondary, color-mix(in srgb, var(--color-brand) 55%, var(--color-text-secondary)));
 }
 
 .squad-team-bench-header {
