@@ -50,17 +50,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async jwt({ token, account, profile }) {
       if (account?.provider && account.providerAccountId && profile?.email) {
-        const user = await upsertOAuthUser({
-          email: profile.email,
-          displayName: profile.name ?? profile.email.split("@")[0] ?? "Fan",
-          provider: account.provider,
-          providerAccountId: account.providerAccountId,
-          emailVerified: Boolean(profile.email_verified)
-        });
-        if (user) {
-          token.sub = user.id;
-          token.onboardingComplete = user.onboardingComplete;
-          token.pointsBalance = user.pointsBalance;
+        try {
+          const user = await upsertOAuthUser({
+            email: profile.email,
+            displayName: profile.name ?? profile.email.split("@")[0] ?? "Fan",
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            emailVerified: Boolean(
+              (profile as { email_verified?: boolean }).email_verified
+            )
+          });
+          if (user) {
+            token.sub = user.id;
+            token.onboardingComplete = user.onboardingComplete;
+            token.pointsBalance = user.pointsBalance;
+          }
+        } catch (error) {
+          console.error("[auth] upsertOAuthUser failed after Google sign-in:", error);
+          throw error;
         }
       } else if (token.sub) {
         const user = await findAuthUserById(String(token.sub));

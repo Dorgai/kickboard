@@ -106,3 +106,10 @@ After first Google sign-in, fans enter **birth year** (child-safety). Under-13 a
 ## Database
 
 Run `npm run db:schema` (includes `db/auth-extensions.sql`) on production after deploy.
+
+If Google login reaches the callback then shows **Server error / problem with the server configuration**:
+
+1. Open `/api/auth/config` — check `authSchemaReady` is `true`.
+2. If `false`, run **`npm run db:schema`** against production Postgres (GitHub workflow **Apply community schema** applies `auth-extensions.sql` too).
+3. Clear site cookies or use a private window (old `0.0.0.0` OAuth cookies can confuse the callback).
+4. Try sign-in again.
