@@ -7,6 +7,7 @@ import {
   getLatestUserSquad,
   isValidFormation,
   listUserSquads,
+  listUserSquadsForFixture,
   updateUserSquad,
   type SquadLineupSlot
 } from "@/lib/squads/store";
@@ -23,11 +24,17 @@ export async function GET(request: Request) {
   }
 
   const fixtureKey = new URL(request.url).searchParams.get("fixtureKey")?.trim() ?? "";
-  const [squads, latest] = await Promise.all([
-    listUserSquads(user.id),
-    fixtureKey ? getLatestUserSquad(user.id, fixtureKey) : Promise.resolve(null)
-  ]);
-  return NextResponse.json({ squads, latest, fixtureKey: fixtureKey || null });
+  const squads = fixtureKey
+    ? await listUserSquadsForFixture(user.id, fixtureKey)
+    : await listUserSquads(user.id);
+  const latest = fixtureKey ? squads[0] ?? null : null;
+  const latestFull =
+    latest && fixtureKey ? await getLatestUserSquad(user.id, fixtureKey) : null;
+  return NextResponse.json({
+    squads,
+    latest: latestFull,
+    fixtureKey: fixtureKey || null
+  });
 }
 
 export async function POST(request: Request) {

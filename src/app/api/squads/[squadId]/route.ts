@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { mapDatabaseError } from "@/lib/community/health";
 import {
+  getUserSquadById,
   isValidFormation,
   updateUserSquad,
   type SquadLineupSlot
@@ -10,6 +11,24 @@ import {
 export const dynamic = "force-dynamic";
 
 type RouteContext = { params: Promise<{ squadId: string }> };
+
+export async function GET(_request: Request, context: RouteContext) {
+  const user = await requireAuthUser();
+  if (!user) {
+    return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+  if (!user.onboardingComplete) {
+    return NextResponse.json({ error: "Complete onboarding first." }, { status: 403 });
+  }
+
+  const { squadId } = await context.params;
+  const squad = await getUserSquadById(squadId, user.id);
+  if (!squad) {
+    return NextResponse.json({ error: "Squad not found." }, { status: 404 });
+  }
+
+  return NextResponse.json({ squad });
+}
 
 export async function PATCH(request: Request, context: RouteContext) {
   const user = await requireAuthUser();

@@ -1254,6 +1254,88 @@ h3 {
   gap: 16px;
 }
 
+.saved-squads-bar {
+  background: color-mix(in srgb, var(--color-bg) 65%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.saved-squads-bar-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  justify-content: space-between;
+}
+
+.saved-squads-bar-header h3 {
+  font-size: 14px;
+  margin: 0;
+}
+
+.saved-squads-new {
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.saved-squads-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.saved-squads-list li {
+  margin: 0;
+  max-width: 100%;
+}
+
+.saved-squad-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  display: grid;
+  gap: 2px;
+  max-width: 16rem;
+  padding: 8px 10px;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.saved-squad-card:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+}
+
+.saved-squad-card.selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+.saved-squad-card-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.saved-squad-card-meta {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.saved-squad-card-time {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+}
+
 .coach-board-feed {
   display: grid;
   gap: 10px;

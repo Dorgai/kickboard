@@ -164,6 +164,92 @@ export async function updateUserSquad(input: {
   return result.rows[0]?.id ?? null;
 }
 
+export type SquadSummary = {
+  id: string;
+  name: string;
+  formation: string;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  playersPlaced: number;
+};
+
+function mapSquadSummary(row: {
+  id: string;
+  name: string;
+  formation: string;
+  published_to_board_at: Date | null;
+  created_at: Date;
+  updated_at: Date;
+  lineup: unknown;
+}) {
+  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
+  const lineup = normalizeLineupSlots(row.lineup, formation);
+  return {
+    id: row.id,
+    name: row.name,
+    formation: row.formation,
+    publishedAt: row.published_to_board_at?.toISOString() ?? null,
+    createdAt: row.created_at.toISOString(),
+    updatedAt: row.updated_at.toISOString(),
+    playersPlaced: lineup.filter((slot) => slot.label).length
+  };
+}
+
+export async function getUserSquadById(squadId: string, userId: string) {
+  const result = await query<{
+    id: string;
+    name: string;
+    formation: string;
+    lineup: unknown;
+    fixture_key: string | null;
+    published_to_board_at: Date | null;
+    created_at: Date;
+    updated_at: Date;
+  }>(
+    `SELECT id, name, formation, lineup, fixture_key, published_to_board_at, created_at, updated_at
+     FROM squads
+     WHERE id = $1 AND user_id = $2`,
+    [squadId, userId]
+  );
+
+  const row = result.rows[0];
+  if (!row) return null;
+
+  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
+
+  return {
+    ...mapSquadSummary(row),
+    formation,
+    lineup: normalizeLineupSlots(row.lineup, formation),
+    fixtureKey: row.fixture_key
+  };
+}
+
+export async function listUserSquadsForFixture(userId: string, fixtureKey: string) {
+  const key = fixtureKey.trim().slice(0, 120);
+  if (!key) return [];
+
+  const result = await query<{
+    id: string;
+    name: string;
+    formation: string;
+    published_to_board_at: Date | null;
+    created_at: Date;
+    updated_at: Date;
+    lineup: unknown;
+  }>(
+    `SELECT id, name, formation, lineup, published_to_board_at, created_at, updated_at
+     FROM squads
+     WHERE user_id = $1 AND fixture_key = $2
+     ORDER BY updated_at DESC
+     LIMIT 30`,
+    [userId, key]
+  );
+
+  return result.rows.map((row) => mapSquadSummary(row));
+}
+
 export async function listUserSquads(userId: string) {
   const result = await query<{
     id: string;
@@ -171,20 +257,16 @@ export async function listUserSquads(userId: string) {
     formation: string;
     published_to_board_at: Date | null;
     created_at: Date;
+    updated_at: Date;
+    lineup: unknown;
   }>(
-    `SELECT id, name, formation, published_to_board_at, created_at
+    `SELECT id, name, formation, lineup, published_to_board_at, created_at, updated_at
      FROM squads
      WHERE user_id = $1
-     ORDER BY created_at DESC
+     ORDER BY updated_at DESC
      LIMIT 20`,
     [userId]
   );
 
-  return result.rows.map((row) => ({
-    id: row.id,
-    name: row.name,
-    formation: row.formation,
-    publishedAt: row.published_to_board_at?.toISOString() ?? null,
-    createdAt: row.created_at.toISOString()
-  }));
+  return result.rows.map((row) => mapSquadSummary(row));
 }

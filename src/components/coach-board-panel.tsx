@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
+import { SavedSquadsBar } from "@/components/saved-squads-bar";
 import { SquadBuilder } from "@/components/squad-builder";
+import type { SquadSummary } from "@/lib/squads/store";
 
 type BoardPost = {
   id: string;
@@ -19,23 +21,83 @@ type CoachBoardPanelProps = {
 
 export function CoachBoardPanel({ fixtureKey, fixtureLabel }: CoachBoardPanelProps) {
   const [posts, setPosts] = useState<BoardPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [squads, setSquads] = useState<SquadSummary[]>([]);
+  const [squadsLoading, setSquadsLoading] = useState(true);
+  const [activeSquadId, setActiveSquadId] = useState<string | null>(null);
+  const [newBoardNonce, setNewBoardNonce] = useState(0);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refreshPosts = useCallback(async () => {
+    setPostsLoading(true);
     try {
       const params = new URLSearchParams({ fixtureKey });
       const response = await fetch(`/api/community/posts?${params}`, { cache: "no-store" });
       const payload = (await response.json()) as { posts?: BoardPost[] };
       setPosts(payload.posts ?? []);
     } finally {
-      setLoading(false);
+      setPostsLoading(false);
+    }
+  }, [fixtureKey]);
+
+  const refreshSquads = useCallback(async () => {
+    setSquadsLoading(true);
+    try {
+      const params = new URLSearchParams({ fixtureKey });
+      const response = await fetch(`/api/squads?${params}`, { cache: "no-store" });
+      if (!response.ok) {
+        setSquads([]);
+        return [];
+      }
+      const payload = (await response.json()) as { squads?: SquadSummary[] };
+      const list = payload.squads ?? [];
+      setSquads(list);
+      return list;
+    } catch {
+      setSquads([]);
+      return [];
+    } finally {
+      setSquadsLoading(false);
     }
   }, [fixtureKey]);
 
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    void refreshPosts();
+  }, [refreshPosts]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSquadsForFixture() {
+      setActiveSquadId(null);
+      setNewBoardNonce(0);
+      const list = await refreshSquads();
+      if (cancelled) return;
+      setActiveSquadId(list[0]?.id ?? null);
+    }
+
+    void loadSquadsForFixture();
+    return () => {
+      cancelled = true;
+    };
+  }, [fixtureKey, refreshSquads]);
+
+  const handleSelectSquad = useCallback((squadId: string) => {
+    setNewBoardNonce(0);
+    setActiveSquadId(squadId);
+  }, []);
+
+  const handleNewBoard = useCallback(() => {
+    setActiveSquadId(null);
+    setNewBoardNonce((value) => value + 1);
+  }, []);
+
+  const handleSquadSaved = useCallback(
+    async (savedId: string) => {
+      const list = await refreshSquads();
+      setActiveSquadId(savedId || list[0]?.id || null);
+    },
+    [refreshSquads]
+  );
 
   return (
     <AuthGate featureLabel="Coach Board">
@@ -45,12 +107,26 @@ export function CoachBoardPanel({ fixtureKey, fixtureLabel }: CoachBoardPanelPro
           are held for moderation before they appear in the feed below.
         </p>
 
-        <SquadBuilder fixtureKey={fixtureKey} fixtureLabel={fixtureLabel} />
+        <SavedSquadsBar
+          activeSquadId={activeSquadId}
+          loading={squadsLoading}
+          squads={squads}
+          onNew={handleNewBoard}
+          onSelect={handleSelectSquad}
+        />
+
+        <SquadBuilder
+          key={`${fixtureKey}:${activeSquadId ?? "new"}:${newBoardNonce}`}
+          activeSquadId={activeSquadId}
+          fixtureKey={fixtureKey}
+          fixtureLabel={fixtureLabel}
+          onSaved={handleSquadSaved}
+        />
 
         <div className="coach-board-feed">
           <h3>Approved feed</h3>
-          {loading ? <p className="inline-status">Loading feed…</p> : null}
-          {!loading && posts.length === 0 ? (
+          {postsLoading ? <p className="inline-status">Loading feed…</p> : null}
+          {!postsLoading && posts.length === 0 ? (
             <p className="inline-status">No approved posts yet. Publish a squad or post in Fan Chat.</p>
           ) : null}
           <div className="community-feed" role="feed">

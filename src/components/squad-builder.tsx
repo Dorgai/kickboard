@@ -12,7 +12,7 @@ import {
 } from "@/lib/squads/lineup";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 
-type LatestSquad = {
+type LoadedSquad = {
   id: string;
   name: string;
   formation: SquadFormation;
@@ -22,9 +22,20 @@ type LatestSquad = {
 type SquadBuilderProps = {
   fixtureKey: string;
   fixtureLabel: string;
+  activeSquadId: string | null;
+  onSaved: (squadId: string) => void | Promise<void>;
 };
 
-export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
+function defaultSquadName(fixtureLabel: string) {
+  return `${fixtureLabel.split("—")[0]?.trim() ?? "My XI"}`;
+}
+
+export function SquadBuilder({
+  fixtureKey,
+  fixtureLabel,
+  activeSquadId,
+  onSaved
+}: SquadBuilderProps) {
   const [formation, setFormation] = useState<SquadFormation>("4-3-3");
   const [name, setName] = useState("My World Cup XI");
   const [lineup, setLineup] = useState<SquadLineupSlot[]>(() => defaultLineupWithPositions("4-3-3"));
@@ -44,31 +55,12 @@ export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
 
     async function load() {
       setLoadState("loading");
-      setSquadId(null);
       setNotice(null);
       setError(null);
-      setFormation("4-3-3");
-      setLineup(defaultLineupWithPositions("4-3-3"));
+      setSelectedSlot(null);
+
       try {
-        const params = new URLSearchParams({ fixtureKey });
-        const [squadsRes, poolRes] = await Promise.all([
-          fetch(`/api/squads?${params}`),
-          fetch("/api/squads/player-pool")
-        ]);
-
-        if (!cancelled && squadsRes.ok) {
-          const squadsPayload = (await squadsRes.json()) as { latest?: LatestSquad | null };
-          const latest = squadsPayload.latest;
-          if (latest?.lineup?.length === 11) {
-            setSquadId(latest.id);
-            setName(latest.name);
-            setFormation(latest.formation);
-            setLineup(latest.lineup);
-          } else {
-            setName(`${fixtureLabel.split("—")[0]?.trim() ?? "My XI"}`);
-          }
-        }
-
+        const poolRes = await fetch("/api/squads/player-pool");
         if (!cancelled) {
           if (poolRes.ok) {
             const poolPayload = (await poolRes.json()) as {
@@ -86,6 +78,30 @@ export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
           setPoolLoading(false);
         }
 
+        if (activeSquadId) {
+          const squadRes = await fetch(`/api/squads/${activeSquadId}`, { cache: "no-store" });
+          if (!cancelled && squadRes.ok) {
+            const payload = (await squadRes.json()) as { squad?: LoadedSquad };
+            const squad = payload.squad;
+            if (squad?.lineup?.length === 11) {
+              setSquadId(squad.id);
+              setName(squad.name);
+              setFormation(squad.formation);
+              setLineup(squad.lineup);
+              if (!cancelled) setLoadState("ready");
+              return;
+            }
+          }
+          if (!cancelled) {
+            setError("Could not load that saved board.");
+          }
+        } else {
+          setSquadId(null);
+          setFormation("4-3-3");
+          setLineup(defaultLineupWithPositions("4-3-3"));
+          setName(defaultSquadName(fixtureLabel));
+        }
+
         if (!cancelled) setLoadState("ready");
       } catch {
         if (!cancelled) {
@@ -100,7 +116,7 @@ export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
     return () => {
       cancelled = true;
     };
-  }, [fixtureKey, fixtureLabel]);
+  }, [activeSquadId, fixtureLabel]);
 
   function changeFormation(next: SquadFormation) {
     setFormation(next);
@@ -127,7 +143,11 @@ export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
       });
       const payload = (await response.json()) as { error?: string; squadId?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to save squad.");
-      setSquadId(payload.squadId ?? squadId);
+      const savedId = payload.squadId ?? squadId;
+      if (savedId) {
+        setSquadId(savedId);
+        await onSaved(savedId);
+      }
       setNotice(payload.message ?? "Squad saved.");
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Unable to save squad.");
@@ -149,6 +169,7 @@ export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to publish.");
       setNotice(payload.message ?? "Published to Coach Board.");
+      await onSaved(squadId);
     } catch (publishError) {
       setError(publishError instanceof Error ? publishError.message : "Unable to publish.");
     } finally {
@@ -167,8 +188,8 @@ export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
         <div>
           <h3>Build your XI</h3>
           <p className="community-panel-lead">
-            Drag players onto the pitch for <strong>{fixtureLabel}</strong>. Your saved squad for this
-            match loads automatically when you switch fixtures.
+            Pick a saved board above or start fresh. Drag players onto the pitch for{" "}
+            <strong>{fixtureLabel}</strong>.
           </p>
         </div>
         <label className="feed-control-field">
@@ -217,7 +238,7 @@ export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
 
       <p className="squad-builder-progress">
         {filledCount}/11 players placed
-        {squadId ? ` · editing squad ${squadId.slice(0, 8)}…` : ""}
+        {squadId ? ` · editing saved board` : " · new board"}
       </p>
 
       <div className="squad-builder-actions">
