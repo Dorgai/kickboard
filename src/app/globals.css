@@ -208,6 +208,103 @@ button:disabled {
   padding: 0 14px;
 }
 
+.header-user-menu {
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  display: inline-flex;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 6px 4px 10px;
+}
+
+.header-user-menu--loading {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 14px;
+}
+
+.header-user-menu--sign-in {
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 14px;
+}
+
+.header-user-menu--signed-in {
+  padding-right: 6px;
+}
+
+.header-user-menu-identity {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  max-width: 11rem;
+}
+
+.header-user-menu-avatar {
+  border-radius: 50%;
+  flex-shrink: 0;
+  height: 32px;
+  object-fit: cover;
+  width: 32px;
+}
+
+.header-user-menu-avatar--initials {
+  align-items: center;
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+  display: grid;
+  font-size: 11px;
+  font-weight: 800;
+  place-items: center;
+}
+
+.header-user-menu-text {
+  display: grid;
+  gap: 1px;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.header-user-menu-name {
+  font-size: 12px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-user-menu-meta {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.header-user-menu-logout {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-left: 1px solid var(--color-border);
+  border-radius: 0 9999px 9999px 0;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 700;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 10px;
+}
+
+.header-user-menu-logout:hover {
+  background: var(--color-brand-light);
+  color: var(--color-brand);
+}
+
 .section {
   margin: 0 auto;
   max-width: var(--max-page);
@@ -4381,6 +4478,14 @@ code {
   }
 
   .tier-badge {
+    display: none;
+  }
+
+  .header-user-menu-identity {
+    max-width: 7.5rem;
+  }
+
+  .header-user-menu-logout span {
     display: none;
   }
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { Bell, ChevronDown, Search, ShieldCheck } from "lucide-react";
+import { Bell, ChevronDown, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { HeaderUserMenu } from "@/components/header-user-menu";
 import { navigation } from "@/lib/kickboard-data";
 
 type AppChromeProps = {
@@ -72,10 +73,7 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
             <Bell size={18} aria-hidden="true" />
             <span aria-label="3 unread notifications">3</span>
           </button>
-          <div className="tier-badge">
-            <ShieldCheck size={16} aria-hidden="true" />
-            Safe MVP
-          </div>
+          <HeaderUserMenu />
         </div>
       </div>
     </header>
