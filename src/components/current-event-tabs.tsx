@@ -74,7 +74,7 @@ function parseHash(hash: string): { tab: CurrentEventTabId; chatOpen: boolean } 
   if (hash === "predictions") {
     return { tab: "predictions", chatOpen: false };
   }
-  return { tab: "coach-board", chatOpen: false };
+  return { tab: "predictions", chatOpen: false };
 }
 
 function setHashForTab(tab: CurrentEventTabId) {
@@ -184,7 +184,7 @@ export function CurrentEventTabs({
     teams: null,
     venueCount: null
   };
-  const [activeTab, setActiveTab] = useState<CurrentEventTabId>("coach-board");
+  const [activeTab, setActiveTab] = useState<CurrentEventTabId>("predictions");
   const [chatOpen, setChatOpen] = useState(false);
   const [activeGroupLetter, setActiveGroupLetter] = useState(groups[0]?.group ?? "A");
   const [activeKnockoutStage, setActiveKnockoutStage] = useState<string>(CURRENT_KNOCKOUT_STAGES[0]);
@@ -197,6 +197,9 @@ export function CurrentEventTabs({
 
   useEffect(() => {
     applyHash();
+    if (!hashTarget()) {
+      window.location.hash = "predictions";
+    }
     window.addEventListener("hashchange", applyHash);
     return () => window.removeEventListener("hashchange", applyHash);
   }, [applyHash]);
