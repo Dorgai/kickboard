@@ -7,7 +7,7 @@ import {
   listRegistrationInvitationsForInviter
 } from "@/lib/invitations/store";
 import { resolveAuthBaseUrl } from "@/auth";
-import { isEmailDeliveryConfigured } from "@/lib/email/config";
+import { assertEmailDeliveryReady, EmailFromAddressError } from "@/lib/email/config";
 import { EmailNotConfiguredError, EmailSendFailedError } from "@/lib/email/resend";
 import { sendRegistrationInvitationEmail } from "@/lib/email/registration-invitation";
 
@@ -73,8 +73,11 @@ export async function POST(request: Request) {
     const inviteeEmail = body.inviteeEmail?.trim() ?? "";
     const shouldSendEmail = body.sendEmail !== false && Boolean(inviteeEmail);
 
-    if (shouldSendEmail && !isEmailDeliveryConfigured()) {
-      throw new EmailNotConfiguredError();
+    if (shouldSendEmail) {
+      if (!process.env.RESEND_API_KEY?.trim() || !process.env.EMAIL_FROM?.trim()) {
+        throw new EmailNotConfiguredError();
+      }
+      assertEmailDeliveryReady();
     }
 
     const invitation = await createRegistrationInvitation({
@@ -124,6 +127,9 @@ export async function POST(request: Request) {
       message
     });
   } catch (error) {
+    if (error instanceof EmailFromAddressError) {
+      return NextResponse.json({ error: error.message }, { status: 503 });
+    }
     const mapped = mapInvitationError(error) ?? mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
     return NextResponse.json({ error: "Unable to create invitation." }, { status: 500 });

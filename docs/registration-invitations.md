@@ -36,9 +36,17 @@ Set on Railway (or local `.env`):
 | `RESEND_API_KEY` | API key from [Resend](https://resend.com) |
 | `EMAIL_FROM` | Verified sender, e.g. `Kickboard <invites@yourdomain.com>` |
 
-`POST /api/invitations` accepts `sendEmail` (default `true` when `inviteeEmail` is set). If email is requested but these variables are missing, the API returns **503** with setup instructions. If sending fails after the invite is created, the API still returns the invitation and `emailDelivery.reason = "send_failed"`.
+**You cannot use `@gmail.com` (or Yahoo/Outlook) as `EMAIL_FROM`.** Resend requires a domain you verify in their dashboard, or their test address:
 
-For testing, Resend allows `onboarding@resend.dev` as the from-address on free accounts once the API key is set.
+```env
+EMAIL_FROM=Kickboard <onboarding@resend.dev>
+```
+
+Inviters’ Gmail addresses are still used as **Reply-To**, so replies go to the person who sent the invite.
+
+`POST /api/invitations` accepts `sendEmail` (default `true` when `inviteeEmail` is set). If email is requested but these variables are missing or `EMAIL_FROM` uses a blocked domain, the API returns **503** with setup instructions. If sending fails after the invite is created, the API still returns the invitation and `emailDelivery.reason = "send_failed"`.
+
+For production, add your domain at [resend.com/domains](https://resend.com/domains), then set e.g. `Kickboard <invites@hellokickboard.com>` once DNS is verified.
 
 Also ensure `AUTH_URL` or `NEXT_PUBLIC_APP_URL` points at your public site so invite links in emails are correct.
 

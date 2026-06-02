@@ -32,6 +32,11 @@ export function mapInvitationError(error: unknown) {
     EMAIL_SEND_FAILED: {
       status: 502,
       error: "The invitation was created but the email could not be sent. Copy the link and send it yourself."
+    },
+    EMAIL_FROM_INVALID: {
+      status: 503,
+      error:
+        "Email sender (EMAIL_FROM) is misconfigured. Use Kickboard <onboarding@resend.dev> for testing, or verify your domain at resend.com/domains. Gmail addresses cannot be used as the sender."
     }
   };
 

@@ -1,4 +1,5 @@
-import { getEmailConfig } from "@/lib/email/config";
+import { EmailFromAddressError, getEmailConfig } from "@/lib/email/config";
+import { formatResendSendErrorDetail } from "@/lib/email/validate-from";
 
 export type SendEmailInput = {
   to: string;
@@ -30,7 +31,15 @@ export class EmailSendFailedError extends Error {
 }
 
 export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
-  const config = getEmailConfig();
+  let config;
+  try {
+    config = getEmailConfig();
+  } catch (error) {
+    if (error instanceof EmailFromAddressError) {
+      throw new EmailSendFailedError(400, error.message);
+    }
+    throw error;
+  }
   if (!config) throw new EmailNotConfiguredError();
 
   const response = await fetch("https://api.resend.com/emails", {
@@ -50,7 +59,8 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   });
 
   if (!response.ok) {
-    const detail = (await response.text()).slice(0, 500);
+    const raw = await response.text();
+    const detail = formatResendSendErrorDetail(response.status, raw);
     throw new EmailSendFailedError(response.status, detail);
   }
 

@@ -67,7 +67,7 @@ export function RegistrationInvitationsPanel() {
       if (!response.ok) throw new Error(payload.error ?? "Unable to create invitation.");
       setNotice(payload.message ?? "Invitation created.");
       if (payload.emailDelivery?.reason === "send_failed" && payload.emailDelivery.detail) {
-        setError(`Email error: ${payload.emailDelivery.detail}`);
+        setError(payload.emailDelivery.detail);
       }
       setLastInviteUrl(payload.invitation?.inviteUrl ?? null);
       setInviteeEmail("");
