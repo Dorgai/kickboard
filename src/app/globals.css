@@ -6081,6 +6081,37 @@ h3 {
   padding: 64px 24px;
 }
 
+.admin-dashboard-layout,
+.admin-dashboard-panel {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.admin-dashboard-tabs.event-tab-bar {
+  margin-bottom: 8px;
+  max-width: 100%;
+  overflow-x: auto;
+  position: sticky;
+  top: 72px;
+  z-index: 12;
+}
+
+.admin-dashboard-tabs.event-tab-bar button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.admin-dashboard .admin-summary-grid {
+  margin-bottom: 0;
+}
+
+@media (max-width: 720px) {
+  .admin-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .admin-hero {
   margin-bottom: 24px;
   max-width: 840px;
