@@ -187,7 +187,7 @@ export function SessionCheckpointDialog() {
                   Upcoming matches
                 </h3>
                 {data.upcoming.length === 0 ? (
-                  <p className="session-checkpoint-empty">No fixtures in the next two weeks.</p>
+                  <p className="session-checkpoint-empty">No upcoming fixtures in the schedule right now.</p>
                 ) : (
                   <ul className="session-checkpoint-matches">
                     {data.upcoming.map((fixture) => (
