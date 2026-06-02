@@ -2549,10 +2549,23 @@ h3 {
   gap: 4px;
 }
 
-.squad-team-bench-formation span {
+.squad-team-bench-formation-label {
   color: color-mix(in srgb, var(--color-text-primary) 65%, var(--color-text-secondary));
   font-size: 10px;
   font-weight: 700;
+}
+
+.squad-team-bench-formations.feed-tab-bar {
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+}
+
+.squad-team-bench-formations.feed-tab-bar button {
+  flex: 1 1 auto;
+  font-size: 11px;
+  min-width: 3.25rem;
+  padding: 6px 8px;
 }
 
 .squad-team-bench-lead {
@@ -2621,6 +2634,12 @@ h3 {
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
   cursor: pointer;
   opacity: 0.88;
+}
+
+.squad-player-chip--selected {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent);
 }
 
 .squad-player-chip-number {

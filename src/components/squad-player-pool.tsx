@@ -2,7 +2,12 @@
 
 import { useMemo, useRef, useState } from "react";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
-import { FORMATIONS, type SquadFormation, type SquadLineupSlot } from "@/lib/squads/lineup";
+import {
+  FORMATIONS,
+  SLOTS_PER_TEAM,
+  type SquadFormation,
+  type SquadLineupSlot
+} from "@/lib/squads/lineup";
 import { playerRoleLabel, SQUAD_PLAYER_ROLES, type SquadPlayerRole } from "@/lib/squads/player-roles";
 import { slotSide } from "@/lib/squads/lineup";
 import {
@@ -24,8 +29,12 @@ type SquadPlayerPoolProps = {
   sourceLabel: string | null;
   loading: boolean;
   error: string | null;
+  homeSelectedPlayerIds: ReadonlySet<number>;
+  awaySelectedPlayerIds: ReadonlySet<number>;
   onHomeFormationChange: (formation: SquadFormation) => void;
   onAwayFormationChange: (formation: SquadFormation) => void;
+  onHomeTogglePlayerSelect: (playerId: number) => void;
+  onAwayTogglePlayerSelect: (playerId: number) => void;
   onRemoveFromPitch: (playerId: number) => void;
 };
 
@@ -34,27 +43,43 @@ function BenchPlayerChip({
   side,
   teamName,
   onPitch,
+  selected,
+  selectionFull,
+  onToggleSelect,
   onRemoveFromPitch
 }: {
   player: SquadPoolPlayer;
   side: "home" | "away";
   teamName: string;
   onPitch: boolean;
+  selected: boolean;
+  selectionFull: boolean;
+  onToggleSelect: (playerId: number) => void;
   onRemoveFromPitch: (playerId: number) => void;
 }) {
   return (
     <li>
       <button
-        className={`squad-player-chip squad-player-chip--bench${onPitch ? " squad-player-chip--on-pitch" : ""}`}
+        className={`squad-player-chip squad-player-chip--bench${onPitch ? " squad-player-chip--on-pitch" : ""}${
+          selected ? " squad-player-chip--selected" : ""
+        }`}
         draggable
         type="button"
         title={
           onPitch
-            ? `Drag into the bench ${side === "home" ? "above" : "below"} to remove from the pitch`
-            : `Drag onto the ${side === "home" ? "top" : "bottom"} half of the pitch`
+            ? `Click or drag into the bench ${side === "home" ? "above" : "below"} to remove from the pitch`
+            : selected
+              ? "Click to deselect for formation lineup"
+              : selectionFull
+                ? `Bench selection is full (${SLOTS_PER_TEAM}). Deselect a player or drag onto the pitch.`
+                : `Click to select for formation · drag onto the ${side === "home" ? "top" : "bottom"} half`
         }
         onClick={() => {
-          if (onPitch) onRemoveFromPitch(player.playerId);
+          if (onPitch) {
+            onRemoveFromPitch(player.playerId);
+            return;
+          }
+          onToggleSelect(player.playerId);
         }}
         onDragStart={(event) => {
           const payload: PitchDragPlayer = {
@@ -71,6 +96,7 @@ function BenchPlayerChip({
       >
         <span className="squad-player-chip-name">{player.name}</span>
         {onPitch ? <span className="squad-player-chip-on-pitch">· on pitch</span> : null}
+        {!onPitch && selected ? <span className="squad-player-chip-on-pitch">· selected</span> : null}
       </button>
     </li>
   );
@@ -95,7 +121,9 @@ export function SquadTeamBench({
   lineup,
   loading,
   error,
+  selectedPlayerIds,
   onFormationChange,
+  onTogglePlayerSelect,
   onRemoveFromPitch
 }: {
   teamName: string;
@@ -105,7 +133,9 @@ export function SquadTeamBench({
   lineup: SquadLineupSlot[];
   loading: boolean;
   error: string | null;
+  selectedPlayerIds: ReadonlySet<number>;
   onFormationChange: (formation: SquadFormation) => void;
+  onTogglePlayerSelect: (playerId: number) => void;
   onRemoveFromPitch: (playerId: number) => void;
 }) {
   const dragDepthRef = useRef(0);
@@ -122,6 +152,8 @@ export function SquadTeamBench({
   );
 
   const playersByRole = useMemo(() => groupPlayersByRole(players), [players]);
+  const selectionCount = selectedPlayerIds.size;
+  const selectionFull = selectionCount >= SLOTS_PER_TEAM;
 
   function handleBenchDragEnter(event: React.DragEvent) {
     if (!isPlayerDragEvent(event)) return;
@@ -169,23 +201,32 @@ export function SquadTeamBench({
     >
       <header className="squad-team-bench-header">
         <h4 className="squad-team-bench-title">{teamName} bench</h4>
-        <label className="squad-team-bench-formation">
-          <span>Formation</span>
-          <select
+        <div className="squad-team-bench-formation">
+          <span className="squad-team-bench-formation-label">Formation</span>
+          <nav
             aria-label={`${teamName} formation`}
-            className="feed-control-input"
-            value={formation}
-            onChange={(event) => onFormationChange(event.target.value as SquadFormation)}
+            className="squad-team-bench-formations feed-tab-bar"
           >
             {FORMATIONS.map((value) => (
-              <option key={value} value={value}>
+              <button
+                aria-pressed={formation === value}
+                className={formation === value ? "active" : undefined}
+                key={value}
+                type="button"
+                onClick={() => onFormationChange(value)}
+              >
                 {value}
-              </option>
+              </button>
             ))}
-          </select>
-        </label>
+          </nav>
+        </div>
         <p className="squad-team-bench-lead">
-          Drag players onto the {side === "home" ? "top" : "bottom"} half · drop here to remove from pitch
+          {selectionCount > 0
+            ? `${selectionCount}/${SLOTS_PER_TEAM} selected — tap a formation to line them up`
+            : `Select up to ${SLOTS_PER_TEAM} players, then a formation · or drag onto the ${
+                side === "home" ? "top" : "bottom"
+              } half`}
+          {" · drop here to remove from pitch"}
         </p>
       </header>
 
@@ -202,7 +243,10 @@ export function SquadTeamBench({
                   key={player.playerId}
                   onPitch={onPitchIds.has(player.playerId)}
                   onRemoveFromPitch={onRemoveFromPitch}
+                  onToggleSelect={onTogglePlayerSelect}
                   player={player}
+                  selected={selectedPlayerIds.has(player.playerId)}
+                  selectionFull={selectionFull}
                   side={side}
                   teamName={teamName}
                 />
@@ -234,8 +278,12 @@ export function SquadPlayerPool(props: SquadPlayerPoolProps) {
     sourceLabel,
     loading,
     error,
+    homeSelectedPlayerIds,
+    awaySelectedPlayerIds,
     onHomeFormationChange,
     onAwayFormationChange,
+    onHomeTogglePlayerSelect,
+    onAwayTogglePlayerSelect,
     onRemoveFromPitch
   } = props;
 
@@ -248,10 +296,12 @@ export function SquadPlayerPool(props: SquadPlayerPoolProps) {
         lineup={lineup}
         loading={loading}
         players={homePlayers}
+        selectedPlayerIds={homeSelectedPlayerIds}
         side="home"
         teamName={homeTeam}
         onFormationChange={onHomeFormationChange}
         onRemoveFromPitch={onRemoveFromPitch}
+        onTogglePlayerSelect={onHomeTogglePlayerSelect}
       />
       <SquadTeamBench
         error={error}
@@ -259,10 +309,12 @@ export function SquadPlayerPool(props: SquadPlayerPoolProps) {
         lineup={lineup}
         loading={loading}
         players={awayPlayers}
+        selectedPlayerIds={awaySelectedPlayerIds}
         side="away"
         teamName={awayTeam}
         onFormationChange={onAwayFormationChange}
         onRemoveFromPitch={onRemoveFromPitch}
+        onTogglePlayerSelect={onAwayTogglePlayerSelect}
       />
     </div>
   );

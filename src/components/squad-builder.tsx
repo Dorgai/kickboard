@@ -8,8 +8,10 @@ import {
   countFilledBySide,
   defaultMatchFormations,
   defaultMatchLineupWithFormations,
+  applyBenchSelectionToSideFormation,
   mergeMatchFormationChangeForSide,
   normalizeLineupTeamLabels,
+  type BenchPlayerPick,
   parseStoredFormations,
   SLOTS_PER_TEAM,
   type MatchFormations,
@@ -63,6 +65,8 @@ export function SquadBuilder({
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [homeSelectedIds, setHomeSelectedIds] = useState<Set<number>>(() => new Set());
+  const [awaySelectedIds, setAwaySelectedIds] = useState<Set<number>>(() => new Set());
 
   const removeFromPitch = useCallback((playerId: number) => {
     setLineup((current) =>
@@ -72,7 +76,68 @@ export function SquadBuilder({
           : slot
       )
     );
+    setHomeSelectedIds((current) => {
+      if (!current.has(playerId)) return current;
+      const next = new Set(current);
+      next.delete(playerId);
+      return next;
+    });
+    setAwaySelectedIds((current) => {
+      if (!current.has(playerId)) return current;
+      const next = new Set(current);
+      next.delete(playerId);
+      return next;
+    });
     setSelectedSlot(null);
+  }, []);
+
+  const benchPicksForSide = useCallback(
+    (
+      selectedIds: ReadonlySet<number>,
+      players: SquadPoolPlayer[],
+      teamName: string
+    ): BenchPlayerPick[] => {
+      const picks: BenchPlayerPick[] = [];
+      for (const playerId of selectedIds) {
+        const player = players.find((entry) => entry.playerId === playerId);
+        if (!player) continue;
+        picks.push({
+          playerId: player.playerId,
+          name: player.name,
+          role: player.role,
+          teamName,
+          jerseyNumber: player.jerseyNumber ?? undefined
+        });
+      }
+      return picks;
+    },
+    []
+  );
+
+  const toggleHomeSelection = useCallback((playerId: number) => {
+    setHomeSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(playerId)) {
+        next.delete(playerId);
+        return next;
+      }
+      if (next.size >= SLOTS_PER_TEAM) return current;
+      next.add(playerId);
+      return next;
+    });
+  }, []);
+
+  const toggleAwaySelection = useCallback((playerId: number) => {
+    setAwaySelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(playerId)) {
+        next.delete(playerId);
+        return next;
+      }
+      if (next.size >= SLOTS_PER_TEAM) return current;
+      next.add(playerId);
+      return next;
+    });
   }, []);
 
   useEffect(() => {
@@ -83,6 +148,8 @@ export function SquadBuilder({
       setNotice(null);
       setError(null);
       setSelectedSlot(null);
+      setHomeSelectedIds(new Set());
+      setAwaySelectedIds(new Set());
       setPoolLoading(true);
 
       try {
@@ -168,17 +235,45 @@ export function SquadBuilder({
     };
   }, [activeSquadId, awayTeam, fixtureKey, homeTeam]);
 
-  const changeHomeFormation = useCallback((next: SquadFormation) => {
-    setFormations((current) => ({ ...current, home: next }));
-    setLineup((current) => mergeMatchFormationChangeForSide("home", next, current));
-    setSelectedSlot(null);
-  }, []);
+  const changeHomeFormation = useCallback(
+    (next: SquadFormation) => {
+      setFormations((current) => ({ ...current, home: next }));
+      setLineup((current) => {
+        const benchPicks = benchPicksForSide(homeSelectedIds, homePlayers, homeTeam);
+        if (benchPicks.length > 0) {
+          return normalizeLineupTeamLabels(
+            applyBenchSelectionToSideFormation("home", next, current, benchPicks),
+            homeTeam,
+            awayTeam
+          );
+        }
+        return mergeMatchFormationChangeForSide("home", next, current);
+      });
+      setHomeSelectedIds(new Set());
+      setSelectedSlot(null);
+    },
+    [awayTeam, benchPicksForSide, homePlayers, homeSelectedIds, homeTeam]
+  );
 
-  const changeAwayFormation = useCallback((next: SquadFormation) => {
-    setFormations((current) => ({ ...current, away: next }));
-    setLineup((current) => mergeMatchFormationChangeForSide("away", next, current));
-    setSelectedSlot(null);
-  }, []);
+  const changeAwayFormation = useCallback(
+    (next: SquadFormation) => {
+      setFormations((current) => ({ ...current, away: next }));
+      setLineup((current) => {
+        const benchPicks = benchPicksForSide(awaySelectedIds, awayPlayers, awayTeam);
+        if (benchPicks.length > 0) {
+          return normalizeLineupTeamLabels(
+            applyBenchSelectionToSideFormation("away", next, current, benchPicks),
+            homeTeam,
+            awayTeam
+          );
+        }
+        return mergeMatchFormationChangeForSide("away", next, current);
+      });
+      setAwaySelectedIds(new Set());
+      setSelectedSlot(null);
+    },
+    [awayPlayers, awaySelectedIds, awayTeam, benchPicksForSide, homeTeam]
+  );
 
   const homeFilled = countFilledBySide(lineup, "home");
   const awayFilled = countFilledBySide(lineup, "away");
@@ -247,6 +342,8 @@ export function SquadBuilder({
 
   const resetToFormation = useCallback(() => {
     setLineup(defaultMatchLineupWithFormations(formations));
+    setHomeSelectedIds(new Set());
+    setAwaySelectedIds(new Set());
     setSelectedSlot(null);
   }, [formations]);
 
@@ -273,10 +370,12 @@ export function SquadBuilder({
             lineup={lineup}
             loading={poolLoading}
             players={homePlayers}
+            selectedPlayerIds={homeSelectedIds}
             side="home"
             teamName={homeTeam}
             onFormationChange={changeHomeFormation}
             onRemoveFromPitch={removeFromPitch}
+            onTogglePlayerSelect={toggleHomeSelection}
           />
           <div className="squad-builder-pitch-column">
             <div className="squad-builder-pitch-stage">
@@ -305,10 +404,12 @@ export function SquadBuilder({
             lineup={lineup}
             loading={poolLoading}
             players={awayPlayers}
+            selectedPlayerIds={awaySelectedIds}
             side="away"
             teamName={awayTeam}
             onFormationChange={changeAwayFormation}
             onRemoveFromPitch={removeFromPitch}
+            onTogglePlayerSelect={toggleAwaySelection}
           />
         </div>
       </div>
