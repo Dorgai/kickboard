@@ -34,9 +34,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   return (
     <AuthGate featureLabel="Predictions">
       <div className="predictions-panel">
-        <PredictionsOverview fixtureKey={selectedKey} refreshToken={overviewRefresh} />
-
-        <p className="community-panel-lead">
+        <p className="community-panel-lead predictions-panel-lead">
           Predictions are <strong>free-to-play skill games</strong> — virtual points only, not betting or
           real-money stakes (see <code>docs/predictions-legal.md</code>). For each match you can pick a{" "}
           <strong>winner or draw</strong>, an <strong>exact score</strong>, and <strong>goal scorers</strong>{" "}
@@ -69,9 +67,11 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
           </div>
         )}
 
+        <PredictionsOverview fixtureKey={selectedKey} refreshToken={overviewRefresh} />
+
         <p className="community-panel-lead predictions-settle-note">
-          Results and balances above update when matches finish and picks are settled (API-Football live
-          data). Until then, each category shows <strong>Pending</strong>.
+          Results and balances update when matches finish and picks are settled (API-Football live data).
+          Until then, each category shows <strong>Pending</strong>.
         </p>
       </div>
     </AuthGate>

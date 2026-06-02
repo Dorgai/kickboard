@@ -8,6 +8,7 @@ import {
   groupScorerPicks,
   MAX_SCORER_PICKS,
   outcomeLabel,
+  outcomeShort,
   type FixtureOutcome,
   type FixturePredictionRecord,
   type ScorerPick
@@ -21,6 +22,16 @@ type FixturePredictionsFormProps = {
   coachBoard?: boolean;
   onSaved?: () => void;
 };
+
+const OUTCOME_OPTIONS: {
+  value: FixtureOutcome;
+  label: string;
+  team?: "home" | "away";
+}[] = [
+  { value: "home", label: "Home win", team: "home" },
+  { value: "draw", label: "Draw" },
+  { value: "away", label: "Away win", team: "away" }
+];
 
 export function FixturePredictionsForm({
   fixtureKey,
@@ -187,87 +198,97 @@ export function FixturePredictionsForm({
       className={`fixture-predictions-form${compact ? " fixture-predictions-form--compact" : ""}${coachBoard ? " fixture-predictions-form--coach-board" : ""}`}
       onSubmit={savePick}
     >
-      <section className="fixture-prediction-section">
-        <h4 className="fixture-prediction-section-title">1 · Winner or draw</h4>
-        <div className="fixture-prediction-choices" role="group" aria-label="Match outcome">
-          {(["home", "draw", "away"] as const).map((value) => (
-            <button
-              key={value}
-              className={`fixture-prediction-choice${predictedOutcome === value ? " fixture-prediction-choice--active" : ""}`}
-              type="button"
-              onClick={() => setPredictedOutcome(value)}
-            >
-              <span className="fixture-prediction-choice-label">
-                {value === "home" ? (
-                  <TeamLabel layout="stacked" name={homeTeam} size="xs" />
-                ) : null}
-                {value === "away" ? (
-                  <TeamLabel layout="stacked" name={awayTeam} size="xs" />
-                ) : null}
-                {value === "draw" ? "Draw" : null}
-              </span>
-            </button>
-          ))}
+      <fieldset className="fixture-prediction-field">
+        <legend className="fixture-prediction-field-label">Winner or draw</legend>
+        <div className="fixture-prediction-outcome-list" role="radiogroup" aria-label="Match outcome">
+          {OUTCOME_OPTIONS.map((option) => {
+            const teamName = option.team === "home" ? homeTeam : option.team === "away" ? awayTeam : null;
+            const selected = predictedOutcome === option.value;
+            return (
+              <label
+                key={option.value}
+                className={`fixture-prediction-outcome-option${selected ? " is-selected" : ""}`}
+              >
+                <input
+                  checked={selected}
+                  className="fixture-prediction-outcome-input"
+                  name={`fixture-outcome-${fixtureKey}`}
+                  type="radio"
+                  value={option.value}
+                  onChange={() => setPredictedOutcome(option.value)}
+                />
+                <span className="fixture-prediction-outcome-body">
+                  {teamName ? <TeamLabel layout="stacked" name={teamName} size="xs" /> : null}
+                  <span className="fixture-prediction-outcome-text">
+                    {teamName ? option.label : outcomeShort(option.value)}
+                  </span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+        <div className="fixture-prediction-field-actions">
+          {predictedOutcome ? (
+            <p className="fixture-prediction-field-summary">
+              {outcomeLabel(predictedOutcome, homeTeam, awayTeam)}
+            </p>
+          ) : (
+            <p className="fixture-prediction-field-hint">Select one option</p>
+          )}
           <button
-            className="fixture-prediction-choice fixture-prediction-choice--clear"
+            className="text-button fixture-prediction-clear"
+            disabled={!predictedOutcome}
             type="button"
             onClick={() => setPredictedOutcome(null)}
           >
             Clear
           </button>
         </div>
-        {predictedOutcome ? (
-          <p className="fixture-prediction-section-note">{outcomeLabel(predictedOutcome, homeTeam, awayTeam)}</p>
-        ) : null}
-      </section>
+      </fieldset>
 
-      <section className="fixture-prediction-section">
-        <h4 className="fixture-prediction-section-title">2 · Exact score</h4>
-        <div className="fixture-prediction-choices fixture-prediction-choices--score" role="group" aria-label="Predicted score">
-          <label className="fixture-prediction-choice fixture-prediction-choice--score">
-            <span className="fixture-prediction-choice-label">
-              <TeamLabel layout="stacked" name={homeTeam} size="xs" />
-            </span>
+      <fieldset className="fixture-prediction-field">
+        <legend className="fixture-prediction-field-label">Exact score</legend>
+        <div className="fixture-prediction-scoreline" role="group" aria-label="Predicted score">
+          <div className="fixture-prediction-score-team">
+            <TeamLabel name={homeTeam} size={compact ? "xs" : "sm"} />
             <input
               aria-label={`${homeTeam} goals`}
-              className="fixture-prediction-score-input"
+              className="fixture-prediction-score-field"
               inputMode="numeric"
               max={20}
               min={0}
-              placeholder="—"
+              placeholder="0"
               type="number"
               value={homeScore}
               onChange={(event) => setHomeScore(event.target.value)}
             />
-          </label>
-          <span aria-hidden className="fixture-prediction-score-separator">
-            :
+          </div>
+          <span aria-hidden className="fixture-prediction-score-dash">
+            –
           </span>
-          <label className="fixture-prediction-choice fixture-prediction-choice--score">
-            <span className="fixture-prediction-choice-label">
-              <TeamLabel layout="stacked" name={awayTeam} size="xs" />
-            </span>
+          <div className="fixture-prediction-score-team">
+            <TeamLabel name={awayTeam} size={compact ? "xs" : "sm"} />
             <input
               aria-label={`${awayTeam} goals`}
-              className="fixture-prediction-score-input"
+              className="fixture-prediction-score-field"
               inputMode="numeric"
               max={20}
               min={0}
-              placeholder="—"
+              placeholder="0"
               type="number"
               value={awayScore}
               onChange={(event) => setAwayScore(event.target.value)}
             />
-          </label>
+          </div>
         </div>
-      </section>
+        <p className="fixture-prediction-field-hint">Leave blank if you only pick winner or scorers</p>
+      </fieldset>
 
       {!compact ? (
-        <section className="fixture-prediction-section">
-          <h4 className="fixture-prediction-section-title">3 · Goal scorers</h4>
-          <p className="fixture-prediction-section-note">
-            Pick up to {MAX_SCORER_PICKS} goals (tap a player to add; same player can score more than
-            once).
+        <fieldset className="fixture-prediction-field fixture-prediction-field--scorers">
+          <legend className="fixture-prediction-field-label">Goal scorers</legend>
+          <p className="fixture-prediction-field-hint">
+            Up to {MAX_SCORER_PICKS} goals — tap a player to add; same player can score more than once.
           </p>
           {groupedScorerPicks.length > 0 ? (
             <ul className="fixture-scorer-selected">
@@ -339,15 +360,16 @@ export function FixturePredictionsForm({
               );
             })}
           </ul>
-        </section>
+        </fieldset>
       ) : null}
 
-      <button className="button primary fixture-prediction-save" disabled={busy || loading} type="submit">
-        {busy ? "Saving…" : "Save predictions"}
-      </button>
-
-      {notice ? <span className="fixture-prediction-notice">{notice}</span> : null}
-      {error ? <span className="fixture-prediction-error">{error}</span> : null}
+      <div className="fixture-prediction-form-footer">
+        <button className="button primary fixture-prediction-save" disabled={busy || loading} type="submit">
+          {busy ? "Saving…" : "Save predictions"}
+        </button>
+        {notice ? <span className="fixture-prediction-notice">{notice}</span> : null}
+        {error ? <span className="fixture-prediction-error">{error}</span> : null}
+      </div>
     </form>
   );
 }

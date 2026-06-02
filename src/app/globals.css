@@ -1264,8 +1264,14 @@ h3 {
 
 .current-event-tab-panel {
   display: grid;
-  gap: 16px;
+  gap: 20px;
   min-height: 12rem;
+}
+
+.current-event-predictions-tab,
+.current-event-coach-tab {
+  display: grid;
+  gap: 20px;
 }
 
 .current-event-coach-tab {
@@ -2125,9 +2131,8 @@ h3 {
 .predictions-match-row {
   align-items: stretch;
   display: grid;
-  gap: 12px;
+  gap: 16px;
   grid-template-columns: minmax(10.5rem, 13.5rem) minmax(0, 1fr);
-  margin-bottom: 12px;
 }
 
 .predictions-match-detail {
@@ -2755,24 +2760,37 @@ h3 {
 
 .predictions-panel {
   display: grid;
-  gap: 12px;
+  gap: 20px;
+}
+
+.predictions-panel-lead {
+  margin: 0;
 }
 
 .predictions-overview {
-  margin-bottom: 4px;
+  display: grid;
+  gap: 0;
+  margin: 0;
 }
 
 .predictions-results-board {
   display: grid;
-  gap: 10px;
-  padding: 14px 16px;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.predictions-overview-divider {
+  background: var(--color-border);
+  height: 1px;
+  margin: 20px 0;
+  width: 100%;
 }
 
 .predictions-results-board-header {
-  align-items: baseline;
+  align-items: flex-start;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 16px;
+  gap: 12px 20px;
   justify-content: space-between;
 }
 
@@ -2811,7 +2829,7 @@ h3 {
 
 .predictions-overview-grid {
   display: grid;
-  gap: 10px;
+  gap: 16px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -2826,37 +2844,30 @@ h3 {
   border-radius: 12px;
   box-shadow: var(--shadow-surface);
   display: grid;
-  gap: 14px;
-  padding: 14px 16px;
+  gap: 18px;
+  padding: 16px 18px;
 }
 
 .fixture-predictions-form--compact {
-  gap: 10px;
-  padding: 10px 12px;
-}
-
-/* Coach Board: full-width row under the pitch — outcome | score side by side */
-.fixture-predictions-form--coach-board {
-  box-sizing: border-box;
-  gap: 12px;
-  max-width: 100%;
+  gap: 14px;
   padding: 12px 14px;
 }
 
-.fixture-predictions-form--coach-board .fixture-prediction-section {
-  min-width: 0;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-save,
-.fixture-predictions-form--coach-board .fixture-prediction-notice,
-.fixture-predictions-form--coach-board .fixture-prediction-error {
-  grid-column: 1 / -1;
+.fixture-predictions-form--coach-board {
+  box-sizing: border-box;
+  gap: 14px;
+  max-width: 100%;
+  padding: 12px 14px;
 }
 
 @media (min-width: 640px) {
   .fixture-predictions-form--coach-board {
     align-items: start;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .fixture-predictions-form--coach-board .fixture-prediction-form-footer {
+    grid-column: 1 / -1;
   }
 }
 
@@ -2866,143 +2877,208 @@ h3 {
   }
 }
 
-.fixture-prediction-section {
+.fixture-prediction-field {
+  border: none;
   display: grid;
-  gap: 8px;
-}
-
-.fixture-prediction-section-title {
-  color: var(--color-text-primary);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  gap: 10px;
   margin: 0;
-  text-transform: uppercase;
+  min-width: 0;
+  padding: 0;
 }
 
-.fixture-prediction-section-note {
+.fixture-prediction-field-label {
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  margin: 0;
+  padding: 0;
+}
+
+.fixture-prediction-field-hint,
+.fixture-prediction-field-summary {
   color: var(--color-text-secondary);
   font-size: 12px;
+  line-height: 1.4;
   margin: 0;
 }
 
-.fixture-prediction-choices {
+.fixture-prediction-field-summary {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.fixture-prediction-field-actions {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px 14px;
+  justify-content: space-between;
 }
 
-.fixture-prediction-choices--score {
-  flex-wrap: nowrap;
-  justify-content: flex-start;
+.fixture-prediction-clear {
+  font-size: 12px;
 }
 
-.fixture-prediction-choice {
-  align-items: center;
-  background: color-mix(in srgb, var(--color-text-primary) 5%, var(--color-bg));
-  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, var(--color-border));
-  border-radius: 8px;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  display: inline-flex;
+.fixture-prediction-outcome-list {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+@media (min-width: 520px) {
+  .fixture-prediction-outcome-list {
+    flex-direction: row;
+  }
+}
+
+.fixture-prediction-outcome-option {
+  align-items: stretch;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.fixture-prediction-outcome-option:last-child {
+  border-bottom: none;
+}
+
+@media (min-width: 520px) {
+  .fixture-prediction-outcome-option {
+    border-bottom: none;
+    border-right: 1px solid var(--color-border);
+  }
+
+  .fixture-prediction-outcome-option:last-child {
+    border-right: none;
+  }
+}
+
+.fixture-prediction-outcome-input {
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  width: 0;
+}
+
+.fixture-prediction-outcome-body {
+  align-items: center;
+  background: var(--color-bg);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+  min-height: 3.5rem;
+  padding: 10px 12px;
+  text-align: center;
+  transition: background 0.12s ease;
+}
+
+[data-theme="light"] .fixture-prediction-outcome-body,
+:root:not([data-theme]) .fixture-prediction-outcome-body {
+  background: #f9fafb;
+}
+
+.fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  box-shadow: inset 0 -3px 0 var(--color-accent);
+}
+
+.fixture-prediction-outcome-text {
+  color: var(--color-text-primary);
   font-size: 12px;
   font-weight: 700;
-  gap: 4px;
-  justify-content: center;
-  min-height: 2.25rem;
-  padding: 6px 10px;
+  line-height: 1.25;
 }
 
-[data-theme="light"] .fixture-prediction-choice,
-:root:not([data-theme]) .fixture-prediction-choice {
+.fixture-prediction-scoreline {
+  align-items: center;
+  display: grid;
+  gap: 10px 14px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  max-width: 22rem;
+}
+
+.fixture-prediction-score-team {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fixture-prediction-score-dash {
+  color: var(--color-text-secondary);
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1;
+  padding-top: 1.25rem;
+}
+
+.fixture-prediction-score-field {
+  appearance: textfield;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+  max-width: 4rem;
+  min-height: 2.75rem;
+  padding: 6px 8px;
+  text-align: center;
+  width: 100%;
+}
+
+[data-theme="light"] .fixture-prediction-score-field,
+:root:not([data-theme]) .fixture-prediction-score-field {
   background: #ffffff;
   border-color: #d1d5db;
   color: #111827;
 }
 
-.fixture-prediction-choice .team-label-text {
-  color: inherit;
-  font-weight: 700;
+.fixture-prediction-score-field:focus-visible {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  outline: none;
 }
 
-.fixture-prediction-choice-label {
-  align-items: center;
-  display: inline-flex;
-  flex-direction: column;
-  gap: 4px;
-  justify-content: center;
-}
-
-.fixture-prediction-choice--active {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
-  border-color: color-mix(in srgb, var(--color-accent) 70%, var(--color-border));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 22%, transparent);
-  color: var(--color-text-primary);
-}
-
-[data-theme="light"] .fixture-prediction-choice--active,
-:root:not([data-theme]) .fixture-prediction-choice--active {
-  background: color-mix(in srgb, var(--color-accent) 14%, #ffffff);
-  color: #111827;
-}
-
-.fixture-prediction-choice--clear {
-  color: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-text-secondary));
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.fixture-prediction-choice--score {
-  cursor: default;
-  min-width: 4.5rem;
-  padding: 6px 8px;
-}
-
-.fixture-prediction-score-input {
-  appearance: textfield;
-  background: transparent;
-  border: none;
-  color: inherit;
-  cursor: text;
-  font-family: inherit;
-  font-size: 1.125rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 800;
-  line-height: 1;
-  margin: 0;
-  max-width: 2.5rem;
-  min-height: 1.5rem;
-  padding: 0;
-  text-align: center;
-  width: 2.25rem;
-}
-
-.fixture-prediction-score-input::-webkit-outer-spin-button,
-.fixture-prediction-score-input::-webkit-inner-spin-button {
+.fixture-prediction-score-field::-webkit-outer-spin-button,
+.fixture-prediction-score-field::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.fixture-prediction-score-input:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  outline-offset: 2px;
+.fixture-prediction-form-footer {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
 }
 
-.fixture-prediction-score-input::placeholder {
-  color: color-mix(in srgb, var(--color-text-primary) 35%, var(--color-text-secondary));
-  font-weight: 600;
+.fixture-predictions-form--coach-board .fixture-prediction-outcome-list {
+  flex-direction: column;
 }
 
-.fixture-prediction-score-separator {
-  color: color-mix(in srgb, var(--color-text-primary) 55%, var(--color-text-secondary));
-  flex: 0 0 auto;
-  font-size: 1rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 800;
-  line-height: 1;
-  padding: 0 2px;
+.fixture-predictions-form--coach-board .fixture-prediction-outcome-option {
+  border-bottom: 1px solid var(--color-border);
+  border-right: none;
+}
+
+.fixture-predictions-form--coach-board .fixture-prediction-outcome-option:last-child {
+  border-bottom: none;
+}
+
+.fixture-predictions-form--coach-board .fixture-prediction-scoreline {
+  max-width: 100%;
 }
 
 .fixture-scorer-pool-list,
@@ -3152,9 +3228,9 @@ h3 {
   border-radius: 12px;
   box-shadow: var(--shadow-surface);
   display: grid;
-  gap: 8px;
+  gap: 10px;
   min-height: 8rem;
-  padding: 12px 14px;
+  padding: 14px 16px;
 }
 
 .predictions-overview-card-header {
@@ -3193,12 +3269,12 @@ h3 {
 
 .predictions-overview-list {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   list-style: none;
   margin: 0;
-  max-height: 11rem;
+  max-height: 14rem;
   overflow: auto;
-  padding: 0;
+  padding: 2px 0;
 }
 
 .predictions-overview-pick {
@@ -3278,10 +3354,10 @@ h3 {
 }
 
 .predictions-wallet-balance-value {
-  font-size: 28px;
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
   font-variant-numeric: tabular-nums;
   font-weight: 800;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .predictions-wallet-balance-label {
@@ -3342,7 +3418,7 @@ h3 {
 
 .community-panel {
   display: grid;
-  gap: 14px;
+  gap: 18px;
 }
 
 .community-panel-header {

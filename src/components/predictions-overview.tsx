@@ -246,6 +246,8 @@ export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: Prediction
         </table>
       </section>
 
+      <div className="predictions-overview-divider" aria-hidden />
+
       <div className="predictions-overview-grid">
         <section className="predictions-overview-card">
           <header className="predictions-overview-card-header">
