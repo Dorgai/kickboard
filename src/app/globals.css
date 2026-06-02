@@ -1576,6 +1576,17 @@ h3 {
   padding: 8px 10px;
 }
 
+.fixture-prediction-pick--card .fixture-prediction-scores {
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+.fixture-prediction-pick--card .fixture-prediction-save {
+  width: auto;
+}
+
 .fixture-prediction-pick-label {
   color: var(--color-text-secondary);
   font-size: 10px;
@@ -1713,10 +1724,26 @@ h3 {
   cursor: default;
 }
 
-.predictions-fixture-picker {
+.predictions-match-row {
+  align-items: stretch;
   display: grid;
   gap: 12px;
+  grid-template-columns: minmax(10.5rem, 13.5rem) minmax(0, 1fr);
   margin-bottom: 12px;
+}
+
+.predictions-match-detail {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .predictions-match-row {
+    grid-template-columns: 1fr;
+  }
+
+  .predictions-match-row .match-fixture-picker-list {
+    max-height: 12rem;
+  }
 }
 
 .coach-board-feed {

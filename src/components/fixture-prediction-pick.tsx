@@ -71,9 +71,11 @@ export function FixturePredictionPick({
     }
   }
 
+  const isInline = inline;
+
   return (
     <form
-      className={`fixture-prediction-pick${inline ? " fixture-prediction-pick--inline" : ""}`}
+      className={`fixture-prediction-pick${isInline ? " fixture-prediction-pick--inline" : " fixture-prediction-pick--card"}`}
       onSubmit={savePick}
     >
       <span className="fixture-prediction-pick-label">Score pick</span>

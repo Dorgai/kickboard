@@ -1,25 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
 import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
-import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
-
-type WorldCupGroup = {
-  group: string;
-  fixtures: Array<{
-    homeTeam: string;
-    awayTeam: string;
-    date: string | null;
-  }>;
-};
+import {
+  FixtureMatchPicker,
+  useFixtureOptions,
+  type WorldCupGroupInput
+} from "@/components/fixture-match-picker";
 
 type PredictionsPanelProps = {
-  groups?: WorldCupGroup[];
+  groups?: WorldCupGroupInput[];
 };
 
 export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
-  const fixtures = useMemo(() => buildFixtureOptionsFromWorldCup(groups, []), [groups]);
+  const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,36 +34,31 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
       <div className="predictions-panel">
         <p className="community-panel-lead">
           Predictions are <strong>free-to-play skill games</strong> — virtual points only, not betting or
-          real-money stakes (see <code>docs/predictions-legal.md</code>). Connected friends can compare
-          score picks on the Coach Board for the same match.
+          real-money stakes (see <code>docs/predictions-legal.md</code>). Pick a match, then enter your
+          score. Connected friends can compare picks on the Coach Board for the same game.
         </p>
 
         {fixtures.length > 0 && selected ? (
-          <div className="predictions-fixture-picker">
-            <label className="feed-control-field">
-              Match
-              <select
-                className="feed-control-input"
-                value={selectedKey ?? ""}
-                onChange={(event) => setSelectedKey(event.target.value)}
-              >
-                {fixtures.map((fixture) => (
-                  <option key={fixture.key} value={fixture.key}>
-                    {fixture.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <FixturePredictionPick
-              awayTeam={selected.awayTeam}
-              fixtureKey={selected.key}
-              homeTeam={selected.homeTeam}
+          <div className="predictions-match-row">
+            <FixtureMatchPicker
+              ariaLabel="Select a match for your prediction"
+              fixtures={fixtures}
+              selectedKey={selectedKey}
+              onSelect={setSelectedKey}
             />
+
+            <div className="predictions-match-detail">
+              <FixturePredictionPick
+                awayTeam={selected.awayTeam}
+                fixtureKey={selected.key}
+                homeTeam={selected.homeTeam}
+              />
+            </div>
           </div>
         ) : (
           <div className="predictions-coming-soon data-card surface-muted">
             <h3>Exact score picks</h3>
-            <p>Select a match on the Coach Board or wait for the fixture list to load here.</p>
+            <p>Fixture list is loading from the tournament feed.</p>
           </div>
         )}
 

@@ -254,10 +254,9 @@ export function CurrentEventTabs({
         ) : null}
 
         {activeTab === "predictions" ? (
-          <section className="data-card surface-flat predictions-section" id="predictions">
-            <h2>Predictions</h2>
+          <div className="current-event-predictions-tab" id="predictions">
             <PredictionsPanel groups={groups} />
-          </section>
+          </div>
         ) : null}
       </div>
 
