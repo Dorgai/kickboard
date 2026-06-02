@@ -129,9 +129,13 @@ export function RegistrationInvitationsPanel() {
     <section className="registration-invitations-section">
       <h3>Invite someone to register</h3>
       <p className="community-panel-lead">
-        Enter their email to send an invitation (and lock the invite to that Google account), or leave
-        email blank to generate a link you can share anywhere. After they register, you&apos;ll be
+        Leave email blank to get a link you can share anywhere (works with your Railway app URL). Add
+        their email only to lock the invite to that Google account. After they register, you&apos;ll be
         connected automatically.
+      </p>
+      <p className="registration-invite-email-note">
+        Automated invite email needs a domain you verify in Resend — not your Railway URL and not Gmail.
+        Without that, use <strong>Copy link</strong> and share it manually.
       </p>
 
       <form className="registration-invite-form" onSubmit={createInvitation}>
