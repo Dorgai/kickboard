@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminHelpSupportPanel } from "@/components/admin-help-support-panel";
 import { AdminFanChatModerationPanel } from "@/components/admin-fan-chat-moderation-panel";
 import { AdminUserActivityPanel } from "@/components/admin-user-activity-panel";
 import { AdminUserManagementPanel } from "@/components/admin-user-management-panel";
@@ -12,14 +13,15 @@ import type { AdminDataSource } from "@/lib/admin/data-sources";
 import type { AdminAuthMode } from "@/lib/admin/fetch";
 import type { CommunityHealth } from "@/lib/community/health";
 
-export const ADMIN_DASHBOARD_TAB_IDS = ["overview", "sources", "users", "moderation"] as const;
+export const ADMIN_DASHBOARD_TAB_IDS = ["overview", "sources", "users", "moderation", "help"] as const;
 export type AdminDashboardTabId = (typeof ADMIN_DASHBOARD_TAB_IDS)[number];
 
 const ADMIN_DASHBOARD_TABS: { id: AdminDashboardTabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "sources", label: "Data sources" },
   { id: "users", label: "Users" },
-  { id: "moderation", label: "Moderation" }
+  { id: "moderation", label: "Moderation" },
+  { id: "help", label: "Help" }
 ];
 
 type AdminDashboardProps = {
@@ -165,6 +167,8 @@ export function AdminDashboard({
             <CommunityModerationPanel auth={auth} />
           </>
         ) : null}
+
+        {effectiveTab === "help" && schemaReady ? <AdminHelpSupportPanel auth={auth} /> : null}
       </div>
     </main>
   );
