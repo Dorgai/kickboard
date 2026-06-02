@@ -18,7 +18,8 @@
     "railway:connect": "bash scripts/railway-connect.sh",
     "railway:deploy": "bash scripts/deploy-production.sh",
     "railway:variables": "bash scripts/configure-railway-variables.sh",
-    "railway:list": "bash scripts/railway-list-targets.sh"
+    "railway:list": "bash scripts/railway-list-targets.sh",
+    "github:secrets": "bash scripts/push-github-secrets.sh"
   },
   "repository": {
     "type": "git",

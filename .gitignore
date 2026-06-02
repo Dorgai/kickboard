@@ -5,6 +5,8 @@ coverage
 *.tsbuildinfo
 .env
 .env*.local
+deploy/github-secrets.env
+deploy/railway-variables.env
 !.env.example
 npm-debug.log*
 yarn-debug.log*
