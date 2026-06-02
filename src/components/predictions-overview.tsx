@@ -7,6 +7,7 @@ import {
   type FixtureOutcome,
   type ScorerPick
 } from "@/lib/fixture-predictions/types";
+import { PREDICTION_BLOCKS, PREDICTION_BLOCK_SHORT } from "@/lib/fixture-predictions/labels";
 
 type CategoryStats = {
   won: number;
@@ -97,7 +98,7 @@ function formatPickSummary(pick: PredictionPickSummary) {
 
   if (pick.predictedOutcome) {
     lines.push({
-      label: "Outcome",
+      label: PREDICTION_BLOCK_SHORT.outcome,
       value: outcomeShort(pick.predictedOutcome),
       status: pick.outcomeStatus,
       points: pick.outcomePointsAwarded
@@ -105,7 +106,7 @@ function formatPickSummary(pick: PredictionPickSummary) {
   }
   if (pick.homeScore !== null && pick.awayScore !== null) {
     lines.push({
-      label: "Score",
+      label: PREDICTION_BLOCK_SHORT.score,
       value: `${pick.homeScore}–${pick.awayScore}`,
       status: pick.scoreStatus,
       points: pick.scorePointsAwarded
@@ -113,7 +114,7 @@ function formatPickSummary(pick: PredictionPickSummary) {
   }
   if (pick.scorerPicks.length > 0) {
     lines.push({
-      label: "Scorers",
+      label: PREDICTION_BLOCK_SHORT.scorers,
       value: formatScorerPicksSummary(pick.scorerPicks),
       status: pick.scorersStatus,
       points: pick.scorersPointsAwarded
@@ -200,29 +201,29 @@ export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: Prediction
     : connectionsPredictions.slice(0, 8);
 
   const categories = [
-    { key: "outcome" as const, label: "Winner / draw" },
-    { key: "score" as const, label: "Exact score" },
-    { key: "scorers" as const, label: "Goal scorers" }
+    { key: "outcome" as const, label: PREDICTION_BLOCKS.outcome },
+    { key: "score" as const, label: PREDICTION_BLOCKS.score },
+    { key: "scorers" as const, label: PREDICTION_BLOCKS.scorers }
   ];
 
   return (
     <div className="predictions-overview">
       <section className="predictions-results-board data-card">
         <header className="predictions-results-board-header">
-          <h3>Results & balance</h3>
+          <h3>Your points</h3>
           <p className="predictions-wallet-balance">
             <span className="predictions-wallet-balance-value">{wallet.balance}</span>
             <span className="predictions-wallet-balance-label">points total</span>
           </p>
         </header>
         <p className="predictions-results-board-lead">
-          Won <strong>{wallet.pointsWon}</strong> pts from settled picks ·{" "}
-          <strong>{wallet.picksPending}</strong> categories still pending
+          Earned <strong>{wallet.pointsWon}</strong> pts so far · <strong>{wallet.picksPending}</strong> picks
+          still waiting on results
         </p>
         <table className="predictions-results-table">
           <thead>
             <tr>
-              <th>Type</th>
+              <th>Pick</th>
               <th>Won</th>
               <th>Lost</th>
               <th>Pending</th>
@@ -251,11 +252,11 @@ export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: Prediction
       <div className="predictions-overview-grid">
         <section className="predictions-overview-card">
           <header className="predictions-overview-card-header">
-            <h3>My predictions</h3>
+            <h3>Your picks</h3>
             <span className="predictions-overview-count">{myPredictions.length}</span>
           </header>
           {myPredictions.length === 0 ? (
-            <p className="predictions-overview-empty">No picks saved yet.</p>
+            <p className="predictions-overview-empty">No picks yet — choose a match above.</p>
           ) : (
             <ul className="predictions-overview-list">
               {myPredictions.map((pick) => (
@@ -267,14 +268,14 @@ export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: Prediction
 
         <section className="predictions-overview-card">
           <header className="predictions-overview-card-header">
-            <h3>Connections&apos; predictions</h3>
+            <h3>Friends&apos; picks</h3>
             <span className="predictions-overview-count">{connectionsForMatch.length}</span>
           </header>
           {connectionsForMatch.length === 0 ? (
             <p className="predictions-overview-empty">
               {fixtureKey
-                ? "No connected fans have picked this match yet."
-                : "Connect with fans to see their picks here."}
+                ? "No friends have picked this match yet."
+                : "Add friends to see their picks here."}
             </p>
           ) : (
             <ul className="predictions-overview-list">

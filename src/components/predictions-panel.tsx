@@ -55,16 +55,15 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
           </div>
         ) : (
           <div className="predictions-coming-soon data-card surface-muted">
-            <h3>Exact score picks</h3>
-            <p>Fixture list is loading from the tournament feed.</p>
+            <h3>Pick a match</h3>
+            <p>Loading upcoming fixtures from the tournament feed.</p>
           </div>
         )}
 
         <PredictionsOverview fixtureKey={selectedKey} refreshToken={overviewRefresh} />
 
         <p className="community-panel-lead predictions-settle-note">
-          Results and balances update when matches finish and picks are settled (API-Football live data).
-          Until then, each category shows <strong>Pending</strong>.
+          Points update after each match finishes. Until then, picks show as <strong>Pending</strong>.
         </p>
       </div>
     </AuthGate>

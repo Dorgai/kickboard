@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     }
     if (error instanceof Error && error.message === "PICK_REQUIRED") {
       return NextResponse.json(
-        { error: "Add at least one: winner/draw, exact score, or goal scorers." },
+        { error: "Add at least one pick: who wins, final score, or who scores." },
         { status: 400 }
       );
     }
