@@ -123,13 +123,18 @@ export function AdminUserActivityPanel({
   }, [loadUserDetail, selected]);
 
   if (loading) {
-    return <p className="inline-status">Loading user activity…</p>;
+    return (
+      <section className="admin-community-section data-card surface-muted">
+        <p className="inline-status">Loading user activity…</p>
+      </section>
+    );
   }
 
   return (
-    <section className="admin-community-section">
+    <section className="admin-community-section data-card surface-muted">
       <div className="section-heading compact">
         <div>
+          <p className="eyebrow">Users</p>
           <h2>User activity</h2>
           <p>
             Searchable presence and actions. <strong>{onlineCount}</strong> user

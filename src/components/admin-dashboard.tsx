@@ -91,23 +91,30 @@ export function AdminDashboard({
   const effectiveTab = visibleTabs.some((tab) => tab.id === activeTab) ? activeTab : "overview";
 
   return (
-    <main className="admin-page admin-dashboard" id="main-content">
-      <section className="admin-hero">
-        <p className="eyebrow">Admin only</p>
-        <h1>Admin dashboard</h1>
-        <p>
-          {isOAuthSession && signedInEmail ? (
-            <>
-              Signed in as <strong>{signedInEmail}</strong>. Use the tabs below to monitor feeds, users,
-              and moderation.
-            </>
-          ) : (
-            <>Operator token session. Use the tabs below to monitor feeds, users, and moderation.</>
-          )}
-        </p>
-      </section>
+    <main className="feed-browser admin-dashboard" id="main-content">
+      <div className="current-event-overview admin-dashboard-overview">
+        <div className="current-event-overview-heading">
+          <div>
+            <p className="eyebrow">Admin only</p>
+            <h2>Admin dashboard</h2>
+            <p className="admin-dashboard-lead">
+              {isOAuthSession && signedInEmail ? (
+                <>
+                  Signed in as <strong>{signedInEmail}</strong>. Use the tabs below to monitor feeds, users,
+                  and moderation.
+                </>
+              ) : (
+                <>Operator token session. Use the tabs below to monitor feeds, users, and moderation.</>
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
 
-      <nav className="event-tab-bar admin-dashboard-tabs" aria-label="Admin dashboard sections">
+      <nav
+        className="event-tab-bar current-event-section-tabs admin-dashboard-tabs"
+        aria-label="Admin dashboard sections"
+      >
         {visibleTabs.map((tab) => (
           <button
             key={tab.id}
@@ -121,10 +128,10 @@ export function AdminDashboard({
         ))}
       </nav>
 
-      <div className="admin-dashboard-panel" role="tabpanel">
+      <div className="current-event-tab-panel admin-dashboard-panel" role="tabpanel">
         {effectiveTab === "overview" ? (
           <>
-            <section className="admin-summary-grid" aria-label="Data source summary">
+            <section className="current-summary-grid admin-summary-grid" aria-label="Data source summary">
               <SummaryCard label="Sources" value={data.summary.total} />
               <SummaryCard label="Connected" value={data.summary.connected} />
               <SummaryCard label="Not configured" value={data.summary.notConfigured} />
@@ -176,7 +183,7 @@ function AdminSourceGrid({ sources }: { sources: AdminDataSource[] }) {
   return (
     <section className="admin-source-grid" aria-label="Connected data sources">
       {sources.map((source) => (
-        <article className="admin-source-card" key={source.id}>
+        <article className="admin-source-card data-card surface-muted" key={source.id}>
           <div className="admin-source-heading">
             <div>
               <span className={`admin-status admin-status-${source.status}`}>

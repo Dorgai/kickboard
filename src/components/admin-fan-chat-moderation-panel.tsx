@@ -89,13 +89,18 @@ export function AdminFanChatModerationPanel({
   }
 
   if (loading) {
-    return <p className="inline-status">Loading Fan Chat messages…</p>;
+    return (
+      <section className="admin-community-section data-card surface-muted">
+        <p className="inline-status">Loading Fan Chat messages…</p>
+      </section>
+    );
   }
 
   return (
-    <section className="admin-community-section">
+    <section className="admin-community-section data-card surface-muted">
       <div className="section-heading compact">
         <div>
+          <p className="eyebrow">Moderation</p>
           <h2>Fan Chat moderation</h2>
           <p>Review recent direct messages and broadcasts. Remove messages that break community rules.</p>
         </div>

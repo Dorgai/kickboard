@@ -76,13 +76,18 @@ export function CommunityModerationPanel({
   }
 
   if (loading) {
-    return <p className="inline-status">Loading moderation queue…</p>;
+    return (
+      <section className="admin-community-section data-card surface-muted">
+        <p className="inline-status">Loading moderation queue…</p>
+      </section>
+    );
   }
 
   return (
-    <section className="admin-community-section">
+    <section className="admin-community-section data-card surface-muted">
       <div className="section-heading compact">
         <div>
+          <p className="eyebrow">Moderation</p>
           <h2>Community moderation</h2>
           <p>Hide or remove Coach Board posts and restore content when appropriate.</p>
         </div>

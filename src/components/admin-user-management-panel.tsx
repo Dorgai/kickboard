@@ -129,9 +129,10 @@ export function AdminUserManagementPanel({
   }
 
   return (
-    <section className="admin-community-section">
+    <section className="admin-community-section data-card surface-muted">
       <div className="section-heading compact">
         <div>
+          <p className="eyebrow">Users</p>
           <h2>User management</h2>
           <p>Search accounts, suspend or ban access, and send official direct messages.</p>
         </div>

@@ -53,19 +53,23 @@ export function AdminAccessGate({ adminConfigured, oauthConfigured }: AdminAcces
   }, [isAdminUser, router, status]);
 
   return (
-    <main className="admin-page admin-gate" id="main-content">
-      <section className="admin-hero">
-        <p className="eyebrow">Admin only</p>
-        <h1>Admin dashboard</h1>
-        <p>
-          Sign in with Google using an email on the admin allowlist (default{" "}
-          <code>laszlo.dorgai@gmail.com</code>; override with <code>ADMIN_EMAILS</code> on Railway). No
-          operator token is required for allowlisted accounts. The token below is optional for scripts and
-          legacy access.
-        </p>
-      </section>
+    <main className="feed-browser admin-gate" id="main-content">
+      <div className="current-event-overview admin-dashboard-overview">
+        <div className="current-event-overview-heading">
+          <div>
+            <p className="eyebrow">Admin only</p>
+            <h2>Admin dashboard</h2>
+            <p className="admin-dashboard-lead">
+              Sign in with Google using an email on the admin allowlist (default{" "}
+              <code>laszlo.dorgai@gmail.com</code>; override with <code>ADMIN_EMAILS</code> on Railway). No
+              operator token is required for allowlisted accounts. The token below is optional for scripts and
+              legacy access.
+            </p>
+          </div>
+        </div>
+      </div>
 
-      <section className="data-card admin-gate-card">
+      <section className="data-card surface-muted admin-gate-card">
         {oauthConfigured ? (
           <div className="admin-gate-oauth">
             <h2>Sign in with Google</h2>
@@ -113,10 +117,11 @@ export function AdminAccessGate({ adminConfigured, oauthConfigured }: AdminAcces
           </p>
         ) : (
           <form className="admin-gate-form" onSubmit={handleTokenSubmit}>
-            <label>
-              Admin token
+            <label className="feed-control-field">
+              <span>Admin token</span>
               <input
                 autoComplete="off"
+                className="feed-control-input"
                 disabled={submitting}
                 name="token"
                 placeholder="Paste admin token"

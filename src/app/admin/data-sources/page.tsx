@@ -71,12 +71,16 @@ export default async function AdminDataSourcesPage({
 
 function AdminDashboardFallback() {
   return (
-    <main className="admin-page admin-dashboard" id="main-content">
-      <section className="admin-hero">
-        <p className="eyebrow">Admin only</p>
-        <h1>Admin dashboard</h1>
-        <p className="inline-status">Loading…</p>
-      </section>
+    <main className="feed-browser admin-dashboard" id="main-content">
+      <div className="current-event-overview admin-dashboard-overview">
+        <div className="current-event-overview-heading">
+          <div>
+            <p className="eyebrow">Admin only</p>
+            <h2>Admin dashboard</h2>
+            <p className="inline-status">Loading…</p>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
