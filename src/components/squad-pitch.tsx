@@ -181,7 +181,7 @@ export function SquadPitch({
         ref={pitchRef}
         role={readOnly ? "img" : "application"}
       >
-        <div className="squad-pitch-grass" aria-hidden />
+        <div className="squad-pitch-surface" aria-hidden />
         <div className="squad-pitch-midline" aria-hidden />
         <div className="squad-pitch-circle" aria-hidden />
         <div className="squad-pitch-box squad-pitch-box--top" aria-hidden />

@@ -2567,16 +2567,26 @@ h3 {
   --pitch-length: 105;
   --pitch-width: 68;
   --pitch-max-height: min(52rem, 82vh);
+  --pitch-line: color-mix(in srgb, #c4b5fd 72%, #fff);
+  --pitch-line-soft: color-mix(in srgb, #a78bfa 35%, transparent);
+  --pitch-surface-top: #1e1b4b;
+  --pitch-surface-mid: #312e81;
+  --pitch-surface-bottom: #1e1b4b;
   aspect-ratio: var(--pitch-width) / var(--pitch-length);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, #1a4d2e 88%, #0d2818) 0%,
-    color-mix(in srgb, #1e5631 90%, #0d2818) 50%,
-    color-mix(in srgb, #1a4d2e 88%, #0d2818) 100%
-  );
-  border: 2px solid color-mix(in srgb, #f5f5f5 35%, transparent);
-  border-radius: 6px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 25%, transparent);
+  background:
+    radial-gradient(ellipse 95% 55% at 50% 0%, color-mix(in srgb, #818cf8 28%, transparent), transparent 62%),
+    radial-gradient(ellipse 95% 55% at 50% 100%, color-mix(in srgb, #f472b6 22%, transparent), transparent 62%),
+    linear-gradient(
+      180deg,
+      var(--pitch-surface-top) 0%,
+      var(--pitch-surface-mid) 48%,
+      var(--pitch-surface-bottom) 100%
+    );
+  border: 1px solid color-mix(in srgb, #a78bfa 55%, transparent);
+  border-radius: 10px;
+  box-shadow:
+    0 12px 40px color-mix(in srgb, #312e81 45%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, #fff 8%, transparent);
   flex: 0 0 auto;
   height: auto;
   margin-inline: auto;
@@ -2587,19 +2597,56 @@ h3 {
   width: min(100%, calc(var(--pitch-max-height) * var(--pitch-width) / var(--pitch-length)));
 }
 
+[data-theme="light"] .squad-pitch,
+:root:not([data-theme]) .squad-pitch {
+  --pitch-line: color-mix(in srgb, #6366f1 55%, #312e81);
+  --pitch-line-soft: color-mix(in srgb, #6366f1 22%, transparent);
+  --pitch-surface-top: #eef2ff;
+  --pitch-surface-mid: #e0e7ff;
+  --pitch-surface-bottom: #eef2ff;
+  background:
+    radial-gradient(ellipse 95% 55% at 50% 0%, color-mix(in srgb, #818cf8 18%, transparent), transparent 62%),
+    radial-gradient(ellipse 95% 55% at 50% 100%, color-mix(in srgb, #f472b6 14%, transparent), transparent 62%),
+    linear-gradient(
+      180deg,
+      var(--pitch-surface-top) 0%,
+      var(--pitch-surface-mid) 48%,
+      var(--pitch-surface-bottom) 100%
+    );
+  border-color: color-mix(in srgb, #6366f1 28%, var(--color-border));
+  box-shadow:
+    var(--shadow-surface),
+    inset 0 0 0 1px color-mix(in srgb, #fff 65%, transparent);
+}
+
+[data-theme="dark"] .squad-pitch {
+  --pitch-line: color-mix(in srgb, #c4b5fd 65%, #fff);
+  --pitch-line-soft: color-mix(in srgb, #a78bfa 40%, transparent);
+}
+
 .squad-builder-pitch-stage .squad-pitch-wrap {
   width: 100%;
 }
 
-.squad-pitch-grass {
-  background-image: repeating-linear-gradient(
-    90deg,
-    color-mix(in srgb, #fff 4%, transparent) 0,
-    color-mix(in srgb, #fff 4%, transparent) 9.52%,
-    transparent 9.52%,
-    transparent 19.05%
-  );
+.squad-pitch-surface {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 11px,
+      var(--pitch-line-soft) 11px,
+      var(--pitch-line-soft) 12px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 11px,
+      var(--pitch-line-soft) 11px,
+      var(--pitch-line-soft) 12px
+    );
   inset: 0;
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, #000 30%, transparent 100%);
+  opacity: 0.85;
   pointer-events: none;
   position: absolute;
 }
@@ -2608,7 +2655,8 @@ h3 {
 .squad-pitch-circle,
 .squad-pitch-box,
 .squad-pitch-goal-area {
-  border: 1px solid color-mix(in srgb, #fff 55%, transparent);
+  border: 1px solid var(--pitch-line);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--pitch-line) 35%, transparent);
   pointer-events: none;
   position: absolute;
 }
@@ -2661,7 +2709,14 @@ h3 {
 }
 
 .squad-pitch--dual .squad-pitch-half-line {
-  background: color-mix(in srgb, #fff 35%, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--pitch-line) 18%,
+    var(--pitch-line) 82%,
+    transparent
+  );
+  box-shadow: 0 0 14px color-mix(in srgb, var(--pitch-line) 45%, transparent);
   height: 2px;
   left: 4%;
   pointer-events: none;
@@ -2673,16 +2728,25 @@ h3 {
 }
 
 .squad-pitch-team-banner {
-  color: color-mix(in srgb, #fff 92%, var(--color-bg));
+  backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pitch-line) 40%, transparent);
+  border-radius: 6px;
+  color: var(--color-text-primary);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
+  padding: 4px 8px;
   pointer-events: none;
   position: absolute;
-  text-shadow: 0 1px 3px color-mix(in srgb, #000 50%, transparent);
   text-transform: uppercase;
   z-index: 1;
+}
+
+[data-theme="dark"] .squad-pitch-team-banner {
+  background: color-mix(in srgb, #0f172a 65%, transparent);
+  color: color-mix(in srgb, #fff 92%, var(--color-bg));
 }
 
 .squad-pitch-team-banner--home {
@@ -2704,12 +2768,11 @@ h3 {
 
 .squad-pitch-ghost {
   align-items: center;
-  background: color-mix(in srgb, #fff 12%, transparent);
-  border: 1px dashed color-mix(in srgb, #fff 35%, transparent);
+  background: color-mix(in srgb, var(--pitch-line) 12%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--pitch-line) 55%, transparent);
   border-radius: 50%;
   display: grid;
   justify-items: center;
-  padding: 0;
   height: 10%;
   min-height: 1.4rem;
   min-width: 1.4rem;
@@ -2718,28 +2781,33 @@ h3 {
 }
 
 .squad-pitch-ghost--empty {
-  background: color-mix(in srgb, #fff 22%, transparent);
-  border-style: solid;
-  border-color: color-mix(in srgb, #fff 50%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 35%, transparent);
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--pitch-line) 70%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #fff 15%, transparent);
   cursor: pointer;
   opacity: 1;
 }
 
 .squad-pitch-ghost--filled {
-  opacity: 0.12;
+  opacity: 0.1;
   pointer-events: none;
 }
 
 .squad-pitch-placeholder-role {
-  color: color-mix(in srgb, #fff 92%, var(--color-bg));
+  color: color-mix(in srgb, var(--pitch-line) 85%, var(--color-text-primary));
   font-size: 8px;
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1.15;
   max-width: 4.25rem;
   text-align: center;
-  text-shadow: 0 1px 2px color-mix(in srgb, #000 55%, transparent);
   text-transform: none;
+}
+
+[data-theme="dark"] .squad-pitch-placeholder-role {
+  color: color-mix(in srgb, #fff 88%, var(--color-bg));
+  text-shadow: 0 1px 2px color-mix(in srgb, #000 55%, transparent);
 }
 
 .squad-pitch-ghost--selected {
@@ -2750,15 +2818,18 @@ h3 {
 .squad-pitch-token {
   align-items: center;
   background: linear-gradient(
-    165deg,
-    color-mix(in srgb, var(--pitch-kit-primary, #3b82f6) 88%, #fff),
-    var(--pitch-kit-primary, #3b82f6)
+    155deg,
+    color-mix(in srgb, var(--pitch-kit-secondary, #a855f7) 45%, #fff) 0%,
+    var(--pitch-kit-primary, #6366f1) 42%,
+    color-mix(in srgb, var(--pitch-kit-primary, #6366f1) 82%, #000) 100%
   );
-  border: 2px solid var(--pitch-kit-secondary, #1d4ed8);
+  border: 2px solid color-mix(in srgb, var(--pitch-kit-secondary, #a855f7) 88%, #fff);
   border-radius: 999px;
   box-shadow:
-    0 4px 12px color-mix(in srgb, #000 35%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent);
+    0 0 0 1px color-mix(in srgb, #fff 30%, transparent),
+    0 6px 18px color-mix(in srgb, var(--pitch-kit-glow, var(--pitch-kit-primary, #6366f1)) 55%, transparent),
+    0 2px 6px color-mix(in srgb, #000 32%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 42%, transparent);
   color: var(--pitch-kit-text, #fff);
   cursor: grab;
   display: grid;
@@ -2770,17 +2841,19 @@ h3 {
 }
 
 .squad-pitch-token--selected {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--pitch-kit-secondary, #1d4ed8));
+  border-color: color-mix(in srgb, #fff 55%, var(--pitch-kit-secondary, #a855f7));
   box-shadow:
-    0 4px 12px color-mix(in srgb, #000 35%, transparent),
-    0 0 0 3px color-mix(in srgb, var(--color-accent) 40%, transparent);
+    0 0 0 1px color-mix(in srgb, #fff 40%, transparent),
+    0 8px 22px color-mix(in srgb, var(--pitch-kit-glow, var(--pitch-kit-primary)) 65%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .squad-pitch-token-role {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--pitch-kit-text, #fff) 72%, var(--pitch-kit-secondary, #a855f7));
   font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.05em;
+  opacity: 0.92;
 }
 
 .squad-pitch-token-name {
@@ -2791,15 +2864,15 @@ h3 {
   max-width: 5.5rem;
   overflow: hidden;
   text-align: center;
-  text-shadow: 0 1px 1px color-mix(in srgb, #000 18%, transparent);
+  text-shadow: 0 1px 2px color-mix(in srgb, #000 28%, transparent);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .squad-pitch-token-number {
-  color: color-mix(in srgb, var(--pitch-kit-text, #fff) 72%, #000);
+  color: color-mix(in srgb, var(--pitch-kit-text, #fff) 80%, var(--pitch-kit-secondary, #a855f7));
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .squad-pitch-drag-overlay {

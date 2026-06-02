@@ -68,8 +68,8 @@ const KIT_BY_CODE: Record<string, TeamKitColors> = {
 };
 
 const SIDE_FALLBACK: Record<"home" | "away", TeamKitColors> = {
-  home: { primary: "#3B82F6", secondary: "#1D4ED8", text: "#FFFFFF" },
-  away: { primary: "#EF4444", secondary: "#B91C1C", text: "#FFFFFF" }
+  home: { primary: "#6366F1", secondary: "#A855F7", text: "#FFFFFF" },
+  away: { primary: "#F43F5E", secondary: "#FB923C", text: "#FFFFFF" }
 };
 
 function hexLuminance(hex: string) {
@@ -116,6 +116,7 @@ export function teamKitInlineStyle(
   return {
     ["--pitch-kit-primary" as string]: kit.primary,
     ["--pitch-kit-secondary" as string]: kit.secondary,
-    ["--pitch-kit-text" as string]: kit.text
+    ["--pitch-kit-text" as string]: kit.text,
+    ["--pitch-kit-glow" as string]: kit.secondary
   };
 }
