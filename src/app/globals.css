@@ -6579,6 +6579,119 @@ h3 {
   padding: 12px 18px 18px;
 }
 
+.welcome-dialog {
+  max-width: min(28rem, 94vw);
+}
+
+.welcome-dialog-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-modal);
+  box-shadow: var(--shadow-elevation-3);
+  display: grid;
+  gap: 0;
+}
+
+.welcome-dialog-header {
+  display: grid;
+  gap: 8px;
+  padding: 28px 24px 8px;
+  text-align: center;
+}
+
+.welcome-dialog-eyebrow {
+  color: var(--color-brand);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.welcome-dialog-header h2 {
+  font-size: clamp(1.85rem, 6vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.welcome-dialog-lead {
+  color: var(--color-text-secondary);
+  font-size: clamp(1rem, 2.8vw, 1.125rem);
+  line-height: 1.35;
+  margin: 0 auto;
+  max-width: 22rem;
+}
+
+.welcome-dialog-highlights {
+  display: grid;
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 20px 22px 8px;
+}
+
+.welcome-dialog-highlight {
+  align-items: flex-start;
+  display: flex;
+  gap: 14px;
+}
+
+.welcome-dialog-icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-brand) 12%, var(--color-bg));
+  border-radius: 14px;
+  color: var(--color-brand);
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+
+.welcome-dialog-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.welcome-dialog-copy strong {
+  font-size: clamp(1.05rem, 3.2vw, 1.2rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.welcome-dialog-copy span {
+  color: var(--color-text-secondary);
+  font-size: clamp(0.9rem, 2.6vw, 1rem);
+  line-height: 1.4;
+}
+
+.welcome-dialog-footer {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  padding: 12px 22px 26px;
+}
+
+.welcome-dialog-cta {
+  font-size: 1rem;
+  font-weight: 800;
+  min-height: 48px;
+  padding-inline: 28px;
+  width: 100%;
+}
+
+.welcome-dialog-footnote {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+  text-align: center;
+}
+
 .match-event-timeline--modal {
   margin: 0;
 }
