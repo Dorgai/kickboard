@@ -26,7 +26,6 @@ export function FixturePredictionPick({
     <FixturePredictionsForm
       awayTeam={awayTeam}
       coachBoard={onCoachBoard}
-      compact={onCoachBoard}
       fixtureKey={fixtureKey}
       homeTeam={homeTeam}
       onSaved={onSaved}
