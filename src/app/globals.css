@@ -2961,13 +2961,14 @@ h3 {
   box-shadow: 0 4px 14px color-mix(in srgb, var(--pitch-kit-primary, #3b82f6) 38%, transparent);
   color: var(--pitch-kit-text, #fff);
   cursor: grab;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0;
-  height: 2.15rem;
-  justify-items: center;
+  height: 2.35rem;
+  justify-content: center;
   min-width: 3.1rem;
   outline: none;
-  padding: 2px 10px 4px;
+  padding: 3px 8px 4px;
   user-select: none;
   width: auto;
   z-index: 2;
@@ -3003,23 +3004,37 @@ h3 {
 }
 
 .squad-pitch-token-name {
+  align-items: center;
   color: inherit;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1.05;
   max-width: 5.25rem;
-  overflow: hidden;
   text-align: center;
   text-shadow: none;
+}
+
+.squad-pitch-token-given,
+.squad-pitch-token-family {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.squad-pitch-token-number {
-  color: color-mix(in srgb, var(--pitch-kit-text, #fff) 75%, transparent);
-  font-size: 8px;
+.squad-pitch-token-given {
+  font-size: 7px;
   font-weight: 500;
-  opacity: 0.9;
+  letter-spacing: 0.01em;
+  opacity: 0.92;
+}
+
+.squad-pitch-token-family {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .squad-pitch-drag-overlay {
