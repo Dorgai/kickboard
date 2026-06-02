@@ -84,33 +84,41 @@ export function FixturePredictionPick({
       <span className="fixture-prediction-pick-label">Score pick</span>
 
       <div className="fixture-prediction-scores">
-        <label className="fixture-prediction-team-score">
-          <TeamLabel name={homeTeam} size="xs" />
-          <input
-            aria-label={`${homeTeam} goals`}
-            className="feed-control-input fixture-prediction-input"
-            inputMode="numeric"
-            max={20}
-            min={0}
-            type="number"
-            value={homeScore}
-            onChange={(event) => setHomeScore(event.target.value)}
-          />
-        </label>
-        <span className="fixture-prediction-separator">:</span>
-        <label className="fixture-prediction-team-score">
-          <TeamLabel name={awayTeam} size="xs" />
-          <input
-            aria-label={`${awayTeam} goals`}
-            className="feed-control-input fixture-prediction-input"
-            inputMode="numeric"
-            max={20}
-            min={0}
-            type="number"
-            value={awayScore}
-            onChange={(event) => setAwayScore(event.target.value)}
-          />
-        </label>
+        <div className="fixture-prediction-score-pair" role="group" aria-label="Predicted score">
+          <label className="fixture-prediction-side">
+            <span className="fixture-prediction-side-team">
+              <TeamLabel name={homeTeam} size={isInline ? "xs" : "sm"} />
+            </span>
+            <input
+              aria-label={`${homeTeam} goals`}
+              className="fixture-prediction-input"
+              inputMode="numeric"
+              max={20}
+              min={0}
+              type="number"
+              value={homeScore}
+              onChange={(event) => setHomeScore(event.target.value)}
+            />
+          </label>
+          <span aria-hidden className="fixture-prediction-separator">
+            :
+          </span>
+          <label className="fixture-prediction-side">
+            <span className="fixture-prediction-side-team">
+              <TeamLabel name={awayTeam} size={isInline ? "xs" : "sm"} />
+            </span>
+            <input
+              aria-label={`${awayTeam} goals`}
+              className="fixture-prediction-input"
+              inputMode="numeric"
+              max={20}
+              min={0}
+              type="number"
+              value={awayScore}
+              onChange={(event) => setAwayScore(event.target.value)}
+            />
+          </label>
+        </div>
         <button className="button primary fixture-prediction-save" disabled={busy || loading} type="submit">
           {busy ? "…" : "Save"}
         </button>
