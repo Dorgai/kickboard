@@ -8,7 +8,6 @@ import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-la
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { CurrentEventTabs } from "@/components/current-event-tabs";
-import { Info } from "lucide-react";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
@@ -341,25 +340,6 @@ export function FeedBrowser() {
           Past events
         </button>
       </nav>
-
-      {activeTab === "current" ? (
-        <section className="feed-hero">
-          <div className="feed-hero-heading">
-            <h1>Current event: 2026 FIFA World Cup.</h1>
-            <button
-              aria-label="About tournament data sources"
-              className="info-tooltip"
-              type="button"
-            >
-              <Info aria-hidden className="info-tooltip-icon" size={18} />
-              <span className="info-tooltip-bubble" role="tooltip">
-                Tournament summary and groups come from public pages. Live scores appear when
-                API-Football and the worker are configured.
-              </span>
-            </button>
-          </div>
-        </section>
-      ) : null}
 
       {loading ? <p className="inline-status">Loading real feeds...</p> : null}
       {error ? <p className="inline-error">{error}</p> : null}
