@@ -119,12 +119,12 @@ function BenchPlayerChip({
         }}
         onPointerDown={(event) => {
           if (onPitch || event.button !== 0) return;
-          const target = event.currentTarget;
-          target.setPointerCapture(event.pointerId);
+          event.preventDefault();
 
           const startX = event.clientX;
           const startY = event.clientY;
           let moved = false;
+          let dropped = false;
 
           const onMove = (moveEvent: PointerEvent) => {
             if (
@@ -137,23 +137,21 @@ function BenchPlayerChip({
           };
 
           const end = (endEvent: PointerEvent) => {
-            if (target.hasPointerCapture(endEvent.pointerId)) {
-              target.releasePointerCapture(endEvent.pointerId);
-            }
-            target.removeEventListener("pointermove", onMove);
-            target.removeEventListener("pointerup", end);
-            target.removeEventListener("pointercancel", end);
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", end);
+            window.removeEventListener("pointercancel", end);
             setPointerDragging(false);
 
-            if (moved) {
+            if (moved && !dropped) {
+              dropped = true;
               suppressClickRef.current = true;
               pitchDropRef?.current?.tryDropPlayer(dragPayload, endEvent.clientX, endEvent.clientY);
             }
           };
 
-          target.addEventListener("pointermove", onMove);
-          target.addEventListener("pointerup", end);
-          target.addEventListener("pointercancel", end);
+          window.addEventListener("pointermove", onMove);
+          window.addEventListener("pointerup", end);
+          window.addEventListener("pointercancel", end);
         }}
       >
         <span className="squad-player-chip-name">{player.name}</span>
