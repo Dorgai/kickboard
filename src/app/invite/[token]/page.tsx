@@ -99,10 +99,13 @@ export default function InviteRegistrationPage() {
 
         {!loading && !error && preview ? (
           <>
-            <h1>Join {preview.inviterDisplayName}</h1>
+            <h1>Join {preview.inviterDisplayName} on Kickboard</h1>
             <p className="community-panel-lead">
-              <strong>@{preview.inviterUsername}</strong> invited you to register on Kickboard — free
+              <strong>{preview.inviterDisplayName}</strong> invited you to register on Kickboard — free
               skill games, Coach Board squads, and predictions for the World Cup.
+            </p>
+            <p className="invite-registration-inviter-handle">
+              Invited by @{preview.inviterUsername}
             </p>
             {preview.personalMessage ? (
               <blockquote className="invite-registration-message">{preview.personalMessage}</blockquote>

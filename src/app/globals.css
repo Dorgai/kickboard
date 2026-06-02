@@ -2002,6 +2002,12 @@ h3 {
   padding-left: 12px;
 }
 
+.invite-registration-inviter-handle {
+  color: color-mix(in srgb, var(--color-text-primary) 55%, var(--color-text-secondary));
+  font-size: 12px;
+  margin: -4px 0 12px;
+}
+
 .invite-registration-email-note,
 .invite-registration-expiry,
 .invite-registration-footnote {

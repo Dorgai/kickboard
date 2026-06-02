@@ -1,6 +1,7 @@
 import { randomBytes } from "crypto";
 import { query } from "@/lib/db";
 import { createAcceptedConnection } from "@/lib/connections/store";
+import { formatInviterPublicName } from "@/lib/invitations/inviter-label";
 
 export type RegistrationInvitationStatus = "pending" | "accepted" | "revoked" | "expired";
 
@@ -194,9 +195,10 @@ export async function getPublicInvitationByToken(token: string): Promise<PublicI
     invitee_email: string | null;
     inviter_username: string;
     inviter_display_name: string | null;
+    inviter_email: string;
   }>(
     `SELECT ri.token, ri.status, ri.expires_at, ri.personal_message, ri.invitee_email,
-            u.username AS inviter_username, u.display_name AS inviter_display_name
+            u.username AS inviter_username, u.display_name AS inviter_display_name, u.email AS inviter_email
      FROM registration_invitations ri
      INNER JOIN users u ON u.id = ri.inviter_id
      WHERE ri.token = $1`,
@@ -215,7 +217,11 @@ export async function getPublicInvitationByToken(token: string): Promise<PublicI
     token: row.token,
     status,
     expiresAt: row.expires_at.toISOString(),
-    inviterDisplayName: row.inviter_display_name ?? row.inviter_username,
+    inviterDisplayName: formatInviterPublicName({
+      displayName: row.inviter_display_name,
+      username: row.inviter_username,
+      email: row.inviter_email
+    }),
     inviterUsername: row.inviter_username,
     personalMessage: row.personal_message,
     inviteeEmail: row.invitee_email

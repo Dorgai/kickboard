@@ -9,6 +9,7 @@ import {
 import { resolveAuthBaseUrl } from "@/auth";
 import { EmailFromAddressError, requireEmailConfig } from "@/lib/email/config";
 import { EmailNotConfiguredError, EmailSendFailedError } from "@/lib/email/resend";
+import { formatInviterPublicName } from "@/lib/invitations/inviter-label";
 import { sendRegistrationInvitationEmail } from "@/lib/email/registration-invitation";
 
 export const dynamic = "force-dynamic";
@@ -94,7 +95,11 @@ export async function POST(request: Request) {
     if (shouldSendEmail && invitation.inviteeEmail) {
       try {
         const sent = await sendRegistrationInvitationEmail({
-          inviterDisplayName: user.displayName ?? user.username,
+          inviterDisplayName: formatInviterPublicName({
+            displayName: user.displayName,
+            username: user.username,
+            email: user.email
+          }),
           inviterEmail: user.email,
           inviteeEmail: invitation.inviteeEmail,
           inviteUrl: invitation.inviteUrl,
