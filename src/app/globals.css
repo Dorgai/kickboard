@@ -2488,12 +2488,6 @@ h3 {
   padding: 4px 8px;
 }
 
-.squad-builder-pitch-column {
-  display: grid;
-  gap: 14px;
-  min-width: 0;
-}
-
 .squad-builder-pitch-stage {
   display: flex;
   justify-content: center;
@@ -2559,6 +2553,19 @@ h3 {
   display: grid;
   gap: 12px;
   min-width: 0;
+}
+
+.squad-builder-benches {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .squad-builder-benches {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .squad-team-benches {

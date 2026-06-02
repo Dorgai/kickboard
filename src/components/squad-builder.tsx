@@ -380,56 +380,56 @@ export function SquadBuilder({
       <div className="squad-builder-layout squad-builder-layout--stacked">
         <div className="squad-builder-pitch-stack">
           {poolLabel ? <p className="squad-team-benches-source">{poolLabel}</p> : null}
-          <SquadTeamBench
-            error={poolError}
-            formation={formations.home}
-            lineup={lineup}
-            loading={poolLoading}
-            pitchDropRef={pitchDropRef}
-            players={homePlayers}
-            selectedPlayerIds={homeSelectedIds}
-            side="home"
-            teamName={homeTeam}
-            onFormationChange={changeHomeFormation}
-            onRemoveFromPitch={removeFromPitch}
-            onTogglePlayerSelect={toggleHomeSelection}
-          />
-          <div className="squad-builder-pitch-column">
-            <div className="squad-builder-pitch-stage">
-              <SquadPitch
-                ref={pitchDropRef}
-                awayTeam={awayTeam}
-                homeTeam={homeTeam}
-                lineup={lineup}
-                selectedSlot={selectedSlot}
-                onLineupChange={setAlignedLineup}
-                onSelectSlot={setSelectedSlot}
-              />
-            </div>
-            <aside className="squad-builder-predictions" aria-label="Predictions for this match">
-              <h4 className="squad-builder-predictions-title">Predictions for this match</h4>
-              <FixturePredictionPick
-                awayTeam={awayTeam}
-                fixtureKey={fixtureKey}
-                homeTeam={homeTeam}
-                coachBoard
-              />
-            </aside>
+          <div className="squad-builder-pitch-stage">
+            <SquadPitch
+              ref={pitchDropRef}
+              awayTeam={awayTeam}
+              homeTeam={homeTeam}
+              lineup={lineup}
+              selectedSlot={selectedSlot}
+              onLineupChange={setAlignedLineup}
+              onSelectSlot={setSelectedSlot}
+            />
           </div>
-          <SquadTeamBench
-            error={poolError}
-            formation={formations.away}
-            lineup={lineup}
-            loading={poolLoading}
-            pitchDropRef={pitchDropRef}
-            players={awayPlayers}
-            selectedPlayerIds={awaySelectedIds}
-            side="away"
-            teamName={awayTeam}
-            onFormationChange={changeAwayFormation}
-            onRemoveFromPitch={removeFromPitch}
-            onTogglePlayerSelect={toggleAwaySelection}
-          />
+          <div className="squad-builder-benches" aria-label="Home and away benches">
+            <SquadTeamBench
+              error={poolError}
+              formation={formations.home}
+              lineup={lineup}
+              loading={poolLoading}
+              pitchDropRef={pitchDropRef}
+              players={homePlayers}
+              selectedPlayerIds={homeSelectedIds}
+              side="home"
+              teamName={homeTeam}
+              onFormationChange={changeHomeFormation}
+              onRemoveFromPitch={removeFromPitch}
+              onTogglePlayerSelect={toggleHomeSelection}
+            />
+            <SquadTeamBench
+              error={poolError}
+              formation={formations.away}
+              lineup={lineup}
+              loading={poolLoading}
+              pitchDropRef={pitchDropRef}
+              players={awayPlayers}
+              selectedPlayerIds={awaySelectedIds}
+              side="away"
+              teamName={awayTeam}
+              onFormationChange={changeAwayFormation}
+              onRemoveFromPitch={removeFromPitch}
+              onTogglePlayerSelect={toggleAwaySelection}
+            />
+          </div>
+          <aside className="squad-builder-predictions" aria-label="Predictions for this match">
+            <h4 className="squad-builder-predictions-title">Predictions for this match</h4>
+            <FixturePredictionPick
+              awayTeam={awayTeam}
+              fixtureKey={fixtureKey}
+              homeTeam={homeTeam}
+              coachBoard
+            />
+          </aside>
         </div>
       </div>
 
