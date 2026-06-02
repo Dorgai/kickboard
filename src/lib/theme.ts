@@ -12,4 +12,4 @@ export function resolveTheme(mode: ThemeMode): "light" | "dark" {
 }
 
 /** Inline script to set `data-theme` before paint (avoids flash). */
-export const themeInitScript = `(function(){try{var k="kickboard-theme";var s=localStorage.getItem(k);var d=document.documentElement;var dark=s==="dark"||(s!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);d.dataset.theme=dark?"dark":"light";}catch(e){}})();`;
+export const themeInitScript = `(function(){try{var k="kickboard-theme";var s=localStorage.getItem(k);var d=document.documentElement;var dark=s==="dark"||(s==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);d.dataset.theme=dark?"dark":"light";}catch(e){}})();`;
