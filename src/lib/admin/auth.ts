@@ -33,12 +33,22 @@ export function getAdminAuthStatus() {
 }
 
 export function isAdminRequest(request: NextRequest) {
-  const configuredToken = process.env.ADMIN_DATA_SOURCES_TOKEN;
-  const requestToken = readTokenFromRequest(request);
+  return isAdminAuthorizedRequest(request);
+}
 
-  if (!configuredToken || !requestToken) {
-    return false;
-  }
+export function isAdminAuthorizedRequest(request: Request | NextRequest) {
+  const configuredToken = process.env.ADMIN_DATA_SOURCES_TOKEN?.trim();
+  if (!configuredToken) return false;
 
-  return requestToken === configuredToken;
+  const requestToken =
+    request instanceof NextRequest
+      ? readTokenFromRequest(request)
+      : readAdminToken({
+          authorization: request.headers.get("authorization"),
+          cookieToken: null,
+          headerToken: request.headers.get("x-admin-token"),
+          queryToken: new URL(request.url).searchParams.get("token")
+        });
+
+  return Boolean(requestToken && requestToken === configuredToken);
 }

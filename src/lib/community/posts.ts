@@ -74,7 +74,7 @@ export async function createTextPost(authorId: string, body: string) {
 
   const result = await query<{ id: string }>(
     `INSERT INTO posts (author_id, post_type, body, moderation_status)
-     VALUES ($1, 'text', $2, 'withheld')
+     VALUES ($1, 'text', $2, 'approved')
      RETURNING id`,
     [authorId, trimmed]
   );
@@ -89,9 +89,12 @@ export async function listPostsForModeration(limit = 50) {
      FROM posts p
      JOIN users u ON u.id = p.author_id
      WHERE p.deleted_at IS NULL
-       AND p.moderation_status IN ('withheld', 'removed')
      ORDER BY
-       CASE p.moderation_status WHEN 'withheld' THEN 0 ELSE 1 END,
+       CASE p.moderation_status
+         WHEN 'withheld' THEN 0
+         WHEN 'removed' THEN 1
+         ELSE 2
+       END,
        p.created_at DESC
      LIMIT $1`,
     [limit]

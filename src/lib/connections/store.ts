@@ -48,6 +48,7 @@ export async function searchConnectableUsers(viewerId: string, queryText: string
      FROM users
      WHERE deleted_at IS NULL
        AND is_suspended = false
+       AND COALESCE(is_banned, false) = false
        AND is_child = false
        AND onboarding_completed_at IS NOT NULL
        AND id <> $1
@@ -84,6 +85,29 @@ export async function areUsersConnected(userId: string, peerId: string) {
   return row?.status === "accepted";
 }
 
+/** Ensures an accepted connection (e.g. official Kickboard moderator account → user). */
+export async function ensureAcceptedConnection(userId: string, peerId: string) {
+  if (userId === peerId) return;
+  const existing = await getConnectionBetween(userId, peerId);
+  if (existing?.status === "accepted") return;
+
+  if (existing) {
+    await query(
+      `UPDATE connections
+       SET status = 'accepted', responded_at = COALESCE(responded_at, now())
+       WHERE id = $1`,
+      [existing.id]
+    );
+    return;
+  }
+
+  await query(
+    `INSERT INTO connections (requester_id, addressee_id, status, responded_at)
+     VALUES ($1, $2, 'accepted', now())`,
+    [userId, peerId]
+  );
+}
+
 export async function createConnectionRequest(requesterId: string, addresseeUsername: string) {
   const username = addresseeUsername.trim().toLowerCase().slice(0, 30);
   if (!username) throw new Error("USERNAME_REQUIRED");
@@ -91,7 +115,8 @@ export async function createConnectionRequest(requesterId: string, addresseeUser
   const addressee = await query<{ id: string; is_child: boolean }>(
     `SELECT id, is_child
      FROM users
-     WHERE username = $1 AND deleted_at IS NULL AND is_suspended = false`,
+     WHERE username = $1 AND deleted_at IS NULL AND is_suspended = false
+       AND COALESCE(is_banned, false) = false`,
     [username]
   );
   const peer = addressee.rows[0];
@@ -204,6 +229,7 @@ export async function listConnectionsForUser(userId: string) {
      WHERE (c.requester_id = $1 OR c.addressee_id = $1)
        AND p.deleted_at IS NULL
        AND p.is_suspended = false
+       AND COALESCE(p.is_banned, false) = false
      ORDER BY c.created_at DESC`,
     [userId]
   );

@@ -79,7 +79,7 @@ export function CommunityModerationPanel({ adminToken }: { adminToken: string })
       <div className="section-heading compact">
         <div>
           <h2>Community moderation</h2>
-          <p>Approve withheld Coach Board posts or remove content after reports.</p>
+          <p>Hide or remove Coach Board posts and restore content when appropriate.</p>
         </div>
         <button className="button secondary" type="button" onClick={load}>
           Refresh
@@ -89,7 +89,7 @@ export function CommunityModerationPanel({ adminToken }: { adminToken: string })
       {error ? <p className="inline-error">{error}</p> : null}
 
       {posts.length === 0 ? (
-        <p className="inline-status">No posts waiting in the moderation queue.</p>
+        <p className="inline-status">No posts to review.</p>
       ) : (
         <ul className="community-moderation-list">
           {posts.map((post) => (
@@ -104,21 +104,23 @@ export function CommunityModerationPanel({ adminToken }: { adminToken: string })
                 <p className="community-post-body">{post.body}</p>
               </div>
               <div className="community-moderation-actions">
-                <button
-                  className="button"
-                  disabled={busyId === post.id}
-                  type="button"
-                  onClick={() => moderate(post.id, "approve")}
-                >
-                  Approve
-                </button>
+                {post.moderationStatus !== "approved" ? (
+                  <button
+                    className="button"
+                    disabled={busyId === post.id}
+                    type="button"
+                    onClick={() => moderate(post.id, "approve")}
+                  >
+                    Restore
+                  </button>
+                ) : null}
                 <button
                   className="button secondary"
                   disabled={busyId === post.id}
                   type="button"
                   onClick={() => moderate(post.id, "withhold")}
                 >
-                  Withhold
+                  Hide
                 </button>
                 <button
                   className="button secondary"

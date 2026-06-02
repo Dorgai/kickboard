@@ -124,7 +124,7 @@ export const safetyPillars = [
   {
     title: "Moderated community",
     icon: HeartHandshake,
-    detail: "Posts, comments, messages and uploads are designed to pass through moderation before display."
+    detail: "Posts and Fan Chat are live by default; admins can hide, remove, and manage accounts from the dashboard."
   },
   {
     title: "Licensed data path",

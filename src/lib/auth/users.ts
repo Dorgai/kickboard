@@ -33,16 +33,30 @@ export async function findAuthUserById(userId: string): Promise<AuthUser | null>
     points_balance: number;
     onboarding_completed_at: Date | null;
     is_suspended: boolean;
+    suspended_until: Date | null;
+    is_banned: boolean;
   }>(
     `SELECT id, email, username, display_name, birth_year, is_child, points_balance,
-            onboarding_completed_at, is_suspended
+            onboarding_completed_at, is_suspended, suspended_until,
+            COALESCE(is_banned, false) AS is_banned
      FROM users
      WHERE id = $1 AND deleted_at IS NULL`,
     [userId]
   );
 
   const row = result.rows[0];
-  if (!row || row.is_suspended) return null;
+  if (!row || row.is_banned) return null;
+
+  if (row.is_suspended) {
+    if (row.suspended_until && row.suspended_until <= new Date()) {
+      await query(
+        `UPDATE users SET is_suspended = false, suspended_until = NULL, updated_at = now() WHERE id = $1`,
+        [userId]
+      );
+    } else {
+      return null;
+    }
+  }
 
   return {
     id: row.id,

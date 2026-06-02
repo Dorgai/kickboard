@@ -1,5 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { AdminAccessGate } from "@/components/admin-access-gate";
+import { AdminFanChatModerationPanel } from "@/components/admin-fan-chat-moderation-panel";
+import { AdminUserManagementPanel } from "@/components/admin-user-management-panel";
 import { CommunityModerationPanel } from "@/components/community-moderation-panel";
 import { CommunitySetupPanel } from "@/components/community-setup-panel";
 import { FeedStatusPanel } from "@/components/feed-status-panel";
@@ -69,7 +71,13 @@ export default async function AdminDataSourcesPage({
         oauthConfigured={isOAuthConfigured()}
       />
 
-      {communityHealth.schemaReady && token ? <CommunityModerationPanel adminToken={token} /> : null}
+      {communityHealth.schemaReady && token ? (
+        <>
+          <AdminUserManagementPanel adminToken={token} />
+          <AdminFanChatModerationPanel adminToken={token} />
+          <CommunityModerationPanel adminToken={token} />
+        </>
+      ) : null}
 
       <section className="admin-source-grid">
         {data.sources.map((source) => (

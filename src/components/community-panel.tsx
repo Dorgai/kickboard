@@ -88,7 +88,7 @@ export function CommunityPanel({ embedded = false }: { embedded?: boolean }) {
       }
 
       setUser(payload.user ?? null);
-      setNotice("You can post on Fan Chat. Posts are reviewed before they go live.");
+      setNotice("You can post on the Coach Board feed.");
       await refresh();
     } catch (joinError) {
       setError(joinError instanceof Error ? joinError.message : "Unable to join.");
@@ -116,7 +116,7 @@ export function CommunityPanel({ embedded = false }: { embedded?: boolean }) {
       }
 
       setDraft("");
-      setNotice(payload.message ?? "Post submitted for moderation.");
+      setNotice(payload.message ?? "Post published.");
     } catch (postError) {
       setError(postError instanceof Error ? postError.message : "Unable to post.");
     } finally {
@@ -174,7 +174,7 @@ export function CommunityPanel({ embedded = false }: { embedded?: boolean }) {
           ) : (
             <>
               Attach Postgres on Railway, run <code>npm run db:schema</code>, and set{" "}
-              <code>JWT_SECRET</code>. Moderation stays on the admin dashboard before posts go public.
+              <code>JWT_SECRET</code>. Admins moderate content from the dashboard after it is published.
             </>
           )}
         </p>
@@ -273,7 +273,7 @@ export function CommunityPanel({ embedded = false }: { embedded?: boolean }) {
 
       <div className="community-feed" role="feed">
         {posts.length === 0 ? (
-          <p className="inline-status">No approved posts yet. Be the first after moderation.</p>
+          <p className="inline-status">No posts yet. Be the first to share.</p>
         ) : (
           posts.map((post) => (
             <article className="community-post-card" key={post.id}>

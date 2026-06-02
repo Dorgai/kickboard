@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     }
 
     const user = await findUserById(legacyUserId);
-    if (!user || user.is_suspended) {
+    if (!user || user.is_suspended || user.is_banned) {
       return NextResponse.json({ error: "Account cannot post." }, { status: 403 });
     }
 
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       postId: post.id,
-      message: "Post submitted for moderation. It will appear on the Coach Board after review."
+      message: "Post published on the Coach Board."
     });
   } catch (error) {
     if (error instanceof Error) {

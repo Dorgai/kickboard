@@ -13,9 +13,10 @@ Moderated public posting for the **Current event** tab. Historical match data st
 
 - Accounts under **13** cannot register for posting (Fan Mode).
 - **Fan Chat** (floating panel) is **private messaging** between **accepted connections**: send to one fan or **broadcast to all connections**. Requires `db/fan-chat-messages-extensions.sql` via `npm run db:schema`.
-- Legacy **Fan Chat** public text posts (moderated feed in `CommunityPanel` when not embedded) still use `moderation_status = withheld` until an admin approves them.
+- **Coach Board** text posts publish as `approved` immediately (no pre-approval queue).
 - **Coach Board squad shares** (`post_type = squad_share`) publish as `approved` immediately (structured lineup summary from saved squads).
-- Reporting a post hides it (`withheld`) until review.
+- Reporting a post hides it (`withheld`) until an admin restores or removes it.
+- **Admin → Data sources**: search users (suspend, ban, send Kickboard DMs), moderate Fan Chat messages (remove), and hide/remove Coach Board posts.
 - Full user auth, DMs, and child profiles are later phases.
 
 ## Authentication (no user password yet)
@@ -57,14 +58,16 @@ Railway’s **`DATABASE_URL`** on the web service is often the **private** host 
 | `GET /api/community/status` | Whether DB + JWT are configured |
 | `GET/POST/DELETE /api/community/session` | Join, current user, sign out |
 | `GET /api/community/posts` | Approved public feed |
-| `POST /api/community/posts` | Submit text post (withheld) |
+| `POST /api/community/posts` | Submit text post (live immediately) |
 | `POST /api/community/posts/:id/report` | Report post |
-| `GET/PATCH /api/admin/community/posts` | Moderation queue (admin bearer token) |
+| `GET/PATCH /api/admin/community/posts` | Coach Board post moderation (admin bearer token) |
+| `GET/PATCH /api/admin/users` | Search users; suspend, ban, or lift restrictions |
+| `GET/POST /api/admin/fan-chat/messages` | Review/remove Fan Chat; send official DMs |
 
 ## UI
 
 - **Current event → Community** (`#community`): feed, join form, compose, report.
-- **Admin → Data sources**: moderation queue when Postgres is configured.
+- **Admin → Data sources**: user management, Fan Chat moderation, and Coach Board post tools when Postgres is configured.
 
 ## Next steps (product)
 

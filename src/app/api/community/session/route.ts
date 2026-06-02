@@ -23,7 +23,7 @@ export async function GET() {
     }
 
     const user = await findUserById(userId);
-    if (!user || user.is_suspended) {
+    if (!user || user.is_suspended || user.is_banned) {
       return NextResponse.json({ connected: true, user: null });
     }
 

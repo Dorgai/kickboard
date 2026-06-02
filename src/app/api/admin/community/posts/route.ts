@@ -1,26 +1,12 @@
 import { NextResponse } from "next/server";
-import { readAdminToken } from "@/lib/admin/auth";
+import { isAdminAuthorizedRequest } from "@/lib/admin/auth";
 import { listPostsForModeration, setPostModerationStatus } from "@/lib/community/posts";
 import { isDatabaseConfigured } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-function isAuthorized(request: Request) {
-  const configured = process.env.ADMIN_DATA_SOURCES_TOKEN?.trim();
-  if (!configured) return false;
-
-  const token = readAdminToken({
-    authorization: request.headers.get("authorization"),
-    cookieToken: null,
-    headerToken: request.headers.get("x-admin-token"),
-    queryToken: new URL(request.url).searchParams.get("token")
-  });
-
-  return Boolean(token && token === configured);
-}
-
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isAdminAuthorizedRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -38,7 +24,7 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isAdminAuthorizedRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

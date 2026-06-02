@@ -168,8 +168,9 @@ export async function listFanChatThread(viewerId: string, peerId: string) {
      FROM fan_chat_messages m
      INNER JOIN users s ON s.id = m.sender_id
      INNER JOIN users r ON r.id = m.recipient_id
-     WHERE (m.sender_id = $1 AND m.recipient_id = $2)
-        OR (m.sender_id = $2 AND m.recipient_id = $1)
+     WHERE m.deleted_at IS NULL
+       AND ((m.sender_id = $1 AND m.recipient_id = $2)
+         OR (m.sender_id = $2 AND m.recipient_id = $1))
      ORDER BY m.created_at ASC
      LIMIT $3`,
     [viewerId, peerId, MAX_THREAD_MESSAGES]
@@ -192,7 +193,7 @@ export async function listFanChatBroadcasts(viewerId: string) {
   }>(
     `SELECT broadcast_id, body, count(*)::text AS recipient_count, min(created_at) AS created_at
      FROM fan_chat_messages
-     WHERE sender_id = $1 AND broadcast_id IS NOT NULL
+     WHERE sender_id = $1 AND broadcast_id IS NOT NULL AND deleted_at IS NULL
      GROUP BY broadcast_id, body
      ORDER BY min(created_at) DESC
      LIMIT 40`,

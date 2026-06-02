@@ -17,5 +17,5 @@ CREATE TABLE IF NOT EXISTS content_reports (
 
 CREATE INDEX IF NOT EXISTS idx_content_reports_post ON content_reports(post_id, created_at DESC);
 
--- New community posts await moderation before appearing on the public feed.
-ALTER TABLE posts ALTER COLUMN moderation_status SET DEFAULT 'withheld';
+-- Community posts publish immediately; admins moderate after the fact (reports / admin review).
+ALTER TABLE posts ALTER COLUMN moderation_status SET DEFAULT 'approved';

@@ -25,8 +25,9 @@ export async function findUserById(userId: string) {
     display_name: string | null;
     is_child: boolean;
     is_suspended: boolean;
+    is_banned: boolean;
   }>(
-    `SELECT id, username, display_name, is_child, is_suspended
+    `SELECT id, username, display_name, is_child, is_suspended, COALESCE(is_banned, false) AS is_banned
      FROM users
      WHERE id = $1 AND deleted_at IS NULL`,
     [userId]
