@@ -7,8 +7,8 @@ Signed-in users get alerts from the bell icon in the header.
 | Category | When |
 |----------|------|
 | **Connection activity** | A connected fan updates predictions, saves/publishes a Coach Board, or posts (approved) |
-| **Upcoming match** | Kickoff within ~72h (API-Football `next` fixtures, when live data is configured) |
-| **Match result** | Full-time scores from API-Football `last` fixtures |
+| **Upcoming match** | Kickoff within ~72h from the public WC26 schedule (Wikipedia); enriched by API-Football when `API_FOOTBALL_KEY` is set |
+| **Match result** | Full-time scores from API-Football (`last` + live fixtures for the World Cup league, when the key is set) |
 
 ## API
 
@@ -20,3 +20,8 @@ Alerts are stored in `user_alerts` (deduped by `alert_key`). Apply `db/user-aler
 ## Polling
 
 The header panel refreshes every 60 seconds while you are signed in.
+
+Optional env for API-Football World Cup filtering (defaults: league `1`, season `2026`):
+
+- `API_FOOTBALL_LEAGUE_ID`
+- `API_FOOTBALL_SEASON`

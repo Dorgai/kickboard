@@ -2,7 +2,12 @@ import { fetchApiFootball, getApiFootballConfig, type ApiFootballFixture } from 
 import { listAcceptedPeerIds } from "@/lib/connections/store";
 import { query } from "@/lib/db";
 import {
+  getCurrentWorldCupFeedCached,
+  parseWorldCupFixtureDate
+} from "@/lib/feeds/current-world-cup";
+import {
   buildApiFootballFixtureKey,
+  buildWorldCupFixtureKey,
   fixtureKeyToShortLabel,
   formatFixtureLabel
 } from "@/lib/fixtures/fixture-key";
@@ -176,14 +181,65 @@ function mapApiFixture(fixture: ApiFootballFixture) {
   };
 }
 
-async function syncMatchAlerts(userId: string) {
-  const { keyConfigured, workerEnabled } = getApiFootballConfig();
-  if (!keyConfigured || !workerEnabled) return;
+function worldCupLeagueParams() {
+  return {
+    league: process.env.API_FOOTBALL_LEAGUE_ID?.trim() || "1",
+    season: process.env.API_FOOTBALL_SEASON?.trim() || "2026"
+  };
+}
+
+async function syncWorldCupScheduleAlerts(userId: string) {
+  try {
+    const feed = await getCurrentWorldCupFeedCached();
+    const now = Date.now();
+    const upcomingCutoff = now + 1000 * 60 * 60 * 72;
+
+    for (const group of feed.groups) {
+      for (const fixture of group.fixtures) {
+        const kickoff = parseWorldCupFixtureDate(fixture.date);
+        if (!kickoff) continue;
+        const kickoffMs = kickoff.getTime();
+        if (kickoffMs < now - 1000 * 60 * 30) continue;
+        if (kickoffMs > upcomingCutoff) continue;
+
+        const fixtureKey = buildWorldCupFixtureKey({
+          homeTeam: fixture.homeTeam,
+          awayTeam: fixture.awayTeam,
+          date: fixture.date,
+          group: group.group
+        });
+
+        await upsertUserAlert({
+          userId,
+          alertKey: `match:upcoming:${fixtureKey}`,
+          category: "match_upcoming",
+          title: "Upcoming match",
+          body: `${fixture.homeTeam} vs ${fixture.awayTeam} — ${kickoff.toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short"
+          })} · Group ${group.group}`,
+          href: "/#tournament",
+          fixtureKey,
+          occurredAt: kickoff
+        });
+      }
+    }
+  } catch {
+    /* Public schedule optional */
+  }
+}
+
+async function syncApiFootballMatchAlerts(userId: string) {
+  const { keyConfigured } = getApiFootballConfig();
+  if (!keyConfigured) return;
+
+  const wc = worldCupLeagueParams();
 
   try {
-    const [upcoming, recent] = await Promise.all([
-      fetchApiFootball<ApiFootballFixture[]>("/fixtures", { next: "25" }),
-      fetchApiFootball<ApiFootballFixture[]>("/fixtures", { last: "25" })
+    const [upcoming, recent, live] = await Promise.all([
+      fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc, next: "25" }),
+      fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc, last: "25" }),
+      fetchApiFootball<ApiFootballFixture[]>("/fixtures", { live: "all" })
     ]);
 
     const now = Date.now();
@@ -204,16 +260,21 @@ async function syncMatchAlerts(userId: string) {
           dateStyle: "medium",
           timeStyle: "short"
         })}`,
-        href: "/#coach-board",
+        href: "/#tournament",
         fixtureKey: mapped.fixtureKey,
         occurredAt: mapped.date
       });
     }
 
-    for (const fixture of recent.response) {
+    const finishedFixtures = [...recent.response, ...live.response];
+    const seenResultKeys = new Set<string>();
+
+    for (const fixture of finishedFixtures) {
       const mapped = mapApiFixture(fixture);
       if (!mapped.isFinished) continue;
       if (mapped.homeGoals === null || mapped.awayGoals === null) continue;
+      if (seenResultKeys.has(mapped.fixtureKey)) continue;
+      seenResultKeys.add(mapped.fixtureKey);
 
       await upsertUserAlert({
         userId,
@@ -227,13 +288,14 @@ async function syncMatchAlerts(userId: string) {
       });
     }
   } catch {
-    /* API optional — connection alerts still work */
+    /* API optional — connection and schedule alerts still work */
   }
 }
 
 export async function syncAlertsForUser(userId: string) {
   const peerIds = await listAcceptedPeerIds(userId);
   await syncConnectionActivityAlerts(userId, peerIds);
-  await syncMatchAlerts(userId);
+  await syncWorldCupScheduleAlerts(userId);
+  await syncApiFootballMatchAlerts(userId);
   await pruneOldAlerts(userId);
 }

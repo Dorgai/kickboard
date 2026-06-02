@@ -139,8 +139,8 @@ export function NotificationsCenter() {
 
           {!loading && status === "authenticated" && alerts.length === 0 ? (
             <p className="inline-status">
-              No alerts yet. Connect with fans and picks will show here; match reminders appear when
-              live data is connected.
+              No alerts yet. Connect with fans to see their predictions and boards; upcoming WC26
+              kickoffs appear within three days of the match.
             </p>
           ) : null}
 
