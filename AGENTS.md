@@ -71,4 +71,8 @@ If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production ta
 - Past-events knockout layout: full-width **Route to the final** bracket on top; match list, summary, team stats/lineups, event timeline, and player stats stack in `.knockout-widgets` rows below (not side-by-side with the tree).
 - Gap tracker: [`docs/feed-browser-roadmap.md`](docs/feed-browser-roadmap.md).
 - Feed & infrastructure status (`FeedStatusPanel`) lives on `/admin/data-sources`, not the public homepage.
-- **Community (Coach Board)** on Current event `#community` needs `DATABASE_URL`, `JWT_SECRET`, and `npm run db:schema` (includes `db/community-extensions.sql`). Posts are withheld until approved in admin moderation.
+- **Coach Board** (`#coach-board`) is **per fixture**: match picker (left) + board (right). Squads/posts use `fixture_key`; run `npm run db:schema` (includes `db/auth-extensions.sql`, `db/fixture-scope-extensions.sql`).
+- **Google OAuth** needs `GOOGLE_CLIENT_*`, `AUTH_URL` (public site URL, not `0.0.0.0`), and `JWT_SECRET`/`AUTH_SECRET` on Railway. Verify `/api/auth/providers` shows your Railway host in `callbackUrl`.
+- **Header** shows signed-in user + log out when OAuth session is active (`SessionProvider` + `HeaderUserMenu`).
+- **Community posts** are withheld until approved in admin moderation (`/admin/data-sources`).
+- Cloud agents cannot read GitHub/Railway secrets; production `DATABASE_URL` / `RAILWAY_TOKEN` must be set in those dashboards or via local `npm run github:secrets` / `npm run railway:variables`.

@@ -8,14 +8,16 @@ import { isDatabaseConfigured } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   if (!isDatabaseConfigured()) {
     return NextResponse.json({ connected: false, posts: [] });
   }
 
+  const fixtureKey = new URL(request.url).searchParams.get("fixtureKey")?.trim() ?? null;
+
   try {
-    const posts = await listApprovedPosts();
-    return NextResponse.json({ connected: true, posts });
+    const posts = await listApprovedPosts(40, fixtureKey);
+    return NextResponse.json({ connected: true, posts, fixtureKey });
   } catch (error) {
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });

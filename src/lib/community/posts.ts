@@ -37,18 +37,32 @@ function mapPost(row: PostRow): CommunityPost {
   };
 }
 
-export async function listApprovedPosts(limit = 40) {
-  const result = await query<PostRow>(
-    `SELECT p.id, p.post_type, p.body, p.created_at, p.comment_count,
-            u.username, u.display_name
-     FROM posts p
-     JOIN users u ON u.id = p.author_id
-     WHERE p.deleted_at IS NULL
-       AND p.moderation_status = 'approved'
-     ORDER BY p.created_at DESC
-     LIMIT $1`,
-    [limit]
-  );
+export async function listApprovedPosts(limit = 40, fixtureKey?: string | null) {
+  const key = fixtureKey?.trim().slice(0, 120);
+  const result = key
+    ? await query<PostRow>(
+        `SELECT p.id, p.post_type, p.body, p.created_at, p.comment_count,
+                u.username, u.display_name
+         FROM posts p
+         JOIN users u ON u.id = p.author_id
+         WHERE p.deleted_at IS NULL
+           AND p.moderation_status = 'approved'
+           AND p.fixture_key = $2
+         ORDER BY p.created_at DESC
+         LIMIT $1`,
+        [limit, key]
+      )
+    : await query<PostRow>(
+        `SELECT p.id, p.post_type, p.body, p.created_at, p.comment_count,
+                u.username, u.display_name
+         FROM posts p
+         JOIN users u ON u.id = p.author_id
+         WHERE p.deleted_at IS NULL
+           AND p.moderation_status = 'approved'
+         ORDER BY p.created_at DESC
+         LIMIT $1`,
+        [limit]
+      );
 
   return result.rows.map((row) => mapPost(row));
 }
