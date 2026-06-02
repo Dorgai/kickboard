@@ -4098,17 +4098,18 @@ h3 {
   margin: 0;
 }
 
+.current-event-overview-heading {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  min-width: 0;
+}
+
 .current-event-overview h2 {
   font-size: 1.05rem;
   line-height: 1.25;
-  margin: 0;
-}
-
-.current-event-overview-note {
-  color: var(--color-text-secondary);
-  flex: 1 1 100%;
-  font-size: 11px;
-  line-height: 1.35;
   margin: 0;
 }
 

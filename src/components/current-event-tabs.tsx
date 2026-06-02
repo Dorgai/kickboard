@@ -1,5 +1,6 @@
 "use client";
 
+import { Info } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
@@ -152,10 +153,21 @@ export function CurrentEventTabs({
     <section className={`current-world-cup-card current-event-tabs-layout${chatOpen ? " fan-chat-dock-open" : ""}`}>
       <div className="current-event-overview">
         <p className="eyebrow">Current World Cup</p>
-        <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
-        {currentWorldCup?.note ? (
-          <p className="current-event-overview-note">{currentWorldCup.note}</p>
-        ) : null}
+        <div className="current-event-overview-heading">
+          <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
+          {currentWorldCup?.note ? (
+            <button
+              aria-label="About tournament squads and data sources"
+              className="info-tooltip"
+              type="button"
+            >
+              <Info aria-hidden className="info-tooltip-icon" size={18} />
+              <span className="info-tooltip-bubble" role="tooltip">
+                {currentWorldCup.note}
+              </span>
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="current-summary-grid current-summary-grid--compact">
