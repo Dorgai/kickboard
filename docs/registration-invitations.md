@@ -50,6 +50,16 @@ For production, add your domain at [resend.com/domains](https://resend.com/domai
 
 Also ensure `AUTH_URL` or `NEXT_PUBLIC_APP_URL` points at your public site so invite links in emails are correct.
 
+### Resend test mode (`onboarding@resend.dev`)
+
+If `EMAIL_FROM` is `Kickboard <onboarding@resend.dev>`, Resend only delivers to **the email on your Resend account** (the address you signed up with). Inviting any other address returns **403** — the invite is still created; use **Copy link**.
+
+To email arbitrary invitees:
+
+1. [resend.com/domains](https://resend.com/domains) → add your domain → add DNS records → wait for **Verified**.
+2. Railway → `EMAIL_FROM=Kickboard <invites@yourdomain.com>` (must use that domain, not Gmail).
+3. Redeploy kickboard production.
+
 ## Limits
 
 - Invites expire after **14 days**.

@@ -38,11 +38,19 @@ export function formatResendSendErrorDetail(status: number, rawBody: string): st
   try {
     const payload = JSON.parse(rawBody) as { message?: string; name?: string };
     if (payload.message) {
-      if (status === 403 && payload.message.toLowerCase().includes("not verified")) {
+      const lower = payload.message.toLowerCase();
+      if (status === 403 && lower.includes("testing emails")) {
+        return (
+          "Resend is in test mode: you can only email your own Resend account address until a domain is verified. " +
+          "Add your domain at resend.com/domains, set Railway EMAIL_FROM to something like Kickboard <invites@yourdomain.com>, " +
+          "then redeploy. Until then, copy the invite link below."
+        );
+      }
+      if (status === 403 && lower.includes("not verified")) {
         return (
           "The sender address uses a domain that is not verified with Resend. " +
-          "Use Kickboard <onboarding@resend.dev> for testing, or verify your own domain at resend.com/domains " +
-          "(you cannot send as @gmail.com)."
+          "Verify your domain at resend.com/domains and set EMAIL_FROM to an address on that domain " +
+          "(you cannot send as @gmail.com). Copy the invite link below to share manually."
         );
       }
       return payload.message;
