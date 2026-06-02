@@ -34,14 +34,8 @@ export type FeatureCard = {
   status: "phase-1" | "phase-2" | "phase-3" | "later";
 };
 
-export const navigation = [
-  "Home",
-  "Bracket",
-  "Squads",
-  "Players",
-  "Community",
-  "Analytics"
-] as const;
+/** Primary header links — detail lives in Current event / Past events tabs on Home. */
+export const navigation = ["Home", "Community"] as const;
 
 export const matchEvents = [
   { minute: "12'", type: "Goal", detail: "Vinicius Junior finishes a low Rodrygo cross", tone: "goal" },

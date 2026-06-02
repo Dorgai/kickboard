@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDown, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HeaderUserMenu } from "@/components/header-user-menu";
@@ -12,15 +11,9 @@ type AppChromeProps = {
   activeNav?: "Home" | "Admin";
 };
 
-const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "analytics"]);
-const CURRENT_EVENT_HASHES = new Set([
-  "tournament",
-  "bracket",
-  "coach-board",
-  "fan-chat",
-  "predictions",
-  "community"
-]);
+function isCommunityHash(hash: string) {
+  return hash === "community" || hash === "coach-board" || hash === "fan-chat";
+}
 
 export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
   const [hash, setHash] = useState("");
@@ -44,38 +37,18 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
           <span>KICKBOARD</span>
         </Link>
 
-        <button className="tournament-switcher" type="button">
-          FIFA World Cup 2026
-          <ChevronDown size={16} aria-hidden="true" />
-        </button>
+        <span className="tournament-switcher tournament-switcher--label">FIFA World Cup 2026</span>
 
         <nav className="nav-tabs">
           {navigation.map((item) => {
-            const slug = item.toLowerCase();
             const isActive =
               activeNav === "Home" &&
-              (item === "Home"
-                ? !hash || hash === "home"
-                : item === "Bracket"
-                  ? hash === "tournament" || hash === "bracket"
-                  : item === "Community"
-                    ? hash === "community" || hash === "coach-board"
-                    : CURRENT_EVENT_HASHES.has(slug)
-                      ? hash === slug
-                      : PAST_EVENT_HASHES.has(hash) && hash === slug);
+              (item === "Home" ? !isCommunityHash(hash) : isCommunityHash(hash));
             return (
               <Link
                 key={item}
                 className={isActive ? "active" : ""}
-                href={
-                  item === "Home"
-                    ? "/"
-                    : item === "Bracket"
-                      ? "/#tournament"
-                      : item === "Community"
-                        ? "/#community"
-                        : `/#${slug}`
-                }
+                href={item === "Home" ? "/" : "/#community"}
               >
                 {item}
               </Link>
@@ -88,9 +61,6 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
 
         <div className="nav-actions">
           <ThemeSelector />
-          <button type="button" aria-label="Open global search">
-            <Search size={18} aria-hidden="true" />
-          </button>
           <NotificationsCenter />
           <HeaderUserMenu />
         </div>

@@ -161,6 +161,12 @@ button:disabled {
   padding: 0 14px;
 }
 
+.tournament-switcher--label {
+  cursor: default;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .nav-tabs {
   display: flex;
   gap: 6px;
