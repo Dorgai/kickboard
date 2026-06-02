@@ -20,13 +20,15 @@ type CoachBoardPanelProps = {
   fixtureLabel: string;
   homeTeam: string;
   awayTeam: string;
+  onFixtureDrop?: (fixtureKey: string) => void;
 };
 
 export function CoachBoardPanel({
   fixtureKey,
   fixtureLabel,
   homeTeam,
-  awayTeam
+  awayTeam,
+  onFixtureDrop
 }: CoachBoardPanelProps) {
   const [posts, setPosts] = useState<BoardPost[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
@@ -117,8 +119,10 @@ export function CoachBoardPanel({
 
         <SavedSquadsBar
           activeSquadId={activeSquadId}
+          fixtureLabel={fixtureLabel}
           loading={squadsLoading}
           squads={squads}
+          onFixtureDrop={onFixtureDrop}
           onNew={handleNewBoard}
           onSelect={handleSelectSquad}
         />

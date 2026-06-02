@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { MatchTeamsLine } from "@/components/team-label";
-import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
+import { writeFixtureDragData } from "@/lib/fixtures/drag-fixture";
 import { groupFixturesByDate, type FixtureOption } from "@/lib/fixtures/fixture-key";
+import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
 
 export type WorldCupGroupInput = {
   group: string;
@@ -59,6 +60,20 @@ export function useFixtureOptions(groups: WorldCupGroupInput[]) {
   );
 }
 
+function fixtureMatchesSearch(fixture: FixtureOption, query: string) {
+  const haystack = [
+    fixture.homeTeam,
+    fixture.awayTeam,
+    fixture.label,
+    fixture.group ?? "",
+    fixture.date ?? "",
+    fixture.status
+  ]
+    .join(" ")
+    .toLowerCase();
+  return haystack.includes(query);
+}
+
 type FixtureMatchPickerProps = {
   fixtures: FixtureOption[];
   selectedKey: string | null;
@@ -67,6 +82,10 @@ type FixtureMatchPickerProps = {
   emptyMessage?: string;
   /** Group matches by day with a vertical timeline rail (Predictions / Coach Board picker). */
   timeline?: boolean;
+  /** Compact search filter (Coach Board). */
+  searchable?: boolean;
+  /** Allow dragging a match to drop on saved boards (Coach Board). */
+  draggableMatches?: boolean;
 };
 
 export function FixtureMatchPicker({
@@ -75,17 +94,41 @@ export function FixtureMatchPicker({
   onSelect,
   ariaLabel = "Select a match",
   emptyMessage = "Fixture list is loading from the tournament feed.",
-  timeline = true
+  timeline = true,
+  searchable = false,
+  draggableMatches = false
 }: FixtureMatchPickerProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredFixtures = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!searchable || !query) return fixtures;
+    return fixtures.filter((fixture) => fixtureMatchesSearch(fixture, query));
+  }, [fixtures, searchQuery, searchable]);
+
   const dateGroups = useMemo(
-    () => (timeline ? groupFixturesByDate(fixtures) : []),
-    [fixtures, timeline]
+    () => (timeline ? groupFixturesByDate(filteredFixtures) : []),
+    [filteredFixtures, timeline]
   );
 
   return (
     <aside className="match-fixture-picker" aria-label={ariaLabel}>
+      {searchable ? (
+        <label className="match-fixture-picker-search match-list-search">
+          <input
+            aria-label="Search matches on Coach Board"
+            autoComplete="off"
+            placeholder="Search matches…"
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+          />
+        </label>
+      ) : null}
       {fixtures.length === 0 ? (
         <p className="inline-status">{emptyMessage}</p>
+      ) : searchable && searchQuery.trim() && filteredFixtures.length === 0 ? (
+        <p className="inline-status">No matches match your search.</p>
       ) : timeline && dateGroups.length > 0 ? (
         <ul className="match-fixture-picker-list match-fixture-picker-list--timeline">
           {dateGroups.map((group) => (
@@ -98,6 +141,7 @@ export function FixtureMatchPicker({
                 {group.fixtures.map((fixture) => (
                   <li key={fixture.key}>
                     <FixturePickerButton
+                      draggable={draggableMatches}
                       fixture={fixture}
                       selected={fixture.key === selectedKey}
                       showDate={false}
@@ -111,9 +155,10 @@ export function FixtureMatchPicker({
         </ul>
       ) : (
         <ul className="match-fixture-picker-list">
-          {fixtures.map((fixture) => (
+          {filteredFixtures.map((fixture) => (
             <li key={fixture.key}>
               <FixturePickerButton
+                draggable={draggableMatches}
                 fixture={fixture}
                 selected={fixture.key === selectedKey}
                 onSelect={() => onSelect(fixture.key)}
@@ -130,18 +175,38 @@ export function FixturePickerButton({
   fixture,
   selected,
   onSelect,
-  showDate = true
+  showDate = true,
+  draggable = false
 }: {
   fixture: FixtureOption;
   selected: boolean;
   onSelect: () => void;
   showDate?: boolean;
+  draggable?: boolean;
 }) {
   return (
-    <button
-      className={`match-fixture-picker-btn${selected ? " selected" : ""}`}
-      type="button"
+    <div
+      className={`match-fixture-picker-btn${selected ? " selected" : ""}${
+        draggable ? " match-fixture-picker-btn--draggable" : ""
+      }`}
+      draggable={draggable}
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
+      onDragStart={
+        draggable
+          ? (event) => {
+              writeFixtureDragData(event.dataTransfer, fixture.key);
+              event.dataTransfer.effectAllowed = "copy";
+            }
+          : undefined
+      }
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
     >
       <span className="match-fixture-picker-status" data-status={fixture.status}>
         {fixture.status === "live" ? "Live" : fixture.status === "finished" ? "FT" : "Upcoming"}
@@ -160,6 +225,6 @@ export function FixturePickerButton({
       {showDate && fixture.date ? (
         <span className="match-fixture-picker-date">{fixture.date}</span>
       ) : null}
-    </button>
+    </div>
   );
 }
