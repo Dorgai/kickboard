@@ -8,7 +8,6 @@ import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-la
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { CurrentEventTabs } from "@/components/current-event-tabs";
-import { WelcomeDialog } from "@/components/welcome-dialog";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
@@ -325,7 +324,6 @@ export function FeedBrowser() {
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
   return (
     <div className="feed-browser">
-      <WelcomeDialog />
       <nav className="event-tab-bar" aria-label="Tournament event selector">
         <button
           className={activeTab === "current" ? "active" : ""}

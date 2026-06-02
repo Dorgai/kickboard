@@ -2,6 +2,7 @@
 
 import { LayoutGrid, Target, Trophy, Users } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { OPEN_WELCOME_EVENT } from "@/lib/help/events";
 import { hasSeenWelcome, markWelcomeSeen } from "@/lib/welcome";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 
@@ -30,8 +31,18 @@ const HIGHLIGHTS = [
 
 export function WelcomeDialog() {
   const [open, setOpen] = useState(false);
+  const [forced, setForced] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+
+  useEffect(() => {
+    function onOpenWelcome() {
+      setForced(true);
+      setOpen(true);
+    }
+    window.addEventListener(OPEN_WELCOME_EVENT, onOpenWelcome);
+    return () => window.removeEventListener(OPEN_WELCOME_EVENT, onOpenWelcome);
+  }, []);
 
   useEffect(() => {
     if (hasSeenWelcome()) return;
@@ -52,10 +63,11 @@ export function WelcomeDialog() {
 
   function dismiss() {
     markWelcomeSeen();
+    setForced(false);
     setOpen(false);
   }
 
-  if (hasSeenWelcome() && !open) {
+  if (hasSeenWelcome() && !open && !forced) {
     return null;
   }
 
