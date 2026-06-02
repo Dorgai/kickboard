@@ -72,6 +72,7 @@ If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production ta
 - Gap tracker: [`docs/feed-browser-roadmap.md`](docs/feed-browser-roadmap.md).
 - Feed & infrastructure status (`FeedStatusPanel`) lives on `/admin/data-sources`, not the public homepage.
 - **Coach Board** (`#coach-board`) is **per fixture**: match picker (left) + board (right). Squads/posts use `fixture_key`; run `npm run db:schema` (includes `db/auth-extensions.sql`, `db/fixture-scope-extensions.sql`).
+- **Coach Board pitch DnD**: bench chips are `<div draggable>` (not `<button>`) with pointer-drag to `SquadPitch` via `pitchDropRef` (`tryDropPlayer`); pitch tokens reposition with pointer capture only (no HTML5 `draggable` on tokens). Tap an on-pitch bench chip to remove.
 - **Google OAuth** needs `GOOGLE_CLIENT_*`, `AUTH_URL` (public site URL, not `0.0.0.0`), and `JWT_SECRET`/`AUTH_SECRET` on Railway. Verify `/api/auth/providers` shows your Railway host in `callbackUrl`. Public sign-in requires publishing the Google consent screen (`docs/publish-production.md`); `/privacy` and `/terms` are hosted for the privacy policy URL.
 - **Header** shows signed-in user + log out when OAuth session is active (`SessionProvider` + `HeaderUserMenu`).
 - **Community posts** publish immediately; admins moderate via `/admin/data-sources` (posts, Fan Chat, suspend/ban users).

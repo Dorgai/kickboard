@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type RefObject } from "react";
+import type { SquadPitchHandle } from "@/components/squad-pitch";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import {
   FORMATIONS,
@@ -38,6 +39,8 @@ type SquadPlayerPoolProps = {
   onRemoveFromPitch: (playerId: number) => void;
 };
 
+const POINTER_DRAG_THRESHOLD_PX = 8;
+
 function BenchPlayerChip({
   player,
   side,
@@ -46,7 +49,8 @@ function BenchPlayerChip({
   selected,
   selectionFull,
   onToggleSelect,
-  onRemoveFromPitch
+  onRemoveFromPitch,
+  pitchDropRef
 }: {
   player: SquadPoolPlayer;
   side: "home" | "away";
@@ -56,25 +60,43 @@ function BenchPlayerChip({
   selectionFull: boolean;
   onToggleSelect: (playerId: number) => void;
   onRemoveFromPitch: (playerId: number) => void;
+  pitchDropRef?: RefObject<SquadPitchHandle | null>;
 }) {
+  const suppressClickRef = useRef(false);
+  const [pointerDragging, setPointerDragging] = useState(false);
+
+  const dragPayload: PitchDragPlayer = {
+    playerId: player.playerId,
+    name: player.name,
+    teamName,
+    role: player.role,
+    jerseyNumber: player.jerseyNumber,
+    fromPitch: onPitch
+  };
+
   return (
     <li>
-      <button
+      <div
         className={`squad-player-chip squad-player-chip--bench${onPitch ? " squad-player-chip--on-pitch" : ""}${
           selected ? " squad-player-chip--selected" : ""
-        }`}
-        draggable
-        type="button"
+        }${pointerDragging ? " squad-player-chip--pointer-drag" : ""}`}
+        draggable={!onPitch}
+        role="button"
+        tabIndex={0}
         title={
           onPitch
-            ? `Click or drag into the bench ${side === "home" ? "above" : "below"} to remove from the pitch`
+            ? `Tap to remove from the pitch, or drag here from the pitch`
             : selected
               ? "Click to deselect for formation lineup"
               : selectionFull
                 ? `Bench selection is full (${SLOTS_PER_TEAM}). Deselect a player or drag onto the pitch.`
-                : `Click to select for formation · drag onto the ${side === "home" ? "top" : "bottom"} half`
+                : `Tap to select · drag onto the ${side === "home" ? "top" : "bottom"} half`
         }
         onClick={() => {
+          if (suppressClickRef.current) {
+            suppressClickRef.current = false;
+            return;
+          }
           if (onPitch) {
             onRemoveFromPitch(player.playerId);
             return;
@@ -82,22 +104,62 @@ function BenchPlayerChip({
           onToggleSelect(player.playerId);
         }}
         onDragStart={(event) => {
-          const payload: PitchDragPlayer = {
-            playerId: player.playerId,
-            name: player.name,
-            teamName,
-            role: player.role,
-            jerseyNumber: player.jerseyNumber,
-            fromPitch: onPitch
-          };
-          writePlayerDragData(event.dataTransfer, payload);
+          writePlayerDragData(event.dataTransfer, dragPayload);
           event.dataTransfer.effectAllowed = onPitch ? "move" : "copy";
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            if (onPitch) {
+              onRemoveFromPitch(player.playerId);
+            } else {
+              onToggleSelect(player.playerId);
+            }
+          }
+        }}
+        onPointerDown={(event) => {
+          if (onPitch || event.button !== 0) return;
+          const target = event.currentTarget;
+          target.setPointerCapture(event.pointerId);
+
+          const startX = event.clientX;
+          const startY = event.clientY;
+          let moved = false;
+
+          const onMove = (moveEvent: PointerEvent) => {
+            if (
+              Math.abs(moveEvent.clientX - startX) > POINTER_DRAG_THRESHOLD_PX ||
+              Math.abs(moveEvent.clientY - startY) > POINTER_DRAG_THRESHOLD_PX
+            ) {
+              moved = true;
+              setPointerDragging(true);
+            }
+          };
+
+          const end = (endEvent: PointerEvent) => {
+            if (target.hasPointerCapture(endEvent.pointerId)) {
+              target.releasePointerCapture(endEvent.pointerId);
+            }
+            target.removeEventListener("pointermove", onMove);
+            target.removeEventListener("pointerup", end);
+            target.removeEventListener("pointercancel", end);
+            setPointerDragging(false);
+
+            if (moved) {
+              suppressClickRef.current = true;
+              pitchDropRef?.current?.tryDropPlayer(dragPayload, endEvent.clientX, endEvent.clientY);
+            }
+          };
+
+          target.addEventListener("pointermove", onMove);
+          target.addEventListener("pointerup", end);
+          target.addEventListener("pointercancel", end);
         }}
       >
         <span className="squad-player-chip-name">{player.name}</span>
         {onPitch ? <span className="squad-player-chip-on-pitch">· on pitch</span> : null}
         {!onPitch && selected ? <span className="squad-player-chip-on-pitch">· selected</span> : null}
-      </button>
+      </div>
     </li>
   );
 }
@@ -124,7 +186,8 @@ export function SquadTeamBench({
   selectedPlayerIds,
   onFormationChange,
   onTogglePlayerSelect,
-  onRemoveFromPitch
+  onRemoveFromPitch,
+  pitchDropRef
 }: {
   teamName: string;
   side: "home" | "away";
@@ -137,6 +200,7 @@ export function SquadTeamBench({
   onFormationChange: (formation: SquadFormation) => void;
   onTogglePlayerSelect: (playerId: number) => void;
   onRemoveFromPitch: (playerId: number) => void;
+  pitchDropRef?: RefObject<SquadPitchHandle | null>;
 }) {
   const dragDepthRef = useRef(0);
   const [benchDragOver, setBenchDragOver] = useState(false);
@@ -247,6 +311,7 @@ export function SquadTeamBench({
                   player={player}
                   selected={selectedPlayerIds.has(player.playerId)}
                   selectionFull={selectionFull}
+                  pitchDropRef={pitchDropRef}
                   side={side}
                   teamName={teamName}
                 />
