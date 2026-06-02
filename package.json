@@ -12,8 +12,10 @@
     "start": "next start",
     "worker:api-football": "node scripts/api-football-worker.mjs",
     "typecheck": "tsc --noEmit",
-    "db:schema": "sh -c 'test -n \"$DATABASE_URL\" && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/schema.sql -f db/community-extensions.sql'",
+    "db:schema": "node scripts/apply-db-schema.mjs",
+    "db:schema:psql": "sh -c 'test -n \"$DATABASE_URL\" && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/schema.sql -f db/community-extensions.sql'",
     "check": "npm run typecheck && npm run build",
+    "railway:connect": "bash scripts/railway-connect.sh",
     "railway:deploy": "bash scripts/deploy-production.sh",
     "railway:variables": "bash scripts/configure-railway-variables.sh",
     "railway:list": "bash scripts/railway-list-targets.sh"

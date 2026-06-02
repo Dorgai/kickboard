@@ -1,0 +1,65 @@
+name: Apply community schema (production)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: apply-community-schema-production
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    env:
+      RAILWAY_ENVIRONMENT: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply community tables
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${DATABASE_URL:-}" ]; then
+            echo "Applying schema via DATABASE_URL secret…"
+            node scripts/apply-db-schema.mjs
+            exit 0
+          fi
+          if [ -z "${RAILWAY_TOKEN:-}" ]; then
+            echo "::error::Add GitHub secret RAILWAY_TOKEN or DATABASE_URL."
+            exit 1
+          fi
+          npm install -g @railway/cli
+          SERVICE_NAME=$(node -e "console.log(JSON.parse(require('fs').readFileSync('deploy/railway.project.json','utf8')).serviceName)")
+          echo "Applying schema via railway run (service=${SERVICE_NAME}, environment=production)…"
+          railway run --service "$SERVICE_NAME" --environment production -- node scripts/apply-db-schema.mjs
+
+      - name: Verify community status
+        env:
+          PRODUCTION_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+        run: |
+          BASE="${PRODUCTION_URL:-https://kickboard-production.up.railway.app}"
+          BASE="${BASE%/}"
+          echo "Checking ${BASE}/api/community/status …"
+          for attempt in $(seq 1 12); do
+            body=$(curl -fsS "${BASE}/api/community/status" || true)
+            echo "$body"
+            if echo "$body" | grep -q '"schemaReady":true'; then
+              echo "Community schema is ready."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning::schemaReady is still false; check Railway Postgres and re-run this workflow."
+          exit 1
