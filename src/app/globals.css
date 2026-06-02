@@ -3035,30 +3035,6 @@ h3 {
   padding: 12px 14px;
 }
 
-.fixture-predictions-form--coach-board {
-  box-sizing: border-box;
-  gap: 14px;
-  max-width: 100%;
-  padding: 12px 14px;
-}
-
-@media (min-width: 640px) {
-  .fixture-predictions-form--coach-board {
-    align-items: start;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-
-  .fixture-predictions-form--coach-board .fixture-prediction-form-footer {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 639px) {
-  .fixture-predictions-form--coach-board {
-    grid-template-columns: 1fr;
-  }
-}
-
 .fixture-prediction-field {
   border: none;
   display: grid;
@@ -3281,24 +3257,6 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 14px;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-outcome-list {
-  flex-direction: column;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-outcome-option {
-  border-bottom: 1px solid var(--color-border);
-  border-right: none;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-outcome-option:last-child {
-  border-bottom: none;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-scoreline {
-  justify-content: center;
-  max-width: 100%;
 }
 
 .fixture-scorer-pool-list,

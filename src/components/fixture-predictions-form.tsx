@@ -183,7 +183,7 @@ export function FixturePredictionsForm({
           predictedOutcome,
           homeScore: hasScore ? Number(homeScore) : null,
           awayScore: hasScore ? Number(awayScore) : null,
-          ...(compact ? {} : { scorerPicks })
+          ...(coachBoard ? {} : { scorerPicks })
         })
       });
       const payload = (await response.json()) as { error?: string; message?: string };
@@ -289,7 +289,7 @@ export function FixturePredictionsForm({
         <p className="fixture-prediction-field-hint">{PREDICTION_HINTS.scoreOptional}</p>
       </fieldset>
 
-      {!compact ? (
+      {!coachBoard ? (
         <fieldset className="fixture-prediction-field fixture-prediction-field--scorers">
           <legend className="fixture-prediction-field-label">{PREDICTION_BLOCKS.scorers}</legend>
           <p className="fixture-prediction-field-hint">{PREDICTION_HINTS.scorersLead}</p>
