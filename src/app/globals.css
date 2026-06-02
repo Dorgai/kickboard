@@ -1299,7 +1299,8 @@ h3 {
 }
 
 .current-event-predictions-tab,
-.current-event-coach-tab {
+.current-event-coach-tab,
+.current-event-community-tab {
   display: grid;
   gap: 20px;
 }

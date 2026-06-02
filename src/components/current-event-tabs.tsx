@@ -10,13 +10,19 @@ import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { PredictionsPanel } from "@/components/predictions-panel";
 import { TeamLabel } from "@/components/team-label";
 
-export const CURRENT_EVENT_TAB_IDS = ["tournament", "coach-board", "predictions"] as const;
+export const CURRENT_EVENT_TAB_IDS = [
+  "tournament",
+  "coach-board",
+  "predictions",
+  "community"
+] as const;
 export type CurrentEventTabId = (typeof CURRENT_EVENT_TAB_IDS)[number];
 
 const CURRENT_EVENT_TABS = [
   { id: "tournament" as const, label: "Tournament" },
   { id: "coach-board" as const, label: "Coach Board" },
-  { id: "predictions" as const, label: "Predictions" }
+  { id: "predictions" as const, label: "Predictions" },
+  { id: "community" as const, label: "Community" }
 ] as const;
 
 const CURRENT_KNOCKOUT_STAGES = [
@@ -52,23 +58,23 @@ function hashTarget() {
   return window.location.hash.replace(/^#/, "").trim().toLowerCase();
 }
 
-function parseHash(hash: string): { tab: CurrentEventTabId; chatOpen: boolean; scrollCommunity: boolean } {
+function parseHash(hash: string): { tab: CurrentEventTabId; chatOpen: boolean } {
   if (hash === "fan-chat") {
-    return { tab: "coach-board", chatOpen: true, scrollCommunity: false };
+    return { tab: "coach-board", chatOpen: true };
   }
   if (hash === "community") {
-    return { tab: "coach-board", chatOpen: false, scrollCommunity: true };
+    return { tab: "community", chatOpen: false };
   }
   if (hash === "tournament" || hash === "bracket") {
-    return { tab: "tournament", chatOpen: false, scrollCommunity: false };
+    return { tab: "tournament", chatOpen: false };
   }
   if (hash === "coach-board") {
-    return { tab: "coach-board", chatOpen: false, scrollCommunity: false };
+    return { tab: "coach-board", chatOpen: false };
   }
   if (hash === "predictions") {
-    return { tab: "predictions", chatOpen: false, scrollCommunity: false };
+    return { tab: "predictions", chatOpen: false };
   }
-  return { tab: "coach-board", chatOpen: false, scrollCommunity: false };
+  return { tab: "coach-board", chatOpen: false };
 }
 
 function setHashForTab(tab: CurrentEventTabId) {
@@ -184,14 +190,9 @@ export function CurrentEventTabs({
   const [activeKnockoutStage, setActiveKnockoutStage] = useState<string>(CURRENT_KNOCKOUT_STAGES[0]);
 
   const applyHash = useCallback(() => {
-    const { tab, chatOpen: openChat, scrollCommunity } = parseHash(hashTarget());
+    const { tab, chatOpen: openChat } = parseHash(hashTarget());
     setActiveTab(tab);
     setChatOpen(openChat);
-    if (scrollCommunity) {
-      window.requestAnimationFrame(() => {
-        document.getElementById("community")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
   }, []);
 
   useEffect(() => {
@@ -335,16 +336,27 @@ export function CurrentEventTabs({
         {activeTab === "coach-board" ? (
           <div className="current-event-coach-tab" id="coach-board">
             <MatchCoachBoardRow groups={groups} />
-            <section className="data-card surface-flat section-anchor community-section" id="community">
-              <h2>Community</h2>
-              <CommunityConnectionsPanel />
-            </section>
           </div>
         ) : null}
 
         {activeTab === "predictions" ? (
           <div className="current-event-predictions-tab" id="predictions">
             <PredictionsPanel groups={groups} />
+          </div>
+        ) : null}
+
+        {activeTab === "community" ? (
+          <div className="current-event-community-tab section-anchor" id="community">
+            <section className="data-card surface-flat community-section">
+              <div className="section-heading compact">
+                <div>
+                  <p className="eyebrow">Connections</p>
+                  <h2>Community</h2>
+                  <p>Find friends, accept invites, and share your registration link.</p>
+                </div>
+              </div>
+              <CommunityConnectionsPanel />
+            </section>
           </div>
         ) : null}
       </div>

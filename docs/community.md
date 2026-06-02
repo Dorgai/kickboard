@@ -66,7 +66,7 @@ Railway’s **`DATABASE_URL`** on the web service is often the **private** host 
 
 ## UI
 
-- **Current event → Community** (`#community`): feed, join form, compose, report.
+- **Current event → Community tab** (`#community`): connections, invites, and related social features (fourth tab after Predictions).
 - **Admin → Data sources**: user management, Fan Chat moderation, and Coach Board post tools when Postgres is configured.
 
 ## Next steps (product)
