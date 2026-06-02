@@ -97,9 +97,15 @@ npm run railway:variables
 
 After first Google sign-in, fans enter **birth year** (child-safety). Under-13 accounts are blocked from posting.
 
+## Coach Board scope
+
+Each **fixture** (upcoming match from the tournament feed) has its own Coach Board. Squads and `squad_share` posts are stored with `fixture_key` so fans only see content for the match they selected.
+
+Run `npm run db:schema` so `db/fixture-scope-extensions.sql` is applied.
+
 ## Features gated by sign-in
 
-- **Coach Board** — squad builder + `squad_share` posts
+- **Coach Board** — per-match squad builder + `squad_share` posts
 - **Fan Chat** — text posts (`post_type = text`)
 - **Predictions** — UI placeholder; settlement in a later phase
 

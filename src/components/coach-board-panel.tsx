@@ -12,20 +12,26 @@ type BoardPost = {
   createdAt: string;
 };
 
-export function CoachBoardPanel() {
+type CoachBoardPanelProps = {
+  fixtureKey: string;
+  fixtureLabel: string;
+};
+
+export function CoachBoardPanel({ fixtureKey, fixtureLabel }: CoachBoardPanelProps) {
   const [posts, setPosts] = useState<BoardPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/community/posts", { cache: "no-store" });
+      const params = new URLSearchParams({ fixtureKey });
+      const response = await fetch(`/api/community/posts?${params}`, { cache: "no-store" });
       const payload = (await response.json()) as { posts?: BoardPost[] };
       setPosts(payload.posts ?? []);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fixtureKey]);
 
   useEffect(() => {
     void refresh();
@@ -35,11 +41,11 @@ export function CoachBoardPanel() {
     <AuthGate featureLabel="Coach Board">
       <div className="coach-board-panel">
         <p className="community-panel-lead">
-          Share squads and see approved posts from other fans. New shares are held for moderation before
-          they appear here.
+          <strong>{fixtureLabel}</strong> — squads and posts here are only for this fixture. New shares
+          are held for moderation before they appear in the feed below.
         </p>
 
-        <SquadBuilder />
+        <SquadBuilder fixtureKey={fixtureKey} fixtureLabel={fixtureLabel} />
 
         <div className="coach-board-feed">
           <h3>Approved feed</h3>

@@ -19,7 +19,12 @@ type LatestSquad = {
   lineup: SquadLineupSlot[];
 };
 
-export function SquadBuilder() {
+type SquadBuilderProps = {
+  fixtureKey: string;
+  fixtureLabel: string;
+};
+
+export function SquadBuilder({ fixtureKey, fixtureLabel }: SquadBuilderProps) {
   const [formation, setFormation] = useState<SquadFormation>("4-3-3");
   const [name, setName] = useState("My World Cup XI");
   const [lineup, setLineup] = useState<SquadLineupSlot[]>(() => defaultLineupWithPositions("4-3-3"));
@@ -39,9 +44,15 @@ export function SquadBuilder() {
 
     async function load() {
       setLoadState("loading");
+      setSquadId(null);
+      setNotice(null);
+      setError(null);
+      setFormation("4-3-3");
+      setLineup(defaultLineupWithPositions("4-3-3"));
       try {
+        const params = new URLSearchParams({ fixtureKey });
         const [squadsRes, poolRes] = await Promise.all([
-          fetch("/api/squads"),
+          fetch(`/api/squads?${params}`),
           fetch("/api/squads/player-pool")
         ]);
 
@@ -53,6 +64,8 @@ export function SquadBuilder() {
             setName(latest.name);
             setFormation(latest.formation);
             setLineup(latest.lineup);
+          } else {
+            setName(`${fixtureLabel.split("—")[0]?.trim() ?? "My XI"}`);
           }
         }
 
@@ -87,7 +100,7 @@ export function SquadBuilder() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [fixtureKey, fixtureLabel]);
 
   function changeFormation(next: SquadFormation) {
     setFormation(next);
@@ -110,7 +123,7 @@ export function SquadBuilder() {
       const response = await fetch("/api/squads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ squadId: squadId ?? undefined, name, formation, lineup })
+        body: JSON.stringify({ squadId: squadId ?? undefined, fixtureKey, name, formation, lineup })
       });
       const payload = (await response.json()) as { error?: string; squadId?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to save squad.");
@@ -154,8 +167,8 @@ export function SquadBuilder() {
         <div>
           <h3>Build your XI</h3>
           <p className="community-panel-lead">
-            Drag players onto the pitch to set formation and exact positions. Your latest saved squad
-            loads automatically.
+            Drag players onto the pitch for <strong>{fixtureLabel}</strong>. Your saved squad for this
+            match loads automatically when you switch fixtures.
           </p>
         </div>
         <label className="feed-control-field">

@@ -33,6 +33,7 @@ export async function createUserSquad(input: {
   name: string;
   formation: SquadFormation;
   lineup: SquadLineupSlot[];
+  fixtureKey: string;
 }) {
   const tournamentId = await getDefaultTournamentId();
   if (!tournamentId) throw new Error("TOURNAMENT_NOT_CONFIGURED");
@@ -42,11 +43,14 @@ export async function createUserSquad(input: {
     normalizeLineupSlots(input.lineup, input.formation)
   );
 
+  const fixtureKey = input.fixtureKey.trim().slice(0, 120);
+  if (!fixtureKey) throw new Error("FIXTURE_KEY_REQUIRED");
+
   const result = await query<{ id: string }>(
-    `INSERT INTO squads (user_id, tournament_id, name, formation, lineup, is_public)
-     VALUES ($1, $2, $3, $4, $5::jsonb, true)
+    `INSERT INTO squads (user_id, tournament_id, name, formation, lineup, is_public, fixture_key)
+     VALUES ($1, $2, $3, $4, $5::jsonb, true, $6)
      RETURNING id`,
-    [input.userId, tournamentId, trimmedName, input.formation, JSON.stringify(lineup)]
+    [input.userId, tournamentId, trimmedName, input.formation, JSON.stringify(lineup), fixtureKey]
   );
 
   return result.rows[0]?.id ?? null;
@@ -58,11 +62,12 @@ export async function publishSquadToBoard(squadId: string, userId: string) {
     name: string;
     formation: string;
     lineup: SquadLineupSlot[];
+    fixture_key: string | null;
   }>(
     `UPDATE squads
      SET published_to_board_at = now(), updated_at = now()
      WHERE id = $1 AND user_id = $2
-     RETURNING id, name, formation, lineup`,
+     RETURNING id, name, formation, lineup, fixture_key`,
     [squadId, userId]
   );
 
@@ -79,16 +84,19 @@ export async function publishSquadToBoard(squadId: string, userId: string) {
   const body = `${row.name} (${row.formation})${summary ? ` — ${summary}` : ""}`.slice(0, 280);
 
   const post = await query<{ id: string }>(
-    `INSERT INTO posts (author_id, post_type, body, squad_id, moderation_status)
-     VALUES ($1, 'squad_share', $2, $3, 'withheld')
+    `INSERT INTO posts (author_id, post_type, body, squad_id, moderation_status, fixture_key)
+     VALUES ($1, 'squad_share', $2, $3, 'withheld', $4)
      RETURNING id`,
-    [userId, body, row.id]
+    [userId, body, row.id, row.fixture_key]
   );
 
   return { squadId: row.id, postId: post.rows[0]?.id ?? null, body };
 }
 
-export async function getLatestUserSquad(userId: string) {
+export async function getLatestUserSquad(userId: string, fixtureKey: string) {
+  const key = fixtureKey.trim().slice(0, 120);
+  if (!key) return null;
+
   const result = await query<{
     id: string;
     name: string;
@@ -100,10 +108,10 @@ export async function getLatestUserSquad(userId: string) {
   }>(
     `SELECT id, name, formation, lineup, published_to_board_at, created_at, updated_at
      FROM squads
-     WHERE user_id = $1
+     WHERE user_id = $1 AND fixture_key = $2
      ORDER BY updated_at DESC
      LIMIT 1`,
-    [userId]
+    [userId, key]
   );
 
   const row = result.rows[0];
@@ -128,19 +136,29 @@ export async function updateUserSquad(input: {
   name: string;
   formation: SquadFormation;
   lineup: SquadLineupSlot[];
+  fixtureKey: string;
 }) {
   const lineup = serializeLineup(normalizeLineupSlots(input.lineup, input.formation));
   const trimmedName = input.name.trim().slice(0, 60) || "My XI";
+  const fixtureKey = input.fixtureKey.trim().slice(0, 120);
 
   const result = await query<{ id: string }>(
     `UPDATE squads
      SET name = $3,
          formation = $4,
          lineup = $5::jsonb,
+         fixture_key = $6,
          updated_at = now()
      WHERE id = $1 AND user_id = $2
      RETURNING id`,
-    [input.squadId, input.userId, trimmedName, input.formation, JSON.stringify(lineup)]
+    [
+      input.squadId,
+      input.userId,
+      trimmedName,
+      input.formation,
+      JSON.stringify(lineup),
+      fixtureKey
+    ]
   );
 
   return result.rows[0]?.id ?? null;

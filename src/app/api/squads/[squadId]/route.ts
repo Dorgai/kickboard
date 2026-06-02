@@ -24,10 +24,16 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   try {
     const body = (await request.json()) as {
+      fixtureKey?: string;
       name?: string;
       formation?: string;
       lineup?: SquadLineupSlot[];
     };
+
+    const fixtureKey = body.fixtureKey?.trim() ?? "";
+    if (!fixtureKey) {
+      return NextResponse.json({ error: "Select a match for this Coach Board." }, { status: 400 });
+    }
 
     const formation = body.formation ?? "4-3-3";
     if (!isValidFormation(formation)) {
@@ -43,7 +49,8 @@ export async function PATCH(request: Request, context: RouteContext) {
       userId: user.id,
       name: body.name ?? "My XI",
       formation,
-      lineup: body.lineup
+      lineup: body.lineup,
+      fixtureKey
     });
 
     if (!updatedId) {

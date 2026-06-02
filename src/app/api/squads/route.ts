@@ -13,7 +13,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await requireAuthUser();
   if (!user) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
@@ -22,8 +22,12 @@ export async function GET() {
     return NextResponse.json({ error: "Complete onboarding first." }, { status: 403 });
   }
 
-  const [squads, latest] = await Promise.all([listUserSquads(user.id), getLatestUserSquad(user.id)]);
-  return NextResponse.json({ squads, latest });
+  const fixtureKey = new URL(request.url).searchParams.get("fixtureKey")?.trim() ?? "";
+  const [squads, latest] = await Promise.all([
+    listUserSquads(user.id),
+    fixtureKey ? getLatestUserSquad(user.id, fixtureKey) : Promise.resolve(null)
+  ]);
+  return NextResponse.json({ squads, latest, fixtureKey: fixtureKey || null });
 }
 
 export async function POST(request: Request) {
@@ -38,10 +42,16 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
       squadId?: string;
+      fixtureKey?: string;
       name?: string;
       formation?: string;
       lineup?: SquadLineupSlot[];
     };
+
+    const fixtureKey = body.fixtureKey?.trim() ?? "";
+    if (!fixtureKey) {
+      return NextResponse.json({ error: "Select a match for this Coach Board." }, { status: 400 });
+    }
 
     const formation = body.formation ?? "4-3-3";
     if (!isValidFormation(formation)) {
@@ -62,7 +72,8 @@ export async function POST(request: Request) {
         userId: user.id,
         name: body.name ?? "My XI",
         formation,
-        lineup
+        lineup,
+        fixtureKey
       });
       if (!squadId) {
         return NextResponse.json({ error: "Squad not found." }, { status: 404 });
@@ -72,7 +83,8 @@ export async function POST(request: Request) {
         userId: user.id,
         name: body.name ?? "My XI",
         formation,
-        lineup
+        lineup,
+        fixtureKey
       });
       if (!squadId) {
         return NextResponse.json({ error: "Unable to save squad." }, { status: 500 });
@@ -89,6 +101,9 @@ export async function POST(request: Request) {
     const mapped = mapDatabaseError(error);
     if (mapped) {
       return NextResponse.json({ error: mapped.error }, { status: mapped.status });
+    }
+    if (error instanceof Error && error.message === "FIXTURE_KEY_REQUIRED") {
+      return NextResponse.json({ error: "Select a match for this Coach Board." }, { status: 400 });
     }
     if (error instanceof Error && error.message === "TOURNAMENT_NOT_CONFIGURED") {
       return NextResponse.json(

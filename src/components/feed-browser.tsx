@@ -2,13 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FeedTabBar } from "@/components/feed-tab-bar";
-import { LiveFixturesPanel } from "@/components/live-fixtures-panel";
+import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
 import { MatchTeamStatsGrid } from "@/components/match-team-stats-grid";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
-import { CoachBoardPanel } from "@/components/coach-board-panel";
 import { FanChatPanel } from "@/components/fan-chat-panel";
 import { PredictionsPanel } from "@/components/predictions-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
@@ -407,8 +406,6 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
 
   return (
     <section className="current-world-cup-card">
-      <LiveFixturesPanel />
-
       <div className="current-event-overview">
         <p className="eyebrow">Current World Cup</p>
         <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
@@ -482,10 +479,7 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
         </div>
       </section>
 
-      <section className="data-card surface-flat section-anchor coach-board-section" id="coach-board">
-        <h2>Coach Board</h2>
-        <CoachBoardPanel />
-      </section>
+      <MatchCoachBoardRow groups={groups} />
 
       <section className="data-card surface-flat section-anchor fan-chat-section" id="fan-chat">
         <h2>Fan Chat</h2>
