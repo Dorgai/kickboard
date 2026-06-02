@@ -79,6 +79,11 @@ export function CommunitySetupPanel({
             then confirm <a href="/api/auth/config">/api/auth/config</a> shows <code>oauthConfigured: true</code>.
             See <code>docs/auth-oauth.md</code>.
           </p>
+          <p className="admin-community-setup-note">
+            Set <code>AUTH_URL</code> to your public site URL (same as <code>NEXT_PUBLIC_APP_URL</code>). After deploy,
+            open <a href="/api/auth/providers">/api/auth/providers</a> — <code>callbackUrl</code> must not be{" "}
+            <code>0.0.0.0</code>.
+          </p>
         </div>
       ) : null}
 

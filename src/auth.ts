@@ -6,15 +6,29 @@ const googleEnabled = Boolean(
   process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim()
 );
 
+/**
+ * Auth.js only reads AUTH_URL / NEXTAUTH_URL for OAuth redirect_uri — not NEXT_PUBLIC_APP_URL.
+ * On Railway, the internal Host is often `0.0.0.0:PORT`, which Google rejects (Error 400).
+ */
+export function ensureAuthUrlEnv(): string {
+  const existing = process.env.AUTH_URL?.trim() || process.env.NEXTAUTH_URL?.trim();
+  if (existing) {
+    return existing.replace(/\/$/, "");
+  }
+  const fallback = process.env.NEXT_PUBLIC_APP_URL?.trim() || "";
+  const normalized = fallback.replace(/\/$/, "");
+  if (normalized) {
+    process.env.AUTH_URL = normalized;
+  }
+  return normalized;
+}
+
 /** Public site URL — required so Google receives the correct redirect_uri (not localhost). */
 export function resolveAuthBaseUrl() {
-  const raw =
-    process.env.AUTH_URL?.trim() ||
-    process.env.NEXTAUTH_URL?.trim() ||
-    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-    "";
-  return raw.replace(/\/$/, "");
+  return ensureAuthUrlEnv();
 }
+
+ensureAuthUrlEnv();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,

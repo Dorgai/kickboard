@@ -61,7 +61,10 @@ export function AuthGate({
             </ul>
             <p className="community-setup-note">
               If Google shows &quot;Access blocked&quot;, add your Gmail under OAuth consent screen →{" "}
-              <strong>Test users</strong> (app in Testing mode). See <code>docs/auth-oauth.md</code>.
+              <strong>Test users</strong> (app in Testing mode). If you already did that, set Railway{" "}
+              <code>AUTH_URL</code> to this site&apos;s URL and check{" "}
+              <a href="/api/auth/providers">/api/auth/providers</a> (callback must not be <code>0.0.0.0</code>). See{" "}
+              <code>docs/auth-oauth.md</code>.
             </p>
           </div>
         ) : (
