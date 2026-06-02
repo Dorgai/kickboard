@@ -71,58 +71,59 @@ export function isValidFormation(value: string): value is SquadFormation {
   return (FORMATIONS as readonly string[]).includes(value);
 }
 
+/** Relative depth (y) and width (x) for one XI — y: 0 own goal → 100 toward halfway. */
 const FORMATION_LAYOUTS: Record<SquadFormation, PitchCoords[]> = {
   "4-3-3": [
-    { x: 50, y: 8 },
-    { x: 18, y: 26 },
-    { x: 38, y: 24 },
-    { x: 62, y: 24 },
-    { x: 82, y: 26 },
-    { x: 28, y: 48 },
+    { x: 50, y: 4 },
+    { x: 18, y: 22 },
+    { x: 38, y: 20 },
+    { x: 62, y: 20 },
+    { x: 82, y: 22 },
+    { x: 28, y: 46 },
     { x: 50, y: 50 },
-    { x: 72, y: 48 },
-    { x: 22, y: 74 },
-    { x: 50, y: 78 },
-    { x: 78, y: 74 }
+    { x: 72, y: 46 },
+    { x: 22, y: 78 },
+    { x: 50, y: 84 },
+    { x: 78, y: 78 }
   ],
   "4-4-2": [
-    { x: 50, y: 8 },
-    { x: 18, y: 26 },
-    { x: 38, y: 24 },
-    { x: 62, y: 24 },
-    { x: 82, y: 26 },
-    { x: 16, y: 50 },
-    { x: 38, y: 48 },
-    { x: 62, y: 48 },
-    { x: 84, y: 50 },
-    { x: 38, y: 76 },
-    { x: 62, y: 76 }
+    { x: 50, y: 4 },
+    { x: 18, y: 22 },
+    { x: 38, y: 20 },
+    { x: 62, y: 20 },
+    { x: 82, y: 22 },
+    { x: 16, y: 48 },
+    { x: 38, y: 46 },
+    { x: 62, y: 46 },
+    { x: 84, y: 48 },
+    { x: 38, y: 80 },
+    { x: 62, y: 80 }
   ],
   "3-5-2": [
-    { x: 50, y: 8 },
-    { x: 26, y: 24 },
-    { x: 50, y: 22 },
-    { x: 74, y: 24 },
-    { x: 12, y: 48 },
-    { x: 32, y: 46 },
+    { x: 50, y: 4 },
+    { x: 26, y: 20 },
+    { x: 50, y: 18 },
+    { x: 74, y: 20 },
+    { x: 12, y: 46 },
+    { x: 32, y: 44 },
     { x: 50, y: 50 },
-    { x: 68, y: 46 },
-    { x: 88, y: 48 },
-    { x: 38, y: 76 },
-    { x: 62, y: 76 }
+    { x: 68, y: 44 },
+    { x: 88, y: 46 },
+    { x: 38, y: 82 },
+    { x: 62, y: 82 }
   ],
   "4-2-3-1": [
-    { x: 50, y: 8 },
-    { x: 18, y: 26 },
-    { x: 38, y: 24 },
-    { x: 62, y: 24 },
-    { x: 82, y: 26 },
-    { x: 36, y: 44 },
-    { x: 64, y: 44 },
-    { x: 22, y: 62 },
-    { x: 50, y: 64 },
-    { x: 78, y: 62 },
-    { x: 50, y: 80 }
+    { x: 50, y: 4 },
+    { x: 18, y: 22 },
+    { x: 38, y: 20 },
+    { x: 62, y: 20 },
+    { x: 82, y: 22 },
+    { x: 36, y: 42 },
+    { x: 64, y: 42 },
+    { x: 22, y: 64 },
+    { x: 50, y: 68 },
+    { x: 78, y: 64 },
+    { x: 50, y: 88 }
   ]
 };
 
@@ -130,21 +131,52 @@ export function clampPitchCoord(value: number) {
   return Math.min(100, Math.max(0, Number(value.toFixed(1))));
 }
 
+/** Home defends the top edge; away defends the bottom — each XI uses its full half. */
+const HOME_HALF = { deep: 3, advance: 48 } as const;
+const AWAY_HALF = { deep: 97, advance: 52 } as const;
+
 /** Keep dragged tokens on the correct half of a dual-team pitch. */
 export function clampCoordsToSide(side: SquadLineupSide, coords: PitchCoords): PitchCoords {
   if (side === "home") {
-    return { x: coords.x, y: clampPitchCoord(Math.min(coords.y, 48)) };
+    return {
+      x: coords.x,
+      y: clampPitchCoord(Math.min(Math.max(coords.y, HOME_HALF.deep), HOME_HALF.advance))
+    };
   }
-  return { x: coords.x, y: clampPitchCoord(Math.max(coords.y, 52)) };
+  return {
+    x: coords.x,
+    y: clampPitchCoord(Math.max(Math.min(coords.y, AWAY_HALF.deep), AWAY_HALF.advance))
+  };
 }
 
-function coordsForSide(layout: PitchCoords, side: SquadLineupSide): PitchCoords {
-  const halfSpan = 44;
-  const yHome = 4 + (layout.y / 100) * halfSpan;
-  if (side === "home") {
-    return { x: layout.x, y: clampPitchCoord(yHome) };
+/** 0 = own goal line, 1 = near the halfway line (within one team's half). */
+function formationDepthNormalized(layout: PitchCoords, formation: SquadFormation) {
+  const points = FORMATION_LAYOUTS[formation];
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (const point of points) {
+    minY = Math.min(minY, point.y);
+    maxY = Math.max(maxY, point.y);
   }
-  return { x: layout.x, y: clampPitchCoord(100 - yHome) };
+  if (!Number.isFinite(minY) || maxY <= minY) return 0.5;
+  return (layout.y - minY) / (maxY - minY);
+}
+
+function coordsForSide(
+  layout: PitchCoords,
+  side: SquadLineupSide,
+  formation: SquadFormation
+): PitchCoords {
+  const depth = formationDepthNormalized(layout, formation);
+
+  if (side === "home") {
+    const y =
+      HOME_HALF.deep + depth * (HOME_HALF.advance - HOME_HALF.deep);
+    return { x: layout.x, y: clampPitchCoord(y) };
+  }
+
+  const y = AWAY_HALF.deep - depth * (AWAY_HALF.deep - AWAY_HALF.advance);
+  return { x: layout.x, y: clampPitchCoord(y) };
 }
 
 /** One XI in the attacking half of a shared pitch (legacy / single-team). */
@@ -179,8 +211,8 @@ function sideLineupFromFormation(formation: SquadFormation, side: SquadLineupSid
     playerId: undefined,
     teamName: undefined,
     jerseyNumber: undefined,
-    x: coordsForSide({ x: slot.x, y: slot.y }, side).x,
-    y: coordsForSide({ x: slot.x, y: slot.y }, side).y
+    x: coordsForSide({ x: slot.x, y: slot.y }, side, formation).x,
+    y: coordsForSide({ x: slot.x, y: slot.y }, side, formation).y
   }));
 }
 
