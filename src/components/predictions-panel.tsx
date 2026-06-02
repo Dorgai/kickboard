@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { AuthGate } from "@/components/auth-gate";
 import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
@@ -10,6 +10,7 @@ import {
   useFixtureOptions,
   type WorldCupGroupInput
 } from "@/components/fixture-match-picker";
+import { scrollToPredictionOutcomeOnMobile } from "@/lib/scroll-to-prediction-outcome";
 
 type PredictionsPanelProps = {
   groups?: WorldCupGroupInput[];
@@ -20,6 +21,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [overviewRefresh, setOverviewRefresh] = useState(0);
+  const scrollToOutcomeAfterSelect = useRef(false);
 
   useEffect(() => {
     if (!fixtures.length) {
@@ -42,6 +44,18 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     );
   }, [fixtures]);
 
+  const handleFixtureSelect = useCallback((key: string) => {
+    scrollToOutcomeAfterSelect.current = true;
+    setSelectedKey(key);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedKey || !scrollToOutcomeAfterSelect.current) return;
+    scrollToOutcomeAfterSelect.current = false;
+    const frame = window.requestAnimationFrame(() => scrollToPredictionOutcomeOnMobile());
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedKey]);
+
   const viewerDisplayName = session?.user?.name ?? null;
 
   const selected = fixtures.find((fixture) => fixture.key === selectedKey) ?? null;
@@ -56,7 +70,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
               fixtures={fixtures}
               selectedKey={selectedKey}
               timeline
-              onSelect={setSelectedKey}
+              onSelect={handleFixtureSelect}
             />
 
             <div className="predictions-match-detail">

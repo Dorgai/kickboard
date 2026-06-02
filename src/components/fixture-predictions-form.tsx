@@ -12,6 +12,7 @@ import {
   PREDICTION_HINTS,
   PREDICTION_OUTCOME_OPTION
 } from "@/lib/fixture-predictions/labels";
+import { PREDICTION_OUTCOME_SECTION_ID } from "@/lib/scroll-to-prediction-outcome";
 import {
   groupScorerPicks,
   MAX_SCORER_PICKS,
@@ -234,7 +235,10 @@ export function FixturePredictionsForm({
       className={`fixture-predictions-form${compact ? " fixture-predictions-form--compact" : ""}${coachBoard ? " fixture-predictions-form--coach-board" : ""}`}
       onSubmit={savePick}
     >
-      <fieldset className="fixture-prediction-field">
+      <fieldset
+        className="fixture-prediction-field section-anchor"
+        id={coachBoard ? undefined : PREDICTION_OUTCOME_SECTION_ID}
+      >
         <legend className="fixture-prediction-field-label">{PREDICTION_BLOCKS.outcome}</legend>
         <div className="fixture-prediction-outcome-list" role="radiogroup" aria-label={PREDICTION_BLOCKS.outcome}>
           {OUTCOME_OPTIONS.map((option) => {
