@@ -1038,6 +1038,19 @@ h3 {
   gap: 12px;
 }
 
+.auth-oauth-setup-help {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-oauth-setup-list {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
 .auth-session-bar {
   align-items: center;
   background: color-mix(in srgb, var(--color-bg) 80%, transparent);
