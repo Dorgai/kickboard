@@ -3051,9 +3051,36 @@ h3 {
 .squad-pitch-token--dragging {
   cursor: grabbing;
   opacity: 0.95;
+  pointer-events: none;
   touch-action: none;
   transition: none;
   z-index: 5;
+}
+
+.squad-pitch-token-remove {
+  -webkit-appearance: none;
+  appearance: none;
+  background: color-mix(in srgb, #000 35%, transparent);
+  border: 1px solid color-mix(in srgb, #fff 45%, transparent);
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+  left: 50%;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 3px 7px;
+  position: absolute;
+  top: calc(100% + 4px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 6;
+}
+
+.squad-pitch-token-remove:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 70%, transparent);
+  outline-offset: 2px;
 }
 
 .squad-pitch--token-drag {

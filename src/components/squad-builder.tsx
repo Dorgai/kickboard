@@ -20,6 +20,7 @@ import {
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
+import { playerIdsMatch } from "@/lib/squads/drag-player";
 import { teamsMatch } from "@/lib/squads/team-names";
 
 type LoadedSquad = {
@@ -80,28 +81,28 @@ export function SquadBuilder({
     [formations]
   );
 
-  const removeFromPitch = useCallback((playerId: number) => {
+  const removeFromPitch = useCallback((playerId: number | string) => {
     setLineup((current) =>
       alignLineupSlotCoordinates(
         current.map((slot) =>
-          slot.playerId === playerId ||
-          (slot.playerId !== undefined && String(slot.playerId) === String(playerId))
+          playerIdsMatch(slot.playerId, playerId)
             ? { ...slot, label: "", playerId: undefined, teamName: undefined, jerseyNumber: undefined }
             : slot
         ),
         formations
       )
     );
+    const numericId = typeof playerId === "number" ? playerId : Number(playerId);
     setHomeSelectedIds((current) => {
-      if (!current.has(playerId)) return current;
+      if (!Number.isFinite(numericId) || !current.has(numericId)) return current;
       const next = new Set(current);
-      next.delete(playerId);
+      next.delete(numericId);
       return next;
     });
     setAwaySelectedIds((current) => {
-      if (!current.has(playerId)) return current;
+      if (!Number.isFinite(numericId) || !current.has(numericId)) return current;
       const next = new Set(current);
-      next.delete(playerId);
+      next.delete(numericId);
       return next;
     });
     setSelectedSlot(null);
@@ -407,8 +408,10 @@ export function SquadBuilder({
           </div>
           <div className="squad-builder-benches" aria-label="Home and away benches">
             <SquadTeamBench
+              awayTeam={awayTeam}
               error={poolError}
               formation={formations.home}
+              homeTeam={homeTeam}
               lineup={lineup}
               loading={poolLoading}
               pitchDropRef={pitchDropRef}
@@ -421,8 +424,10 @@ export function SquadBuilder({
               onTogglePlayerSelect={toggleHomeSelection}
             />
             <SquadTeamBench
+              awayTeam={awayTeam}
               error={poolError}
               formation={formations.away}
+              homeTeam={homeTeam}
               lineup={lineup}
               loading={poolLoading}
               pitchDropRef={pitchDropRef}

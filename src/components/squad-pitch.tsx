@@ -22,9 +22,13 @@ import { playerRoleLabel } from "@/lib/squads/player-roles";
 import {
   playerIdsMatch,
   readPlayerDragData,
-  writePlayerDragData,
   type PitchDragPlayer
 } from "@/lib/squads/drag-player";
+import {
+  attachPitchPointerSession,
+  startTokenPointerSession,
+  type PitchPointerSessionCallbacks
+} from "@/lib/squads/pitch-pointer-session";
 import { teamsMatch } from "@/lib/squads/team-names";
 import { teamKitInlineStyle } from "@/lib/team-kit-colors";
 
@@ -32,6 +36,7 @@ export type { PitchDragPlayer };
 
 export type SquadPitchHandle = {
   tryDropPlayer: (player: PitchDragPlayer, clientX: number, clientY: number) => boolean;
+  getPitchRect: () => DOMRect | null;
 };
 
 type SquadPitchProps = {
@@ -41,7 +46,7 @@ type SquadPitchProps = {
   selectedSlot: number | null;
   onSelectSlot: (slot: number | null) => void;
   onLineupChange: (lineup: SquadLineupSlot[]) => void;
-  onRemovePlayer?: (playerId: number) => void;
+  onRemovePlayer?: (playerId: number | string) => void;
   readOnly?: boolean;
 };
 
@@ -73,16 +78,13 @@ function PitchTokenName({ label }: { label: string }) {
   );
 }
 
-function nearestEmptySlot(
+function nearestEmptySlotIndex(
   lineup: SquadLineupSlot[],
   side: SquadLineupSide,
   role?: SquadLineupSlot["role"]
 ) {
   const byRole = lineup.findIndex(
-    (slot) =>
-      !slot.label &&
-      slotSide(slot) === side &&
-      (!role || slot.role === role)
+    (slot) => !slot.label && slotSide(slot) === side && (!role || slot.role === role)
   );
   if (byRole >= 0) return byRole;
   return lineup.findIndex((slot) => !slot.label && slotSide(slot) === side);
@@ -103,11 +105,8 @@ function isPointOnPitch(pitch: DOMRect, clientX: number, clientY: number) {
   );
 }
 
-function benchSideFromPoint(clientX: number, clientY: number): SquadLineupSide | null {
-  const element = document.elementFromPoint(clientX, clientY);
-  const bench = element?.closest("[data-squad-bench-side]");
-  const side = bench?.getAttribute("data-squad-bench-side");
-  return side === "home" || side === "away" ? side : null;
+function pitchPlayerId(slot: SquadLineupSlot): number | string | undefined {
+  return slot.playerId;
 }
 
 export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function SquadPitch(
@@ -127,7 +126,6 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
   const lineupRef = useRef(lineup);
   const onLineupChangeRef = useRef(onLineupChange);
   const onRemovePlayerRef = useRef(onRemovePlayer);
-  const lastSwapTargetRef = useRef<number | null>(null);
   const [draggingPlayerId, setDraggingPlayerId] = useState<number | string | null>(null);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
 
@@ -185,9 +183,36 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     [awayTeam, commitLineup, homeTeam, onSelectSlot]
   );
 
+  const tryMovePitchPlayer = useCallback(
+    (player: PitchDragPlayer, clientX: number, clientY: number) => {
+      const pitch = pitchRef.current?.getBoundingClientRect();
+      if (!pitch || !isPointOnPitch(pitch, clientX, clientY)) return false;
+
+      const currentLineup = lineupRef.current;
+      const moving = currentLineup.find(
+        (slot) => playerIdsMatch(slot.playerId, player.playerId) && slot.label
+      );
+      if (!moving) return false;
+
+      const coords = coordsFromPointer(pitch, clientX, clientY);
+      const side = slotSide(moving);
+      const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
+      if (side !== dropSide) return false;
+
+      const targetSlot = nearestFormationSlotNumber(currentLineup, side, coords);
+      if (!targetSlot || targetSlot === moving.slot) return false;
+
+      commitLineup(swapLineupSlots(currentLineup, moving.slot, targetSlot));
+      return true;
+    },
+    [commitLineup]
+  );
+
   const tryDropPlayer = useCallback(
     (player: PitchDragPlayer, clientX: number, clientY: number) => {
-      if (player.fromPitch) return false;
+      if (player.fromPitch) {
+        return tryMovePitchPlayer(player, clientX, clientY);
+      }
       const pitch = pitchRef.current?.getBoundingClientRect();
       if (!pitch || !isPointOnPitch(pitch, clientX, clientY)) return false;
 
@@ -211,43 +236,38 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
         }
       }
       if (targetIndex < 0) {
-        targetIndex = nearestEmptySlot(currentLineup, playerSide, player.role);
+        targetIndex = nearestEmptySlotIndex(currentLineup, playerSide, player.role);
       }
       if (targetIndex < 0) return false;
       return assignPlayerAt(player, targetIndex);
     },
-    [assignPlayerAt, awayTeam, homeTeam]
+    [assignPlayerAt, awayTeam, homeTeam, tryMovePitchPlayer]
   );
 
-  useImperativeHandle(ref, () => ({ tryDropPlayer }), [tryDropPlayer]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      tryDropPlayer,
+      getPitchRect: () => pitchRef.current?.getBoundingClientRect() ?? null
+    }),
+    [tryDropPlayer]
+  );
 
-  const swapPlayerToNearestSlot = useCallback(
-    (playerId: number | string, clientX: number, clientY: number) => {
-      const currentLineup = lineupRef.current;
-      const pitch = pitchRef.current?.getBoundingClientRect();
-      if (!pitch) return;
-
-      const moving = currentLineup.find((slot) => playerIdsMatch(slot.playerId, playerId) && slot.label);
-      if (!moving) return;
-
-      const coords = coordsFromPointer(pitch, clientX, clientY);
-      const side = slotSide(moving);
-      const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
-      if (side !== dropSide) return;
-
-      const targetSlot = nearestFormationSlotNumber(currentLineup, side, coords);
-      if (!targetSlot || targetSlot === moving.slot) {
-        lastSwapTargetRef.current = null;
-        return;
+  const pointerCallbacks = useCallback((): PitchPointerSessionCallbacks => {
+    return {
+      getLineup: () => lineupRef.current,
+      commitLineup,
+      getPitchRect: () => pitchRef.current?.getBoundingClientRect() ?? null,
+      homeTeam,
+      awayTeam,
+      tryPlaceBenchPlayer: tryDropPlayer,
+      removePlayer: (playerId) => onRemovePlayerRef.current?.(playerId),
+      onDragVisualChange: (playerId, offset) => {
+        setDraggingPlayerId(playerId);
+        setDragOffset(offset);
       }
-      if (targetSlot === lastSwapTargetRef.current) return;
-
-      lastSwapTargetRef.current = targetSlot;
-      const next = swapLineupSlots(currentLineup, moving.slot, targetSlot);
-      commitLineup(next);
-    },
-    [commitLineup]
-  );
+    };
+  }, [awayTeam, commitLineup, homeTeam, tryDropPlayer]);
 
   const clearSlot = useCallback(
     (slotNumber: number) => {
@@ -280,18 +300,6 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     tryDropPlayer(player, event.clientX, event.clientY);
   }
 
-  function dragPayloadForSlot(slot: SquadLineupSlot): PitchDragPlayer | null {
-    if (!slot.playerId || !slot.label) return null;
-    return {
-      playerId: Number(slot.playerId),
-      name: slot.label,
-      teamName: slot.teamName ?? (slotSide(slot) === "home" ? homeTeam : awayTeam),
-      role: slot.role,
-      jerseyNumber: slot.jerseyNumber ?? null,
-      fromPitch: true
-    };
-  }
-
   function handleTokenPointerDown(
     event: ReactPointerEvent<HTMLDivElement>,
     slot: SquadLineupSlot
@@ -301,67 +309,42 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     event.stopPropagation();
 
     const playerId = slot.playerId;
-    const startX = event.clientX;
-    const startY = event.clientY;
-    let dragging = false;
+    const captureTarget = event.currentTarget;
+    try {
+      captureTarget.setPointerCapture(event.pointerId);
+    } catch {
+      /* unsupported */
+    }
+
+    const session = startTokenPointerSession(playerId, event.clientX, event.clientY);
     setDraggingPlayerId(playerId);
     setDragOffset({ x: 0, y: 0 });
-    lastSwapTargetRef.current = null;
     onSelectSlot(slot.slot);
 
-    const onMove = (moveEvent: PointerEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const deltaY = moveEvent.clientY - startY;
-
-      if (!dragging) {
-        if (Math.abs(deltaX) <= 4 && Math.abs(deltaY) <= 4) return;
-        dragging = true;
+    attachPitchPointerSession(session, pointerCallbacks(), {
+      captureTarget,
+      onEnd: () => {
+        const current = lineupRef.current.find((entry) => playerIdsMatch(entry.playerId, playerId));
+        if (current) onSelectSlot(current.slot);
       }
+    });
+  }
 
-      moveEvent.preventDefault();
-      setDragOffset({ x: deltaX, y: deltaY });
-      swapPlayerToNearestSlot(playerId, moveEvent.clientX, moveEvent.clientY);
-    };
-
-    const end = (endEvent: PointerEvent) => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", end);
-      window.removeEventListener("pointercancel", end);
-
-      if (dragging) {
-        const benchSide = benchSideFromPoint(endEvent.clientX, endEvent.clientY);
-        const moving = lineupRef.current.find(
-          (entry) => playerIdsMatch(entry.playerId, playerId) && entry.label
-        );
-        if (benchSide && moving && slotSide(moving) === benchSide) {
-          const numericId = Number(playerId);
-          if (Number.isFinite(numericId)) {
-            onRemovePlayerRef.current?.(numericId);
-          }
-        } else {
-          swapPlayerToNearestSlot(playerId, endEvent.clientX, endEvent.clientY);
-        }
-      }
-
-      setDraggingPlayerId(null);
-      setDragOffset(null);
-      lastSwapTargetRef.current = null;
-
-      const current = lineupRef.current.find((entry) => playerIdsMatch(entry.playerId, playerId));
-      if (current) onSelectSlot(current.slot);
-    };
-
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", end);
-    window.addEventListener("pointercancel", end);
+  function removeSlotPlayer(slot: SquadLineupSlot) {
+    const id = pitchPlayerId(slot);
+    if (id === undefined) {
+      clearSlot(slot.slot);
+      return;
+    }
+    onRemovePlayerRef.current?.(id);
   }
 
   return (
     <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
       {!readOnly ? (
         <p className="squad-pitch-hint squad-pitch-hint--compact">
-          Drag from the bench onto that team&apos;s half. Drag a name on the pitch to swap or drop on their
-          bench to remove. Tap an on-pitch bench chip or press Delete while selected.
+          Drag from the bench onto that team&apos;s half. Drag a name on the pitch to swap positions or drop on
+          their bench to remove. Tap Remove on a selected player or tap an on-pitch bench chip.
         </p>
       ) : null}
       <div
@@ -422,14 +405,13 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
             const isDragging =
               draggingPlayerId !== null && playerIdsMatch(draggingPlayerId, slot.playerId);
             const offset = isDragging ? dragOffset : null;
-            const payload = dragPayloadForSlot(slot);
+            const isSelected = selectedSlot === slot.slot;
             return (
               <div
                 aria-label={slot.label}
                 className={`squad-pitch-token squad-pitch-token--${side}${
-                  selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""
+                  isSelected ? " squad-pitch-token--selected" : ""
                 }${isDragging ? " squad-pitch-token--dragging" : ""}`}
-                draggable={!readOnly && Boolean(payload)}
                 key={`player-${slot.playerId}`}
                 role={readOnly ? "presentation" : "button"}
                 style={{
@@ -441,25 +423,13 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
                   ...teamKitInlineStyle(canonicalTeam, side, { homeTeam, awayTeam })
                 }}
                 tabIndex={readOnly ? -1 : 0}
-                onDragStart={
-                  readOnly || !payload
-                    ? undefined
-                    : (event) => {
-                        writePlayerDragData(event.dataTransfer, payload);
-                        event.dataTransfer.effectAllowed = "move";
-                      }
-                }
                 onKeyDown={
                   readOnly
                     ? undefined
                     : (event) => {
                         if (event.key === "Backspace" || event.key === "Delete") {
-                          const numericId = Number(slot.playerId);
-                          if (Number.isFinite(numericId)) {
-                            onRemovePlayerRef.current?.(numericId);
-                          } else {
-                            clearSlot(slot.slot);
-                          }
+                          event.preventDefault();
+                          removeSlotPlayer(slot);
                         }
                       }
                 }
@@ -468,6 +438,20 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
                 }
               >
                 <PitchTokenName label={slot.label} />
+                {!readOnly && isSelected ? (
+                  <button
+                    className="squad-pitch-token-remove"
+                    type="button"
+                    aria-label={`Remove ${slot.label} from pitch`}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      removeSlotPlayer(slot);
+                    }}
+                  >
+                    Remove
+                  </button>
+                ) : null}
               </div>
             );
           })}
