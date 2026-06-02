@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FeedTabBar } from "@/components/feed-tab-bar";
-import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { groupMatchesByLetter, inferTeamToGroup } from "@/lib/group-stage";
 import { MatchTeamStatsGrid } from "@/components/match-team-stats-grid";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
