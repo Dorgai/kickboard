@@ -159,25 +159,40 @@ export function CommunityPanel() {
   }
 
   if (!status?.connected) {
+    const primaryMessage =
+      status?.writeProbeError ?? status?.message ?? "Community is not configured yet.";
+    const messageMentionsSchema = /db:schema|tables are missing|community tables/i.test(primaryMessage);
+    const needsSchema =
+      status?.schemaReady === false && status.database && status.jwt && !messageMentionsSchema;
+    const needsInfra = !status?.database || !status?.jwt;
+
     return (
       <div className="community-setup">
-        <p className="inline-status">{status?.writeProbeError ?? status?.message ?? "Community is not configured yet."}</p>
-        <p className="community-setup-note">
-          {status?.writeProbeError ? (
-            <>{status.writeProbeError} Check Admin → Data sources → Coach Board setup for details.</>
-          ) : status?.schemaReady === false && status.database ? (
-            <>
-              Postgres is connected but tables are missing. From a machine that can reach your Railway
-              database, run <code>npm run db:schema</code> (loads <code>db/schema.sql</code> and{" "}
-              <code>db/community-extensions.sql</code>).
-            </>
-          ) : (
-            <>
-              Attach Postgres on Railway, run <code>npm run db:schema</code>, and set{" "}
-              <code>JWT_SECRET</code>. Moderation stays on the admin dashboard before posts go public.
-            </>
-          )}
-        </p>
+        <p className="inline-status">{primaryMessage}</p>
+        {status?.writeProbeError ? (
+          <p className="community-setup-note">
+            Check Admin → Data sources → Coach Board setup for details.
+          </p>
+        ) : null}
+        {needsSchema ? (
+          <p className="community-setup-note">
+            From a machine that can reach your Railway database, run <code>npm run db:schema</code>{" "}
+            (applies <code>db/schema.sql</code> and <code>db/community-extensions.sql</code>). Or add{" "}
+            <code>DATABASE_URL</code> to GitHub Actions secrets so deploy applies it automatically.
+          </p>
+        ) : null}
+        {needsInfra ? (
+          <p className="community-setup-note">
+            Attach Postgres on Railway, run <code>npm run db:schema</code>, and set <code>JWT_SECRET</code>.
+            Moderation stays on the admin dashboard before posts go public.
+          </p>
+        ) : null}
+        {messageMentionsSchema ? (
+          <p className="community-setup-note">
+            Copy <code>DATABASE_URL</code> from Railway Postgres variables, then run{" "}
+            <code>npm run db:schema</code> once locally or via <code>railway run npm run db:schema</code>.
+          </p>
+        ) : null}
         <p className="community-setup-note">
           There is no community password yet — join uses display name + birth year, then an httpOnly session
           cookie. Admin moderation uses <code>ADMIN_DATA_SOURCES_TOKEN</code>, not your community login.

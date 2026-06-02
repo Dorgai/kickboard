@@ -34,7 +34,9 @@ This runs TypeScript checking and a production Next.js build.
 
 ## Deploy to Railway
 
-See [`docs/deploy-railway.md`](docs/deploy-railway.md) to deploy into the existing **kickboard** Railway project (not a new one). Requires `RAILWAY_PROJECT_ID`, `RAILWAY_SERVICE_ID`, and `RAILWAY_TOKEN`.
+Production: **https://kickboard-production.up.railway.app**
+
+See [`docs/deploy-railway.md`](docs/deploy-railway.md) to deploy into the existing **kickboard** Railway project (not a new one). Requires `RAILWAY_TOKEN` (and optionally `RAILWAY_PROJECT_ID` / `RAILWAY_SERVICE_ID`).
 
 ## Railway services to create
 

@@ -1,5 +1,6 @@
 {
   "projectName": "kickboard",
   "serviceName": "kickboard",
-  "environment": "production"
+  "environment": "production",
+  "productionUrl": "https://kickboard-production.up.railway.app"
 }

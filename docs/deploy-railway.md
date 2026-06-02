@@ -88,6 +88,32 @@ Inside the **kickboard** project (not another project):
 
 Use either dashboard deploy **or** GitHub Actions CLI deploy — not two unrelated projects.
 
+## Connect the CLI to kickboard (local or Cloud Agent)
+
+1. Railway → **kickboard** project → **Settings** → **Tokens** → create a **project** token.
+2. From the repo root:
+
+```bash
+export RAILWAY_TOKEN="<paste token>"
+npm run railway:connect
+```
+
+This links the directory to **kickboard** / **kickboard** / **production** (see [`deploy/railway.project.json`](../deploy/railway.project.json)). If `railway project list` fails with `Unauthorized`, also set:
+
+```bash
+export RAILWAY_PROJECT_ID="<uuid from Railway dashboard>"
+export RAILWAY_SERVICE_ID="<uuid from kickboard service settings>"
+npm run railway:connect
+```
+
+Apply community tables on production Postgres after connecting:
+
+```bash
+railway run npm run db:schema
+# or in one step:
+RAILWAY_CONNECT_APPLY_SCHEMA=1 npm run railway:connect
+```
+
 ## Local CLI deploy (recommended to ship `main` now)
 
 1. Railway → **kickboard** project (not another project) → **Settings** → **Tokens** → create a **project** token with deploy access. Account-only tokens that cannot list projects will fail with `Unauthorized` in CI.
@@ -95,6 +121,7 @@ Use either dashboard deploy **or** GitHub Actions CLI deploy — not two unrelat
 
 ```bash
 export RAILWAY_TOKEN="<paste token>"
+npm run railway:connect   # optional but recommended before railway run / deploy
 npm run check          # optional: verify build locally
 npm run railway:deploy # uploads repo → kickboard production, waits for /api/health
 ```
