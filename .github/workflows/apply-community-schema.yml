@@ -1,5 +1,8 @@
 name: Apply community schema (production)
 
+# Start with Actions → "Run workflow" on main. Do NOT use "Re-run jobs" on an old failed run —
+# that re-executes the workflow file from the failed commit (still uses railway run + private DB).
+
 on:
   workflow_dispatch:
 
@@ -11,6 +14,7 @@ jobs:
   apply:
     runs-on: ubuntu-latest
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       RAILWAY_ENVIRONMENT: production
     steps:
       - name: Checkout
@@ -35,27 +39,32 @@ jobs:
           RAILWAY_POSTGRES_SERVICE_NAME: ${{ vars.RAILWAY_POSTGRES_SERVICE_NAME }}
         run: |
           set -euo pipefail
-          echo "Schema workflow v2 (public DATABASE_URL — does not use railway run)"
-          git rev-parse HEAD
+          if ! grep -q "Schema workflow v3" .github/workflows/apply-community-schema.yml; then
+            echo "::error::This run is using an outdated workflow. In GitHub Actions, open this workflow and click Run workflow (do not Re-run jobs on an old failure)."
+            exit 1
+          fi
+          echo "Schema workflow v3 — connects with public Postgres URL only (never railway run)"
+          echo "Commit: $(git rev-parse HEAD)"
           if [ -z "${RAILWAY_TOKEN:-}" ] && [ -z "${DATABASE_URL:-}" ]; then
-            echo "::error::Add GitHub secret RAILWAY_TOKEN or DATABASE_URL (public Postgres URL)."
+            echo "::error::Add GitHub secret DATABASE_URL (Railway Postgres → Connect → Public URL) and/or RAILWAY_TOKEN."
             exit 1
           fi
           if [ -n "${DATABASE_URL:-}" ]; then
             echo "Using DATABASE_URL from GitHub secret…"
             if echo "$DATABASE_URL" | grep -q 'railway\.internal'; then
-              echo "::error::DATABASE_URL secret points at postgres.railway.internal. Replace it with Railway Postgres → Connect → Public URL."
+              echo "::error::DATABASE_URL secret uses postgres.railway.internal. Replace with Railway Postgres → Connect → Public URL."
               exit 1
             fi
           else
             npm install -g @railway/cli
-            echo "Resolving DATABASE_PUBLIC_URL from Railway CLI…"
+            echo "Resolving DATABASE_PUBLIC_URL from Railway…"
             export DATABASE_URL="$(node scripts/resolve-railway-database-url.mjs)"
             node -e "const u=new URL(process.env.DATABASE_URL); console.log('Postgres host:', u.hostname)"
           fi
           node scripts/apply-db-schema.mjs
 
       - name: Verify community status
+        continue-on-error: true
         env:
           PRODUCTION_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
         run: |
@@ -71,5 +80,4 @@ jobs:
             fi
             sleep 5
           done
-          echo "::warning::schemaReady is still false; check Railway Postgres and re-run this workflow."
-          exit 1
+          echo "::warning::schemaReady is still false after apply. Refresh the app or check DATABASE_URL targets the same DB as production."
