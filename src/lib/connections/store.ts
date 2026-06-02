@@ -241,6 +241,28 @@ export async function listConnectionsForUser(userId: string) {
   return { accepted, pendingIncoming, pendingOutgoing };
 }
 
+/** Connect inviter and new registrant after a registration invite is redeemed. */
+export async function createAcceptedConnection(inviterId: string, inviteeId: string) {
+  if (inviterId === inviteeId) return;
+
+  const existing = await getConnectionBetween(inviterId, inviteeId);
+  if (existing?.status === "accepted") return;
+  if (existing?.status === "blocked") return;
+
+  if (existing?.status === "pending") {
+    if (existing.addressee_id === inviteeId) {
+      await respondToConnectionRequest(existing.id, inviteeId, "accept");
+    }
+    return;
+  }
+
+  await query(
+    `INSERT INTO connections (requester_id, addressee_id, status, responded_at)
+     VALUES ($1, $2, 'accepted', now())`,
+    [inviterId, inviteeId]
+  );
+}
+
 export async function listAcceptedPeerIds(userId: string) {
   const result = await query<{ peer_id: string }>(
     `SELECT CASE WHEN requester_id = $1 THEN addressee_id ELSE requester_id END AS peer_id

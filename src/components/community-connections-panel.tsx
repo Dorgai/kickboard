@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
+import { RegistrationInvitationsPanel } from "@/components/registration-invitations-panel";
 
 type PublicUserCard = {
   id: string;
@@ -153,6 +154,8 @@ function ConnectionsPanelInner() {
 
   return (
     <div className="community-connections-panel">
+      <RegistrationInvitationsPanel />
+
       <p className="community-panel-lead">
         Connect with other registered fans. Once you accept each other, you can see their Coach Board
         squads and score picks for the same match — free-to-play predictions, not real-money betting.

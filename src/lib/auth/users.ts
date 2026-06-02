@@ -154,7 +154,11 @@ export async function upsertOAuthUser(input: {
   throw lastError ?? new Error("USER_INSERT_FAILED");
 }
 
-export async function completeUserOnboarding(userId: string, birthYear: number) {
+export async function completeUserOnboarding(
+  userId: string,
+  birthYear: number,
+  options?: { registrationInviteToken?: string | null }
+) {
   if (!Number.isInteger(birthYear) || birthYear < 1900 || birthYear > new Date().getFullYear()) {
     throw new Error("INVALID_BIRTH_YEAR");
   }
@@ -172,6 +176,30 @@ export async function completeUserOnboarding(userId: string, birthYear: number) 
 
   if (child) {
     throw new Error("CHILD_ACCOUNT_BLOCKED");
+  }
+
+  if (options?.registrationInviteToken) {
+    const { redeemRegistrationInvitation } = await import("@/lib/invitations/store");
+    const user = await query<{ email: string }>(
+      `SELECT email FROM users WHERE id = $1 AND deleted_at IS NULL`,
+      [userId]
+    );
+    const email = user.rows[0]?.email;
+    if (email) {
+      try {
+        await redeemRegistrationInvitation({
+          inviteToken: options.registrationInviteToken,
+          newUserId: userId,
+          newUserEmail: email
+        });
+      } catch (error) {
+        if (error instanceof Error && error.message === "ALREADY_REGISTERED") {
+          /* signed in again with same account */
+        } else {
+          throw error;
+        }
+      }
+    }
   }
 
   return findAuthUserById(userId);
