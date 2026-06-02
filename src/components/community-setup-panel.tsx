@@ -3,11 +3,21 @@ import type { CommunityHealth } from "@/lib/community/health";
 type CommunitySetupPanelProps = {
   adminTokenConfigured: boolean;
   health: CommunityHealth;
+  oauthConfigured: boolean;
 };
 
-export function CommunitySetupPanel({ adminTokenConfigured, health }: CommunitySetupPanelProps) {
+export function CommunitySetupPanel({
+  adminTokenConfigured,
+  health,
+  oauthConfigured
+}: CommunitySetupPanelProps) {
   const ready =
-    health.database && health.jwt && health.schemaReady && health.writeProbeOk && adminTokenConfigured;
+    health.database &&
+    health.jwt &&
+    health.schemaReady &&
+    health.writeProbeOk &&
+    adminTokenConfigured &&
+    oauthConfigured;
 
   return (
     <section className="feed-status-panel admin-community-setup data-card surface-muted" aria-label="Community setup">
@@ -49,7 +59,28 @@ export function CommunitySetupPanel({ adminTokenConfigured, health }: CommunityS
           detail="Bearer token for moderation API on this page"
           label="ADMIN_DATA_SOURCES_TOKEN"
         />
+        <SetupTile
+          connected={oauthConfigured}
+          detail="GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET on kickboard service"
+          label="Google OAuth"
+        />
       </div>
+
+      {!oauthConfigured ? (
+        <div className="admin-community-setup-steps">
+          <h3>Enable Google sign-in</h3>
+          <p>
+            Create a Web OAuth client in Google Cloud Console. Set redirect URI to{" "}
+            <code>https://kickboard-production.up.railway.app/api/auth/callback/google</code> (or your custom
+            domain).
+          </p>
+          <p className="admin-community-setup-note">
+            Add <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> in Railway variables, redeploy,
+            then confirm <a href="/api/auth/config">/api/auth/config</a> shows <code>oauthConfigured: true</code>.
+            See <code>docs/auth-oauth.md</code>.
+          </p>
+        </div>
+      ) : null}
 
       {!health.schemaReady && health.database ? (
         <div className="admin-community-setup-steps">
@@ -60,8 +91,8 @@ export function CommunitySetupPanel({ adminTokenConfigured, health }: CommunityS
 npm run db:schema`}</code>
           </pre>
           <p className="admin-community-setup-note">
-            Applies <code>db/schema.sql</code> and <code>db/community-extensions.sql</code>. Fan join does not
-            use a password — only display name, birth year, and an httpOnly session cookie.
+            Applies <code>db/schema.sql</code>, <code>db/community-extensions.sql</code>, and{" "}
+            <code>db/auth-extensions.sql</code>.
           </p>
         </div>
       ) : null}

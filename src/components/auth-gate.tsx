@@ -41,10 +41,32 @@ export function AuthGate({
           a separate community password.
         </p>
         {oauthConfigured === false ? (
-          <p className="inline-status">
-            Google OAuth is not configured on this environment. Set <code>GOOGLE_CLIENT_ID</code> and{" "}
-            <code>GOOGLE_CLIENT_SECRET</code> on Railway.
-          </p>
+          <div className="auth-oauth-setup-help">
+            <p className="inline-status">
+              Google OAuth is not configured on this server. Add variables on the Railway <strong>kickboard</strong>{" "}
+              service, then redeploy.
+            </p>
+            <ul className="auth-oauth-setup-list">
+              <li>
+                <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> from Google Cloud Console
+              </li>
+              <li>
+                Redirect URI:{" "}
+                <code>
+                  {typeof window !== "undefined"
+                    ? `${window.location.origin}/api/auth/callback/google`
+                    : "/api/auth/callback/google"}
+                </code>
+              </li>
+            </ul>
+            <p className="community-setup-note">
+              Full steps: <code>docs/auth-oauth.md</code> in the repo. Check{" "}
+              <a href="/api/auth/config" rel="noopener noreferrer" target="_blank">
+                /api/auth/config
+              </a>{" "}
+              after deploy (should show <code>oauthConfigured: true</code>).
+            </p>
+          </div>
         ) : (
           <button
             className="button primary"

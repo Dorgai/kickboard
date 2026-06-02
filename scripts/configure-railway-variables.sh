@@ -58,6 +58,25 @@ if [ -n "${API_FOOTBALL_KEY:-}" ]; then
   set_var "API_FOOTBALL_KEY=${API_FOOTBALL_KEY}"
 fi
 
+if [ -n "${GOOGLE_CLIENT_ID:-}" ]; then
+  echo "Setting GOOGLE_CLIENT_ID..."
+  set_var "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}"
+else
+  echo "skip GOOGLE_CLIENT_ID (required for fan sign-in — see docs/auth-oauth.md)"
+fi
+
+if [ -n "${GOOGLE_CLIENT_SECRET:-}" ]; then
+  echo "Setting GOOGLE_CLIENT_SECRET..."
+  set_var "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}"
+else
+  echo "skip GOOGLE_CLIENT_SECRET"
+fi
+
+if [ -n "${AUTH_SECRET:-}" ]; then
+  echo "Setting AUTH_SECRET..."
+  set_var "AUTH_SECRET=${AUTH_SECRET}"
+fi
+
 if [ "${SKIP_FINAL_REDEPLOY:-}" != "1" ]; then
   echo "Redeploying kickboard service..."
   railway_cli up --detach "${RAILWAY_TARGET_ARGS[@]}"
