@@ -3001,28 +3001,43 @@ h3 {
   line-height: 1.25;
 }
 
+.fixture-prediction-field:has(.fixture-prediction-scoreline) .fixture-prediction-field-hint {
+  text-align: center;
+}
+
 .fixture-prediction-scoreline {
   align-items: center;
-  display: grid;
-  gap: 10px 14px;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  max-width: 22rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  justify-content: center;
+  margin-inline: auto;
+  max-width: 100%;
+  width: 100%;
 }
 
 .fixture-prediction-score-team {
   align-items: center;
   display: flex;
+  flex: 0 1 auto;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
+  text-align: center;
+}
+
+.fixture-prediction-score-team .team-label-stacked {
+  align-items: center;
 }
 
 .fixture-prediction-score-dash {
+  align-self: center;
   color: var(--color-text-secondary);
+  flex-shrink: 0;
   font-size: 1.25rem;
   font-weight: 800;
   line-height: 1;
-  padding-top: 1.25rem;
+  padding: 0;
 }
 
 .fixture-prediction-score-field {
@@ -3036,11 +3051,12 @@ h3 {
   font-variant-numeric: tabular-nums;
   font-weight: 800;
   line-height: 1;
-  max-width: 4rem;
+  margin-inline: auto;
   min-height: 2.75rem;
-  padding: 6px 8px;
+  min-width: 3.25rem;
+  padding: 6px 10px;
   text-align: center;
-  width: 100%;
+  width: 3.25rem;
 }
 
 [data-theme="light"] .fixture-prediction-score-field,
@@ -3083,6 +3099,7 @@ h3 {
 }
 
 .fixture-predictions-form--coach-board .fixture-prediction-scoreline {
+  justify-content: center;
   max-width: 100%;
 }
 
