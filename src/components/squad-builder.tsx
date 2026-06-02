@@ -97,16 +97,22 @@ export function SquadBuilder({
               matchLabel: string;
             };
             const all = poolPayload.players ?? [];
-            setHomePlayers(
-              poolPayload.homePlayers?.length
-                ? poolPayload.homePlayers
-                : all.filter((player) => teamsMatch(player.teamName, homeTeam))
+            const mergedHome = [
+              ...(poolPayload.homePlayers ?? []),
+              ...all.filter((player) => teamsMatch(player.teamName, homeTeam))
+            ].filter(
+              (player, index, list) =>
+                list.findIndex((entry) => entry.playerId === player.playerId) === index
             );
-            setAwayPlayers(
-              poolPayload.awayPlayers?.length
-                ? poolPayload.awayPlayers
-                : all.filter((player) => teamsMatch(player.teamName, awayTeam))
+            const mergedAway = [
+              ...(poolPayload.awayPlayers ?? []),
+              ...all.filter((player) => teamsMatch(player.teamName, awayTeam))
+            ].filter(
+              (player, index, list) =>
+                list.findIndex((entry) => entry.playerId === player.playerId) === index
             );
+            setHomePlayers(mergedHome);
+            setAwayPlayers(mergedAway);
             setPoolLabel(`${poolPayload.seasonName} · ${poolPayload.matchLabel}`);
             setPoolError(null);
           } else {

@@ -209,7 +209,10 @@ export function SquadTeamBench({
         ))}
       </div>
       {!loading && !error && players.length === 0 ? (
-        <p className="inline-status">No players loaded for this team.</p>
+        <p className="inline-status squad-team-bench-empty">
+          No squad list in StatsBomb open data for {teamName}. Try a fixture where both nations
+          appear in a recent World Cup, or check back when official squads are linked.
+        </p>
       ) : null}
     </aside>
   );
