@@ -492,6 +492,7 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  justify-content: center;
   margin-top: 32px;
 }
 
@@ -1300,7 +1301,8 @@ h3 {
 .current-event-section-tabs.event-tab-bar {
   display: flex;
   flex-wrap: wrap;
-  margin: 4px 0 18px;
+  justify-content: center;
+  margin: 4px auto 18px;
   max-width: 100%;
   width: fit-content;
 }
@@ -1739,6 +1741,23 @@ h3 {
 .auth-gate-shell {
   display: grid;
   gap: 12px;
+}
+
+.auth-gate {
+  justify-items: center;
+  text-align: center;
+}
+
+.auth-gate .auth-oauth-setup-help,
+.auth-gate .feed-control-field {
+  justify-self: stretch;
+  text-align: left;
+  width: 100%;
+}
+
+.fixture-predictions-form .fixture-prediction-field-label {
+  text-align: center;
+  width: 100%;
 }
 
 .auth-oauth-setup-help {
@@ -2219,9 +2238,12 @@ h3 {
 .fixture-prediction-save {
   font-size: 13px;
   font-weight: 700;
+  margin-inline: auto;
+  max-width: min(100%, 20rem);
   min-height: 2.75rem;
+  min-width: 10rem;
   padding: 8px 16px;
-  width: 100%;
+  width: auto;
 }
 
 .fixture-prediction-pick--card .fixture-prediction-save {
@@ -2458,6 +2480,7 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: center;
 }
 
 .squad-builder-layout {
@@ -3115,7 +3138,7 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 14px;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .fixture-prediction-clear {
@@ -3299,16 +3322,21 @@ h3 {
 .fixture-prediction-form-footer {
   align-items: center;
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 10px 14px;
+  justify-content: center;
+  text-align: center;
 }
 
 .prediction-share {
   border-top: 1px solid color-mix(in srgb, var(--color-text-primary) 12%, var(--color-border));
   display: grid;
   gap: 8px;
+  justify-items: center;
   margin-top: 12px;
   padding-top: 12px;
+  text-align: center;
 }
 
 .prediction-share--compact {
@@ -3322,12 +3350,14 @@ h3 {
   font-size: 12px;
   font-weight: 700;
   margin: 0;
+  text-align: center;
 }
 
 .prediction-share-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: center;
 }
 
 .prediction-share-btn {
@@ -4077,20 +4107,28 @@ h3 {
   border: none;
   border-radius: 9999px;
   box-shadow: var(--shadow-surface);
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
-  margin: 0 0 28px;
+  justify-content: center;
+  margin: 0 auto 28px;
+  max-width: 100%;
   padding: 6px;
   position: sticky;
   top: 84px;
+  width: fit-content;
   z-index: 15;
 }
 
 .theme-selector.event-tab-bar {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
   margin: 0;
   padding: 4px;
   position: static;
   top: auto;
+  width: auto;
 }
 
 .theme-selector.event-tab-bar button {
@@ -4124,6 +4162,7 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  justify-content: center;
   margin: 0 0 12px;
 }
 
@@ -7231,6 +7270,7 @@ code {
     display: flex;
     flex-wrap: nowrap;
     gap: 4px;
+    justify-content: center;
     left: 0;
     overflow-x: auto;
     padding: 6px 8px;
@@ -7348,8 +7388,10 @@ code {
     padding: 12px;
   }
 
-  .current-event-section-tabs.event-tab-bar {
-    max-width: none;
+  .feed-browser > .event-tab-bar,
+  .current-event-section-tabs.event-tab-bar,
+  .feed-browser.admin-dashboard .admin-dashboard-tabs.event-tab-bar {
+    justify-content: center;
     width: 100%;
   }
 
