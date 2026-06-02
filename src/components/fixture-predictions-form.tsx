@@ -8,7 +8,6 @@ import {
   groupScorerPicks,
   MAX_SCORER_PICKS,
   outcomeLabel,
-  outcomeShort,
   type FixtureOutcome,
   type FixturePredictionRecord,
   type ScorerPick
@@ -199,9 +198,13 @@ export function FixturePredictionsForm({
               onClick={() => setPredictedOutcome(value)}
             >
               <span className="fixture-prediction-choice-label">
-                {value === "home" ? <TeamLabel name={homeTeam} size="xs" /> : null}
-                {value === "away" ? <TeamLabel name={awayTeam} size="xs" /> : null}
-                {value === "draw" ? "Draw" : outcomeShort(value)}
+                {value === "home" ? (
+                  <TeamLabel layout="stacked" name={homeTeam} size="xs" />
+                ) : null}
+                {value === "away" ? (
+                  <TeamLabel layout="stacked" name={awayTeam} size="xs" />
+                ) : null}
+                {value === "draw" ? "Draw" : null}
               </span>
             </button>
           ))}
@@ -223,7 +226,7 @@ export function FixturePredictionsForm({
         <div className="fixture-prediction-choices fixture-prediction-choices--score" role="group" aria-label="Predicted score">
           <label className="fixture-prediction-choice fixture-prediction-choice--score">
             <span className="fixture-prediction-choice-label">
-              <TeamLabel name={homeTeam} size="xs" />
+              <TeamLabel layout="stacked" name={homeTeam} size="xs" />
             </span>
             <input
               aria-label={`${homeTeam} goals`}
@@ -242,7 +245,7 @@ export function FixturePredictionsForm({
           </span>
           <label className="fixture-prediction-choice fixture-prediction-choice--score">
             <span className="fixture-prediction-choice-label">
-              <TeamLabel name={awayTeam} size="xs" />
+              <TeamLabel layout="stacked" name={awayTeam} size="xs" />
             </span>
             <input
               aria-label={`${awayTeam} goals`}

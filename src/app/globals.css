@@ -889,6 +889,20 @@ h3 {
   white-space: nowrap;
 }
 
+.team-label-stacked {
+  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.team-label-stacked .team-label-text {
+  line-height: 1.2;
+  max-width: 5.5rem;
+  text-align: center;
+  white-space: normal;
+}
+
 .match-teams-line {
   align-items: center;
   display: inline-flex;
@@ -2803,7 +2817,8 @@ h3 {
 .fixture-prediction-choice-label {
   align-items: center;
   display: inline-flex;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
   justify-content: center;
 }
 

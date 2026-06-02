@@ -47,14 +47,24 @@ type TeamLabelProps = {
   name: string;
   countryHint?: string | null;
   size?: "xs" | "sm" | "md";
+  /** Flag above name (e.g. compact prediction chips). */
+  layout?: "inline" | "stacked";
   className?: string;
 };
 
-export function TeamLabel({ name, countryHint, size = "sm", className = "" }: TeamLabelProps) {
+export function TeamLabel({
+  name,
+  countryHint,
+  size = "sm",
+  layout = "inline",
+  className = ""
+}: TeamLabelProps) {
   const code = resolveCountryCode(countryHint ?? name);
 
   return (
-    <span className={`team-label team-label-${size} ${className}`.trim()}>
+    <span
+      className={`team-label team-label-${size}${layout === "stacked" ? " team-label-stacked" : ""} ${className}`.trim()}
+    >
       <CountryFlag code={code} label={name} size={size} />
       <span className="team-label-text">{name}</span>
     </span>
