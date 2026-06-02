@@ -1,12 +1,12 @@
 "use client";
 
-import { CommunityPanel } from "@/components/community-panel";
 import { AuthGate } from "@/components/auth-gate";
+import { FanChatMessenger } from "@/components/fan-chat-messenger";
 
 export function FanChatPanel() {
   return (
     <AuthGate featureLabel="Fan Chat">
-      <CommunityPanel embedded />
+      <FanChatMessenger />
     </AuthGate>
   );
 }

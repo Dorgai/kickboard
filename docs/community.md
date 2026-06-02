@@ -12,7 +12,8 @@ Moderated public posting for the **Current event** tab. Historical match data st
 ## Safety model
 
 - Accounts under **13** cannot register for posting (Fan Mode).
-- **Fan Chat** text posts are stored as `moderation_status = withheld` until an admin approves them.
+- **Fan Chat** (floating panel) is **private messaging** between **accepted connections**: send to one fan or **broadcast to all connections**. Requires `db/fan-chat-messages-extensions.sql` via `npm run db:schema`.
+- Legacy **Fan Chat** public text posts (moderated feed in `CommunityPanel` when not embedded) still use `moderation_status = withheld` until an admin approves them.
 - **Coach Board squad shares** (`post_type = squad_share`) publish as `approved` immediately (structured lineup summary from saved squads).
 - Reporting a post hides it (`withheld`) until review.
 - Full user auth, DMs, and child profiles are later phases.
