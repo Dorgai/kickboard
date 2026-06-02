@@ -3,6 +3,7 @@
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -109,7 +110,18 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
   ref
 ) {
   const pitchRef = useRef<HTMLDivElement>(null);
-  const [draggingSlot, setDraggingSlot] = useState<number | null>(null);
+  const lineupRef = useRef(lineup);
+  const onLineupChangeRef = useRef(onLineupChange);
+  const [draggingPlayerId, setDraggingPlayerId] = useState<number | string | null>(null);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    lineupRef.current = lineup;
+  }, [lineup]);
+
+  useEffect(() => {
+    onLineupChangeRef.current = onLineupChange;
+  }, [onLineupChange]);
 
   const assignPlayerAt = useCallback(
     (player: PitchDragPlayer, coords: { x: number; y: number }, targetSlot?: number) => {
@@ -166,7 +178,20 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
       const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
       if (playerSide !== dropSide) return false;
 
-      const targetIndex = nearestEmptySlot(lineup, playerSide, player.role);
+      let targetIndex = -1;
+      let bestDist = Infinity;
+      for (let index = 0; index < lineup.length; index += 1) {
+        const slot = lineup[index];
+        if (slot.label || slotSide(slot) !== playerSide) continue;
+        const dist = (slot.x - coords.x) ** 2 + (slot.y - coords.y) ** 2;
+        if (dist < bestDist) {
+          bestDist = dist;
+          targetIndex = index;
+        }
+      }
+      if (targetIndex < 0) {
+        targetIndex = nearestEmptySlot(lineup, playerSide, player.role);
+      }
       if (targetIndex < 0) return false;
       const anchor = lineup[targetIndex];
       return assignPlayerAt(player, { x: anchor.x, y: anchor.y }, targetIndex);
@@ -176,15 +201,28 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
 
   useImperativeHandle(ref, () => ({ tryDropPlayer }), [tryDropPlayer]);
 
-  const moveSlot = useCallback(
-    (slotNumber: number, coords: { x: number; y: number }) => {
-      const moving = lineup.find((slot) => slot.slot === slotNumber);
-      if (!moving?.label) return;
-      const targetSlot = nearestFormationSlotNumber(lineup, slotSide(moving), coords);
-      if (!targetSlot) return;
-      onLineupChange(swapLineupSlots(lineup, slotNumber, targetSlot));
+  const swapPlayerToNearestSlot = useCallback(
+    (playerId: number | string, clientX: number, clientY: number) => {
+    const currentLineup = lineupRef.current;
+    const pitch = pitchRef.current?.getBoundingClientRect();
+    if (!pitch) return;
+
+    const moving = currentLineup.find((slot) => slot.playerId === playerId && slot.label);
+    if (!moving) return;
+
+    const coords = coordsFromPointer(pitch, clientX, clientY);
+    const side = slotSide(moving);
+    const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
+    if (side !== dropSide) return;
+
+    const targetSlot = nearestFormationSlotNumber(currentLineup, side, coords);
+    if (!targetSlot || targetSlot === moving.slot) return;
+
+    onLineupChangeRef.current(
+      swapLineupSlots(currentLineup, moving.slot, targetSlot)
+    );
     },
-    [lineup, onLineupChange]
+    []
   );
 
   const clearSlot = useCallback(
@@ -223,40 +261,50 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     event: ReactPointerEvent<HTMLDivElement>,
     slot: SquadLineupSlot
   ) {
-    if (readOnly || event.button !== 0) return;
+    if (readOnly || event.button !== 0 || !slot.playerId || !slot.label) return;
     event.preventDefault();
+    event.stopPropagation();
 
+    const playerId = slot.playerId;
     const target = event.currentTarget;
     target.setPointerCapture(event.pointerId);
 
     const startX = event.clientX;
     const startY = event.clientY;
-    let moved = false;
-    setDraggingSlot(slot.slot);
+    let dragging = false;
+    setDraggingPlayerId(playerId);
+    setDragOffset({ x: 0, y: 0 });
     onSelectSlot(slot.slot);
 
     const onMove = (moveEvent: PointerEvent) => {
-      if (
-        Math.abs(moveEvent.clientX - startX) > 6 ||
-        Math.abs(moveEvent.clientY - startY) > 6
-      ) {
-        moved = true;
-      }
-      if (!moved) return;
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
 
-      const pitch = pitchRef.current?.getBoundingClientRect();
-      if (!pitch) return;
-      moveSlot(slot.slot, coordsFromPointer(pitch, moveEvent.clientX, moveEvent.clientY));
+      if (!dragging) {
+        if (Math.abs(deltaX) <= 4 && Math.abs(deltaY) <= 4) return;
+        dragging = true;
+      }
+
+      moveEvent.preventDefault();
+      setDragOffset({ x: deltaX, y: deltaY });
+      swapPlayerToNearestSlot(playerId, moveEvent.clientX, moveEvent.clientY);
     };
 
     const end = (endEvent: PointerEvent) => {
-      setDraggingSlot(null);
+      if (dragging) {
+        swapPlayerToNearestSlot(playerId, endEvent.clientX, endEvent.clientY);
+      }
+      setDraggingPlayerId(null);
+      setDragOffset(null);
       if (target.hasPointerCapture(endEvent.pointerId)) {
         target.releasePointerCapture(endEvent.pointerId);
       }
       target.removeEventListener("pointermove", onMove);
       target.removeEventListener("pointerup", end);
       target.removeEventListener("pointercancel", end);
+
+      const current = lineupRef.current.find((entry) => entry.playerId === playerId);
+      if (current) onSelectSlot(current.slot);
     };
 
     target.addEventListener("pointermove", onMove);
@@ -268,13 +316,13 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
       {!readOnly ? (
         <p className="squad-pitch-hint squad-pitch-hint--compact">
-          Drag from the bench above or below onto that team&apos;s half. Drop back on their bench to remove
-          (or press Delete while selected).
+          Drag from the bench onto that team&apos;s half. Drag a name on the pitch to swap positions. Tap a
+          bench chip marked on pitch to remove (or press Delete while selected).
         </p>
       ) : null}
       <div
         aria-label="Football pitch with home and away teams"
-        className={`squad-pitch squad-pitch--dual${draggingSlot ? " squad-pitch--token-drag" : ""}`}
+        className={`squad-pitch squad-pitch--dual${draggingPlayerId ? " squad-pitch--token-drag" : ""}`}
         onDragOver={readOnly ? undefined : handleDragOver}
         onDrop={readOnly ? undefined : handleDrop}
         ref={pitchRef}
@@ -327,17 +375,22 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
           .map((slot) => {
             const side = slotSide(slot);
             const canonicalTeam = side === "home" ? homeTeam : awayTeam;
+            const isDragging = draggingPlayerId === slot.playerId;
+            const offset = isDragging ? dragOffset : null;
             return (
               <div
                 aria-label={slot.label}
                 className={`squad-pitch-token squad-pitch-token--${side}${
                   selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""
-                }${draggingSlot === slot.slot ? " squad-pitch-token--dragging" : ""}`}
+                }${isDragging ? " squad-pitch-token--dragging" : ""}`}
                 key={`token-${slot.slot}`}
                 role={readOnly ? "presentation" : "button"}
                 style={{
                   left: `${slot.x}%`,
                   top: `${slot.y}%`,
+                  transform: offset
+                    ? `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px))`
+                    : undefined,
                   ...teamKitInlineStyle(canonicalTeam, side, { homeTeam, awayTeam })
                 }}
                 tabIndex={readOnly ? -1 : 0}
@@ -359,7 +412,6 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
             );
           })}
 
-        {draggingSlot ? <span className="squad-pitch-drag-overlay" aria-hidden /> : null}
       </div>
     </div>
   );

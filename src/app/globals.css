@@ -3013,6 +3013,7 @@ h3 {
 .squad-pitch-token {
   align-items: center;
   aspect-ratio: 1.45 / 1;
+  pointer-events: auto;
   background: linear-gradient(
     160deg,
     color-mix(in srgb, var(--pitch-kit-primary, #3b82f6) 88%, #fff) 0%,
@@ -3042,9 +3043,10 @@ h3 {
 
 .squad-pitch-token--dragging {
   cursor: grabbing;
-  opacity: 0.88;
+  opacity: 0.95;
   touch-action: none;
-  z-index: 4;
+  transition: none;
+  z-index: 5;
 }
 
 .squad-pitch--token-drag {
