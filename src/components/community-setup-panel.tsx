@@ -96,8 +96,14 @@ export function CommunitySetupPanel({
 npm run db:schema`}</code>
           </pre>
           <p className="admin-community-setup-note">
-            Applies <code>db/schema.sql</code>, <code>db/community-extensions.sql</code>, and{" "}
-            <code>db/auth-extensions.sql</code>.
+            Use the <strong>public</strong> Postgres URL (<code>DATABASE_PUBLIC_URL</code> or Connect → Public
+            URL). The web service&apos;s private <code>postgres.railway.internal</code> URL only works inside
+            Railway, not from your laptop or GitHub Actions.
+          </p>
+          <p className="admin-community-setup-note">
+            Applies all files under <code>db/</code> (schema, community, auth, predictions, alerts, etc.). Then
+            open <a href="/api/community/status">/api/community/status</a> — <code>schemaReady</code> must be{" "}
+            <code>true</code>.
           </p>
         </div>
       ) : null}

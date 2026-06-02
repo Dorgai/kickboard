@@ -27,7 +27,7 @@ export function mapDatabaseError(error: unknown) {
     return {
       status: 503,
       error:
-        "Community tables are missing. On Railway Postgres run: npm run db:schema (applies db/schema.sql and db/community-extensions.sql)."
+        "Community tables are missing. From your laptop or GitHub Actions, set DATABASE_URL to Railway Postgres → Connect → Public URL (not postgres.railway.internal), then run npm run db:schema. Or run the “Apply community schema (production)” workflow. Verify GET /api/community/status shows schemaReady:true."
     };
   }
   const pgMessage = formatPgError(error);
