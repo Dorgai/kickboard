@@ -1869,6 +1869,13 @@ h3 {
   margin: -4px 0 8px;
 }
 
+.registration-invite-email-note {
+  color: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-text-secondary));
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0 0 12px;
+}
+
 .registration-invite-form {
   display: grid;
   gap: 8px;
