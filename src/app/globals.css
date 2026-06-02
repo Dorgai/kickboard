@@ -1136,8 +1136,12 @@ h3 {
   position: relative;
 }
 
-.current-event-main-tabs {
-  margin-bottom: 4px;
+.current-event-section-tabs.event-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 4px 0 18px;
+  max-width: 100%;
+  width: fit-content;
 }
 
 .current-event-tab-panel {

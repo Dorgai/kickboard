@@ -12,10 +12,10 @@ export const CURRENT_EVENT_TAB_IDS = ["tournament", "coach-board", "predictions"
 export type CurrentEventTabId = (typeof CURRENT_EVENT_TAB_IDS)[number];
 
 const CURRENT_EVENT_TABS = [
-  { id: "tournament" as const, label: "Tournament path" },
+  { id: "tournament" as const, label: "Tournament" },
   { id: "coach-board" as const, label: "Coach Board" },
   { id: "predictions" as const, label: "Predictions" }
-];
+] as const;
 
 const CURRENT_KNOCKOUT_STAGES = [
   "Round of 32",
@@ -165,13 +165,18 @@ export function CurrentEventTabs({
         <SummaryTile compact label="Venues" value={summary.venueCount ?? "—"} />
       </div>
 
-      <FeedTabBar
-        ariaLabel="Current event sections"
-        className="current-event-main-tabs"
-        tabs={CURRENT_EVENT_TABS}
-        value={activeTab}
-        onChange={(id) => selectTab(id as CurrentEventTabId)}
-      />
+      <nav className="event-tab-bar current-event-section-tabs" aria-label="Current event sections">
+        {CURRENT_EVENT_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            className={activeTab === tab.id ? "active" : ""}
+            type="button"
+            onClick={() => selectTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
 
       <div className="current-event-tab-panel" role="tabpanel">
         {activeTab === "tournament" ? (
