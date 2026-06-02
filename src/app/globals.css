@@ -3996,8 +3996,65 @@ h3 {
   gap: 12px;
 }
 
+.feed-hero-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
 .feed-hero h1 {
+  margin: 0;
   max-width: 900px;
+}
+
+.info-tooltip {
+  align-items: center;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, var(--color-border));
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  cursor: help;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 2rem;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+  width: 2rem;
+}
+
+.info-tooltip:hover,
+.info-tooltip:focus-visible {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  color: var(--color-text-primary);
+}
+
+.info-tooltip-bubble {
+  background: var(--color-text-primary);
+  border-radius: 8px;
+  color: var(--color-bg);
+  font-size: 12px;
+  font-weight: 500;
+  left: 50%;
+  letter-spacing: normal;
+  line-height: 1.4;
+  max-width: min(18rem, 80vw);
+  opacity: 0;
+  padding: 8px 10px;
+  pointer-events: none;
+  position: absolute;
+  text-align: left;
+  top: calc(100% + 8px);
+  transform: translateX(-50%);
+  transition: opacity 0.15s ease;
+  white-space: normal;
+  z-index: 20;
+}
+
+.info-tooltip:hover .info-tooltip-bubble,
+.info-tooltip:focus-visible .info-tooltip-bubble {
+  opacity: 1;
 }
 
 .feed-hero p,
