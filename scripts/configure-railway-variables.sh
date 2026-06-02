@@ -47,11 +47,20 @@ else
   echo "skip REDIS_URL (add Railway Redis in the kickboard project and re-run)"
 fi
 
+if [ -z "${NEXT_PUBLIC_APP_URL:-}" ]; then
+  NEXT_PUBLIC_APP_URL="$(node -e "
+    const c = JSON.parse(require('fs').readFileSync('deploy/railway.project.json', 'utf8'));
+    if (c.productionUrl) console.log(c.productionUrl);
+  " 2>/dev/null || true)"
+fi
+
 if [ -n "${NEXT_PUBLIC_APP_URL:-}" ]; then
   echo "Setting NEXT_PUBLIC_APP_URL..."
   set_var "NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}"
+  echo "Setting AUTH_URL..."
+  set_var "AUTH_URL=${NEXT_PUBLIC_APP_URL}"
 else
-  echo "skip NEXT_PUBLIC_APP_URL (set after you generate a domain on this service)"
+  echo "skip NEXT_PUBLIC_APP_URL / AUTH_URL"
 fi
 
 if [ -n "${API_FOOTBALL_KEY:-}" ]; then

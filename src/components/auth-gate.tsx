@@ -60,11 +60,8 @@ export function AuthGate({
               </li>
             </ul>
             <p className="community-setup-note">
-              Full steps: <code>docs/auth-oauth.md</code> in the repo. Check{" "}
-              <a href="/api/auth/config" rel="noopener noreferrer" target="_blank">
-                /api/auth/config
-              </a>{" "}
-              after deploy (should show <code>oauthConfigured: true</code>).
+              If Google shows &quot;Access blocked&quot;, add your Gmail under OAuth consent screen →{" "}
+              <strong>Test users</strong> (app in Testing mode). See <code>docs/auth-oauth.md</code>.
             </p>
           </div>
         ) : (
