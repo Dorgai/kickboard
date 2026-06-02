@@ -225,13 +225,7 @@ export function SquadPitch({
                   }
                 }}
                 aria-label={`${slotSide(slot)} ${playerRoleLabel(slot.role)} slot ${slot.slot}`}
-              >
-                {!slot.label ? (
-                  <span className="squad-pitch-placeholder-role" aria-hidden>
-                    {playerRoleLabel(slot.role)}
-                  </span>
-                ) : null}
-              </button>
+              />
             ))
           : null}
 

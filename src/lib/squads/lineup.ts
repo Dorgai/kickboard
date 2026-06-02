@@ -302,6 +302,54 @@ export function mergeMatchFormationChangeForSide(
   return mergeFormationChangeForSide(template, prior);
 }
 
+export type BenchPlayerPick = {
+  playerId: number;
+  name: string;
+  role: SquadPlayerRole;
+  teamName: string;
+  jerseyNumber?: number;
+};
+
+function assignPlayersToSideTemplate(
+  template: SquadLineupSlot[],
+  players: BenchPlayerPick[]
+): SquadLineupSlot[] {
+  const used = new Set<number>();
+
+  return template.map((slot) => {
+    let pickIndex = players.findIndex(
+      (player, index) => !used.has(index) && player.role === slot.role
+    );
+    if (pickIndex < 0) {
+      pickIndex = players.findIndex((player, index) => !used.has(index));
+    }
+    if (pickIndex < 0) return slot;
+
+    used.add(pickIndex);
+    const player = players[pickIndex];
+    return {
+      ...slot,
+      label: player.name,
+      playerId: player.playerId,
+      teamName: player.teamName,
+      jerseyNumber: player.jerseyNumber
+    };
+  });
+}
+
+/** Place bench-selected players onto formation slots; keeps the other side unchanged. */
+export function applyBenchSelectionToSideFormation(
+  side: SquadLineupSide,
+  formation: SquadFormation,
+  previous: SquadLineupSlot[],
+  selectedPlayers: BenchPlayerPick[]
+): SquadLineupSlot[] {
+  const template = sideLineupFromFormation(formation, side);
+  const filled = assignPlayersToSideTemplate(template, selectedPlayers);
+  const otherSide = previous.filter((slot) => slotSide(slot) !== side);
+  return side === "home" ? [...filled, ...otherSide] : [...otherSide, ...filled];
+}
+
 export function mergeMatchFormationChange(
   formations: MatchFormations,
   previous: SquadLineupSlot[]
