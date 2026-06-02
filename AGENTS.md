@@ -71,4 +71,4 @@ If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production ta
 - Past-events knockout layout: full-width **Route to the final** bracket on top; match list, summary, team stats/lineups, event timeline, and player stats stack in `.knockout-widgets` rows below (not side-by-side with the tree).
 - Gap tracker: [`docs/feed-browser-roadmap.md`](docs/feed-browser-roadmap.md).
 - Feed & infrastructure status (`FeedStatusPanel`) lives on `/admin/data-sources`, not the public homepage.
-- **Community (Coach Board)** on Current event `#community` needs `DATABASE_URL`, `JWT_SECRET`, and `npm run db:schema` (includes `db/community-extensions.sql`). Posts are withheld until approved in admin moderation.
+- **Community (Coach Board)** on Current event `#community` needs `DATABASE_URL`, `JWT_SECRET`, and a one-time `npm run db:schema` (Node script: `scripts/apply-db-schema.mjs`). If production shows “tables are not installed”, run `railway run npm run db:schema` or add `DATABASE_URL` to GitHub Actions secrets so deploy applies schema automatically.

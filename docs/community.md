@@ -33,6 +33,15 @@ export DATABASE_URL=postgresql://USER:PASS@HOST:PORT/railway
 npm run db:schema
 ```
 
+`db:schema` uses Node (`scripts/apply-db-schema.mjs`) so you do not need `psql` installed. On Railway:
+
+```bash
+railway link   # kickboard / production
+railway run npm run db:schema
+```
+
+Or add the production `DATABASE_URL` as a GitHub Actions secret; **Deploy to Railway** runs `db:schema` before each deploy when that secret is set.
+
 Use the **public** Railway Postgres URL from the plugin (Variables → `DATABASE_URL`).
 
 4. Ensure `ADMIN_DATA_SOURCES_TOKEN` is set for the moderation UI.
