@@ -29,11 +29,14 @@ Full email/password auth, verification, and password reset are a later phase.
 3. Apply schema (**required** — without this, join returns 500):
 
 ```bash
+# Use the PUBLIC URL (Connect → Public URL), not postgres.railway.internal
 export DATABASE_URL=postgresql://USER:PASS@HOST:PORT/railway
 npm run db:schema
 ```
 
-Use the **public** Railway Postgres URL from the plugin (Variables → `DATABASE_URL`).
+Railway’s **`DATABASE_URL`** on the web service is often the **private** host (`postgres.railway.internal`) — that only works inside Railway. For GitHub Actions, your laptop, or `npm run db:schema` locally, use **`DATABASE_PUBLIC_URL`** from the Postgres plugin, or copy **Connect → Public URL**.
+
+**GitHub Actions:** run workflow **Apply community schema (production)**. It uses `RAILWAY_TOKEN` to fetch `DATABASE_PUBLIC_URL`, or set GitHub secret **`DATABASE_URL`** to the public connection string directly.
 
 4. Ensure `ADMIN_DATA_SOURCES_TOKEN` is set for the moderation UI.
 5. Check `GET /api/community/status` — `schemaReady` must be `true`.

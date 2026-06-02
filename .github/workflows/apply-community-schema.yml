@@ -29,21 +29,23 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_POSTGRES_SERVICE_NAME: ${{ vars.RAILWAY_POSTGRES_SERVICE_NAME }}
         run: |
           set -euo pipefail
-          if [ -n "${DATABASE_URL:-}" ]; then
-            echo "Applying schema via DATABASE_URL secret…"
-            node scripts/apply-db-schema.mjs
-            exit 0
-          fi
-          if [ -z "${RAILWAY_TOKEN:-}" ]; then
-            echo "::error::Add GitHub secret RAILWAY_TOKEN or DATABASE_URL."
+          if [ -z "${RAILWAY_TOKEN:-}" ] && [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::Add GitHub secret RAILWAY_TOKEN or DATABASE_URL (public Postgres URL)."
             exit 1
           fi
-          npm install -g @railway/cli
-          SERVICE_NAME=$(node -e "console.log(JSON.parse(require('fs').readFileSync('deploy/railway.project.json','utf8')).serviceName)")
-          echo "Applying schema via railway run (service=${SERVICE_NAME}, environment=production)…"
-          railway run --service "$SERVICE_NAME" --environment production -- node scripts/apply-db-schema.mjs
+          if [ -z "${DATABASE_URL:-}" ]; then
+            npm install -g @railway/cli
+            echo "Resolving public Postgres URL from Railway (not railway run — private host is unreachable from CI)…"
+            export DATABASE_URL="$(node scripts/resolve-railway-database-url.mjs)"
+            node -e "const u=new URL(process.env.DATABASE_URL); console.log('Postgres host:', u.hostname)"
+          else
+            echo "Applying schema via DATABASE_URL GitHub secret…"
+          fi
+          node scripts/apply-db-schema.mjs
 
       - name: Verify community status
         env:

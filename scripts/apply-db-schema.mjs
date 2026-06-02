@@ -18,6 +18,13 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
+if (/\.railway\.internal\b/i.test(databaseUrl) || /postgres\.railway\.internal/i.test(databaseUrl)) {
+  console.error(
+    "error: DATABASE_URL uses Railway private networking (postgres.railway.internal). GitHub Actions and your laptop need the public URL — Railway Postgres → Connect → Public URL, or DATABASE_PUBLIC_URL."
+  );
+  process.exit(1);
+}
+
 const files = ["db/schema.sql", "db/community-extensions.sql"];
 
 async function applyFile(client, relativePath) {
