@@ -2,9 +2,10 @@
 
 import { useCallback, useRef, useState } from "react";
 import {
-  clampCoordsToSide,
   clampPitchCoord,
+  nearestFormationSlotNumber,
   slotSide,
+  swapLineupSlots,
   SLOTS_PER_TEAM,
   type SquadLineupSide,
   type SquadLineupSlot
@@ -78,8 +79,7 @@ export function SquadPitch({
       if (slotIndex < 0) return;
       if (slotSide(lineup[slotIndex]) !== playerSide) return;
 
-      const placed = clampCoordsToSide(playerSide, coords);
-
+      const anchor = lineup[slotIndex];
       const canonicalTeam = playerSide === "home" ? homeTeam : awayTeam;
 
       const next = lineup.map((slot, index) => {
@@ -91,8 +91,8 @@ export function SquadPitch({
             playerId: player.playerId,
             teamName: canonicalTeam,
             jerseyNumber: player.jerseyNumber ?? undefined,
-            x: placed.x,
-            y: placed.y
+            x: anchor.x,
+            y: anchor.y
           };
         }
         if (slot.playerId === player.playerId) {
@@ -109,13 +109,11 @@ export function SquadPitch({
 
   const moveSlot = useCallback(
     (slotNumber: number, coords: { x: number; y: number }) => {
-      onLineupChange(
-        lineup.map((slot) => {
-          if (slot.slot !== slotNumber) return slot;
-          const placed = clampCoordsToSide(slotSide(slot), coords);
-          return { ...slot, x: placed.x, y: placed.y };
-        })
-      );
+      const moving = lineup.find((slot) => slot.slot === slotNumber);
+      if (!moving?.label) return;
+      const targetSlot = nearestFormationSlotNumber(lineup, slotSide(moving), coords);
+      if (!targetSlot) return;
+      onLineupChange(swapLineupSlots(lineup, slotNumber, targetSlot));
     },
     [lineup, onLineupChange]
   );
@@ -160,8 +158,10 @@ export function SquadPitch({
       const playerSide = sideForPlayer(player, homeTeam, awayTeam);
       if (!playerSide || playerSide !== dropSide) return;
 
-      const targetSlot = nearestEmptySlot(lineup, playerSide, player.role);
-      assignPlayerAt(player, coords, targetSlot >= 0 ? targetSlot : undefined);
+      const targetIndex = nearestEmptySlot(lineup, playerSide, player.role);
+      if (targetIndex < 0) return;
+      const anchor = lineup[targetIndex];
+      assignPlayerAt(player, { x: anchor.x, y: anchor.y }, targetIndex);
     } catch {
       /* ignore malformed drag payload */
     }

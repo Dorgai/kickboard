@@ -404,8 +404,9 @@ function mapLineupEntry(
   const label = typeof entry.label === "string" ? entry.label.trim().slice(0, 80) : "";
   const role =
     typeof entry.role === "string" && isSquadPlayerRole(entry.role) ? entry.role : slot.role;
-  const x = typeof entry.x === "number" ? clampPitchCoord(entry.x) : slot.x;
-  const y = typeof entry.y === "number" ? clampPitchCoord(entry.y) : slot.y;
+  // Always use formation template coordinates for this slot (ignore legacy free-drag x/y).
+  const x = slot.x;
+  const y = slot.y;
   const side =
     entry.side === "home" || entry.side === "away" ? entry.side : slot.side ?? slotSide(slot);
   const playerId =
@@ -431,6 +432,84 @@ function mapLineupEntry(
 }
 
 /** Use fixture home/away labels on filled slots so kit colours and drag checks stay consistent. */
+/** Snap every slot to canonical formation coordinates (fixes legacy drag positions). */
+export function alignLineupSlotCoordinates(
+  lineup: SquadLineupSlot[],
+  formations: MatchFormations
+): SquadLineupSlot[] {
+  const template = defaultMatchLineupWithFormations(formations);
+  const coordsBySlot = new Map(template.map((slot) => [slot.slot, { x: slot.x, y: slot.y }]));
+  const roleBySlot = new Map(template.map((slot) => [slot.slot, slot.role]));
+
+  return lineup.map((slot) => {
+    const coords = coordsBySlot.get(slot.slot);
+    const role = roleBySlot.get(slot.slot) ?? slot.role;
+    if (!coords) return slot;
+    return { ...slot, x: coords.x, y: coords.y, role };
+  });
+}
+
+export function nearestFormationSlotNumber(
+  lineup: SquadLineupSlot[],
+  side: SquadLineupSide,
+  coords: PitchCoords
+): number | null {
+  let best: number | null = null;
+  let bestDist = Infinity;
+
+  for (const slot of lineup) {
+    if (slotSide(slot) !== side) continue;
+    const dist = (slot.x - coords.x) ** 2 + (slot.y - coords.y) ** 2;
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = slot.slot;
+    }
+  }
+
+  return best;
+}
+
+export function swapLineupSlots(
+  lineup: SquadLineupSlot[],
+  fromSlotNumber: number,
+  toSlotNumber: number
+): SquadLineupSlot[] {
+  if (fromSlotNumber === toSlotNumber) return lineup;
+
+  const fromIdx = lineup.findIndex((slot) => slot.slot === fromSlotNumber);
+  const toIdx = lineup.findIndex((slot) => slot.slot === toSlotNumber);
+  if (fromIdx < 0 || toIdx < 0) return lineup;
+
+  const from = lineup[fromIdx];
+  const to = lineup[toIdx];
+  if (!from.label) return lineup;
+
+  const takePlayer = (slot: SquadLineupSlot) => ({
+    label: slot.label,
+    playerId: slot.playerId,
+    teamName: slot.teamName,
+    jerseyNumber: slot.jerseyNumber,
+    role: slot.role
+  });
+
+  const emptyPlayer = {
+    label: "",
+    playerId: undefined,
+    teamName: undefined,
+    jerseyNumber: undefined
+  };
+
+  return lineup.map((slot, index) => {
+    if (index === fromIdx) {
+      return to.label ? { ...slot, ...takePlayer(to) } : { ...slot, ...emptyPlayer };
+    }
+    if (index === toIdx) {
+      return { ...slot, ...takePlayer(from) };
+    }
+    return slot;
+  });
+}
+
 export function normalizeLineupTeamLabels(
   lineup: SquadLineupSlot[],
   homeTeam: string,
@@ -475,9 +554,10 @@ export function normalizeLineupSlots(
       bySlot.set(slotNumber, entry as Record<string, unknown>);
     });
 
-    return matchTemplate.map((slot) =>
+    const mapped = matchTemplate.map((slot) =>
       mapLineupEntry(slot, bySlot.get(slot.slot) ?? bySlot.get(slot.slot - SLOTS_PER_TEAM))
     );
+    return alignLineupSlotCoordinates(mapped, matchFormations);
   }
 
   const legacyFormation =
@@ -487,19 +567,20 @@ export function normalizeLineupSlots(
     mapLineupEntry(slot, raw[index] as Record<string, unknown> | undefined)
   );
 
-  return matchTemplate.map((slot) => {
-    if (slotSide(slot) === "away") return slot;
-    const legacySlot = legacy[slot.slot - 1];
-    if (!legacySlot) return slot;
-    return {
-      ...slot,
-      label: legacySlot.label,
-      role: legacySlot.role,
-      x: legacySlot.x,
-      y: legacySlot.y,
-      playerId: legacySlot.playerId,
-      teamName: legacySlot.teamName,
-      jerseyNumber: legacySlot.jerseyNumber
-    };
-  });
+  return alignLineupSlotCoordinates(
+    matchTemplate.map((slot) => {
+      if (slotSide(slot) === "away") return slot;
+      const legacySlot = legacy[slot.slot - 1];
+      if (!legacySlot) return slot;
+      return {
+        ...slot,
+        label: legacySlot.label,
+        role: legacySlot.role,
+        playerId: legacySlot.playerId,
+        teamName: legacySlot.teamName,
+        jerseyNumber: legacySlot.jerseyNumber
+      };
+    }),
+    matchFormations
+  );
 }

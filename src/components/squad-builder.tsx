@@ -8,6 +8,7 @@ import {
   countFilledBySide,
   defaultMatchFormations,
   defaultMatchLineupWithFormations,
+  alignLineupSlotCoordinates,
   applyBenchSelectionToSideFormation,
   mergeMatchFormationChangeForSide,
   normalizeLineupTeamLabels,
@@ -67,6 +68,13 @@ export function SquadBuilder({
   const [busy, setBusy] = useState(false);
   const [homeSelectedIds, setHomeSelectedIds] = useState<Set<number>>(() => new Set());
   const [awaySelectedIds, setAwaySelectedIds] = useState<Set<number>>(() => new Set());
+
+  const setAlignedLineup = useCallback(
+    (next: SquadLineupSlot[]) => {
+      setLineup(alignLineupSlotCoordinates(next, formations));
+    },
+    [formations]
+  );
 
   const removeFromPitch = useCallback((playerId: number) => {
     setLineup((current) =>
@@ -204,7 +212,12 @@ export function SquadBuilder({
               const loadedFormations =
                 squad.formations ?? parseStoredFormations(squad.formation ?? "4-3-3");
               setFormations(loadedFormations);
-              setLineup(normalizeLineupTeamLabels(squad.lineup, homeTeam, awayTeam));
+              setLineup(
+                alignLineupSlotCoordinates(
+                  normalizeLineupTeamLabels(squad.lineup, homeTeam, awayTeam),
+                  loadedFormations
+                )
+              );
               if (!cancelled) setLoadState("ready");
               return;
             }
@@ -384,7 +397,7 @@ export function SquadBuilder({
                 homeTeam={homeTeam}
                 lineup={lineup}
                 selectedSlot={selectedSlot}
-                onLineupChange={setLineup}
+                onLineupChange={setAlignedLineup}
                 onSelectSlot={setSelectedSlot}
               />
             </div>
