@@ -393,7 +393,6 @@ const CURRENT_KNOCKOUT_STAGES = [
 ] as const;
 
 function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldCup | null }) {
-  const qualifiedCount = currentWorldCup?.qualifiedTeams.length ?? 0;
   const groups = currentWorldCup?.groups ?? [];
   const [activeGroupLetter, setActiveGroupLetter] = useState(groups[0]?.group ?? "A");
   const [activeKnockoutStage, setActiveKnockoutStage] = useState<string>(CURRENT_KNOCKOUT_STAGES[0]);
@@ -410,34 +409,17 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
     <section className="current-world-cup-card">
       <LiveFixturesPanel />
 
-      <div>
-        <p className="eyebrow">Current World Cup public feed</p>
+      <div className="current-event-overview">
+        <p className="eyebrow">Current World Cup</p>
         <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
-        <p>{currentWorldCup?.note ?? "Current tournament source is loading or unavailable."}</p>
+        {currentWorldCup?.note ? <p className="current-event-overview-note">{currentWorldCup.note}</p> : null}
       </div>
-      <div className="current-summary-grid">
-        <SummaryTile label="Hosts" value={currentWorldCup?.summary.hostCountries ?? "Unavailable"} />
-        <SummaryTile label="Dates" value={currentWorldCup?.summary.dates ?? "Unavailable"} />
-        <SummaryTile label="Teams" value={currentWorldCup?.summary.teams ?? "Unavailable"} />
-        <SummaryTile label="Venues" value={currentWorldCup?.summary.venueCount ?? "Unavailable"} />
+      <div className="current-summary-grid current-summary-grid--compact">
+        <SummaryTile compact label="Hosts" value={currentWorldCup?.summary.hostCountries ?? "—"} />
+        <SummaryTile compact label="Dates" value={currentWorldCup?.summary.dates ?? "—"} />
+        <SummaryTile compact label="Teams" value={currentWorldCup?.summary.teams ?? "—"} />
+        <SummaryTile compact label="Venues" value={currentWorldCup?.summary.venueCount ?? "—"} />
       </div>
-
-      {qualifiedCount > 0 ? (
-        <details className="qualified-team-disclosure">
-          <summary>
-            {qualifiedCount} qualified {qualifiedCount === 1 ? "nation" : "nations"}
-          </summary>
-          <div className="qualified-team-list qualified-team-list--compact">
-            {currentWorldCup!.qualifiedTeams.map((team) => (
-              <span className="qualified-team-chip" key={team}>
-                <TeamLabel name={team} size="xs" />
-              </span>
-            ))}
-          </div>
-        </details>
-      ) : (
-        <p className="inline-status">Qualified-team table was not available from the public source.</p>
-      )}
 
       <section className="bracket-tree-card surface-muted current-event-bracket" id="bracket">
         <div className="section-heading compact">
@@ -1018,9 +1000,17 @@ function BracketMatchButton({
   );
 }
 
-function SummaryTile({ label, value }: { label: string; value: string }) {
+function SummaryTile({
+  label,
+  value,
+  compact = false
+}: {
+  label: string;
+  value: string;
+  compact?: boolean;
+}) {
   return (
-    <div className="summary-tile">
+    <div className={`summary-tile${compact ? " summary-tile--compact" : ""}`}>
       <span>{label}</span>
       <strong>{value}</strong>
     </div>

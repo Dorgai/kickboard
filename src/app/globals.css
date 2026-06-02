@@ -2077,7 +2077,37 @@ h3 {
 .current-world-cup-card,
 .bracket-tree-card {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+}
+
+.current-world-cup-card {
+  padding: 12px 14px;
+}
+
+.current-event-overview {
+  align-items: baseline;
+  column-gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.current-event-overview .eyebrow {
+  margin: 0;
+}
+
+.current-event-overview h2 {
+  font-size: 1.05rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.current-event-overview-note {
+  color: var(--color-text-secondary);
+  flex: 1 1 100%;
+  font-size: 11px;
+  line-height: 1.35;
+  margin: 0;
 }
 
 .bracket-tree-card.compact-tree {
@@ -2124,6 +2154,10 @@ h3 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.current-summary-grid--compact {
+  gap: 6px;
+}
+
 .summary-tile {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -2141,64 +2175,29 @@ h3 {
   text-transform: uppercase;
 }
 
-.qualified-team-list {
+.summary-tile--compact {
+  align-items: baseline;
+  border-radius: 8px;
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
+  justify-content: space-between;
+  min-height: 0;
+  padding: 5px 10px;
 }
 
-.qualified-team-list span {
-  background: var(--color-brand-light);
-  border-radius: 9999px;
-  color: var(--color-brand);
-  font-size: 13px;
-  font-weight: 800;
-  padding: 6px 10px;
+.summary-tile--compact span {
+  flex-shrink: 0;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  margin-bottom: 0;
 }
 
-.qualified-team-disclosure {
-  margin: 0 0 16px;
-}
-
-.qualified-team-disclosure summary {
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 800;
-  list-style: none;
-  user-select: none;
-}
-
-.qualified-team-disclosure summary::-webkit-details-marker {
-  display: none;
-}
-
-.qualified-team-disclosure summary::before {
-  content: "▸ ";
-}
-
-.qualified-team-disclosure[open] summary::before {
-  content: "▾ ";
-}
-
-.qualified-team-list--compact {
-  gap: 4px;
-  margin-top: 8px;
-  padding-right: 4px;
-}
-
-.qualified-team-chip {
-  background: color-mix(in srgb, var(--color-brand) 8%, var(--color-bg));
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  display: inline-flex;
-  max-width: 100%;
-  padding: 3px 7px;
-}
-
-.qualified-team-chip .team-label-text {
+.summary-tile--compact strong {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
+  line-height: 1.25;
+  min-width: 0;
+  text-align: right;
 }
 
 .current-group-grid {
