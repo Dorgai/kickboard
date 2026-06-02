@@ -152,21 +152,25 @@ export function CurrentEventTabs({
   return (
     <section className={`current-world-cup-card current-event-tabs-layout${chatOpen ? " fan-chat-dock-open" : ""}`}>
       <div className="current-event-overview">
-        <p className="eyebrow">Current World Cup</p>
         <div className="current-event-overview-heading">
           <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
-          {currentWorldCup?.note ? (
-            <button
-              aria-label="About tournament squads and data sources"
-              className="info-tooltip"
-              type="button"
-            >
-              <Info aria-hidden className="info-tooltip-icon" size={18} />
-              <span className="info-tooltip-bubble" role="tooltip">
-                {currentWorldCup.note}
-              </span>
-            </button>
-          ) : null}
+          <button
+            aria-label="About tournament squads and data sources"
+            className="info-tooltip"
+            type="button"
+          >
+            <Info aria-hidden className="info-tooltip-icon" size={18} />
+            <span className="info-tooltip-bubble" role="tooltip">
+              {currentWorldCup?.note ? (
+                <>
+                  {currentWorldCup.note}
+                  {" "}
+                </>
+              ) : null}
+              Tournament summary and groups come from public pages. Live scores appear when
+              API-Football and the worker are configured.
+            </span>
+          </button>
         </div>
       </div>
 
