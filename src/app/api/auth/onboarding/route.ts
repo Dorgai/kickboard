@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordActivityEvent } from "@/lib/activity/store";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { completeUserOnboarding } from "@/lib/auth/users";
 import { mapDatabaseError } from "@/lib/community/health";
@@ -27,6 +28,13 @@ export async function POST(request: Request) {
     if (!updated) {
       return NextResponse.json({ error: "Unable to complete onboarding." }, { status: 500 });
     }
+
+    void recordActivityEvent({
+      userId: user.id,
+      eventType: "onboarding_complete",
+      summary: `Completed onboarding (birth year ${birthYear})`,
+      metadata: { birthYear }
+    }).catch(() => undefined);
 
     const response = NextResponse.json({
       user: {

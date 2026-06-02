@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { adminFetch, type AdminAuthMode } from "@/lib/admin/fetch";
 
 type ModerationPost = {
   id: string;
@@ -10,24 +11,24 @@ type ModerationPost = {
   moderationStatus: "approved" | "withheld" | "removed";
 };
 
-export function CommunityModerationPanel({ adminToken }: { adminToken: string }) {
+export function CommunityModerationPanel({
+  auth
+}: {
+  auth: { mode: AdminAuthMode; token?: string };
+}) {
   const [posts, setPosts] = useState<ModerationPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const headers = {
-    Authorization: `Bearer ${adminToken}`,
-    "Content-Type": "application/json"
-  };
-
   const load = useCallback(async () => {
     setError(null);
     try {
-      const response = await fetch("/api/admin/community/posts", {
-        headers,
-        cache: "no-store"
-      });
+      const response = await adminFetch(
+        "/api/admin/community/posts",
+        { headers: { "Content-Type": "application/json" } },
+        auth
+      );
       const payload = (await response.json()) as { error?: string; posts?: ModerationPost[] };
 
       if (!response.ok) {
@@ -40,7 +41,7 @@ export function CommunityModerationPanel({ adminToken }: { adminToken: string })
     } finally {
       setLoading(false);
     }
-  }, [adminToken]);
+  }, [auth]);
 
   useEffect(() => {
     load();
@@ -51,11 +52,15 @@ export function CommunityModerationPanel({ adminToken }: { adminToken: string })
     setError(null);
 
     try {
-      const response = await fetch("/api/admin/community/posts", {
-        method: "PATCH",
-        headers,
-        body: JSON.stringify({ postId, action })
-      });
+      const response = await adminFetch(
+        "/api/admin/community/posts",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postId, action })
+        },
+        auth
+      );
       const payload = (await response.json()) as { error?: string };
 
       if (!response.ok) {

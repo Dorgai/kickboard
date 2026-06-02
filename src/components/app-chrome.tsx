@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { HeaderUserMenu } from "@/components/header-user-menu";
 import { NotificationsCenter } from "@/components/notifications-center";
@@ -16,6 +17,7 @@ function isCommunityHash(hash: string) {
 }
 
 export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
+  const { data: session } = useSession();
   const [hash, setHash] = useState("");
 
   useEffect(() => {
@@ -54,9 +56,11 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
               </Link>
             );
           })}
-          <Link className={activeNav === "Admin" ? "active" : ""} href="/admin/data-sources">
-            Admin
-          </Link>
+          {session?.user?.isAdmin ? (
+            <Link className={activeNav === "Admin" ? "active" : ""} href="/admin/data-sources">
+              Admin
+            </Link>
+          ) : null}
         </nav>
 
         <div className="nav-actions">

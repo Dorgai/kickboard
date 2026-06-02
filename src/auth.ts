@@ -1,5 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { recordActivityWithPresence } from "@/lib/activity/store";
+import { isAdminEmail } from "@/lib/admin/emails";
 import { findAuthUserById, upsertOAuthUser } from "@/lib/auth/users";
 
 const googleEnabled = Boolean(
@@ -64,6 +66,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             token.sub = user.id;
             token.onboardingComplete = user.onboardingComplete;
             token.pointsBalance = user.pointsBalance;
+            token.email = profile.email;
+            token.isAdmin = isAdminEmail(profile.email);
+            void recordActivityWithPresence({
+              userId: user.id,
+              eventType: "sign_in",
+              summary: "Signed in with Google",
+              metadata: { email: profile.email }
+            }).catch((error) => {
+              console.error("[activity] sign_in", error);
+            });
           }
         } catch (error) {
           console.error("[auth] upsertOAuthUser failed after Google sign-in:", error);
@@ -74,7 +86,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (user) {
           token.onboardingComplete = user.onboardingComplete;
           token.pointsBalance = user.pointsBalance;
+          token.email = user.email;
+          token.isAdmin = isAdminEmail(user.email);
         }
+      } else if (token.email && typeof token.email === "string") {
+        token.isAdmin = isAdminEmail(token.email);
       }
       return token;
     },
@@ -83,6 +99,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = String(token.sub);
         session.user.onboardingComplete = Boolean(token.onboardingComplete);
         session.user.pointsBalance = Number(token.pointsBalance ?? 0);
+        session.user.isAdmin = Boolean(token.isAdmin);
       }
       return session;
     }

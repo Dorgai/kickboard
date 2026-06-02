@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordActivityEvent } from "@/lib/activity/store";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { mapDatabaseError } from "@/lib/community/health";
 import { MATCH_LINEUP_SIZE } from "@/lib/squads/lineup";
@@ -101,6 +102,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Unable to save squad." }, { status: 500 });
       }
     }
+
+    void recordActivityEvent({
+      userId: user.id,
+      eventType: "squad_saved",
+      summary: existingId ? "Updated Coach Board squad" : "Saved new Coach Board squad",
+      metadata: { squadId, fixtureKey }
+    }).catch(() => undefined);
 
     return NextResponse.json({
       squadId,

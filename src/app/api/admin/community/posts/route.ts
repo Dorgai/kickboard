@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { isAdminAuthorizedRequest } from "@/lib/admin/auth";
+import { requireAdminAuth } from "@/lib/admin/require-admin";
 import { listPostsForModeration, setPostModerationStatus } from "@/lib/community/posts";
 import { isDatabaseConfigured } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  if (!isAdminAuthorizedRequest(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  if (!isAdminAuthorizedRequest(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

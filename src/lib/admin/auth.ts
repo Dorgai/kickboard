@@ -1,4 +1,6 @@
 import { NextRequest } from "next/server";
+import { auth } from "@/auth";
+import { isAdminEmail } from "@/lib/admin/emails";
 
 export const ADMIN_COOKIE = "kickboard_admin_token";
 
@@ -32,14 +34,12 @@ export function getAdminAuthStatus() {
   };
 }
 
-export function isAdminRequest(request: NextRequest) {
+export async function isAdminRequest(request: NextRequest) {
   return isAdminAuthorizedRequest(request);
 }
 
-export function isAdminAuthorizedRequest(request: Request | NextRequest) {
+export async function isAdminAuthorizedRequest(request: Request | NextRequest) {
   const configuredToken = process.env.ADMIN_DATA_SOURCES_TOKEN?.trim();
-  if (!configuredToken) return false;
-
   const requestToken =
     request instanceof NextRequest
       ? readTokenFromRequest(request)
@@ -50,5 +50,10 @@ export function isAdminAuthorizedRequest(request: Request | NextRequest) {
           queryToken: new URL(request.url).searchParams.get("token")
         });
 
-  return Boolean(requestToken && requestToken === configuredToken);
+  if (configuredToken && requestToken && requestToken === configuredToken) {
+    return true;
+  }
+
+  const session = await auth();
+  return Boolean(session?.user?.email && isAdminEmail(session.user.email));
 }

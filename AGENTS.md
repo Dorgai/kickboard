@@ -75,4 +75,5 @@ If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production ta
 - **Google OAuth** needs `GOOGLE_CLIENT_*`, `AUTH_URL` (public site URL, not `0.0.0.0`), and `JWT_SECRET`/`AUTH_SECRET` on Railway. Verify `/api/auth/providers` shows your Railway host in `callbackUrl`. Public sign-in requires publishing the Google consent screen (`docs/publish-production.md`); `/privacy` and `/terms` are hosted for the privacy policy URL.
 - **Header** shows signed-in user + log out when OAuth session is active (`SessionProvider` + `HeaderUserMenu`).
 - **Community posts** publish immediately; admins moderate via `/admin/data-sources` (posts, Fan Chat, suspend/ban users).
+- **Admin access**: Google OAuth allowlist (`ADMIN_EMAILS`, default `laszlo.dorgai@gmail.com`) or legacy `ADMIN_DATA_SOURCES_TOKEN`. User activity/presence requires `db/user-activity-extensions.sql` via `npm run db:schema`.
 - Cloud agents cannot read GitHub/Railway secrets; production `DATABASE_URL` / `RAILWAY_TOKEN` must be set in those dashboards or via local `npm run github:secrets` / `npm run railway:variables`.

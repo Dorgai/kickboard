@@ -1,13 +1,16 @@
 import { cookies, headers } from "next/headers";
 import { AdminAccessGate } from "@/components/admin-access-gate";
 import { AdminFanChatModerationPanel } from "@/components/admin-fan-chat-moderation-panel";
+import { AdminUserActivityPanel } from "@/components/admin-user-activity-panel";
 import { AdminUserManagementPanel } from "@/components/admin-user-management-panel";
 import { CommunityModerationPanel } from "@/components/community-moderation-panel";
 import { CommunitySetupPanel } from "@/components/community-setup-panel";
 import { FeedStatusPanel } from "@/components/feed-status-panel";
-import { isOAuthConfigured } from "@/auth";
+import { auth, isOAuthConfigured } from "@/auth";
 import { getCommunityHealth } from "@/lib/community/health";
 import { ADMIN_COOKIE, getAdminAuthStatus, readAdminToken } from "@/lib/admin/auth";
+import { isAdminEmail } from "@/lib/admin/emails";
+import type { AdminAuthMode } from "@/lib/admin/fetch";
 import { buildAdminDataSources } from "@/lib/admin/data-sources";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +18,7 @@ export const metadata = {
   title: "Kickboard Admin | Data sources"
 };
 
-function isPageAuthorized(token: string | null) {
+function isPageTokenAuthorized(token: string | null) {
   const configuredToken = process.env.ADMIN_DATA_SOURCES_TOKEN;
   return Boolean(configuredToken && token && token === configuredToken);
 }
@@ -35,11 +38,20 @@ export default async function AdminDataSourcesPage({
     queryToken: params.token ?? null
   });
 
-  const { configured } = getAdminAuthStatus();
+  const session = await auth();
+  const oauthAdmin = Boolean(session?.user?.email && isAdminEmail(session.user.email));
+  const tokenAuth = isPageTokenAuthorized(token);
 
-  if (!isPageAuthorized(token)) {
-    return <AdminAccessGate adminConfigured={configured} />;
+  const { configured } = getAdminAuthStatus();
+  const oauthConfigured = isOAuthConfigured();
+
+  if (!oauthAdmin && !tokenAuth) {
+    return <AdminAccessGate adminConfigured={configured} oauthConfigured={oauthConfigured} />;
   }
+
+  const adminAuth: { mode: AdminAuthMode; token?: string } = oauthAdmin
+    ? { mode: "oauth" }
+    : { mode: "token", token: token! };
 
   const data = await buildAdminDataSources();
   const communityHealth = await getCommunityHealth();
@@ -49,10 +61,18 @@ export default async function AdminDataSourcesPage({
     <main className="admin-page" id="main-content">
       <section className="admin-hero">
         <p className="eyebrow">Admin only</p>
-        <h1>Data source operations</h1>
+        <h1>Admin dashboard</h1>
         <p>
-          Monitor which feeds are connected, when they were checked, what each source updates, and which
-          infrastructure services are configured.
+          {oauthAdmin ? (
+            <>
+              Signed in as <strong>{session?.user?.email}</strong>. Monitor feeds, user activity, moderation,
+              and infrastructure.
+            </>
+          ) : (
+            <>
+              Operator token session. Monitor feeds, user activity, moderation, and infrastructure.
+            </>
+          )}
         </p>
       </section>
 
@@ -63,19 +83,23 @@ export default async function AdminDataSourcesPage({
         <SummaryCard label="Last checked" value={new Date(data.generatedAt).toLocaleString()} />
       </section>
 
+      {communityHealth.schemaReady ? (
+        <AdminUserActivityPanel auth={adminAuth} />
+      ) : null}
+
       <FeedStatusPanel />
 
       <CommunitySetupPanel
         adminTokenConfigured={adminTokenConfigured}
         health={communityHealth}
-        oauthConfigured={isOAuthConfigured()}
+        oauthConfigured={oauthConfigured}
       />
 
-      {communityHealth.schemaReady && token ? (
+      {communityHealth.schemaReady ? (
         <>
-          <AdminUserManagementPanel adminToken={token} />
-          <AdminFanChatModerationPanel adminToken={token} />
-          <CommunityModerationPanel adminToken={token} />
+          <AdminUserManagementPanel auth={adminAuth} />
+          <AdminFanChatModerationPanel auth={adminAuth} />
+          <CommunityModerationPanel auth={adminAuth} />
         </>
       ) : null}
 

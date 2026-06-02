@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { adminFetch, type AdminAuthMode } from "@/lib/admin/fetch";
 
 type AdminFanChatMessage = {
   id: string;
@@ -16,10 +17,10 @@ type AdminFanChatMessage = {
 };
 
 export function AdminFanChatModerationPanel({
-  adminToken,
+  auth,
   filterUserId
 }: {
-  adminToken: string;
+  auth: { mode: AdminAuthMode; token?: string };
   filterUserId?: string | null;
 }) {
   const [messages, setMessages] = useState<AdminFanChatMessage[]>([]);
@@ -27,11 +28,6 @@ export function AdminFanChatModerationPanel({
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const headers = {
-    Authorization: `Bearer ${adminToken}`,
-    "Content-Type": "application/json"
-  };
 
   const load = useCallback(async () => {
     setError(null);
@@ -41,10 +37,7 @@ export function AdminFanChatModerationPanel({
       const trimmed = userIdFilter.trim();
       if (trimmed) params.set("userId", trimmed);
 
-      const response = await fetch(`/api/admin/fan-chat/messages?${params}`, {
-        headers,
-        cache: "no-store"
-      });
+      const response = await adminFetch(`/api/admin/fan-chat/messages?${params}`, undefined, auth);
       const payload = (await response.json()) as { error?: string; messages?: AdminFanChatMessage[] };
 
       if (!response.ok) {
@@ -57,7 +50,7 @@ export function AdminFanChatModerationPanel({
     } finally {
       setLoading(false);
     }
-  }, [adminToken, userIdFilter]);
+  }, [auth, userIdFilter]);
 
   useEffect(() => {
     void load();
@@ -72,11 +65,15 @@ export function AdminFanChatModerationPanel({
     setError(null);
 
     try {
-      const response = await fetch("/api/admin/fan-chat/messages", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ action: "delete", messageId })
-      });
+      const response = await adminFetch(
+        "/api/admin/fan-chat/messages",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "delete", messageId })
+        },
+        auth
+      );
       const payload = (await response.json()) as { error?: string };
 
       if (!response.ok) {

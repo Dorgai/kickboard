@@ -3875,6 +3875,88 @@ h3 {
   resize: vertical;
 }
 
+.admin-gate-oauth {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.admin-gate-oauth h2,
+.admin-gate-card > h2 {
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+
+.admin-gate-divider {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: 20px 0;
+}
+
+.admin-activity-filters {
+  align-items: end;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+
+.admin-activity-online-only {
+  align-items: center;
+  display: flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 8px;
+  min-height: 2.75rem;
+}
+
+.admin-activity-detail {
+  max-height: 32rem;
+  overflow: auto;
+}
+
+.admin-activity-subheading {
+  font-size: 0.95rem;
+  margin: 16px 0 8px;
+}
+
+.admin-activity-session-list {
+  display: grid;
+  font-size: 12px;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-activity-session-list li {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-activity-session-list span {
+  color: var(--color-text-secondary);
+}
+
+.admin-activity-event-list .community-moderation-item {
+  padding: 10px 12px;
+}
+
+.admin-activity-event-type {
+  color: var(--color-brand);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-activity-meta-inline {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.admin-user-badge--online {
+  background: color-mix(in srgb, var(--color-live) 22%, transparent);
+  color: #047857;
+}
+
 .community-moderation-list {
   display: grid;
   gap: 10px;

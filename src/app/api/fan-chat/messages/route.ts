@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordActivityEvent } from "@/lib/activity/store";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { mapDatabaseError } from "@/lib/community/health";
 import { mapFanChatError } from "@/lib/fan-chat/errors";
@@ -71,6 +72,19 @@ export async function POST(request: Request) {
       recipientId: recipientId === "all" ? "all" : recipientId,
       body: text
     });
+
+    void recordActivityEvent({
+      userId: user!.id,
+      eventType: result.mode === "broadcast" ? "fan_chat_broadcast" : "fan_chat_sent",
+      summary:
+        result.mode === "broadcast"
+          ? `Broadcast Fan Chat to ${result.recipientCount} connections`
+          : "Sent Fan Chat direct message",
+      metadata:
+        result.mode === "broadcast"
+          ? { broadcastId: result.broadcastId, recipientCount: result.recipientCount }
+          : { messageId: result.messageId }
+    }).catch(() => undefined);
 
     return NextResponse.json({
       ...result,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { adminFetch, type AdminAuthMode } from "@/lib/admin/fetch";
 
 type AdminUser = {
   id: string;
@@ -14,7 +15,11 @@ type AdminUser = {
   createdAt: string;
 };
 
-export function AdminUserManagementPanel({ adminToken }: { adminToken: string }) {
+export function AdminUserManagementPanel({
+  auth
+}: {
+  auth: { mode: AdminAuthMode; token?: string };
+}) {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [selected, setSelected] = useState<AdminUser | null>(null);
@@ -25,11 +30,6 @@ export function AdminUserManagementPanel({ adminToken }: { adminToken: string })
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const headers = {
-    Authorization: `Bearer ${adminToken}`,
-    "Content-Type": "application/json"
-  };
-
   const search = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -37,7 +37,7 @@ export function AdminUserManagementPanel({ adminToken }: { adminToken: string })
 
     try {
       const params = new URLSearchParams({ q: query.trim() });
-      const response = await fetch(`/api/admin/users?${params}`, { headers, cache: "no-store" });
+      const response = await adminFetch(`/api/admin/users?${params}`, undefined, auth);
       const payload = (await response.json()) as { error?: string; users?: AdminUser[] };
 
       if (!response.ok) {
@@ -55,7 +55,7 @@ export function AdminUserManagementPanel({ adminToken }: { adminToken: string })
     } finally {
       setLoading(false);
     }
-  }, [adminToken, query]);
+  }, [auth, query]);
 
   async function patchUser(userId: string, action: string, suspendedUntilValue?: string | null) {
     setBusyId(userId);
@@ -63,15 +63,19 @@ export function AdminUserManagementPanel({ adminToken }: { adminToken: string })
     setNotice(null);
 
     try {
-      const response = await fetch("/api/admin/users", {
-        method: "PATCH",
-        headers,
-        body: JSON.stringify({
+      const response = await adminFetch(
+        "/api/admin/users",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
           userId,
           action,
           suspendedUntil: suspendedUntilValue ?? null
         })
-      });
+        },
+        auth
+      );
       const payload = (await response.json()) as { error?: string; user?: AdminUser };
 
       if (!response.ok) {
@@ -100,11 +104,15 @@ export function AdminUserManagementPanel({ adminToken }: { adminToken: string })
     setNotice(null);
 
     try {
-      const response = await fetch("/api/admin/fan-chat/messages", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ recipientUserId: selected.id, body: dmBody })
-      });
+      const response = await adminFetch(
+        "/api/admin/fan-chat/messages",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ recipientUserId: selected.id, body: dmBody })
+        },
+        auth
+      );
       const payload = (await response.json()) as { error?: string };
 
       if (!response.ok) {

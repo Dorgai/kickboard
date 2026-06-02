@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordActivityEvent } from "@/lib/activity/store";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { mapDatabaseError } from "@/lib/community/health";
 import { publishSquadToBoard } from "@/lib/squads/store";
@@ -20,6 +21,12 @@ export async function POST(_request: Request, context: RouteContext) {
 
   try {
     const result = await publishSquadToBoard(squadId, user.id);
+    void recordActivityEvent({
+      userId: user.id,
+      eventType: "squad_published",
+      summary: "Published squad to Coach Board",
+      metadata: { squadId, postId: result.postId }
+    }).catch(() => undefined);
     return NextResponse.json({
       ...result,
       message: "Squad shared to Coach Board."

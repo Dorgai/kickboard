@@ -1,4 +1,5 @@
 import { query } from "@/lib/db";
+import { isAdminEmail } from "@/lib/admin/emails";
 import { isChildAccount } from "@/lib/community/users";
 
 export type AuthUser = {
@@ -87,13 +88,19 @@ export async function upsertOAuthUser(input: {
   );
 
   if (existing.rows[0]?.id) {
-    await query(
-      `UPDATE users
+      await query(
+        `UPDATE users
        SET display_name = COALESCE(NULLIF($2, ''), display_name),
            email_verified_at = CASE WHEN $3 THEN COALESCE(email_verified_at, now()) ELSE email_verified_at END,
+           role = CASE WHEN $4 THEN 'admin'::role_enum ELSE role END,
            updated_at = now()
        WHERE id = $1`,
-      [existing.rows[0].id, input.displayName.trim(), input.emailVerified]
+      [
+        existing.rows[0].id,
+        input.displayName.trim(),
+        input.emailVerified,
+        isAdminEmail(email)
+      ]
     );
     return findAuthUserById(existing.rows[0].id);
   }
@@ -110,6 +117,7 @@ export async function upsertOAuthUser(input: {
            oauth_subject = $3,
            display_name = COALESCE(NULLIF($4, ''), display_name),
            email_verified_at = CASE WHEN $5 THEN COALESCE(email_verified_at, now()) ELSE email_verified_at END,
+           role = CASE WHEN $6 THEN 'admin'::role_enum ELSE role END,
            updated_at = now()
        WHERE id = $1`,
       [
@@ -117,7 +125,8 @@ export async function upsertOAuthUser(input: {
         input.provider,
         input.providerAccountId,
         input.displayName.trim(),
-        input.emailVerified
+        input.emailVerified,
+        isAdminEmail(email)
       ]
     );
     return findAuthUserById(byEmail.rows[0].id);
@@ -135,7 +144,8 @@ export async function upsertOAuthUser(input: {
            oauth_provider, oauth_subject, email_verified_at, tier, role
          )
          VALUES ($1, $2, $3, NULL, false, $4, $5,
-                 CASE WHEN $6 THEN now() ELSE NULL END, 'fan', 'user')
+                 CASE WHEN $6 THEN now() ELSE NULL END, 'fan',
+                 CASE WHEN $7 THEN 'admin'::role_enum ELSE 'user'::role_enum END)
          RETURNING id`,
         [
           email,
@@ -143,7 +153,8 @@ export async function upsertOAuthUser(input: {
           input.displayName.trim() || username,
           input.provider,
           input.providerAccountId,
-          input.emailVerified
+          input.emailVerified,
+          isAdminEmail(email)
         ]
       );
 

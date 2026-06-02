@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordActivityEvent } from "@/lib/activity/store";
 import { mapDatabaseError } from "@/lib/community/health";
 import { createTextPost, listApprovedPosts } from "@/lib/community/posts";
 import { requireAuthUser } from "@/lib/auth/require-user";
@@ -55,6 +56,13 @@ export async function POST(request: Request) {
     const body = payload.body ?? "";
 
     const post = await createTextPost(legacyUserId, body);
+
+    void recordActivityEvent({
+      userId: legacyUserId,
+      eventType: "post_created",
+      summary: `Posted on Coach Board: ${body.trim().slice(0, 80)}`,
+      metadata: { postId: post.id }
+    }).catch(() => undefined);
 
     return NextResponse.json({
       ok: true,
