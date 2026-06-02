@@ -2603,14 +2603,6 @@ h3 {
   left: 8px;
 }
 
-.squad-pitch-token--home {
-  border-color: color-mix(in srgb, #60a5fa 75%, #fff);
-}
-
-.squad-pitch-token--away {
-  border-color: color-mix(in srgb, #f87171 75%, #fff);
-}
-
 .squad-pitch-ghost,
 .squad-pitch-token {
   position: absolute;
@@ -2665,10 +2657,17 @@ h3 {
 
 .squad-pitch-token {
   align-items: center;
-  background: color-mix(in srgb, var(--color-bg) 92%, #fff);
-  border: 2px solid color-mix(in srgb, var(--color-accent) 70%, #fff);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--pitch-kit-primary, #3b82f6) 88%, #fff),
+    var(--pitch-kit-primary, #3b82f6)
+  );
+  border: 2px solid var(--pitch-kit-secondary, #1d4ed8);
   border-radius: 999px;
-  box-shadow: 0 4px 12px color-mix(in srgb, #000 35%, transparent);
+  box-shadow:
+    0 4px 12px color-mix(in srgb, #000 35%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent);
+  color: var(--pitch-kit-text, #fff);
   cursor: grab;
   display: grid;
   gap: 0;
@@ -2679,8 +2678,10 @@ h3 {
 }
 
 .squad-pitch-token--selected {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--pitch-kit-secondary, #1d4ed8));
+  box-shadow:
+    0 4px 12px color-mix(in srgb, #000 35%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 
 .squad-pitch-token-role {
@@ -2691,18 +2692,20 @@ h3 {
 }
 
 .squad-pitch-token-name {
+  color: inherit;
   font-size: 10px;
   font-weight: 800;
   line-height: 1.15;
   max-width: 5.5rem;
   overflow: hidden;
   text-align: center;
+  text-shadow: 0 1px 1px color-mix(in srgb, #000 18%, transparent);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .squad-pitch-token-number {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--pitch-kit-text, #fff) 72%, #000);
   font-size: 9px;
   font-weight: 700;
 }

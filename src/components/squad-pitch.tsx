@@ -12,6 +12,7 @@ import {
 import { playerRoleLabel } from "@/lib/squads/player-roles";
 import { readPlayerDragData, writePlayerDragData, type PitchDragPlayer } from "@/lib/squads/drag-player";
 import { teamsMatch } from "@/lib/squads/team-names";
+import { teamKitInlineStyle } from "@/lib/team-kit-colors";
 
 export type { PitchDragPlayer };
 
@@ -234,14 +235,23 @@ export function SquadPitch({
 
         {lineup
           .filter((slot) => slot.label)
-          .map((slot) => (
+          .map((slot) => {
+            const side = slotSide(slot);
+            const kitTeam =
+              slot.teamName ||
+              (side === "home" ? homeTeam : awayTeam);
+            return (
             <div
-              className={`squad-pitch-token squad-pitch-token--${slotSide(slot)}${
+              className={`squad-pitch-token squad-pitch-token--${side}${
                 selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""
               }`}
               draggable={!readOnly}
               key={slot.slot}
-              style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+              style={{
+                left: `${slot.x}%`,
+                top: `${slot.y}%`,
+                ...teamKitInlineStyle(kitTeam, side)
+              }}
               onDragStart={
                 readOnly
                   ? undefined
@@ -312,7 +322,8 @@ export function SquadPitch({
                 <span className="squad-pitch-token-number">{slot.jerseyNumber}</span>
               ) : null}
             </div>
-          ))}
+            );
+          })}
 
         {draggingSlot ? <span className="squad-pitch-drag-overlay" aria-hidden /> : null}
       </div>
