@@ -257,8 +257,9 @@ export function SquadTeamBench({
       </div>
       {!loading && !error && players.length === 0 ? (
         <p className="inline-status squad-team-bench-empty">
-          No squad list found for {teamName} yet. Kickboard checks StatsBomb historical data and, when
-          configured, API-Football lineups and squad lists for this match.
+          No squad list found for {teamName} yet. Kickboard checks StatsBomb historical World Cups,
+          API-Football WC squads and recent lineups (when configured), and Wikipedia national-team
+          call-up lists.
         </p>
       ) : null}
     </aside>

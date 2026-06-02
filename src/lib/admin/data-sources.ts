@@ -84,7 +84,21 @@ export async function buildAdminDataSources() {
       "Tournament summary dates and host information"
     ],
     message:
-      "Current tournament endpoint parses public tournament and group pages. Player squads depend on official release/public availability."
+      "Current tournament endpoint parses public tournament and group pages. Coach Board squads also fall back to Wikipedia national-team call-up tables when StatsBomb has no roster."
+  });
+
+  sources.push({
+    id: "wikipedia-national-squads",
+    name: "Wikipedia national team squads",
+    category: "current",
+    status: "online",
+    connected: true,
+    lastCheckedAt: checkedAt,
+    lastRefreshedAt: null,
+    refreshCadence: "Public pages, cached for 1 hour per team",
+    updates: ["Current squad tables for WC call-ups", "Coach Board player pool fallback"],
+    message:
+      "Used when StatsBomb has no historical World Cup lineup and API-Football has not published squads yet."
   });
 
   sources.push({
@@ -102,6 +116,7 @@ export async function buildAdminDataSources() {
       "Events",
       "Statistics",
       "Lineups when available",
+      "World Cup team squads and league player lists (Coach Board)",
       "Post-match player statistics"
     ],
     records: {
