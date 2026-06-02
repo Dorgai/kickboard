@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { mapDatabaseError } from "@/lib/community/health";
+import { MATCH_LINEUP_SIZE, SLOTS_PER_TEAM } from "@/lib/squads/lineup";
 import {
   getUserSquadById,
   isValidFormation,
@@ -59,8 +60,14 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Invalid formation." }, { status: 400 });
     }
 
-    if (!Array.isArray(body.lineup) || body.lineup.length !== 11) {
-      return NextResponse.json({ error: "Lineup must include 11 players." }, { status: 400 });
+    if (
+      !Array.isArray(body.lineup) ||
+      (body.lineup.length !== MATCH_LINEUP_SIZE && body.lineup.length !== SLOTS_PER_TEAM)
+    ) {
+      return NextResponse.json(
+        { error: `Lineup must include ${MATCH_LINEUP_SIZE} slots (home and away).` },
+        { status: 400 }
+      );
     }
 
     const updatedId = await updateUserSquad({

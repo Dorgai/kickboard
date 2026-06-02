@@ -6,8 +6,10 @@ import { SquadPitch } from "@/components/squad-pitch";
 import { SquadPlayerPool } from "@/components/squad-player-pool";
 import {
   FORMATIONS,
-  defaultLineupWithPositions,
-  mergeFormationChange,
+  countFilledBySide,
+  defaultMatchLineupWithPositions,
+  mergeMatchFormationChange,
+  SLOTS_PER_TEAM,
   type SquadFormation,
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
@@ -30,7 +32,7 @@ type SquadBuilderProps = {
 };
 
 function autoSquadName(fixtureLabel: string) {
-  return `${fixtureLabel.split("—")[0]?.trim() ?? "My XI"}`.slice(0, 60);
+  return `${fixtureLabel.split("—")[0]?.trim() ?? "Match board"}`.slice(0, 60);
 }
 
 export function SquadBuilder({
@@ -42,7 +44,9 @@ export function SquadBuilder({
   onSaved
 }: SquadBuilderProps) {
   const [formation, setFormation] = useState<SquadFormation>("4-3-3");
-  const [lineup, setLineup] = useState<SquadLineupSlot[]>(() => defaultLineupWithPositions("4-3-3"));
+  const [lineup, setLineup] = useState<SquadLineupSlot[]>(() =>
+    defaultMatchLineupWithPositions("4-3-3")
+  );
   const [squadId, setSquadId] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [players, setPlayers] = useState<SquadPoolPlayer[]>([]);
@@ -54,6 +58,17 @@ export function SquadBuilder({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  const removeFromPitch = useCallback((playerId: number) => {
+    setLineup((current) =>
+      current.map((slot) =>
+        slot.playerId === playerId
+          ? { ...slot, label: "", playerId: undefined, teamName: undefined, jerseyNumber: undefined }
+          : slot
+      )
+    );
+    setSelectedSlot(null);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -62,9 +77,11 @@ export function SquadBuilder({
       setNotice(null);
       setError(null);
       setSelectedSlot(null);
+      setPoolLoading(true);
 
       try {
-        const poolRes = await fetch("/api/squads/player-pool");
+        const poolParams = new URLSearchParams({ homeTeam, awayTeam });
+        const poolRes = await fetch(`/api/squads/player-pool?${poolParams}`);
         if (!cancelled) {
           if (poolRes.ok) {
             const poolPayload = (await poolRes.json()) as {
@@ -87,7 +104,7 @@ export function SquadBuilder({
           if (!cancelled && squadRes.ok) {
             const payload = (await squadRes.json()) as { squad?: LoadedSquad };
             const squad = payload.squad;
-            if (squad?.lineup?.length === 11) {
+            if (squad?.lineup?.length) {
               setSquadId(squad.id);
               setFormation(squad.formation);
               setLineup(squad.lineup);
@@ -101,7 +118,7 @@ export function SquadBuilder({
         } else {
           setSquadId(null);
           setFormation("4-3-3");
-          setLineup(defaultLineupWithPositions("4-3-3"));
+          setLineup(defaultMatchLineupWithPositions("4-3-3"));
         }
 
         if (!cancelled) setLoadState("ready");
@@ -118,20 +135,22 @@ export function SquadBuilder({
     return () => {
       cancelled = true;
     };
-  }, [activeSquadId, fixtureLabel]);
+  }, [activeSquadId, awayTeam, fixtureKey, homeTeam]);
 
   function changeFormation(next: SquadFormation) {
     setFormation(next);
-    setLineup((current) => mergeFormationChange(next, current));
+    setLineup((current) => mergeMatchFormationChange(next, current));
     setSelectedSlot(null);
   }
 
-  const filledCount = lineup.filter((slot) => slot.label).length;
+  const homeFilled = countFilledBySide(lineup, "home");
+  const awayFilled = countFilledBySide(lineup, "away");
+  const readyToSave = homeFilled >= SLOTS_PER_TEAM && awayFilled >= SLOTS_PER_TEAM;
 
   async function saveSquad(event: FormEvent) {
     event.preventDefault();
-    if (filledCount < 11) {
-      setError("Place all 11 players on the pitch before saving.");
+    if (!readyToSave) {
+      setError(`Place ${SLOTS_PER_TEAM} home and ${SLOTS_PER_TEAM} away players on the pitch before saving.`);
       return;
     }
 
@@ -182,7 +201,7 @@ export function SquadBuilder({
   }
 
   const resetToFormation = useCallback(() => {
-    setLineup(defaultLineupWithPositions(formation));
+    setLineup(defaultMatchLineupWithPositions(formation));
     setSelectedSlot(null);
   }, [formation]);
 
@@ -190,9 +209,10 @@ export function SquadBuilder({
     <form className="squad-builder" onSubmit={saveSquad}>
       <header className="squad-builder-toolbar">
         <div className="squad-builder-toolbar-title">
-          <h3>Build your XI</h3>
+          <h3>Build both XIs</h3>
           <p className="squad-builder-progress">
-            {filledCount}/11 · {squadId ? "saved board" : "new board"}
+            {homeTeam} {homeFilled}/{SLOTS_PER_TEAM} · {awayTeam} {awayFilled}/{SLOTS_PER_TEAM}
+            {squadId ? " · saved board" : " · new board"}
           </p>
         </div>
         <label className="squad-builder-formation-field">
@@ -215,9 +235,12 @@ export function SquadBuilder({
 
       <div className="squad-builder-layout">
         <SquadPlayerPool
+          awayTeam={awayTeam}
           error={poolError}
+          homeTeam={homeTeam}
           lineup={lineup}
           loading={poolLoading}
+          onRemoveFromPitch={removeFromPitch}
           players={players}
           sourceLabel={poolLabel}
         />
@@ -225,6 +248,8 @@ export function SquadBuilder({
         <div className="squad-builder-pitch-column">
           <div className="squad-builder-pitch-row">
             <SquadPitch
+              awayTeam={awayTeam}
+              homeTeam={homeTeam}
               lineup={lineup}
               selectedSlot={selectedSlot}
               onLineupChange={setLineup}
@@ -241,14 +266,14 @@ export function SquadBuilder({
       </div>
 
       <div className="squad-builder-actions">
-        <button className="button primary" disabled={busy || filledCount < 11} type="submit">
-          {busy ? "Saving…" : squadId ? "Update squad" : "Save squad"}
+        <button className="button primary" disabled={busy || !readyToSave} type="submit">
+          {busy ? "Saving…" : squadId ? "Update board" : "Save board"}
         </button>
         <button className="button secondary" disabled={busy || !squadId} type="button" onClick={publishSquad}>
           Publish to Coach Board
         </button>
         <button className="button secondary" disabled={busy} type="button" onClick={resetToFormation}>
-          Reset positions
+          Clear pitch
         </button>
       </div>
 
