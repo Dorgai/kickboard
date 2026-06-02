@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { UserAlert } from "@/lib/alerts/types";
+import { useDismissOnOutsidePointerDown } from "@/lib/use-dismiss-on-outside-pointer-down";
 
 function categoryLabel(category: UserAlert["category"]) {
   if (category === "connection_activity") return "Connection";
@@ -67,18 +68,7 @@ export function NotificationsCenter() {
     return undefined;
   }, [load, status]);
 
-  useEffect(() => {
-    if (!open) return;
-
-    function onPointerDown(event: MouseEvent) {
-      if (!panelRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open]);
+  useDismissOnOutsidePointerDown(open, () => setOpen(false), [panelRef]);
 
   async function markRead(alert: UserAlert) {
     if (alert.readAt) return;

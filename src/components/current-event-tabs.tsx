@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { FloatingFanChat } from "@/components/floating-fan-chat";
+import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { PredictionsPanel } from "@/components/predictions-panel";
 import { TeamLabel } from "@/components/team-label";
@@ -138,6 +139,7 @@ function TournamentSummaryDialog({
           event.preventDefault();
           close();
         }}
+        onClick={(event) => closeDialogOnBackdropClick(event, close)}
         onClose={close}
       >
         <div className="timeline-modal-panel">

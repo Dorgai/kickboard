@@ -1531,7 +1531,7 @@ h3 {
   }
 
   .fan-chat-float-backdrop {
-    display: none;
+    background: transparent;
   }
 }
 

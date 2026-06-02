@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { MatchEventTimeline } from "@/components/match-event-timeline";
+import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 
 type MatchEventTimelineLauncherProps = {
   matchId: number;
@@ -44,6 +45,7 @@ export function MatchEventTimelineLauncher({ matchId }: MatchEventTimelineLaunch
           event.preventDefault();
           close();
         }}
+        onClick={(event) => closeDialogOnBackdropClick(event, close)}
         onClose={close}
       >
         <div className="timeline-modal-panel">

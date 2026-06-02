@@ -1,7 +1,9 @@
 "use client";
 
 import { MessageCircle, X } from "lucide-react";
+import { useRef } from "react";
 import { FanChatPanel } from "@/components/fan-chat-panel";
+import { useDismissOnOutsidePointerDown } from "@/lib/use-dismiss-on-outside-pointer-down";
 
 type FloatingFanChatProps = {
   open: boolean;
@@ -9,6 +11,11 @@ type FloatingFanChatProps = {
 };
 
 export function FloatingFanChat({ open, onOpenChange }: FloatingFanChatProps) {
+  const panelRef = useRef<HTMLElement>(null);
+  const fabRef = useRef<HTMLButtonElement>(null);
+
+  useDismissOnOutsidePointerDown(open, () => onOpenChange(false), [panelRef, fabRef]);
+
   return (
     <div className="fan-chat-float-root" data-open={open ? "true" : "false"}>
       {open ? (
@@ -21,6 +28,7 @@ export function FloatingFanChat({ open, onOpenChange }: FloatingFanChatProps) {
       ) : null}
 
       <aside
+        ref={panelRef}
         aria-label="Fan Chat"
         className={`fan-chat-float-panel${open ? " fan-chat-float-panel--open" : ""}`}
         hidden={!open}
@@ -42,6 +50,7 @@ export function FloatingFanChat({ open, onOpenChange }: FloatingFanChatProps) {
       </aside>
 
       <button
+        ref={fabRef}
         aria-expanded={open}
         className={`fan-chat-float-fab${open ? " fan-chat-float-fab--hidden" : ""}`}
         type="button"
