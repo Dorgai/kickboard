@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 
 type InvitationRow = {
   id: string;
@@ -12,7 +13,14 @@ type InvitationRow = {
   createdAt: string;
 };
 
+function normalizeInviteEmail(value: string) {
+  return value.trim().toLowerCase();
+}
+
 export function RegistrationInvitationsPanel() {
+  const { data: session } = useSession();
+  const signedInEmail = session?.user?.email?.trim().toLowerCase() ?? null;
+
   const [invitations, setInvitations] = useState<InvitationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteeEmail, setInviteeEmail] = useState("");
@@ -42,8 +50,20 @@ export function RegistrationInvitationsPanel() {
     void refresh();
   }, [refresh]);
 
+  const inviteeIsSelf = useMemo(() => {
+    const trimmed = normalizeInviteEmail(inviteeEmail);
+    if (!trimmed || !signedInEmail) return false;
+    return trimmed === signedInEmail;
+  }, [inviteeEmail, signedInEmail]);
+
   async function createInvitation(event: FormEvent) {
     event.preventDefault();
+    if (inviteeIsSelf) {
+      setError(
+        "That email is your sign-in address. Enter a friend's email, or leave the field blank to create a shareable link."
+      );
+      return;
+    }
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -118,6 +138,7 @@ export function RegistrationInvitationsPanel() {
         <label className="feed-control-field">
           Their email (optional)
           <input
+            aria-invalid={inviteeIsSelf}
             className="feed-control-input"
             placeholder="friend@example.com"
             type="email"
@@ -125,6 +146,12 @@ export function RegistrationInvitationsPanel() {
             onChange={(event) => setInviteeEmail(event.target.value)}
           />
         </label>
+        {inviteeIsSelf ? (
+          <p className="inline-status registration-invite-hint">
+            Invitations are for someone else. Leave email blank for a link you can copy, or use a
+            different address.
+          </p>
+        ) : null}
         <label className="feed-control-field">
           Short message (optional)
           <textarea
@@ -146,7 +173,7 @@ export function RegistrationInvitationsPanel() {
             Send invitation email to {inviteeEmail.trim()}
           </label>
         ) : null}
-        <button className="button primary" disabled={busy} type="submit">
+        <button className="button primary" disabled={busy || inviteeIsSelf} type="submit">
           {busy
             ? "Sending…"
             : inviteeEmail.trim() && sendEmail

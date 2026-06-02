@@ -97,7 +97,7 @@ export async function createRegistrationInvitation(input: {
   const inviteeEmail = emailRaw ? normalizeEmail(emailRaw) : null;
   if (emailRaw && !isValidEmail(inviteeEmail!)) throw new Error("INVALID_EMAIL");
   if (inviteeEmail && inviteeEmail === normalizeEmail(inviter.rows[0].email)) {
-    throw new Error("CANNOT_INVITE_SELF");
+    throw new Error("INVITEE_IS_INVITER");
   }
 
   const message = input.personalMessage?.trim().slice(0, 280) ?? null;
@@ -268,7 +268,7 @@ export async function redeemRegistrationInvitation(input: {
     throw new Error("INVITATION_EXPIRED");
   }
 
-  if (row.inviter_id === input.newUserId) throw new Error("CANNOT_INVITE_SELF");
+  if (row.inviter_id === input.newUserId) throw new Error("INVITATION_OWN_LINK");
 
   if (row.invitee_email) {
     const invited = normalizeEmail(row.invitee_email);

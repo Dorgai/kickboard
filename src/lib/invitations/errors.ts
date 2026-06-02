@@ -17,7 +17,21 @@ export function mapInvitationError(error: unknown) {
       status: 403,
       error: "Sign in with the Google account that matches the invited email."
     },
-    CANNOT_INVITE_SELF: { status: 400, error: "You cannot invite yourself." },
+    INVITEE_IS_INVITER: {
+      status: 400,
+      error:
+        "That email is the same as your sign-in address. Enter a friend's email, or leave the field blank to create a shareable link."
+    },
+    INVITATION_OWN_LINK: {
+      status: 400,
+      error:
+        "You created this invitation. Share the link with someone who has not joined yet — you cannot redeem your own invite."
+    },
+    CANNOT_INVITE_SELF: {
+      status: 400,
+      error:
+        "That email is the same as your sign-in address. Enter a friend's email, or leave the field blank to create a shareable link."
+    },
     FORBIDDEN: { status: 403, error: "Not allowed." },
     TOKEN_REQUIRED: { status: 400, error: "Invitation token is required." },
     ALREADY_REGISTERED: {

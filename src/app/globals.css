@@ -1865,6 +1865,10 @@ h3 {
   margin: 0;
 }
 
+.registration-invite-hint {
+  margin: -4px 0 8px;
+}
+
 .registration-invite-form {
   display: grid;
   gap: 8px;
