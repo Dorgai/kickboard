@@ -4382,8 +4382,16 @@ h3 {
 
 .current-event-summary-trigger {
   font-size: 12px;
+  font-weight: 700;
   min-height: 2rem;
   padding: 0 12px;
+}
+
+[data-theme="light"] .current-event-summary-trigger.button.secondary,
+:root:not([data-theme]) .current-event-summary-trigger.button.secondary {
+  background: var(--color-bg);
+  border-color: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  color: #111827;
 }
 
 .current-summary-grid--popup {
@@ -4396,8 +4404,41 @@ h3 {
   }
 }
 
+.tournament-summary-modal .timeline-modal-header h2 {
+  color: var(--color-text-primary);
+}
+
+.tournament-summary-modal .timeline-modal-close.button.secondary {
+  background: var(--color-bg);
+  border-color: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
 .tournament-summary-modal .summary-tile {
+  background: var(--color-bg);
+  border-color: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
   padding: 12px 14px;
+}
+
+.tournament-summary-modal .summary-tile-label {
+  color: #374151;
+}
+
+.tournament-summary-modal .summary-tile-value {
+  color: var(--color-text-primary);
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+[data-theme="dark"] .tournament-summary-modal .summary-tile-label {
+  color: var(--color-text-secondary);
+}
+
+[data-theme="dark"] .tournament-summary-modal .summary-tile-value {
+  color: var(--color-text-primary);
 }
 
 .current-event-overview h2 {
