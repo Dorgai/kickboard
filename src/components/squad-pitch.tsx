@@ -44,6 +44,28 @@ function coordsFromPointer(pitch: DOMRect, clientX: number, clientY: number) {
   return { x, y };
 }
 
+/** First name(s) on line 1, surname on line 2 (shirt-style). */
+function splitPitchPlayerName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length <= 1) {
+    return { given: "", family: parts[0] ?? "" };
+  }
+  return {
+    given: parts.slice(0, -1).join(" "),
+    family: parts[parts.length - 1] ?? ""
+  };
+}
+
+function PitchTokenName({ label }: { label: string }) {
+  const { given, family } = splitPitchPlayerName(label);
+  return (
+    <span className="squad-pitch-token-name">
+      {given ? <span className="squad-pitch-token-given">{given}</span> : null}
+      {family ? <span className="squad-pitch-token-family">{family}</span> : null}
+    </span>
+  );
+}
+
 function nearestEmptySlot(
   lineup: SquadLineupSlot[],
   side: SquadLineupSide,
@@ -307,6 +329,7 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
             const canonicalTeam = side === "home" ? homeTeam : awayTeam;
             return (
               <div
+                aria-label={slot.label}
                 className={`squad-pitch-token squad-pitch-token--${side}${
                   selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""
                 }${draggingSlot === slot.slot ? " squad-pitch-token--dragging" : ""}`}
@@ -331,10 +354,7 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
                   readOnly ? undefined : (event) => handleTokenPointerDown(event, slot)
                 }
               >
-                <span className="squad-pitch-token-name">{slot.label}</span>
-                {slot.jerseyNumber ? (
-                  <span className="squad-pitch-token-number">{slot.jerseyNumber}</span>
-                ) : null}
+                <PitchTokenName label={slot.label} />
               </div>
             );
           })}
