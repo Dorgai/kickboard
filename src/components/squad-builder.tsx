@@ -190,9 +190,11 @@ export function SquadBuilder({
             );
             setHomePlayers(mergedHome);
             setAwayPlayers(mergedAway);
-            const sourceHint = poolPayload.source?.includes("api-football")
-              ? " · API-Football squads"
-              : "";
+            const sourceHint = poolPayload.source?.includes("wikipedia")
+              ? " · Wikipedia squads"
+              : poolPayload.source?.includes("api-football")
+                ? " · API-Football squads"
+                : "";
             setPoolLabel(`${poolPayload.seasonName} · ${poolPayload.matchLabel}${sourceHint}`);
             setPoolError(null);
           } else {

@@ -262,3 +262,201 @@ export async function loadApiFootballFixtureSquads(
     usedSquads
   };
 }
+
+type ApiFootballTeamEntry = {
+  team: { id: number; name: string; national?: boolean };
+};
+
+type ApiFootballLeaguePlayer = {
+  player: { id: number; name: string };
+  statistics: { games: { number: number | null; position: string | null } }[];
+};
+
+let worldCupTeamsCache: { loadedAt: number; teams: ApiFootballTeamEntry[] } | null = null;
+const WORLD_CUP_TEAMS_CACHE_MS = 60 * 60 * 1000;
+
+async function listWorldCupTeamsFromApi() {
+  const now = Date.now();
+  if (worldCupTeamsCache && now - worldCupTeamsCache.loadedAt < WORLD_CUP_TEAMS_CACHE_MS) {
+    return worldCupTeamsCache.teams;
+  }
+
+  const wc = worldCupLeagueParams();
+  const payload = await fetchApiFootball<ApiFootballTeamEntry[]>("/teams", wc);
+  const teams = payload.response ?? [];
+  worldCupTeamsCache = { loadedAt: now, teams };
+  return teams;
+}
+
+async function resolveApiFootballTeamId(teamName: string) {
+  const trimmed = teamName.trim();
+  if (!trimmed) return null;
+
+  const wcTeams = await listWorldCupTeamsFromApi();
+  const fromLeague = wcTeams.find((entry) => teamsMatch(entry.team.name, trimmed));
+  if (fromLeague) return fromLeague.team.id;
+
+  const searchTerm = trimmed.length > 12 ? trimmed.slice(0, 12) : trimmed;
+  try {
+    const payload = await fetchApiFootball<ApiFootballTeamEntry[]>("/teams", { search: searchTerm });
+    const candidates = (payload.response ?? []).filter(
+      (entry) => entry.team.national !== false && teamsMatch(entry.team.name, trimmed)
+    );
+    return candidates[0]?.team.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function loadSquadListForTeamId(teamId: number, displayTeamName: string) {
+  const wc = worldCupLeagueParams();
+  const byId = new Map<number, SquadPoolPlayer>();
+
+  try {
+    const squads = await fetchApiFootball<ApiFootballSquadTeam[]>("/players/squads", {
+      team: String(teamId),
+      season: wc.season
+    });
+    for (const entry of squads.response ?? []) {
+      for (const player of entry.players ?? []) {
+        addApiPlayer(byId, player, displayTeamName, player.position);
+      }
+    }
+  } catch {
+    /* squad list may not be published */
+  }
+
+  return Array.from(byId.values()).sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+  );
+}
+
+async function loadLeaguePlayersForTeamId(teamId: number, displayTeamName: string) {
+  const wc = worldCupLeagueParams();
+  const byId = new Map<number, SquadPoolPlayer>();
+  let page = 1;
+  let totalPages = 1;
+
+  while (page <= totalPages && page <= 6) {
+    const payload = await fetchApiFootball<ApiFootballLeaguePlayer[]>("/players", {
+      league: wc.league,
+      season: wc.season,
+      team: String(teamId),
+      page: String(page)
+    });
+
+    const paging = (payload as { paging?: { total?: number } }).paging;
+    totalPages = paging?.total ?? 1;
+
+    for (const row of payload.response ?? []) {
+      const stats = row.statistics?.[0];
+      const number = stats?.games?.number ?? null;
+      const position = stats?.games?.position ?? null;
+      addApiPlayer(
+        byId,
+        { id: row.player.id, name: row.player.name, number, pos: position },
+        displayTeamName,
+        position
+      );
+    }
+
+    if (!payload.response?.length) break;
+    page += 1;
+  }
+
+  return Array.from(byId.values()).sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+  );
+}
+
+async function loadRecentLineupPlayersForTeamId(teamId: number, displayTeamName: string) {
+  const wc = worldCupLeagueParams();
+  const byId = new Map<number, SquadPoolPlayer>();
+
+  try {
+    const fixtures = await fetchApiFootball<ApiFootballFixture[]>("/fixtures", {
+      team: String(teamId),
+      last: "12"
+    });
+
+    for (const fixture of fixtures.response ?? []) {
+      if (byId.size >= 26) break;
+      try {
+        const lineups = await loadLineupsForFixtureId(fixture.fixture.id);
+        for (const entry of lineups) {
+          if (!teamsMatch(entry.team.name, displayTeamName)) continue;
+          for (const row of [...entry.startXI, ...entry.substitutes]) {
+            addApiPlayer(byId, row.player, displayTeamName, row.player.pos);
+          }
+        }
+      } catch {
+        /* skip fixture */
+      }
+    }
+  } catch {
+    return [];
+  }
+
+  return Array.from(byId.values()).sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+  );
+}
+
+export type ApiFootballTeamSquadResult = {
+  players: SquadPoolPlayer[];
+  teamId: number;
+  usedSquads: boolean;
+  usedLeaguePlayers: boolean;
+  usedRecentLineups: boolean;
+};
+
+/**
+ * Load a national-team squad by team name (World Cup league roster, league player list, or recent lineups).
+ */
+export async function loadApiFootballTeamSquad(teamName: string): Promise<ApiFootballTeamSquadResult | null> {
+  if (!getApiFootballConfig().keyConfigured) return null;
+
+  const displayTeam = teamName.trim();
+  if (!displayTeam) return null;
+
+  let teamId: number | null = null;
+  try {
+    teamId = await resolveApiFootballTeamId(displayTeam);
+  } catch {
+    return null;
+  }
+  if (!teamId) return null;
+
+  let players = await loadSquadListForTeamId(teamId, displayTeam);
+  let usedSquads = players.length > 0;
+  let usedLeaguePlayers = false;
+  let usedRecentLineups = false;
+
+  if (players.length < 11) {
+    try {
+      const fromLeague = await loadLeaguePlayersForTeamId(teamId, displayTeam);
+      if (fromLeague.length > players.length) {
+        players = fromLeague;
+        usedLeaguePlayers = true;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  if (players.length < 11) {
+    try {
+      const fromLineups = await loadRecentLineupPlayersForTeamId(teamId, displayTeam);
+      if (fromLineups.length > players.length) {
+        players = fromLineups;
+        usedRecentLineups = true;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  if (!players.length) return null;
+
+  return { players, teamId, usedSquads, usedLeaguePlayers, usedRecentLineups };
+}
