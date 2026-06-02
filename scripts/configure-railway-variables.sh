@@ -64,7 +64,12 @@ else
 fi
 
 if [ -n "${API_FOOTBALL_KEY:-}" ]; then
+  echo "Setting API_FOOTBALL_KEY..."
   set_var "API_FOOTBALL_KEY=${API_FOOTBALL_KEY}"
+  echo "Setting KICKBOARD_WORKER_ENABLED=true (enables /api/feeds/realtime on web)..."
+  set_var "KICKBOARD_WORKER_ENABLED=true"
+else
+  echo "skip API_FOOTBALL_KEY (live match picker stays on static schedule only)"
 fi
 
 if [ -n "${GOOGLE_CLIENT_ID:-}" ]; then

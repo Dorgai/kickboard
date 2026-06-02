@@ -25,6 +25,8 @@ type RealtimeFixture = {
   status: { short: string };
   homeTeam: string;
   awayTeam: string;
+  homeGoals?: number | null;
+  awayGoals?: number | null;
 };
 
 export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
@@ -141,6 +143,11 @@ function FixturePickerButton({
         layout="stacked"
         size="xs"
       />
+      {fixture.homeGoals != null && fixture.awayGoals != null ? (
+        <span className="match-fixture-picker-score">
+          {fixture.homeGoals} – {fixture.awayGoals}
+        </span>
+      ) : null}
       {fixture.date ? <span className="match-fixture-picker-date">{fixture.date}</span> : null}
     </button>
   );

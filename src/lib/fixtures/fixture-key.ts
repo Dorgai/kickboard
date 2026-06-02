@@ -7,6 +7,8 @@ export type FixtureOption = {
   status: "upcoming" | "live" | "finished";
   label: string;
   sortKey: string;
+  homeGoals?: number | null;
+  awayGoals?: number | null;
 };
 
 function slugPart(value: string) {

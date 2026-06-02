@@ -1197,6 +1197,13 @@ h3 {
   color: var(--color-danger);
 }
 
+.match-fixture-picker-score {
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
 .match-fixture-picker-date {
   color: var(--color-text-secondary);
   font-size: 10px;

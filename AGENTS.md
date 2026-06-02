@@ -13,7 +13,7 @@ The runnable Next.js app is on **`main`**. Use `main` for Railway deploys and lo
 | Next.js web (`npm run dev`) | Yes | Default dev entry point on port 3000 |
 | PostgreSQL | No for feed browser MVP | `.env` placeholders satisfy config checks; attach Railway/local Postgres when DB features are implemented |
 | Redis | No for feed browser MVP | Same as Postgres; required for `npm run worker:api-football` |
-| API-Football worker | Optional | `npm run worker:api-football` with `REDIS_URL`, `API_FOOTBALL_KEY`, and `KICKBOARD_WORKER_ENABLED=true` |
+| API-Football live picker | Optional (production) | Web service: `API_FOOTBALL_KEY` + `KICKBOARD_WORKER_ENABLED=true` — see `docs/api-football-live-setup.md`. Background worker optional: `npm run worker:api-football` with `REDIS_URL` |
 
 The homepage and StatsBomb historical feeds work without Postgres, Redis, or API-Football credentials. StatsBomb data is fetched from the public GitHub open-data feed at request time.
 

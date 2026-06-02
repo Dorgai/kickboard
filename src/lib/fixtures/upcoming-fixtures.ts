@@ -23,6 +23,8 @@ type LiveFixtureInput = {
   status: { short: string };
   homeTeam: string;
   awayTeam: string;
+  homeGoals?: number | null;
+  awayGoals?: number | null;
 };
 
 export function buildFixtureOptionsFromWorldCup(groups: WorldCupGroup[], liveFixtures: LiveFixtureInput[] = []) {
@@ -65,6 +67,8 @@ export function buildFixtureOptionsFromWorldCup(groups: WorldCupGroup[], liveFix
       date: live.date,
       group: null,
       status,
+      homeGoals: live.homeGoals,
+      awayGoals: live.awayGoals,
       label: formatFixtureLabel({
         homeTeam: live.homeTeam,
         awayTeam: live.awayTeam,
