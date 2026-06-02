@@ -2,7 +2,7 @@
 
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type AdminAccessGateProps = {
   adminConfigured: boolean;
@@ -46,14 +46,22 @@ export function AdminAccessGate({ adminConfigured, oauthConfigured }: AdminAcces
   const signedInEmail = session?.user?.email;
   const isAdminUser = Boolean(session?.user?.isAdmin);
 
+  useEffect(() => {
+    if (status === "authenticated" && isAdminUser) {
+      router.refresh();
+    }
+  }, [isAdminUser, router, status]);
+
   return (
     <main className="admin-page admin-gate" id="main-content">
       <section className="admin-hero">
         <p className="eyebrow">Admin only</p>
         <h1>Admin dashboard</h1>
         <p>
-          Sign in with your admin Google account, or use a legacy operator token. Default admin email:{" "}
-          <code>laszlo.dorgai@gmail.com</code> (override with <code>ADMIN_EMAILS</code> on Railway).
+          Sign in with Google using an email on the admin allowlist (default{" "}
+          <code>laszlo.dorgai@gmail.com</code>; override with <code>ADMIN_EMAILS</code> on Railway). No
+          operator token is required for allowlisted accounts. The token below is optional for scripts and
+          legacy access.
         </p>
       </section>
 

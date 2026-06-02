@@ -16,7 +16,6 @@ export function CommunitySetupPanel({
     health.jwt &&
     health.schemaReady &&
     health.writeProbeOk &&
-    adminTokenConfigured &&
     oauthConfigured;
 
   return (
@@ -56,7 +55,7 @@ export function CommunitySetupPanel({
         />
         <SetupTile
           connected={adminTokenConfigured}
-          detail="Bearer token for moderation API on this page"
+          detail="Optional — API/scripts without Google sign-in"
           label="ADMIN_DATA_SOURCES_TOKEN"
         />
         <SetupTile
@@ -129,8 +128,9 @@ npm run db:schema`}</code>
 
       {!adminTokenConfigured ? (
         <p className="inline-status admin-community-setup-note">
-          Set <code>ADMIN_DATA_SOURCES_TOKEN</code> in Railway variables to unlock this page and the moderation
-          queue below.
+          <code>ADMIN_DATA_SOURCES_TOKEN</code> is optional if you use Google admin sign-in (
+          <code>ADMIN_EMAILS</code>). Set it only if you need token-based API access or a non-Google operator
+          login.
         </p>
       ) : null}
     </section>
