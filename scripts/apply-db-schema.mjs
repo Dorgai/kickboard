@@ -38,7 +38,8 @@ const files = [
   "db/fan-chat-messages-extensions.sql",
   "db/admin-moderation-extensions.sql",
   "db/user-activity-extensions.sql",
-  "db/help-support-extensions.sql"
+  "db/help-support-extensions.sql",
+  "db/fixture-prediction-events-extensions.sql"
 ];
 
 async function applyFile(client, relativePath) {

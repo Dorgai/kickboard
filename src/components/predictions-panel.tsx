@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { AuthGate } from "@/components/auth-gate";
 import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
 import { PredictionsOverview } from "@/components/predictions-overview";
+import { UserPickActivityPanel } from "@/components/user-pick-activity-panel";
 import {
   FixtureMatchPicker,
   useFixtureOptions,
@@ -21,6 +22,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [overviewRefresh, setOverviewRefresh] = useState(0);
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const scrollToOutcomeAfterSelect = useRef(false);
 
   useEffect(() => {
@@ -78,7 +80,10 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                 awayTeam={selected.awayTeam}
                 fixtureKey={selected.key}
                 homeTeam={selected.homeTeam}
-                onSaved={() => setOverviewRefresh((token) => token + 1)}
+                onSaved={() => {
+                  setOverviewRefresh((token) => token + 1);
+                  setActivityRefresh((token) => token + 1);
+                }}
               />
             </div>
           </div>
@@ -94,6 +99,8 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
           refreshToken={overviewRefresh}
           viewerDisplayName={viewerDisplayName}
         />
+
+        <UserPickActivityPanel refreshToken={activityRefresh} />
 
         <p className="community-panel-lead predictions-settle-note">
           Points update after each match finishes. Until then, picks show as <strong>Pending</strong>.
