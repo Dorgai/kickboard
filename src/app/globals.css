@@ -2165,7 +2165,7 @@ h3 {
 .squad-builder-layout {
   display: grid;
   gap: 10px;
-  grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+  grid-template-columns: minmax(20rem, 34rem) minmax(0, 1fr);
 }
 
 @media (max-width: 820px) {
@@ -2174,90 +2174,113 @@ h3 {
   }
 }
 
-.squad-player-pools {
+.squad-team-benches {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
-.squad-player-pools-source {
-  color: var(--color-text-secondary);
+.squad-team-benches-source {
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
   font-size: 10px;
   line-height: 1.35;
   margin: 0;
 }
 
-.squad-player-pools-grid {
+.squad-team-benches-grid {
   display: grid;
-  gap: 8px;
+  gap: 12px;
   grid-template-columns: 1fr 1fr;
   min-width: 0;
 }
 
-@media (max-width: 820px) {
-  .squad-player-pools-grid {
+@media (max-width: 1100px) {
+  .squad-team-benches-grid {
     grid-template-columns: 1fr;
   }
 }
 
-.squad-player-pool {
-  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
+.squad-team-bench {
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 16%, var(--color-border));
+  border-radius: 12px;
+  box-shadow: var(--shadow-surface);
+  color: var(--color-text-primary);
   display: grid;
   gap: 8px;
-  max-height: 28rem;
+  max-height: 26rem;
   min-width: 0;
   overflow: auto;
-  padding: 10px;
+  padding: 10px 12px;
 }
 
-.squad-player-bench-drop {
-  border: 1px dashed var(--color-border);
-  border-radius: 8px;
-  color: var(--color-text-secondary);
+.squad-team-bench--home {
+  border-top: 3px solid color-mix(in srgb, var(--color-accent) 75%, var(--color-border));
+}
+
+.squad-team-bench--away {
+  border-top: 3px solid color-mix(in srgb, var(--color-brand) 55%, var(--color-text-secondary));
+}
+
+.squad-team-bench-header {
+  display: grid;
+  gap: 6px;
+}
+
+.squad-team-bench-title {
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.squad-team-bench-formation {
+  display: grid;
+  gap: 4px;
+}
+
+.squad-team-bench-formation span {
+  color: color-mix(in srgb, var(--color-text-primary) 65%, var(--color-text-secondary));
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.squad-team-bench-lead {
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
   font-size: 11px;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.squad-team-bench-drop {
+  background: color-mix(in srgb, var(--color-text-primary) 4%, var(--color-bg));
+  border: 1px dashed color-mix(in srgb, var(--color-text-primary) 22%, var(--color-border));
+  border-radius: 8px;
+  color: color-mix(in srgb, var(--color-text-primary) 70%, var(--color-text-secondary));
+  font-size: 11px;
+  font-weight: 600;
   line-height: 1.35;
   padding: 8px 10px;
   text-align: center;
 }
 
-.squad-player-bench-drop--active {
-  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+.squad-team-bench-drop--active {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg));
   border-color: var(--color-accent);
+  border-style: solid;
   color: var(--color-text-primary);
 }
 
-.squad-player-pool-header h4 {
-  font-size: 13px;
-  margin: 0;
-}
-
-.squad-player-pool-formation {
-  display: grid;
-  gap: 4px;
-  margin-top: 6px;
-}
-
-.squad-player-pool-formation span {
-  color: var(--color-text-secondary);
-  font-size: 10px;
-  font-weight: 600;
-}
-
-.squad-player-pool-source {
-  color: var(--color-text-secondary);
-  font-size: 10px;
-  line-height: 1.35;
-  margin: 4px 0 0;
-}
-
-.squad-player-pool-filters {
+.squad-team-bench-filters {
   display: grid;
   gap: 6px;
 }
 
-.squad-player-pool-list {
+.squad-team-bench-filters .feed-control-input {
+  color: var(--color-text-primary);
+}
+
+.squad-team-bench-list {
   display: grid;
   gap: 6px;
   list-style: none;
@@ -2266,11 +2289,17 @@ h3 {
   padding: 0;
 }
 
+.squad-team-bench .inline-status {
+  color: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-text-secondary));
+  font-size: 11px;
+}
+
 .squad-player-chip {
   align-items: flex-start;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-text-primary) 4%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 14%, var(--color-border));
   border-radius: 8px;
+  color: var(--color-text-primary);
   cursor: grab;
   display: grid;
   gap: 2px;
@@ -2284,38 +2313,39 @@ h3 {
 }
 
 .squad-player-chip--on-pitch {
-  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
   cursor: pointer;
-  opacity: 0.72;
+  opacity: 0.88;
 }
 
 .squad-player-chip-number {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 55%, var(--color-text-secondary));
   font-size: 10px;
   font-weight: 700;
 }
 
 .squad-player-chip-on-pitch {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 85%, var(--color-text-primary));
   font-size: 9px;
   font-weight: 700;
 }
 
 .squad-player-chip-role {
-  color: var(--color-text-secondary);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-text-secondary));
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
 }
 
 .squad-player-chip-name {
+  color: var(--color-text-primary);
   font-size: 12px;
   font-weight: 700;
 }
 
 .squad-player-chip-meta {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
   font-size: 10px;
 }
 

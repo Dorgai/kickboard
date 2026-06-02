@@ -5,7 +5,8 @@ import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import { FORMATIONS, type SquadFormation, type SquadLineupSlot } from "@/lib/squads/lineup";
 import { playerRoleLabel, SQUAD_PLAYER_ROLES, type SquadPlayerRole } from "@/lib/squads/player-roles";
 import { slotSide } from "@/lib/squads/lineup";
-import { DRAG_PLAYER_MIME } from "@/components/squad-pitch";
+import { DRAG_PLAYER_MIME, type PitchDragPlayer } from "@/components/squad-pitch";
+import { teamsMatch } from "@/lib/squads/team-names";
 
 type SquadPlayerPoolProps = {
   homePlayers: SquadPoolPlayer[];
@@ -22,16 +23,6 @@ type SquadPlayerPoolProps = {
   onAwayFormationChange: (formation: SquadFormation) => void;
   onRemoveFromPitch: (playerId: number) => void;
 };
-
-function parseDragPlayer(raw: string): { playerId: number; fromPitch?: boolean } | null {
-  try {
-    const parsed = JSON.parse(raw) as { playerId?: number; fromPitch?: boolean };
-    if (typeof parsed.playerId !== "number") return null;
-    return { playerId: parsed.playerId, fromPitch: parsed.fromPitch };
-  } catch {
-    return null;
-  }
-}
 
 function PlayerChip({
   player,
@@ -132,17 +123,26 @@ function SquadTeamPlayerPool({
   function handleBenchDrop(event: React.DragEvent) {
     event.preventDefault();
     setBenchDragOver(false);
-    const parsed = parseDragPlayer(event.dataTransfer.getData(DRAG_PLAYER_MIME));
-    if (parsed?.fromPitch) {
-      onRemoveFromPitch(parsed.playerId);
+    const raw = event.dataTransfer.getData(DRAG_PLAYER_MIME);
+    if (!raw) return;
+    try {
+      const player = JSON.parse(raw) as PitchDragPlayer;
+      if (!player.fromPitch) return;
+      if (!teamsMatch(player.teamName, teamName)) return;
+      onRemoveFromPitch(player.playerId);
+    } catch {
+      /* ignore */
     }
   }
 
   return (
-    <aside className="squad-player-pool">
-      <header className="squad-player-pool-header">
-        <h4>{teamName}</h4>
-        <label className="squad-player-pool-formation">
+    <aside
+      className={`squad-team-bench squad-team-bench--${side}`}
+      aria-label={`${teamName} bench`}
+    >
+      <header className="squad-team-bench-header">
+        <h4 className="squad-team-bench-title">{teamName} bench</h4>
+        <label className="squad-team-bench-formation">
           <span>Formation</span>
           <select
             aria-label={`${teamName} formation`}
@@ -157,19 +157,21 @@ function SquadTeamPlayerPool({
             ))}
           </select>
         </label>
-        <p className="squad-player-pool-source">Bench · drag onto the {side} half of the pitch</p>
+        <p className="squad-team-bench-lead">
+          {side === "home" ? "Top half" : "Bottom half"} of the pitch · drag players from this list only
+        </p>
       </header>
 
       <div
-        className={`squad-player-bench-drop${benchDragOver ? " squad-player-bench-drop--active" : ""}`}
+        className={`squad-team-bench-drop${benchDragOver ? " squad-team-bench-drop--active" : ""}`}
         onDragLeave={() => setBenchDragOver(false)}
         onDragOver={handleBenchDragOver}
         onDrop={handleBenchDrop}
       >
-        Drop a {teamName} player here to return to the bench
+        Drop {teamName} players here to return to this bench
       </div>
 
-      <div className="squad-player-pool-filters">
+      <div className="squad-team-bench-filters">
         <input
           aria-label={`Search ${teamName} players`}
           className="feed-control-input"
@@ -195,7 +197,7 @@ function SquadTeamPlayerPool({
       {loading ? <p className="inline-status">Loading players…</p> : null}
       {error ? <p className="inline-status">{error}</p> : null}
 
-      <ul className="squad-player-pool-list">
+      <ul className="squad-team-bench-list">
         {filteredPlayers.map((player) => (
           <PlayerChip
             key={player.playerId}
@@ -228,9 +230,9 @@ export function SquadPlayerPool({
   onRemoveFromPitch
 }: SquadPlayerPoolProps) {
   return (
-    <div className="squad-player-pools">
-      {sourceLabel ? <p className="squad-player-pools-source">{sourceLabel}</p> : null}
-      <div className="squad-player-pools-grid">
+    <div className="squad-team-benches" aria-label="Team benches">
+      {sourceLabel ? <p className="squad-team-benches-source">{sourceLabel}</p> : null}
+      <div className="squad-team-benches-grid">
         <SquadTeamPlayerPool
           error={error}
           formation={homeFormation}
