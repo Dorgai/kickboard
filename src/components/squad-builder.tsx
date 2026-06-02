@@ -9,6 +9,7 @@ import {
   defaultMatchFormations,
   defaultMatchLineupWithFormations,
   mergeMatchFormationChangeForSide,
+  normalizeLineupTeamLabels,
   parseStoredFormations,
   SLOTS_PER_TEAM,
   type MatchFormations,
@@ -85,7 +86,7 @@ export function SquadBuilder({
       setPoolLoading(true);
 
       try {
-        const poolParams = new URLSearchParams({ homeTeam, awayTeam });
+        const poolParams = new URLSearchParams({ homeTeam, awayTeam, fixtureKey });
         const poolRes = await fetch(`/api/squads/player-pool?${poolParams}`);
         if (!cancelled) {
           if (poolRes.ok) {
@@ -95,6 +96,7 @@ export function SquadBuilder({
               awayPlayers?: SquadPoolPlayer[];
               seasonName: string;
               matchLabel: string;
+              source?: string;
             };
             const all = poolPayload.players ?? [];
             const mergedHome = [
@@ -113,7 +115,10 @@ export function SquadBuilder({
             );
             setHomePlayers(mergedHome);
             setAwayPlayers(mergedAway);
-            setPoolLabel(`${poolPayload.seasonName} · ${poolPayload.matchLabel}`);
+            const sourceHint = poolPayload.source?.includes("api-football")
+              ? " · API-Football squads"
+              : "";
+            setPoolLabel(`${poolPayload.seasonName} · ${poolPayload.matchLabel}${sourceHint}`);
             setPoolError(null);
           } else {
             const poolFail = (await poolRes.json()) as { error?: string };
@@ -132,7 +137,7 @@ export function SquadBuilder({
               const loadedFormations =
                 squad.formations ?? parseStoredFormations(squad.formation ?? "4-3-3");
               setFormations(loadedFormations);
-              setLineup(squad.lineup);
+              setLineup(normalizeLineupTeamLabels(squad.lineup, homeTeam, awayTeam));
               if (!cancelled) setLoadState("ready");
               return;
             }

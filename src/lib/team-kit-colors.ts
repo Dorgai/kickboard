@@ -64,7 +64,29 @@ const KIT_BY_CODE: Record<string, TeamKitColors> = {
   UY: { primary: "#FFFFFF", secondary: "#0038A8", text: "#1B1B1B" },
   VE: { primary: "#FFCC00", secondary: "#CF142B", text: "#1B1B1B" },
   "GB-WLS": { primary: "#FFFFFF", secondary: "#D30731", text: "#1B1B1B" },
-  ZM: { primary: "#198A00", secondary: "#EF7D00", text: "#FFFFFF" }
+  ZM: { primary: "#198A00", secondary: "#EF7D00", text: "#FFFFFF" },
+  CM: { primary: "#FFD100", secondary: "#007A5E", text: "#1B1B1B" },
+  HT: { primary: "#00209F", secondary: "#D21034", text: "#FFFFFF" },
+  HU: { primary: "#CE2939", secondary: "#477050", text: "#FFFFFF" },
+  IS: { primary: "#0251A0", secondary: "#DC1E35", text: "#FFFFFF" },
+  PA: { primary: "#FFFFFF", secondary: "#DA121A", text: "#1B1B1B" },
+  UZ: { primary: "#1EB53A", secondary: "#0099B5", text: "#FFFFFF" },
+  CV: { primary: "#003893", secondary: "#FFD100", text: "#FFFFFF" },
+  CW: { primary: "#002B7F", secondary: "#FCD116", text: "#FFFFFF" },
+  MK: { primary: "#D20000", secondary: "#FFE600", text: "#1B1B1B" },
+  AL: { primary: "#E41E20", secondary: "#000000", text: "#FFFFFF" },
+  BA: { primary: "#002395", secondary: "#FECB00", text: "#FFFFFF" },
+  SI: { primary: "#FFFFFF", secondary: "#005DA4", text: "#1B1B1B" },
+  EE: { primary: "#0072CE", secondary: "#000000", text: "#FFFFFF" },
+  LV: { primary: "#9E3039", secondary: "#FFFFFF", text: "#FFFFFF" },
+  LT: { primary: "#FDB913", secondary: "#006A44", text: "#1B1B1B" },
+  FI: { primary: "#FFFFFF", secondary: "#003580", text: "#1B1B1B" },
+  SE: { primary: "#FFCD00", secondary: "#005293", text: "#1B1B1B" },
+  IE: { primary: "#FFFFFF", secondary: "#FF883E", text: "#1B1B1B" },
+  JM: { primary: "#009639", secondary: "#FED100", text: "#1B1B1B" },
+  PY: { primary: "#FFFFFF", secondary: "#D52B1E", text: "#1B1B1B" },
+  PE: { primary: "#FFFFFF", secondary: "#D91023", text: "#1B1B1B" },
+  BO: { primary: "#007934", secondary: "#F9E300", text: "#1B1B1B" }
 };
 
 const SIDE_FALLBACK: Record<"home" | "away", TeamKitColors> = {
@@ -105,14 +127,27 @@ export function getTeamKitColors(teamName: string, side: "home" | "away" = "home
     }
   }
 
-  return SIDE_FALLBACK[side];
+  return { ...SIDE_FALLBACK[side] };
+}
+
+/** Kit colours for a player token — always uses the fixture team label for the pitch half. */
+export function getTeamKitColorsForPitchSide(
+  side: "home" | "away",
+  homeTeam: string,
+  awayTeam: string
+): TeamKitColors {
+  const label = side === "home" ? homeTeam : awayTeam;
+  return getTeamKitColors(label, side);
 }
 
 export function teamKitInlineStyle(
   teamName: string,
-  side: "home" | "away"
+  side: "home" | "away",
+  fixtureTeams?: { homeTeam: string; awayTeam: string }
 ): CSSProperties {
-  const kit = getTeamKitColors(teamName, side);
+  const kit = fixtureTeams
+    ? getTeamKitColorsForPitchSide(side, fixtureTeams.homeTeam, fixtureTeams.awayTeam)
+    : getTeamKitColors(teamName, side);
   return {
     ["--pitch-kit-primary" as string]: kit.primary,
     ["--pitch-kit-secondary" as string]: kit.secondary,

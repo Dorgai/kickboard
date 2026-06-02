@@ -382,6 +382,23 @@ function mapLineupEntry(
   };
 }
 
+/** Use fixture home/away labels on filled slots so kit colours and drag checks stay consistent. */
+export function normalizeLineupTeamLabels(
+  lineup: SquadLineupSlot[],
+  homeTeam: string,
+  awayTeam: string
+): SquadLineupSlot[] {
+  const home = homeTeam.trim();
+  const away = awayTeam.trim();
+  return lineup.map((slot) => {
+    if (!slot.label?.trim()) {
+      return { ...slot, teamName: undefined };
+    }
+    const side = slotSide(slot);
+    return { ...slot, teamName: side === "home" ? home : away };
+  });
+}
+
 export function normalizeLineupSlots(
   raw: unknown,
   formations: MatchFormations | SquadFormation

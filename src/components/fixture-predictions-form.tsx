@@ -92,7 +92,7 @@ export function FixturePredictionsForm({
     async function loadPool() {
       setPoolLoading(true);
       try {
-        const params = new URLSearchParams({ homeTeam, awayTeam });
+        const params = new URLSearchParams({ homeTeam, awayTeam, fixtureKey });
         const response = await fetch(`/api/squads/player-pool?${params}`);
         if (!cancelled && response.ok) {
           const payload = (await response.json()) as {

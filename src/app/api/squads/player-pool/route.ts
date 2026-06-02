@@ -13,6 +13,7 @@ export async function GET(request: Request) {
   const seasonId = Number(searchParams.get("seasonId"));
   const homeTeam = searchParams.get("homeTeam")?.trim() ?? "";
   const awayTeam = searchParams.get("awayTeam")?.trim() ?? "";
+  const fixtureKey = searchParams.get("fixtureKey")?.trim() ?? "";
   const team = searchParams.get("team")?.trim() ?? "";
 
   try {
@@ -24,7 +25,9 @@ export async function GET(request: Request) {
     }
 
     if (homeTeam && awayTeam) {
-      const pool = await getFixtureSquadPlayerPool(homeTeam, awayTeam);
+      const pool = await getFixtureSquadPlayerPool(homeTeam, awayTeam, {
+        fixtureKey: fixtureKey || null
+      });
       return NextResponse.json(pool, {
         headers: { "Cache-Control": "public, max-age=3600" }
       });

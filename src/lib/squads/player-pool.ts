@@ -1,3 +1,4 @@
+import { loadApiFootballFixtureSquads } from "@/lib/api-football-lineups";
 import { primaryLineupPosition } from "@/lib/lineup-position-groups";
 import { getLineups, getMatches, getWorldCupCompetitions } from "@/lib/statsbomb";
 import type { SquadPlayerRole } from "@/lib/squads/player-roles";
@@ -74,6 +75,65 @@ function addPlayersFromLineups(
 }
 
 const TARGET_SQUAD_SIZE = 26;
+
+function mergeTeamPlayers(
+  existing: SquadPoolPlayer[],
+  incoming: SquadPoolPlayer[],
+  displayTeamName: string
+) {
+  const byId = new Map<number, SquadPoolPlayer>();
+  for (const player of existing) {
+    byId.set(player.playerId, { ...player, teamName: displayTeamName });
+  }
+  for (const player of incoming) {
+    if (!byId.has(player.playerId)) {
+      byId.set(player.playerId, { ...player, teamName: displayTeamName });
+    }
+  }
+  return Array.from(byId.values()).sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+  );
+}
+
+async function supplementFromApiFootball(
+  homePlayers: SquadPoolPlayer[],
+  awayPlayers: SquadPoolPlayer[],
+  home: string,
+  away: string,
+  fixtureKey?: string | null
+) {
+  const needsHome = homePlayers.length < TARGET_SQUAD_SIZE;
+  const needsAway = awayPlayers.length < TARGET_SQUAD_SIZE;
+  if (!needsHome && !needsAway) {
+    return { homePlayers, awayPlayers, apiSource: null as string | null, apiMatchLabel: undefined as string | undefined };
+  }
+
+  const api = await loadApiFootballFixtureSquads(home, away, fixtureKey);
+  if (!api) {
+    return { homePlayers, awayPlayers, apiSource: null as string | null, apiMatchLabel: undefined as string | undefined };
+  }
+
+  let nextHome = homePlayers;
+  let nextAway = awayPlayers;
+
+  if (needsHome && api.home.length) {
+    nextHome = homePlayers.length ? mergeTeamPlayers(homePlayers, api.home, home) : api.home;
+  }
+  if (needsAway && api.away.length) {
+    nextAway = awayPlayers.length ? mergeTeamPlayers(awayPlayers, api.away, away) : api.away;
+  }
+
+  const parts = ["api-football"];
+  if (api.usedLineups) parts.push("lineups");
+  if (api.usedSquads) parts.push("squads");
+
+  return {
+    homePlayers: nextHome,
+    awayPlayers: nextAway,
+    apiSource: parts.join("/"),
+    apiMatchLabel: api.matchLabel
+  };
+}
 
 /**
  * Load a national-team squad from any FIFA World Cup edition in StatsBomb open data.
@@ -191,7 +251,11 @@ export async function getWorldCupSquadPlayerPool(options?: {
  * Players for the two fixture teams (StatsBomb WC open data). Loads each side from any
  * World Cup edition where that nation appears (2026 schedule labels may not match 2022 alone).
  */
-export async function getFixtureSquadPlayerPool(homeTeam: string, awayTeam: string) {
+export async function getFixtureSquadPlayerPool(
+  homeTeam: string,
+  awayTeam: string,
+  options?: { fixtureKey?: string | null }
+) {
   const home = homeTeam.trim();
   const away = awayTeam.trim();
   if (!home || !away) {
@@ -235,12 +299,26 @@ export async function getFixtureSquadPlayerPool(homeTeam: string, awayTeam: stri
     addPlayersFromLineups(byId, lineups, [home, away]);
     const fromMatch = Array.from(byId.values());
     if (!homePlayers.length) {
-      homePlayers = fromMatch.filter((player) => teamsMatch(player.teamName, home));
+      homePlayers = fromMatch
+        .filter((player) => teamsMatch(player.teamName, home))
+        .map((player) => ({ ...player, teamName: home }));
     }
     if (!awayPlayers.length) {
-      awayPlayers = fromMatch.filter((player) => teamsMatch(player.teamName, away));
+      awayPlayers = fromMatch
+        .filter((player) => teamsMatch(player.teamName, away))
+        .map((player) => ({ ...player, teamName: away }));
     }
   }
+
+  const apiSupplement = await supplementFromApiFootball(
+    homePlayers,
+    awayPlayers,
+    home,
+    away,
+    options?.fixtureKey
+  );
+  homePlayers = apiSupplement.homePlayers;
+  awayPlayers = apiSupplement.awayPlayers;
 
   const players = [...homePlayers, ...awayPlayers]
     .filter(
@@ -259,13 +337,16 @@ export async function getFixtureSquadPlayerPool(homeTeam: string, awayTeam: stri
     ? `${fixtureMatch.home_team.home_team_name} vs ${fixtureMatch.away_team.away_team_name}`
     : `${home} vs ${away}`;
 
+  const sources = ["statsbomb/open-data"];
+  if (apiSupplement.apiSource) sources.push(apiSupplement.apiSource);
+
   return {
-    source: "statsbomb/open-data",
+    source: sources.join("+"),
     competitionId: competition.competition_id,
     seasonId: competition.season_id,
     seasonName: competition.season_name,
     matchId: fixtureMatch?.match_id ?? null,
-    matchLabel,
+    matchLabel: apiSupplement.apiMatchLabel ?? matchLabel,
     homeTeam: home,
     awayTeam: away,
     players,

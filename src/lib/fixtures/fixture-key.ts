@@ -37,6 +37,13 @@ export function buildApiFootballFixtureKey(fixtureId: number) {
   return `api-football:${fixtureId}`;
 }
 
+export function parseApiFootballFixtureId(fixtureKey: string | null | undefined) {
+  const key = fixtureKey?.trim() ?? "";
+  if (!key.startsWith("api-football:")) return null;
+  const id = Number(key.slice("api-football:".length));
+  return Number.isFinite(id) && id > 0 ? id : null;
+}
+
 export function formatFixtureLabel(input: {
   homeTeam: string;
   awayTeam: string;

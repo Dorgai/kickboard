@@ -32,11 +32,13 @@ type SquadPlayerPoolProps = {
 function BenchPlayerChip({
   player,
   side,
+  teamName,
   onPitch,
   onRemoveFromPitch
 }: {
   player: SquadPoolPlayer;
   side: "home" | "away";
+  teamName: string;
   onPitch: boolean;
   onRemoveFromPitch: (playerId: number) => void;
 }) {
@@ -58,7 +60,7 @@ function BenchPlayerChip({
           const payload: PitchDragPlayer = {
             playerId: player.playerId,
             name: player.name,
-            teamName: player.teamName,
+            teamName,
             role: player.role,
             jerseyNumber: player.jerseyNumber,
             fromPitch: onPitch
@@ -202,6 +204,7 @@ export function SquadTeamBench({
                   onRemoveFromPitch={onRemoveFromPitch}
                   player={player}
                   side={side}
+                  teamName={teamName}
                 />
               ))}
             </ul>
@@ -210,8 +213,8 @@ export function SquadTeamBench({
       </div>
       {!loading && !error && players.length === 0 ? (
         <p className="inline-status squad-team-bench-empty">
-          No squad list in StatsBomb open data for {teamName}. Try a fixture where both nations
-          appear in a recent World Cup, or check back when official squads are linked.
+          No squad list found for {teamName} yet. Kickboard checks StatsBomb historical data and, when
+          configured, API-Football lineups and squad lists for this match.
         </p>
       ) : null}
     </aside>

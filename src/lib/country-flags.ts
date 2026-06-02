@@ -1,3 +1,5 @@
+import { teamsMatch } from "@/lib/squads/team-names";
+
 const COUNTRY_CODES: Record<string, string> = {
   afghanistan: "AF",
   albania: "AL",
@@ -213,6 +215,10 @@ export function resolveCountryCode(teamOrCountry: string | null | undefined) {
   const withoutSuffix = normalized.replace(/\s+(fc|sc|cf)$/u, "");
   if (COUNTRY_CODES[withoutSuffix]) {
     return COUNTRY_CODES[withoutSuffix];
+  }
+
+  for (const [name, code] of Object.entries(COUNTRY_CODES)) {
+    if (teamsMatch(teamOrCountry, name)) return code;
   }
 
   return null;

@@ -80,6 +80,8 @@ export function SquadPitch({
 
       const placed = clampCoordsToSide(playerSide, coords);
 
+      const canonicalTeam = playerSide === "home" ? homeTeam : awayTeam;
+
       const next = lineup.map((slot, index) => {
         if (index === slotIndex) {
           return {
@@ -87,7 +89,7 @@ export function SquadPitch({
             label: player.name,
             role: player.role,
             playerId: player.playerId,
-            teamName: player.teamName,
+            teamName: canonicalTeam,
             jerseyNumber: player.jerseyNumber ?? undefined,
             x: placed.x,
             y: placed.y
@@ -237,9 +239,7 @@ export function SquadPitch({
           .filter((slot) => slot.label)
           .map((slot) => {
             const side = slotSide(slot);
-            const kitTeam =
-              slot.teamName ||
-              (side === "home" ? homeTeam : awayTeam);
+            const canonicalTeam = side === "home" ? homeTeam : awayTeam;
             return (
             <div
               className={`squad-pitch-token squad-pitch-token--${side}${
@@ -250,7 +250,7 @@ export function SquadPitch({
               style={{
                 left: `${slot.x}%`,
                 top: `${slot.y}%`,
-                ...teamKitInlineStyle(kitTeam, side)
+                ...teamKitInlineStyle(canonicalTeam, side, { homeTeam, awayTeam })
               }}
               onDragStart={
                 readOnly
@@ -259,7 +259,7 @@ export function SquadPitch({
                       writePlayerDragData(event.dataTransfer, {
                         playerId: Number(slot.playerId),
                         name: slot.label,
-                        teamName: slot.teamName ?? "",
+                        teamName: canonicalTeam,
                         role: slot.role,
                         jerseyNumber: slot.jerseyNumber ?? null,
                         fromPitch: true
