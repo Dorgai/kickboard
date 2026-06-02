@@ -6,7 +6,8 @@
   --color-surface: #ffffff;
   --color-bg: #f3f4f6;
   --color-text-primary: #111827;
-  --color-text-secondary: #6b7280;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
   --color-border: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
   --color-live: #10b981;
   --color-danger: #ef4444;
@@ -30,6 +31,7 @@
   --color-bg: #111827;
   --color-text-primary: #f9fafb;
   --color-text-secondary: #9ca3af;
+  --color-text-muted: #9ca3af;
   --color-border: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
   --color-live: #34d399;
   --color-danger: #f87171;
@@ -266,9 +268,13 @@ button:disabled {
   background: color-mix(in srgb, var(--color-bg) 60%, transparent);
 }
 
+.notifications-panel-item {
+  color: var(--color-text-primary);
+}
+
 .notifications-panel-item-meta {
   align-items: center;
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted, var(--color-text-secondary));
   display: flex;
   font-size: 10px;
   gap: 8px;
@@ -276,17 +282,19 @@ button:disabled {
 }
 
 .notifications-panel-category {
+  color: var(--color-text-primary);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .notifications-panel-item strong {
+  color: var(--color-text-primary);
   font-size: 13px;
 }
 
 .notifications-panel-body {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 68%, var(--color-text-secondary));
   font-size: 12px;
   line-height: 1.4;
 }
@@ -819,6 +827,12 @@ h3 {
 .surface-muted {
   background: color-mix(in srgb, var(--color-surface) 92%, var(--color-bg));
   box-shadow: var(--shadow-surface);
+  color: var(--color-text-primary);
+}
+
+.surface-muted p,
+.data-card p {
+  color: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-text-secondary));
 }
 
 .widget-elevated {
@@ -883,10 +897,20 @@ h3 {
 }
 
 .team-label-text {
+  color: var(--color-text-primary);
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+[data-theme="light"] .team-label-text,
+:root:not([data-theme]) .team-label-text {
+  color: #111827;
+}
+
+[data-theme="dark"] .team-label-text {
+  color: #f9fafb;
 }
 
 .team-label-stacked {
@@ -1515,12 +1539,17 @@ h3 {
   border: none;
   border-radius: 10px;
   box-shadow: var(--shadow-surface);
+  color: var(--color-text-primary);
   cursor: pointer;
   display: grid;
   gap: 4px;
   padding: 8px 10px;
   text-align: left;
   width: 100%;
+}
+
+.match-fixture-picker-btn .team-label-text {
+  color: var(--color-text-primary);
 }
 
 .match-fixture-picker-btn.selected {
@@ -1530,11 +1559,24 @@ h3 {
 }
 
 .match-fixture-picker-status {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 70%, var(--color-text-secondary));
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.match-fixture-picker-status[data-status="upcoming"] {
+  color: var(--color-brand);
+}
+
+[data-theme="light"] .match-fixture-picker-status[data-status="upcoming"],
+:root:not([data-theme]) .match-fixture-picker-status[data-status="upcoming"] {
+  color: #1a56db;
+}
+
+.match-fixture-picker-status[data-status="finished"] {
+  color: color-mix(in srgb, var(--color-text-primary) 75%, var(--color-text-secondary));
 }
 
 .match-fixture-picker-status[data-status="live"] {
@@ -1549,7 +1591,7 @@ h3 {
 }
 
 .match-fixture-picker-date {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
   font-size: 10px;
   line-height: 1.3;
 }
@@ -2805,7 +2847,7 @@ h3 {
 }
 
 .predictions-results-board-lead {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 68%, var(--color-text-secondary));
   font-size: 13px;
   line-height: 1.45;
   margin: 0;
@@ -3256,7 +3298,7 @@ h3 {
 .predictions-overview-count {
   background: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg));
   border-radius: 9999px;
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-text-secondary));
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
@@ -3266,7 +3308,7 @@ h3 {
 }
 
 .predictions-overview-empty {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 65%, var(--color-text-secondary));
   font-size: 12px;
   line-height: 1.45;
   margin: 0;
@@ -3675,10 +3717,21 @@ h3 {
   border: 1px solid var(--color-border);
   border-radius: 10px;
   box-shadow: none;
-  color: inherit;
+  color: var(--color-text-primary);
   cursor: pointer;
   font: inherit;
   text-align: left;
+}
+
+.match-fixture-btn .team-label-text {
+  color: var(--color-text-primary);
+}
+
+.match-fixture-btn--teams-stacked > span {
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .match-fixture-btn--compact.match-fixture-btn--teams-stacked {
@@ -3813,7 +3866,7 @@ h3 {
 }
 
 .match-fixture-date {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
   flex-shrink: 0;
   font-size: 10px;
   font-weight: 600;
@@ -3840,7 +3893,7 @@ h3 {
 }
 
 .group-stage-match-list button > span:last-child {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
   font-size: 12px;
 }
 
@@ -5861,7 +5914,7 @@ h3 {
 }
 
 .current-schedule-date {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-text-secondary));
   font-size: 12px;
 }
 
@@ -5885,13 +5938,13 @@ h3 {
 }
 
 .live-fixture-league {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-text-secondary));
   font-size: 12px;
   margin: 0;
 }
 
 .live-fixture-status {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 70%, var(--color-text-secondary));
   font-size: 13px;
   font-weight: 800;
   margin: 0;
@@ -5899,6 +5952,10 @@ h3 {
 
 .live-fixture-status[data-live="true"] {
   color: var(--color-live);
+}
+
+.live-fixture-status[data-live="false"] {
+  color: var(--color-brand);
 }
 
 .live-fixtures-requirements {
