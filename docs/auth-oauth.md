@@ -51,8 +51,11 @@ If Google shows **“doesn't comply with OAuth 2.0 policy”** or **Error 400: i
 
 1. Google Cloud → **APIs & Services** → **OAuth consent screen**.
 2. If **Publishing status** is **Testing**, only **Test users** can sign in.
-3. Under **Test users** → **Add users** → add `laszlo.dorgai@gmail.com` (every fan email you want during testing).
-4. Or complete verification and **Publish app** (needs privacy policy URL for public use).
+3. Under **Test users** → **Add users** → add each Gmail you want during testing.
+4. To allow **anyone** to sign in, follow **[Publish for production](publish-production.md)**:
+   - Set privacy policy to `https://<your-host>/privacy` (hosted by Kickboard).
+   - Set application home page to `https://<your-host>`.
+   - Click **Publish app** on the consent screen (External user type).
 
 ### B. Redirect URI mismatch
 

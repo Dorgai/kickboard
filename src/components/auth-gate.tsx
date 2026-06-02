@@ -68,11 +68,15 @@ export function AuthGate({
               </li>
             </ul>
             <p className="community-setup-note">
-              If Google shows &quot;Access blocked&quot;, add your Gmail under OAuth consent screen →{" "}
-              <strong>Test users</strong> (app in Testing mode). If you already did that, set Railway{" "}
-              <code>AUTH_URL</code> to this site&apos;s URL and check{" "}
-              <a href="/api/auth/providers">/api/auth/providers</a> (callback must not be <code>0.0.0.0</code>). See{" "}
-              <code>docs/auth-oauth.md</code>.
+              <strong>Only testers can sign in?</strong> In Google Cloud → OAuth consent screen, click{" "}
+              <strong>Publish app</strong> (leave Testing mode). Add{" "}
+              <a href="/privacy">Privacy Policy</a> and your site URL there — see{" "}
+              <code>docs/publish-production.md</code>.
+            </p>
+            <p className="community-setup-note">
+              If Google shows &quot;Access blocked&quot; while still in Testing, add Gmail under{" "}
+              <strong>Test users</strong>. Set Railway <code>AUTH_URL</code> to this site and check{" "}
+              <a href="/api/auth/providers">/api/auth/providers</a> (callback must not be <code>0.0.0.0</code>).
             </p>
           </div>
         ) : (

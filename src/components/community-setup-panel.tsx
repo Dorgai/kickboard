@@ -85,7 +85,26 @@ export function CommunitySetupPanel({
             <code>0.0.0.0</code>.
           </p>
         </div>
-      ) : null}
+      ) : (
+        <div className="admin-community-setup-steps">
+          <h3>Publish Google sign-in (not test-only)</h3>
+          <p>
+            OAuth is configured on Railway. To let <strong>any</strong> Google user sign in (not just test users),
+            publish the consent screen in Google Cloud and use these URLs:
+          </p>
+          <ul className="auth-oauth-setup-list">
+            <li>
+              Privacy policy: <a href="/privacy">/privacy</a>
+            </li>
+            <li>
+              Terms: <a href="/terms">/terms</a>
+            </li>
+          </ul>
+          <p className="admin-community-setup-note">
+            Step-by-step: <code>docs/publish-production.md</code> (Publish app, External users, matching redirect URIs).
+          </p>
+        </div>
+      )}
 
       {!health.schemaReady && health.database ? (
         <div className="admin-community-setup-steps">

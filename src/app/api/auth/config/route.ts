@@ -11,11 +11,17 @@ export async function GET() {
     !authUrlEnv && Boolean(process.env.NEXT_PUBLIC_APP_URL?.trim());
   const authSchema = await getAuthSchemaHealth();
 
+  const privacyPolicyUrl = baseUrl ? `${baseUrl}/privacy` : null;
+  const termsUrl = baseUrl ? `${baseUrl}/terms` : null;
+
   return NextResponse.json({
     oauthConfigured: isOAuthConfigured(),
     providers: isOAuthConfigured() ? ["google"] : [],
     authBaseUrl: baseUrl || null,
     googleRedirectUri: baseUrl ? `${baseUrl}/api/auth/callback/google` : null,
+    privacyPolicyUrl,
+    termsUrl,
+    applicationHomepageUrl: baseUrl || null,
     /** True when AUTH_URL or NEXTAUTH_URL is set (Auth.js reads these for redirect_uri). */
     authUrlConfigured: Boolean(authUrlEnv),
     /** Set when only NEXT_PUBLIC_APP_URL exists — server patches AUTH_URL at boot if possible. */
