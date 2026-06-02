@@ -8,6 +8,9 @@ import {
   type ScorerPick
 } from "@/lib/fixture-predictions/types";
 import { PREDICTION_BLOCKS, PREDICTION_BLOCK_SHORT } from "@/lib/fixture-predictions/labels";
+import { PredictionShareButtons } from "@/components/prediction-share-buttons";
+import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
+import type { PredictionSharePayload } from "@/lib/predictions/share";
 
 type CategoryStats = {
   won: number;
@@ -124,16 +127,39 @@ function formatPickSummary(pick: PredictionPickSummary) {
   return lines;
 }
 
+function pickToSharePayload(
+  pick: PredictionPickSummary,
+  displayName: string | null
+): PredictionSharePayload {
+  const { homeTeam, awayTeam } = parseFixtureKeyTeams(pick.fixtureKey);
+  return {
+    v: 1,
+    fixtureKey: pick.fixtureKey,
+    fixtureLabel: pick.fixtureLabel,
+    homeTeam,
+    awayTeam,
+    predictedOutcome: pick.predictedOutcome,
+    homeScore: pick.homeScore,
+    awayScore: pick.awayScore,
+    scorerPicks: pick.scorerPicks,
+    displayName
+  };
+}
+
 function PickCard({
   title,
   pick,
-  peer
+  peer,
+  shareDisplayName
 }: {
   title: string;
   pick: PredictionPickSummary;
   peer?: { displayName: string; username: string };
+  shareDisplayName?: string | null;
 }) {
   const lines = formatPickSummary(pick);
+  const sharePayload =
+    shareDisplayName !== undefined ? pickToSharePayload(pick, shareDisplayName) : null;
   return (
     <li className="predictions-overview-pick">
       <div className="predictions-overview-pick-main">
@@ -154,11 +180,18 @@ function PickCard({
           ))}
         </div>
       )}
+      {sharePayload ? (
+        <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
+      ) : null}
     </li>
   );
 }
 
-export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: PredictionsOverviewProps) {
+export function PredictionsOverview({
+  fixtureKey,
+  refreshToken = 0,
+  viewerDisplayName = null
+}: PredictionsOverviewProps & { viewerDisplayName?: string | null }) {
   const [data, setData] = useState<PredictionsOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -260,7 +293,12 @@ export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: Prediction
           ) : (
             <ul className="predictions-overview-list">
               {myPredictions.map((pick) => (
-                <PickCard key={pick.id} pick={pick} title={pick.fixtureLabel} />
+                <PickCard
+                  key={pick.id}
+                  pick={pick}
+                  shareDisplayName={viewerDisplayName}
+                  title={pick.fixtureLabel}
+                />
               ))}
             </ul>
           )}

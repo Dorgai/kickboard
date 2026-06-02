@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { AuthGate } from "@/components/auth-gate";
 import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
 import { PredictionsOverview } from "@/components/predictions-overview";
@@ -15,6 +16,7 @@ type PredictionsPanelProps = {
 };
 
 export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
+  const { data: session } = useSession();
   const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [overviewRefresh, setOverviewRefresh] = useState(0);
@@ -24,10 +26,23 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
       setSelectedKey(null);
       return;
     }
+    const fromQuery =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("predictionsFixture")?.trim()
+        : null;
+    if (fromQuery && fixtures.some((fixture) => fixture.key === fromQuery)) {
+      setSelectedKey(fromQuery);
+      if (typeof window !== "undefined" && window.location.hash.replace(/^#/, "") !== "predictions") {
+        window.location.hash = "predictions";
+      }
+      return;
+    }
     setSelectedKey((current) =>
       current && fixtures.some((fixture) => fixture.key === current) ? current : fixtures[0].key
     );
   }, [fixtures]);
+
+  const viewerDisplayName = session?.user?.name ?? null;
 
   const selected = fixtures.find((fixture) => fixture.key === selectedKey) ?? null;
 
@@ -60,7 +75,11 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
           </div>
         )}
 
-        <PredictionsOverview fixtureKey={selectedKey} refreshToken={overviewRefresh} />
+        <PredictionsOverview
+          fixtureKey={selectedKey}
+          refreshToken={overviewRefresh}
+          viewerDisplayName={viewerDisplayName}
+        />
 
         <p className="community-panel-lead predictions-settle-note">
           Points update after each match finishes. Until then, picks show as <strong>Pending</strong>.

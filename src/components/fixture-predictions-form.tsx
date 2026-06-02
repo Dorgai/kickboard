@@ -1,6 +1,9 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
+import { PredictionShareButtons } from "@/components/prediction-share-buttons";
+import type { PredictionSharePayload } from "@/lib/predictions/share";
 import { TeamLabel } from "@/components/team-label";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import { teamsMatch } from "@/lib/squads/team-names";
@@ -46,6 +49,7 @@ export function FixturePredictionsForm({
   coachBoard = false,
   onSaved
 }: FixturePredictionsFormProps) {
+  const { data: session } = useSession();
   const [predictedOutcome, setPredictedOutcome] = useState<FixtureOutcome | null>(null);
   const [homeScore, setHomeScore] = useState("");
   const [awayScore, setAwayScore] = useState("");
@@ -167,6 +171,33 @@ export function FixturePredictionsForm({
   }
 
   const groupedScorerPicks = useMemo(() => groupScorerPicks(scorerPicks), [scorerPicks]);
+
+  const sharePayload = useMemo((): PredictionSharePayload | null => {
+    const hasScore = homeScore !== "" && awayScore !== "";
+    if (!predictedOutcome && !hasScore && scorerPicks.length === 0) return null;
+    return {
+      v: 1,
+      fixtureKey,
+      fixtureLabel: `${homeTeam} vs ${awayTeam}`,
+      homeTeam,
+      awayTeam,
+      predictedOutcome,
+      homeScore: hasScore ? Number(homeScore) : null,
+      awayScore: hasScore ? Number(awayScore) : null,
+      scorerPicks: coachBoard ? [] : scorerPicks,
+      displayName: session?.user?.name ?? null
+    };
+  }, [
+    awayScore,
+    awayTeam,
+    coachBoard,
+    fixtureKey,
+    homeScore,
+    homeTeam,
+    predictedOutcome,
+    scorerPicks,
+    session?.user?.name
+  ]);
 
   async function savePick(event: FormEvent) {
     event.preventDefault();
@@ -373,6 +404,10 @@ export function FixturePredictionsForm({
         {notice ? <span className="fixture-prediction-notice">{notice}</span> : null}
         {error ? <span className="fixture-prediction-error">{error}</span> : null}
       </div>
+
+      {sharePayload && !loading ? (
+        <PredictionShareButtons disabled={busy} payload={sharePayload} />
+      ) : null}
     </form>
   );
 }

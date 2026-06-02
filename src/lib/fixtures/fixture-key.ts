@@ -80,6 +80,18 @@ export function fixtureKeyToShortLabel(fixtureKey: string) {
   return key;
 }
 
+export function parseFixtureKeyTeams(fixtureKey: string) {
+  const label = fixtureKeyToShortLabel(fixtureKey);
+  const vsIndex = label.toLowerCase().indexOf(" vs ");
+  if (vsIndex >= 0) {
+    const homeTeam = label.slice(0, vsIndex).trim();
+    const afterVs = label.slice(vsIndex + 4).trim();
+    const awayTeam = afterVs.split(" · ")[0]?.trim() ?? afterVs;
+    return { homeTeam: homeTeam || "Home", awayTeam: awayTeam || "Away" };
+  }
+  return { homeTeam: "Home", awayTeam: "Away" };
+}
+
 export function parseFixtureSortKey(date: string | null) {
   if (!date) return "9999-99-99";
   const parsed = Date.parse(date);
