@@ -272,7 +272,7 @@ export function SquadBuilder({
         />
 
         <div className="squad-builder-pitch-column">
-          <div className="squad-builder-pitch-row">
+          <div className="squad-builder-pitch-stage">
             <SquadPitch
               awayTeam={awayTeam}
               homeTeam={homeTeam}
@@ -281,13 +281,16 @@ export function SquadBuilder({
               onLineupChange={setLineup}
               onSelectSlot={setSelectedSlot}
             />
+          </div>
+          <aside className="squad-builder-predictions" aria-label="Predictions for this match">
+            <h4 className="squad-builder-predictions-title">Predictions for this match</h4>
             <FixturePredictionPick
               awayTeam={awayTeam}
               fixtureKey={fixtureKey}
               homeTeam={homeTeam}
-              inline
+              coachBoard
             />
-          </div>
+          </aside>
         </div>
       </div>
 

@@ -2120,26 +2120,37 @@ h3 {
 
 .squad-builder-pitch-column {
   display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.squad-builder-pitch-stage {
+  isolation: isolate;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.squad-builder-pitch-stage .squad-pitch-wrap {
+  min-width: 0;
+}
+
+.squad-builder-predictions {
+  display: grid;
   gap: 8px;
   min-width: 0;
+  width: 100%;
 }
 
-.squad-builder-pitch-row {
-  align-items: stretch;
-  display: grid;
-  gap: 10px;
-  grid-template-columns: minmax(0, 1fr) auto;
-  min-width: 0;
+.squad-builder-predictions-title {
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0;
 }
 
-.squad-builder-pitch-row .squad-pitch-wrap {
-  min-width: 0;
-}
-
-@media (max-width: 720px) {
-  .squad-builder-pitch-row {
-    grid-template-columns: 1fr;
-  }
+.squad-builder-predictions .fixture-predictions-form--coach-board {
+  width: 100%;
 }
 
 .squad-builder-grid {
@@ -2685,6 +2696,63 @@ h3 {
 .fixture-predictions-form--compact {
   gap: 10px;
   padding: 10px 12px;
+}
+
+/* Coach Board: full-width row under the pitch — outcome | score side by side */
+.fixture-predictions-form--coach-board {
+  box-sizing: border-box;
+  gap: 12px;
+  max-width: 100%;
+  padding: 12px 14px;
+}
+
+.fixture-predictions-form--coach-board .fixture-prediction-section {
+  min-width: 0;
+}
+
+.fixture-predictions-form--coach-board .fixture-prediction-save,
+.fixture-predictions-form--coach-board .fixture-prediction-notice,
+.fixture-predictions-form--coach-board .fixture-prediction-error {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 640px) {
+  .fixture-predictions-form--coach-board {
+    align-items: start;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 639px) {
+  .fixture-predictions-form--coach-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fixture-predictions-form--coach-board .fixture-outcome-picks {
+  gap: 8px;
+}
+
+.fixture-predictions-form--coach-board .fixture-prediction-scores {
+  align-items: center;
+}
+
+.fixture-predictions-form--coach-board .fixture-prediction-score-pair {
+  align-items: flex-end;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.fixture-predictions-form--coach-board .fixture-prediction-input {
+  font-size: clamp(1.25rem, 3vw, 1.65rem);
+  max-width: 3.5rem;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+
+.fixture-predictions-form--coach-board .fixture-prediction-separator {
+  font-size: 1.35rem;
+  padding-bottom: 0.45rem;
 }
 
 .fixture-prediction-section {

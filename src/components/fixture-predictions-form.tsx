@@ -18,6 +18,7 @@ type FixturePredictionsFormProps = {
   homeTeam: string;
   awayTeam: string;
   compact?: boolean;
+  coachBoard?: boolean;
   onSaved?: () => void;
 };
 
@@ -26,6 +27,7 @@ export function FixturePredictionsForm({
   homeTeam,
   awayTeam,
   compact = false,
+  coachBoard = false,
   onSaved
 }: FixturePredictionsFormProps) {
   const [predictedOutcome, setPredictedOutcome] = useState<FixtureOutcome | null>(null);
@@ -163,7 +165,7 @@ export function FixturePredictionsForm({
 
   return (
     <form
-      className={`fixture-predictions-form${compact ? " fixture-predictions-form--compact" : ""}`}
+      className={`fixture-predictions-form${compact ? " fixture-predictions-form--compact" : ""}${coachBoard ? " fixture-predictions-form--coach-board" : ""}`}
       onSubmit={savePick}
     >
       <section className="fixture-prediction-section">

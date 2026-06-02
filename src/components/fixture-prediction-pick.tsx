@@ -6,22 +6,27 @@ type FixturePredictionPickProps = {
   fixtureKey: string;
   homeTeam: string;
   awayTeam: string;
+  /** @deprecated Use coachBoard */
   inline?: boolean;
+  coachBoard?: boolean;
   onSaved?: () => void;
 };
 
-/** Coach Board / compact surface — outcome + score (scorers on Predictions tab). */
+/** Coach Board — outcome + score below the pitch (scorers on Predictions tab). */
 export function FixturePredictionPick({
   fixtureKey,
   homeTeam,
   awayTeam,
   inline = false,
+  coachBoard = false,
   onSaved
 }: FixturePredictionPickProps) {
+  const onCoachBoard = coachBoard || inline;
   return (
     <FixturePredictionsForm
       awayTeam={awayTeam}
-      compact={inline}
+      coachBoard={onCoachBoard}
+      compact={onCoachBoard}
       fixtureKey={fixtureKey}
       homeTeam={homeTeam}
       onSaved={onSaved}
