@@ -111,6 +111,20 @@ function main() {
   }
 
   const tried = [];
+  const webService = config.serviceName?.trim();
+
+  if (webService) {
+    tried.push(webService);
+    try {
+      const url = pickDatabaseUrl(listServiceVariables(webService));
+      if (url) {
+        process.stdout.write(url);
+        return;
+      }
+    } catch {
+      // try postgres plugin services next
+    }
+  }
 
   for (const serviceName of postgresServiceNames) {
     tried.push(serviceName);
