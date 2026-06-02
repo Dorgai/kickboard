@@ -1113,6 +1113,9 @@ h3 {
 
 .section-anchor,
 #bracket,
+#tournament,
+#coach-board,
+#predictions,
 #squads,
 #players,
 #community,
@@ -1127,6 +1130,146 @@ h3 {
 .predictions-section {
   display: grid;
   gap: 12px;
+}
+
+.current-event-tabs-layout {
+  position: relative;
+}
+
+.current-event-main-tabs {
+  margin-bottom: 4px;
+}
+
+.current-event-tab-panel {
+  display: grid;
+  gap: 16px;
+  min-height: 12rem;
+}
+
+.current-event-coach-tab {
+  display: grid;
+  gap: 16px;
+}
+
+.current-event-coach-tab .match-coach-row {
+  margin-bottom: 0;
+}
+
+.fan-chat-float-root {
+  pointer-events: none;
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 40;
+}
+
+.fan-chat-float-root * {
+  pointer-events: auto;
+}
+
+.fan-chat-float-fab {
+  align-items: center;
+  background: var(--color-brand);
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--color-brand) 45%, transparent);
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.fan-chat-float-fab--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.92);
+}
+
+.fan-chat-float-backdrop {
+  background: color-mix(in srgb, #000 35%, transparent);
+  border: none;
+  cursor: pointer;
+  inset: 0;
+  position: fixed;
+  z-index: 38;
+}
+
+.fan-chat-float-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px 14px 0 0;
+  box-shadow: -8px 0 32px color-mix(in srgb, #000 18%, transparent);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: min(85vh, 40rem);
+  max-height: calc(100vh - 32px);
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+  width: min(22rem, 100vw);
+  z-index: 39;
+}
+
+.fan-chat-float-panel--open {
+  transform: translateX(0);
+}
+
+.fan-chat-float-header {
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 14px;
+}
+
+.fan-chat-float-header h2 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.fan-chat-float-close {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: grid;
+  line-height: 0;
+  padding: 6px;
+  place-items: center;
+}
+
+.fan-chat-float-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 14px 16px;
+}
+
+@media (min-width: 1100px) {
+  .current-event-tabs-layout.fan-chat-dock-open {
+    padding-right: min(22rem, 28vw);
+  }
+
+  .fan-chat-float-panel {
+    border-radius: 14px 0 0 14px;
+    bottom: 16px;
+    height: min(80vh, 36rem);
+    right: 16px;
+    transform: translateX(calc(100% + 24px));
+  }
+
+  .fan-chat-float-panel--open {
+    transform: translateX(0);
+  }
+
+  .fan-chat-float-backdrop {
+    display: none;
+  }
 }
 
 .match-coach-row {

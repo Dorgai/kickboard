@@ -11,7 +11,14 @@ type AppChromeProps = {
 };
 
 const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "analytics"]);
-const CURRENT_EVENT_HASHES = new Set(["coach-board", "fan-chat", "predictions", "community"]);
+const CURRENT_EVENT_HASHES = new Set([
+  "tournament",
+  "bracket",
+  "coach-board",
+  "fan-chat",
+  "predictions",
+  "community"
+]);
 
 export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
   const [hash, setHash] = useState("");
@@ -47,14 +54,26 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
               activeNav === "Home" &&
               (item === "Home"
                 ? !hash || hash === "home"
-                : CURRENT_EVENT_HASHES.has(slug)
-                  ? hash === slug
-                  : PAST_EVENT_HASHES.has(hash) && hash === slug);
+                : item === "Bracket"
+                  ? hash === "tournament" || hash === "bracket"
+                  : item === "Community"
+                    ? hash === "community" || hash === "coach-board"
+                    : CURRENT_EVENT_HASHES.has(slug)
+                      ? hash === slug
+                      : PAST_EVENT_HASHES.has(hash) && hash === slug);
             return (
               <Link
                 key={item}
                 className={isActive ? "active" : ""}
-                href={item === "Home" ? "/" : `/#${slug}`}
+                href={
+                  item === "Home"
+                    ? "/"
+                    : item === "Bracket"
+                      ? "/#tournament"
+                      : item === "Community"
+                        ? "/#community"
+                        : `/#${slug}`
+                }
               >
                 {item}
               </Link>

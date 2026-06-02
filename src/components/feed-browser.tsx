@@ -8,9 +8,7 @@ import { MatchTeamStatsGrid } from "@/components/match-team-stats-grid";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
-import { FanChatPanel } from "@/components/fan-chat-panel";
-import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
-import { PredictionsPanel } from "@/components/predictions-panel";
+import { CurrentEventTabs } from "@/components/current-event-tabs";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
@@ -107,7 +105,14 @@ type CurrentWorldCup = {
 type EventTab = "current" | "past";
 
 const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "analytics"]);
-const CURRENT_EVENT_HASHES = new Set(["coach-board", "fan-chat", "predictions", "community"]);
+const CURRENT_EVENT_HASHES = new Set([
+  "tournament",
+  "bracket",
+  "coach-board",
+  "fan-chat",
+  "predictions",
+  "community"
+]);
 
 function hashTarget(): string | null {
   if (typeof window === "undefined") return null;
@@ -353,7 +358,7 @@ export function FeedBrowser() {
       {error ? <p className="inline-error">{error}</p> : null}
 
       {activeTab === "current" ? (
-        <CurrentEventPanel currentWorldCup={currentWorldCup} />
+        <CurrentEventTabs currentWorldCup={currentWorldCup} />
       ) : (
         <PastEventsPanel
           bracketRounds={bracketRounds}
@@ -381,122 +386,6 @@ export function FeedBrowser() {
         />
       )}
     </div>
-  );
-}
-
-const CURRENT_KNOCKOUT_STAGES = [
-  "Round of 32",
-  "Round of 16",
-  "Quarter-finals",
-  "Semi-finals",
-  "Final"
-] as const;
-
-function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldCup | null }) {
-  const groups = currentWorldCup?.groups ?? [];
-  const [activeGroupLetter, setActiveGroupLetter] = useState(groups[0]?.group ?? "A");
-  const [activeKnockoutStage, setActiveKnockoutStage] = useState<string>(CURRENT_KNOCKOUT_STAGES[0]);
-
-  useEffect(() => {
-    if (groups.length && !groups.some((group) => group.group === activeGroupLetter)) {
-      setActiveGroupLetter(groups[0].group);
-    }
-  }, [activeGroupLetter, groups]);
-
-  const activeGroup = groups.find((group) => group.group === activeGroupLetter);
-
-  return (
-    <section className="current-world-cup-card">
-      <div className="current-event-overview">
-        <p className="eyebrow">Current World Cup</p>
-        <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
-        {currentWorldCup?.note ? <p className="current-event-overview-note">{currentWorldCup.note}</p> : null}
-      </div>
-      <div className="current-summary-grid current-summary-grid--compact">
-        <SummaryTile compact label="Hosts" value={currentWorldCup?.summary.hostCountries ?? "—"} />
-        <SummaryTile compact label="Dates" value={currentWorldCup?.summary.dates ?? "—"} />
-        <SummaryTile compact label="Teams" value={currentWorldCup?.summary.teams ?? "—"} />
-        <SummaryTile compact label="Venues" value={currentWorldCup?.summary.venueCount ?? "—"} />
-      </div>
-
-      <section className="bracket-tree-card surface-muted current-event-bracket" id="bracket">
-        <div className="section-heading compact">
-          <div>
-            <p className="eyebrow">Tournament path</p>
-            <h2>Route to the final</h2>
-            <p>Use tabs to browse groups and knockout stages. Knockout pairings appear when live data connects.</p>
-          </div>
-        </div>
-
-        <div className="bracket-tabbed-section">
-          <h3 className="bracket-tabbed-heading">Group stage</h3>
-          {groups.length ? (
-            <>
-              <FeedTabBar
-                ariaLabel="Group stage groups"
-                className="bracket-stage-tabs"
-                tabs={groups.map((group) => ({
-                  id: group.group,
-                  label: `Group ${group.group}`
-                }))}
-                value={activeGroupLetter}
-                onChange={setActiveGroupLetter}
-              />
-              {activeGroup ? (
-                <div className="bracket-cluster">
-                  <div className="bracket-cluster-teams">
-                    {activeGroup.teams.map((team) => (
-                      <div className="bracket-team-slot" key={`${activeGroup.group}-${team}`}>
-                        <TeamLabel name={team} size="xs" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <button className="bracket-tbd-slot" disabled type="button">
-              <strong>Groups A–L</strong>
-              <span>Loading from public feed</span>
-            </button>
-          )}
-        </div>
-
-        <div className="bracket-tabbed-section">
-          <h3 className="bracket-tabbed-heading">Knockout</h3>
-          <FeedTabBar
-            ariaLabel="Knockout stages"
-            className="bracket-stage-tabs"
-            tabs={CURRENT_KNOCKOUT_STAGES.map((stage) => ({ id: stage, label: stage }))}
-            value={activeKnockoutStage}
-            onChange={setActiveKnockoutStage}
-          />
-          <button className="bracket-tbd-slot" disabled type="button">
-            <strong>Pairings TBD</strong>
-            <span>
-              {activeKnockoutStage === "Final" ? "July 19, 2026" : "Live feed pending"} · {activeKnockoutStage}
-            </span>
-          </button>
-        </div>
-      </section>
-
-      <MatchCoachBoardRow groups={groups} />
-
-      <section className="data-card surface-flat section-anchor fan-chat-section" id="fan-chat">
-        <h2>Fan Chat</h2>
-        <FanChatPanel />
-      </section>
-
-      <section className="data-card surface-flat section-anchor community-section" id="community">
-        <h2>Community</h2>
-        <CommunityConnectionsPanel />
-      </section>
-
-      <section className="data-card surface-flat section-anchor predictions-section" id="predictions">
-        <h2>Predictions</h2>
-        <PredictionsPanel groups={groups} />
-      </section>
-    </section>
   );
 }
 
