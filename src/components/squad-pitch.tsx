@@ -196,37 +196,39 @@ export function SquadPitch({
         <span className="squad-pitch-team-banner squad-pitch-team-banner--away">{awayTeam}</span>
 
         {!readOnly
-          ? lineup.map((slot, slotIndex) => (
-              <button
-                className={`squad-pitch-ghost${slot.label ? " squad-pitch-ghost--filled" : " squad-pitch-ghost--empty"}${
-                  selectedSlot === slot.slot ? " squad-pitch-ghost--selected" : ""
-                }`}
-                key={`ghost-${slot.slot}`}
-                style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
-                type="button"
-                onClick={() => onSelectSlot(slot.slot)}
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  event.dataTransfer.dropEffect = "copy";
-                }}
-                onDrop={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  if (slot.label) return;
-                  try {
-                    const player = readPlayerDragData(event.dataTransfer);
-                    if (!player || player.fromPitch) return;
-                    const playerSide = sideForPlayer(player, homeTeam, awayTeam);
-                    if (!playerSide || playerSide !== slotSide(slot)) return;
-                    assignPlayerAt(player, { x: slot.x, y: slot.y }, slotIndex);
-                  } catch {
-                    /* ignore */
-                  }
-                }}
-                aria-label={`${slotSide(slot)} ${playerRoleLabel(slot.role)} slot ${slot.slot}`}
-              />
-            ))
+          ? lineup.map((slot, slotIndex) => {
+              if (slot.label) return null;
+              return (
+                <button
+                  className={`squad-pitch-ghost squad-pitch-ghost--empty${
+                    selectedSlot === slot.slot ? " squad-pitch-ghost--selected" : ""
+                  }`}
+                  key={`ghost-${slot.slot}`}
+                  style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+                  type="button"
+                  onClick={() => onSelectSlot(slot.slot)}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.dataTransfer.dropEffect = "copy";
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    try {
+                      const player = readPlayerDragData(event.dataTransfer);
+                      if (!player || player.fromPitch) return;
+                      const playerSide = sideForPlayer(player, homeTeam, awayTeam);
+                      if (!playerSide || playerSide !== slotSide(slot)) return;
+                      assignPlayerAt(player, { x: slot.x, y: slot.y }, slotIndex);
+                    } catch {
+                      /* ignore */
+                    }
+                  }}
+                  aria-label={`${slotSide(slot)} ${playerRoleLabel(slot.role)} slot ${slot.slot}`}
+                />
+              );
+            })
           : null}
 
         {lineup
@@ -240,7 +242,7 @@ export function SquadPitch({
                 selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""
               }`}
               draggable={!readOnly}
-              key={slot.slot}
+              key={`token-${slot.slot}`}
               style={{
                 left: `${slot.x}%`,
                 top: `${slot.y}%`,

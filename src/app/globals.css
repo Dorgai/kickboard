@@ -2858,34 +2858,23 @@ h3 {
 .squad-pitch-token {
   position: absolute;
   transform: translate(-50%, -50%);
-  z-index: 2;
 }
 
 .squad-pitch-ghost {
-  align-items: center;
-  background: color-mix(in srgb, var(--color-surface) 25%, transparent);
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
   border: none;
   border-radius: 50%;
-  display: grid;
-  justify-items: center;
+  cursor: pointer;
   height: 10%;
   min-height: 1.4rem;
   min-width: 1.4rem;
+  opacity: 0;
+  outline: none;
   padding: 0;
   width: 10%;
-}
-
-.squad-pitch-ghost--empty {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  cursor: pointer;
-  opacity: 0;
-}
-
-.squad-pitch-ghost--filled {
-  opacity: 0.1;
-  pointer-events: none;
+  z-index: 1;
 }
 
 .squad-pitch-ghost--empty.squad-pitch-ghost--selected {
@@ -2893,9 +2882,9 @@ h3 {
   opacity: 0.35;
 }
 
-.squad-pitch-ghost--selected {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 45%, transparent);
+.squad-pitch-ghost:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  opacity: 0.35;
 }
 
 .squad-pitch-token {
@@ -2916,12 +2905,18 @@ h3 {
   height: 2.15rem;
   justify-items: center;
   min-width: 3.1rem;
+  outline: none;
   padding: 2px 10px 4px;
   user-select: none;
   width: auto;
+  z-index: 2;
 }
 
 .squad-pitch-token--selected {
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--pitch-kit-primary, #3b82f6) 45%, transparent);
+}
+
+.squad-pitch-token:focus-visible {
   box-shadow:
     0 6px 18px color-mix(in srgb, var(--pitch-kit-primary, #3b82f6) 45%, transparent),
     0 0 0 2px color-mix(in srgb, var(--color-accent) 55%, transparent);
