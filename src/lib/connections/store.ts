@@ -137,14 +137,16 @@ export async function createConnectionRequest(requesterId: string, addresseeUser
     if (existing.status === "pending") throw new Error("REQUEST_ALREADY_PENDING");
   }
 
-  const inserted = await query<{ id: string }>(
+  const inserted = await query<{ id: string; addressee_id: string }>(
     `INSERT INTO connections (requester_id, addressee_id, status)
      VALUES ($1, $2, 'pending')
-     RETURNING id`,
+     RETURNING id, addressee_id`,
     [requesterId, peer.id]
   );
 
-  return inserted.rows[0]?.id ?? null;
+  const row = inserted.rows[0];
+  if (!row) return null;
+  return { connectionId: row.id, addresseeId: row.addressee_id };
 }
 
 export async function respondToConnectionRequest(
@@ -183,7 +185,11 @@ export async function respondToConnectionRequest(
        WHERE id = $1`,
       [connectionId]
     );
-    return { status: "accepted" as const };
+    return {
+      status: "accepted" as const,
+      requesterId: connection.requester_id,
+      addresseeId: connection.addressee_id
+    };
   }
 
   if (action === "block") {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { mapConnectionError } from "@/lib/connections/errors";
 import { cancelOutgoingRequest, respondToConnectionRequest } from "@/lib/connections/store";
+import { notifyConnectionAccepted } from "@/lib/push/connection-notify";
 import { mapDatabaseError } from "@/lib/community/health";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +33,10 @@ export async function PATCH(request: Request, context: RouteContext) {
     const result = await respondToConnectionRequest(connectionId, user.id, action);
     if (!result) {
       return NextResponse.json({ error: "Connection not found." }, { status: 404 });
+    }
+
+    if (result.status === "accepted" && "requesterId" in result) {
+      notifyConnectionAccepted(result.requesterId, result.addresseeId);
     }
 
     return NextResponse.json({ status: result.status, message: "Connection updated." });

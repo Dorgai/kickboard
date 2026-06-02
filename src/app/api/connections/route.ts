@@ -5,6 +5,7 @@ import {
   createConnectionRequest,
   listConnectionsForUser
 } from "@/lib/connections/store";
+import { notifyIncomingConnectionRequest } from "@/lib/push/connection-notify";
 import { mapDatabaseError } from "@/lib/community/health";
 
 export const dynamic = "force-dynamic";
@@ -45,11 +46,12 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as { username?: string };
-    const connectionId = await createConnectionRequest(user.id, body.username ?? "");
-    if (!connectionId) {
+    const created = await createConnectionRequest(user.id, body.username ?? "");
+    if (!created) {
       return NextResponse.json({ error: "Unable to send request." }, { status: 500 });
     }
-    return NextResponse.json({ connectionId, message: "Connection request sent." });
+    notifyIncomingConnectionRequest(created.addresseeId, user.id);
+    return NextResponse.json({ connectionId: created.connectionId, message: "Connection request sent." });
   } catch (error) {
     const connectionMapped = mapConnectionError(error);
     if (connectionMapped) {
