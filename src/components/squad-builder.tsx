@@ -249,7 +249,6 @@ export function SquadBuilder({
     <form className="squad-builder" onSubmit={saveSquad}>
       <header className="squad-builder-toolbar">
         <div className="squad-builder-toolbar-title">
-          <h3>Build both XIs</h3>
           <p className="squad-builder-progress">
             {homeTeam} {homeFilled}/{SLOTS_PER_TEAM} ({formations.home}) · {awayTeam} {awayFilled}/
             {SLOTS_PER_TEAM} ({formations.away})
