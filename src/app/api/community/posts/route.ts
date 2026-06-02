@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { mapDatabaseError } from "@/lib/community/health";
 import { createTextPost, listApprovedPosts } from "@/lib/community/posts";
+import { requireAuthUser } from "@/lib/auth/require-user";
 import { getCommunitySessionUserId } from "@/lib/community/session";
 import { findUserById } from "@/lib/community/users";
 import { isDatabaseConfigured } from "@/lib/db";
@@ -29,12 +30,17 @@ export async function POST(request: Request) {
   }
 
   try {
-    const userId = await getCommunitySessionUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Sign in to the community first." }, { status: 401 });
+    const authUser = await requireAuthUser();
+    const legacyUserId = authUser?.id ?? (await getCommunitySessionUserId());
+    if (!legacyUserId) {
+      return NextResponse.json({ error: "Sign in with Google to post." }, { status: 401 });
     }
 
-    const user = await findUserById(userId);
+    if (authUser && !authUser.onboardingComplete) {
+      return NextResponse.json({ error: "Complete onboarding (birth year) first." }, { status: 403 });
+    }
+
+    const user = await findUserById(legacyUserId);
     if (!user || user.is_suspended) {
       return NextResponse.json({ error: "Account cannot post." }, { status: 403 });
     }
@@ -46,7 +52,7 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as { body?: string };
     const body = payload.body ?? "";
 
-    const post = await createTextPost(userId, body);
+    const post = await createTextPost(legacyUserId, body);
 
     return NextResponse.json({
       ok: true,
