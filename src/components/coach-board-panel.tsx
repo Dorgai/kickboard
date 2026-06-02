@@ -133,7 +133,7 @@ export function CoachBoardPanel({
           onSaved={handleSquadSaved}
         />
 
-        <FriendsMatchActivity fixtureKey={fixtureKey} />
+        <FriendsMatchActivity awayTeam={awayTeam} fixtureKey={fixtureKey} homeTeam={homeTeam} />
 
         <div className="coach-board-feed">
           <h3>Approved feed</h3>

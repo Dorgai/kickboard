@@ -1,7 +1,13 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { clampPitchCoord, type SquadLineupSlot } from "@/lib/squads/lineup";
+import {
+  clampPitchCoord,
+  slotSide,
+  SLOTS_PER_TEAM,
+  type SquadLineupSlot
+} from "@/lib/squads/lineup";
+import { teamsMatch } from "@/lib/squads/team-names";
 
 const DRAG_PLAYER_MIME = "application/x-kickboard-player";
 
@@ -11,10 +17,13 @@ export type PitchDragPlayer = {
   teamName: string;
   role: SquadLineupSlot["role"];
   jerseyNumber: number | null;
+  fromPitch?: boolean;
 };
 
 type SquadPitchProps = {
   lineup: SquadLineupSlot[];
+  homeTeam: string;
+  awayTeam: string;
   selectedSlot: number | null;
   onSelectSlot: (slot: number | null) => void;
   onLineupChange: (lineup: SquadLineupSlot[]) => void;
@@ -27,14 +36,31 @@ function coordsFromPointer(pitch: DOMRect, clientX: number, clientY: number) {
   return { x, y };
 }
 
-function nearestEmptySlot(lineup: SquadLineupSlot[], role?: SquadLineupSlot["role"]) {
-  const byRole = lineup.findIndex((slot) => !slot.label && (!role || slot.role === role));
+function nearestEmptySlot(
+  lineup: SquadLineupSlot[],
+  side: SquadLineupSlot["side"],
+  role?: SquadLineupSlot["role"]
+) {
+  const byRole = lineup.findIndex(
+    (slot) =>
+      !slot.label &&
+      slotSide(slot) === side &&
+      (!role || slot.role === role)
+  );
   if (byRole >= 0) return byRole;
-  return lineup.findIndex((slot) => !slot.label);
+  return lineup.findIndex((slot) => !slot.label && slotSide(slot) === side);
+}
+
+function sideForPlayer(player: PitchDragPlayer, homeTeam: string, awayTeam: string) {
+  if (teamsMatch(player.teamName, homeTeam)) return "home" as const;
+  if (teamsMatch(player.teamName, awayTeam)) return "away" as const;
+  return null;
 }
 
 export function SquadPitch({
   lineup,
+  homeTeam,
+  awayTeam,
   selectedSlot,
   onSelectSlot,
   onLineupChange,
@@ -45,15 +71,16 @@ export function SquadPitch({
 
   const assignPlayerAt = useCallback(
     (player: PitchDragPlayer, coords: { x: number; y: number }, targetSlot?: number) => {
+      const playerSide = sideForPlayer(player, homeTeam, awayTeam);
+      if (!playerSide) return;
+
       const slotIndex =
         targetSlot !== undefined
           ? targetSlot
-          : nearestEmptySlot(
-              lineup,
-              player.role
-            );
+          : nearestEmptySlot(lineup, playerSide, player.role);
 
       if (slotIndex < 0) return;
+      if (slotSide(lineup[slotIndex]) !== playerSide) return;
 
       const next = lineup.map((slot, index) => {
         if (index === slotIndex) {
@@ -75,9 +102,9 @@ export function SquadPitch({
       });
 
       onLineupChange(next);
-      onSelectSlot(slotIndex + 1);
+      onSelectSlot(lineup[slotIndex]?.slot ?? slotIndex + 1);
     },
-    [lineup, onLineupChange, onSelectSlot]
+    [awayTeam, homeTeam, lineup, onLineupChange, onSelectSlot]
   );
 
   const moveSlot = useCallback(
@@ -126,8 +153,14 @@ export function SquadPitch({
 
     try {
       const player = JSON.parse(raw) as PitchDragPlayer;
+      if (player.fromPitch) return;
       const coords = coordsFromPointer(pitch, event.clientX, event.clientY);
-      assignPlayerAt(player, coords);
+      const dropSide: SquadLineupSlot["side"] = coords.y < 50 ? "home" : "away";
+      const playerSide = sideForPlayer(player, homeTeam, awayTeam);
+      if (!playerSide || playerSide !== dropSide) return;
+
+      const targetSlot = nearestEmptySlot(lineup, playerSide, player.role);
+      assignPlayerAt(player, coords, targetSlot >= 0 ? targetSlot : undefined);
     } catch {
       /* ignore malformed drag payload */
     }
@@ -137,12 +170,13 @@ export function SquadPitch({
     <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
       {!readOnly ? (
         <p className="squad-pitch-hint squad-pitch-hint--compact">
-          Drag players onto a role slot. Change formation to update placeholders.
+          Drag from each team&apos;s bench onto their half. Click a player or drag back to the bench to
+          remove.
         </p>
       ) : null}
       <div
-        aria-label="Football pitch"
-        className="squad-pitch"
+        aria-label="Football pitch with home and away teams"
+        className="squad-pitch squad-pitch--dual"
         onDragOver={readOnly ? undefined : handleDragOver}
         onDrop={readOnly ? undefined : handleDrop}
         ref={pitchRef}
@@ -155,6 +189,10 @@ export function SquadPitch({
         <div className="squad-pitch-box squad-pitch-box--bottom" aria-hidden />
         <div className="squad-pitch-goal-area squad-pitch-goal-area--top" aria-hidden />
         <div className="squad-pitch-goal-area squad-pitch-goal-area--bottom" aria-hidden />
+        <div className="squad-pitch-half-line" aria-hidden />
+
+        <span className="squad-pitch-team-banner squad-pitch-team-banner--home">{homeTeam}</span>
+        <span className="squad-pitch-team-banner squad-pitch-team-banner--away">{awayTeam}</span>
 
         {!readOnly
           ? lineup.map((slot) => (
@@ -166,7 +204,7 @@ export function SquadPitch({
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 type="button"
                 onClick={() => onSelectSlot(slot.slot)}
-                aria-label={`${slot.role} slot ${slot.slot}`}
+                aria-label={`${slotSide(slot)} ${slot.role} slot ${slot.slot}`}
               >
                 {!slot.label ? (
                   <span className="squad-pitch-placeholder-role" aria-hidden>
@@ -181,14 +219,38 @@ export function SquadPitch({
           .filter((slot) => slot.label)
           .map((slot) => (
             <div
-              className={`squad-pitch-token${selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""}`}
+              className={`squad-pitch-token squad-pitch-token--${slotSide(slot)}${
+                selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""
+              }`}
+              draggable={!readOnly}
               key={slot.slot}
               style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+              onDragStart={
+                readOnly
+                  ? undefined
+                  : (event) => {
+                      event.dataTransfer.setData(
+                        DRAG_PLAYER_MIME,
+                        JSON.stringify({
+                          playerId: Number(slot.playerId),
+                          name: slot.label,
+                          teamName: slot.teamName ?? "",
+                          role: slot.role,
+                          jerseyNumber: slot.jerseyNumber ?? null,
+                          fromPitch: true
+                        } satisfies PitchDragPlayer)
+                      );
+                      event.dataTransfer.effectAllowed = "move";
+                    }
+              }
               onPointerDown={
                 readOnly
                   ? undefined
                   : (event) => {
                       if (event.button !== 0) return;
+                      const startX = event.clientX;
+                      const startY = event.clientY;
+                      let moved = false;
                       event.preventDefault();
                       setDraggingSlot(slot.slot);
                       onSelectSlot(slot.slot);
@@ -196,6 +258,12 @@ export function SquadPitch({
                       if (!pitch) return;
 
                       const onMove = (moveEvent: PointerEvent) => {
+                        if (
+                          Math.abs(moveEvent.clientX - startX) > 4 ||
+                          Math.abs(moveEvent.clientY - startY) > 4
+                        ) {
+                          moved = true;
+                        }
                         moveSlot(
                           slot.slot,
                           coordsFromPointer(pitch, moveEvent.clientX, moveEvent.clientY)
@@ -206,6 +274,9 @@ export function SquadPitch({
                         setDraggingSlot(null);
                         window.removeEventListener("pointermove", onMove);
                         window.removeEventListener("pointerup", onUp);
+                        if (!moved) {
+                          clearSlot(slot.slot);
+                        }
                       };
 
                       window.addEventListener("pointermove", onMove);
@@ -238,4 +309,4 @@ export function SquadPitch({
   );
 }
 
-export { DRAG_PLAYER_MIME };
+export { DRAG_PLAYER_MIME, SLOTS_PER_TEAM };

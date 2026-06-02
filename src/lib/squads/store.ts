@@ -1,8 +1,9 @@
 import { query } from "@/lib/db";
 import { getDefaultTournamentId } from "@/lib/auth/users";
 import {
-  defaultLineupWithPositions,
+  defaultMatchLineupWithPositions,
   isValidFormation,
+  MATCH_LINEUP_SIZE,
   normalizeLineupSlots,
   type SquadFormation,
   type SquadLineupSlot
@@ -12,16 +13,17 @@ export type { SquadFormation, SquadLineupSlot } from "@/lib/squads/lineup";
 export { FORMATIONS, isValidFormation } from "@/lib/squads/lineup";
 
 export function defaultLineupForFormation(formation: SquadFormation): SquadLineupSlot[] {
-  return defaultLineupWithPositions(formation);
+  return defaultMatchLineupWithPositions(formation);
 }
 
 function serializeLineup(lineup: SquadLineupSlot[]) {
-  return lineup.slice(0, 11).map((slot, index) => ({
-    slot: index + 1,
+  return lineup.slice(0, MATCH_LINEUP_SIZE).map((slot) => ({
+    slot: slot.slot,
     label: slot.label.trim().slice(0, 80),
     role: slot.role,
     x: slot.x,
     y: slot.y,
+    side: slot.side,
     ...(slot.playerId !== undefined ? { playerId: slot.playerId } : {}),
     ...(slot.teamName ? { teamName: slot.teamName.slice(0, 80) } : {}),
     ...(slot.jerseyNumber !== undefined ? { jerseyNumber: slot.jerseyNumber } : {})
@@ -78,7 +80,7 @@ export async function publishSquadToBoard(squadId: string, userId: string) {
   const lineup = normalizeLineupSlots(row.lineup, formation);
   const summary = lineup
     .filter((slot) => slot.label)
-    .map((slot) => `${slot.role}: ${slot.label}`)
+    .map((slot) => `${slot.side === "away" ? "A" : "H"} ${slot.role}: ${slot.label}`)
     .join(" · ");
 
   const body = `${row.name} (${row.formation})${summary ? ` — ${summary}` : ""}`.slice(0, 280);

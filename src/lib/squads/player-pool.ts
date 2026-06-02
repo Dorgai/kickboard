@@ -1,5 +1,6 @@
 import { primaryLineupPosition } from "@/lib/lineup-position-groups";
 import { getLineups, getMatches, getWorldCupCompetitions } from "@/lib/statsbomb";
+import { teamsMatch } from "@/lib/squads/team-names";
 
 export type SquadPoolPlayer = {
   playerId: number;
@@ -74,6 +75,102 @@ export async function getWorldCupSquadPlayerPool(options?: {
     seasonName: competition.season_name,
     matchId: finalMatch.match_id,
     matchLabel: `${finalMatch.home_team.home_team_name} vs ${finalMatch.away_team.away_team_name}`,
+    players
+  };
+}
+
+function addPlayersFromLineups(
+  byId: Map<number, SquadPoolPlayer>,
+  lineups: Awaited<ReturnType<typeof getLineups>>,
+  allowedTeams: string[]
+) {
+  for (const team of lineups) {
+    const allowed = allowedTeams.some((name) => teamsMatch(team.team_name, name));
+    if (!allowed) continue;
+
+    for (const player of team.lineup) {
+      if (!player.player_id || byId.has(player.player_id)) continue;
+      byId.set(player.player_id, {
+        playerId: player.player_id,
+        name: player.player_nickname?.trim() || player.player_name,
+        teamName: team.team_name,
+        role: mapRole(primaryLineupPosition(player.positions)),
+        jerseyNumber: player.jersey_number ?? null
+      });
+    }
+  }
+}
+
+/**
+ * Players for the two fixture teams (StatsBomb WC open data). Falls back to scanning
+ * the tournament when an exact match pairing is not found.
+ */
+export async function getFixtureSquadPlayerPool(homeTeam: string, awayTeam: string) {
+  const home = homeTeam.trim();
+  const away = awayTeam.trim();
+  if (!home || !away) {
+    throw new Error("TEAMS_REQUIRED");
+  }
+
+  const competitions = await getWorldCupCompetitions();
+  const competition =
+    competitions.find((entry) => entry.match_available) ?? competitions[0];
+
+  if (!competition) {
+    throw new Error("NO_WORLD_CUP_DATA");
+  }
+
+  const matches = await getMatches(competition.competition_id, competition.season_id);
+  if (!matches.length) {
+    throw new Error("NO_MATCHES");
+  }
+
+  const allowedTeams = [home, away];
+  const fixtureMatch =
+    matches.find((match) => {
+      const matchHome = match.home_team.home_team_name;
+      const matchAway = match.away_team.away_team_name;
+      return (
+        (teamsMatch(matchHome, home) && teamsMatch(matchAway, away)) ||
+        (teamsMatch(matchHome, away) && teamsMatch(matchAway, home))
+      );
+    }) ?? null;
+
+  const byId = new Map<number, SquadPoolPlayer>();
+
+  if (fixtureMatch) {
+    const lineups = await getLineups(fixtureMatch.match_id);
+    addPlayersFromLineups(byId, lineups, allowedTeams);
+  } else {
+    for (const match of matches) {
+      const lineups = await getLineups(match.match_id);
+      addPlayersFromLineups(byId, lineups, allowedTeams);
+      if (byId.size >= 46) break;
+    }
+  }
+
+  const players = Array.from(byId.values()).sort((a, b) => {
+    const aHome = teamsMatch(a.teamName, home);
+    const bHome = teamsMatch(b.teamName, home);
+    if (aHome !== bHome) return aHome ? -1 : 1;
+    const byTeam = a.teamName.localeCompare(b.teamName, undefined, { sensitivity: "base" });
+    if (byTeam !== 0) return byTeam;
+    return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+  });
+
+  const matchLabel = fixtureMatch
+    ? `${fixtureMatch.home_team.home_team_name} vs ${fixtureMatch.away_team.away_team_name}`
+    : `${home} vs ${away}`;
+
+  return {
+    source: "statsbomb/open-data",
+    competitionId: competition.competition_id,
+    seasonId: competition.season_id,
+    seasonName: competition.season_name,
+    matchId: fixtureMatch?.match_id ?? null,
+    matchLabel,
+    homeTeam: home,
+    awayTeam: away,
     players
   };
 }

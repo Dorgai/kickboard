@@ -22,9 +22,11 @@ type PeerMatchActivity = {
 
 type FriendsMatchActivityProps = {
   fixtureKey: string;
+  homeTeam: string;
+  awayTeam: string;
 };
 
-export function FriendsMatchActivity({ fixtureKey }: FriendsMatchActivityProps) {
+export function FriendsMatchActivity({ fixtureKey, homeTeam, awayTeam }: FriendsMatchActivityProps) {
   const [peers, setPeers] = useState<PeerMatchActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -176,6 +178,8 @@ export function FriendsMatchActivity({ fixtureKey }: FriendsMatchActivityProps) 
                         {expandedLineup.name} ({expandedLineup.formation})
                       </p>
                       <SquadPitch
+                        awayTeam={awayTeam}
+                        homeTeam={homeTeam}
                         lineup={expandedLineup.lineup}
                         readOnly
                         selectedSlot={null}

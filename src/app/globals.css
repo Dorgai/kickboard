@@ -1843,6 +1843,10 @@ h3 {
   min-width: 0;
 }
 
+.squad-builder-pitch-row .squad-pitch-wrap {
+  min-width: 0;
+}
+
 @media (max-width: 720px) {
   .squad-builder-pitch-row {
     grid-template-columns: 1fr;
@@ -1887,9 +1891,38 @@ h3 {
   border-radius: 10px;
   display: grid;
   gap: 8px;
-  max-height: 28rem;
-  overflow: hidden;
+  max-height: 32rem;
+  overflow: auto;
   padding: 10px;
+}
+
+.squad-player-bench-drop {
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.squad-player-bench-drop--active {
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+.squad-player-team-section {
+  display: grid;
+  gap: 6px;
+}
+
+.squad-player-team-heading {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  margin: 0;
+  text-transform: uppercase;
 }
 
 .squad-player-pool-header h4 {
@@ -1936,8 +1969,21 @@ h3 {
 }
 
 .squad-player-chip--on-pitch {
-  cursor: default;
-  opacity: 0.45;
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  cursor: pointer;
+  opacity: 0.72;
+}
+
+.squad-player-chip-number {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.squad-player-chip-on-pitch {
+  color: var(--color-accent);
+  font-size: 9px;
+  font-weight: 700;
 }
 
 .squad-player-chip-role {
@@ -2066,6 +2112,49 @@ h3 {
 
 .squad-pitch-goal-area--bottom {
   bottom: 0;
+}
+
+.squad-pitch--dual .squad-pitch-half-line {
+  background: color-mix(in srgb, #fff 35%, transparent);
+  height: 2px;
+  left: 4%;
+  pointer-events: none;
+  position: absolute;
+  right: 4%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.squad-pitch-team-banner {
+  color: color-mix(in srgb, #fff 92%, var(--color-bg));
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  pointer-events: none;
+  position: absolute;
+  text-shadow: 0 1px 3px color-mix(in srgb, #000 50%, transparent);
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+.squad-pitch-team-banner--home {
+  left: 8px;
+  top: 8px;
+}
+
+.squad-pitch-team-banner--away {
+  bottom: 8px;
+  left: 8px;
+}
+
+.squad-pitch-token--home {
+  border-color: color-mix(in srgb, #60a5fa 75%, #fff);
+}
+
+.squad-pitch-token--away {
+  border-color: color-mix(in srgb, #f87171 75%, #fff);
 }
 
 .squad-pitch-ghost,

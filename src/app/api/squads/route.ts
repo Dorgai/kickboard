@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { mapDatabaseError } from "@/lib/community/health";
+import { MATCH_LINEUP_SIZE } from "@/lib/squads/lineup";
 import {
   createUserSquad,
   defaultLineupForFormation,
@@ -66,7 +67,8 @@ export async function POST(request: Request) {
     }
 
     const lineup =
-      Array.isArray(body.lineup) && body.lineup.length === 11
+      Array.isArray(body.lineup) &&
+      (body.lineup.length === MATCH_LINEUP_SIZE || body.lineup.length === 11)
         ? body.lineup
         : defaultLineupForFormation(formation);
 
