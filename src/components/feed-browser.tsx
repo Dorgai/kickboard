@@ -8,7 +8,9 @@ import { MatchTeamStatsGrid } from "@/components/match-team-stats-grid";
 import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-launcher";
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
-import { CommunityPanel } from "@/components/community-panel";
+import { CoachBoardPanel } from "@/components/coach-board-panel";
+import { FanChatPanel } from "@/components/fan-chat-panel";
+import { PredictionsPanel } from "@/components/predictions-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
 type WorldCupCompetition = {
@@ -105,7 +107,7 @@ type CurrentWorldCup = {
 type EventTab = "current" | "past";
 
 const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "analytics"]);
-const CURRENT_EVENT_HASHES = new Set(["community"]);
+const CURRENT_EVENT_HASHES = new Set(["coach-board", "fan-chat", "predictions", "community"]);
 
 function hashTarget(): string | null {
   if (typeof window === "undefined") return null;
@@ -498,9 +500,19 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
         </div>
       </section>
 
-      <section className="data-card surface-flat section-anchor community-section" id="community">
-        <h2>Community</h2>
-        <CommunityPanel />
+      <section className="data-card surface-flat section-anchor coach-board-section" id="coach-board">
+        <h2>Coach Board</h2>
+        <CoachBoardPanel />
+      </section>
+
+      <section className="data-card surface-flat section-anchor fan-chat-section" id="fan-chat">
+        <h2>Fan Chat</h2>
+        <FanChatPanel />
+      </section>
+
+      <section className="data-card surface-flat section-anchor predictions-section" id="predictions">
+        <h2>Predictions</h2>
+        <PredictionsPanel />
       </section>
     </section>
   );

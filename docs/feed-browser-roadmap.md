@@ -32,23 +32,25 @@ This tracks the homepage feed browser against `README.md` and product cards in `
 | Current knockout pairings | TBD slots until live fixture mapping from API-Football |
 | Realtime on Current tab | Live panel added; depends on `API_FOOTBALL_KEY` + worker |
 
-## Community (in progress)
+## Community & engagement (phase 1 shipped)
 
 | Feature | Status |
 |---------|--------|
-| Coach Board feed (approved posts) | `CommunityPanel` + `/api/community/posts` |
-| Join / session (birth year gate) | `/api/community/session` |
-| Moderation-first posting | New posts default `withheld`; admin approve |
-| Report post | `/api/community/posts/[id]/report` |
-| Admin moderation queue | `/admin/data-sources` + `/api/admin/community/posts` |
+| Google OAuth + birth-year onboarding | NextAuth + `/api/auth/onboarding` — see [`docs/auth-oauth.md`](auth-oauth.md) |
+| Coach Board (squad builder + feed) | `CoachBoardPanel`, `/api/squads`, `squad_share` posts |
+| Fan Chat (text posts) | `FanChatPanel`, `/api/community/posts` |
+| Predictions (points, not betting) | `PredictionsPanel` placeholder; tables ready |
+| Moderation | Withheld by default; admin approve |
+| Legacy join (dev) | `/api/community/session` when OAuth not configured |
 
-Requires Postgres (`db/schema.sql`, `db/community-extensions.sql`) and `JWT_SECRET`. See [`docs/community.md`](community.md).
+Requires Postgres (`db/schema.sql`, `db/community-extensions.sql`, `db/auth-extensions.sql`), `JWT_SECRET`, and `GOOGLE_CLIENT_*` for OAuth.
 
 ## Later phase (documented, not started)
 
 - Widget dashboard (`docs/widget-contract.md`)
-- Squad share post type, comments, reactions
-- Virtual wallet & predictions
+- Prediction settlement worker + leaderboard widget
+- Comments, reactions, player-linked squads
+- Virtual wallet UI
 - Pro analytics / FastAPI service
 - User auth, Fan Mode, Stripe tiers
 - UserStatCard export, portrait pipeline

@@ -25,7 +25,7 @@ if (/\.railway\.internal\b/i.test(databaseUrl) || /postgres\.railway\.internal/i
   process.exit(1);
 }
 
-const files = ["db/schema.sql", "db/community-extensions.sql"];
+const files = ["db/schema.sql", "db/community-extensions.sql", "db/auth-extensions.sql"];
 
 async function applyFile(client, relativePath) {
   const absolutePath = path.join(root, relativePath);

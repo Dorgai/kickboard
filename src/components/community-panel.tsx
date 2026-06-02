@@ -29,7 +29,7 @@ type CommunityStatus = {
   message: string;
 };
 
-export function CommunityPanel() {
+export function CommunityPanel({ embedded = false }: { embedded?: boolean }) {
   const [status, setStatus] = useState<CommunityStatus | null>(null);
   const [user, setUser] = useState<CommunityUser | null>(null);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
@@ -88,7 +88,7 @@ export function CommunityPanel() {
       }
 
       setUser(payload.user ?? null);
-      setNotice("You can post on the Coach Board. Posts are reviewed before they go live.");
+      setNotice("You can post on Fan Chat. Posts are reviewed before they go live.");
       await refresh();
     } catch (joinError) {
       setError(joinError instanceof Error ? joinError.message : "Unable to join.");
@@ -188,32 +188,38 @@ export function CommunityPanel() {
 
   return (
     <div className="community-panel">
-      <header className="community-panel-header">
-        <div>
-          <p className="eyebrow">Coach Board</p>
-          <p className="community-panel-lead">
-            Share match takes and squad ideas. Every post is held for moderation before it appears here.
-          </p>
-        </div>
-        {user ? (
-          <div className="community-session-chip">
-            <span>{user.displayName}</span>
-            <button className="text-button" type="button" onClick={handleSignOut}>
-              Sign out
-            </button>
+      {!embedded ? (
+        <header className="community-panel-header">
+          <div>
+            <p className="eyebrow">Fan Chat</p>
+            <p className="community-panel-lead">
+              Short moderated posts. Sign in with Google on Current event (OAuth).
+            </p>
           </div>
-        ) : null}
-      </header>
+          {user ? (
+            <div className="community-session-chip">
+              <span>{user.displayName}</span>
+              <button className="text-button" type="button" onClick={handleSignOut}>
+                Sign out
+              </button>
+            </div>
+          ) : null}
+        </header>
+      ) : (
+        <p className="community-panel-lead">
+          Text-only posts for match takes. Squad shares belong on the Coach Board above.
+        </p>
+      )}
 
       {error ? <p className="inline-error">{error}</p> : null}
       {notice ? <p className="inline-status community-notice">{notice}</p> : null}
 
-      {!user ? (
+      {!embedded && !user ? (
         <form className="community-join-form" onSubmit={handleJoin}>
-          <h3>Join the Coach Board</h3>
+          <h3>Legacy join (dev)</h3>
           <p className="community-panel-lead">
-            No password — pick a display name and birth year. We use a secure browser session cookie after you
-            join. Accounts under 13 cannot post publicly.
+            Prefer Google sign-in on Current event. This fallback creates a local-only account when OAuth is
+            not configured.
           </p>
           <label className="feed-control-field">
             Display name
@@ -239,10 +245,10 @@ export function CommunityPanel() {
             />
           </label>
           <button className="button" disabled={submitting} type="submit">
-            {submitting ? "Joining…" : "Join community"}
+            {submitting ? "Joining…" : "Join (legacy)"}
           </button>
         </form>
-      ) : (
+      ) : embedded || user ? (
         <form className="community-compose-form" onSubmit={handlePost}>
           <label className="feed-control-field">
             New post
@@ -263,7 +269,7 @@ export function CommunityPanel() {
             </button>
           </div>
         </form>
-      )}
+      ) : null}
 
       <div className="community-feed" role="feed">
         {posts.length === 0 ? (

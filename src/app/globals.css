@@ -1024,9 +1024,97 @@ h3 {
   scroll-margin-top: 120px;
 }
 
-.community-section {
+.community-section,
+.coach-board-section,
+.fan-chat-section,
+.predictions-section {
   display: grid;
   gap: 12px;
+}
+
+.auth-gate,
+.auth-gate-shell {
+  display: grid;
+  gap: 12px;
+}
+
+.auth-session-bar {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.coach-board-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.coach-board-feed {
+  display: grid;
+  gap: 10px;
+}
+
+.coach-board-post-type {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.squad-builder {
+  background: color-mix(in srgb, var(--color-bg) 70%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  display: grid;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.squad-builder-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+}
+
+.squad-builder-slot span {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.squad-builder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.predictions-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.predictions-coming-soon {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.predictions-spec-list {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 1.1rem;
 }
 
 .community-panel {

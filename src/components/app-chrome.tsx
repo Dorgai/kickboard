@@ -10,7 +10,7 @@ type AppChromeProps = {
 };
 
 const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "analytics"]);
-const CURRENT_EVENT_HASHES = new Set(["community"]);
+const CURRENT_EVENT_HASHES = new Set(["coach-board", "fan-chat", "predictions", "community"]);
 
 export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
   const [hash, setHash] = useState("");
