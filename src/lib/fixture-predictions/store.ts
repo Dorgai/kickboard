@@ -1,4 +1,11 @@
 import { query } from "@/lib/db";
+import { fixtureKeyToShortLabel } from "@/lib/fixtures/fixture-key";
+import { recordFixturePredictionEvent } from "@/lib/fixture-predictions/events";
+import {
+  detectPredictionAction,
+  snapshotFromRecord,
+  summarizePredictionChange
+} from "@/lib/fixture-predictions/snapshot";
 import {
   MAX_SCORER_PICKS,
   normalizeResultStatus,
@@ -87,6 +94,8 @@ function normalizeScore(value: unknown): number | null {
   return score;
 }
 
+export type PredictionChangeAction = "created" | "updated" | "deleted" | "unchanged";
+
 export async function upsertUserFixturePrediction(input: {
   userId: string;
   fixtureKey: string;
@@ -152,5 +161,62 @@ export async function upsertUserFixturePrediction(input: {
     ]
   );
 
-  return result.rows[0]?.id ?? null;
+  const id = result.rows[0]?.id ?? null;
+  if (!id) return { id: null, change: "unchanged" as const };
+
+  const nextRecord = await getUserFixturePrediction(input.userId, key);
+  const previousSnapshot = snapshotFromRecord(existing);
+  const nextSnapshot = snapshotFromRecord(nextRecord);
+  const action = detectPredictionAction(previousSnapshot, nextSnapshot);
+
+  if (action !== "unchanged") {
+    const fixtureLabel = fixtureKeyToShortLabel(key);
+    await recordFixturePredictionEvent({
+      userId: input.userId,
+      fixtureKey: key,
+      action,
+      summary: summarizePredictionChange({
+        action,
+        previous: previousSnapshot,
+        next: nextSnapshot,
+        fixtureLabel
+      }),
+      previousSnapshot,
+      nextSnapshot
+    });
+  }
+
+  return { id, change: action };
+}
+
+export async function deleteUserFixturePrediction(userId: string, fixtureKey: string) {
+  const key = fixtureKey.trim().slice(0, 120);
+  if (!key) throw new Error("FIXTURE_KEY_REQUIRED");
+
+  const existing = await getUserFixturePrediction(userId, key);
+  if (!existing) return { deleted: false, change: "unchanged" as const };
+
+  const previousSnapshot = snapshotFromRecord(existing);
+
+  await query(`DELETE FROM fixture_predictions WHERE user_id = $1 AND fixture_key = $2`, [
+    userId,
+    key
+  ]);
+
+  const fixtureLabel = fixtureKeyToShortLabel(key);
+  await recordFixturePredictionEvent({
+    userId,
+    fixtureKey: key,
+    action: "deleted",
+    summary: summarizePredictionChange({
+      action: "deleted",
+      previous: previousSnapshot,
+      next: null,
+      fixtureLabel
+    }),
+    previousSnapshot,
+    nextSnapshot: null
+  });
+
+  return { deleted: true, change: "deleted" as const };
 }

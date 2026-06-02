@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { UserAlert } from "@/lib/alerts/types";
+import { useToastOptional } from "@/components/toast-provider";
 import { useDismissOnOutsidePointerDown } from "@/lib/use-dismiss-on-outside-pointer-down";
 
 function categoryLabel(category: UserAlert["category"]) {
@@ -32,6 +33,9 @@ export function NotificationsCenter() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const seenAlertKeysRef = useRef<Set<string>>(new Set());
+  const alertsSeededRef = useRef(false);
+  const toast = useToastOptional();
 
   const load = useCallback(async () => {
     if (status !== "authenticated") {
@@ -50,14 +54,33 @@ export function NotificationsCenter() {
         error?: string;
       };
       if (!response.ok) throw new Error(payload.error ?? "Unable to load alerts.");
-      setAlerts(payload.alerts ?? []);
+      const nextAlerts = payload.alerts ?? [];
+      if (!alertsSeededRef.current) {
+        for (const alert of nextAlerts) {
+          seenAlertKeysRef.current.add(alert.alertKey);
+        }
+        alertsSeededRef.current = true;
+      } else {
+        for (const alert of nextAlerts) {
+          if (alert.category !== "connection_activity" || alert.readAt) continue;
+          if (!alert.alertKey.includes("prediction-event:")) continue;
+          if (seenAlertKeysRef.current.has(alert.alertKey)) continue;
+          seenAlertKeysRef.current.add(alert.alertKey);
+          toast?.showToast({
+            message: `${alert.title} — ${alert.body}`,
+            variant: "info",
+            durationMs: 5600
+          });
+        }
+      }
+      setAlerts(nextAlerts);
       setUnreadCount(payload.unreadCount ?? 0);
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Unable to load alerts.");
     } finally {
       setLoading(false);
     }
-  }, [status]);
+  }, [status, toast]);
 
   useEffect(() => {
     if (status === "authenticated") {

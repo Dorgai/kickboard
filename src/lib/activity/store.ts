@@ -14,6 +14,8 @@ export type ActivityEventType =
   | "connection_request"
   | "connection_accepted"
   | "prediction_saved"
+  | "prediction_updated"
+  | "prediction_deleted"
   | "onboarding_complete";
 
 export async function touchPresence(

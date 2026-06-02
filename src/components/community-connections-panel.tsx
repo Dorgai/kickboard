@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
+import { ConnectionActivityTimeline } from "@/components/connection-activity-timeline";
 import { RegistrationInvitationsPanel } from "@/components/registration-invitations-panel";
 
 type PublicUserCard = {
@@ -160,6 +161,8 @@ function ConnectionsPanelInner() {
         Connect with other registered fans. Once you accept each other, you can see their Coach Board
         squads and score picks for the same match — free-to-play predictions, not real-money betting.
       </p>
+
+      <ConnectionActivityTimeline />
 
       <form className="connections-connect-form" onSubmit={handleConnectSubmit}>
         <label className="feed-control-field">

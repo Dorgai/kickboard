@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useToast } from "@/components/toast-provider";
 import { PredictionShareButtons } from "@/components/prediction-share-buttons";
 import type { PredictionSharePayload } from "@/lib/predictions/share";
 import { TeamLabel } from "@/components/team-label";
@@ -12,6 +13,7 @@ import {
   PREDICTION_HINTS,
   PREDICTION_OUTCOME_OPTION
 } from "@/lib/fixture-predictions/labels";
+import { notifyPredictionActivity } from "@/lib/fixture-predictions/activity-events";
 import { PREDICTION_OUTCOME_SECTION_ID } from "@/lib/scroll-to-prediction-outcome";
 import {
   groupScorerPicks,
@@ -29,7 +31,7 @@ type FixturePredictionsFormProps = {
   awayTeam: string;
   compact?: boolean;
   coachBoard?: boolean;
-  onSaved?: () => void;
+  onSaved?: (change?: string) => void;
 };
 
 const OUTCOME_OPTIONS: {
@@ -51,6 +53,8 @@ export function FixturePredictionsForm({
   onSaved
 }: FixturePredictionsFormProps) {
   const { data: session } = useSession();
+  const { showToast } = useToast();
+  const [hasSavedPick, setHasSavedPick] = useState(false);
   const [predictedOutcome, setPredictedOutcome] = useState<FixtureOutcome | null>(null);
   const [homeScore, setHomeScore] = useState("");
   const [awayScore, setAwayScore] = useState("");
@@ -76,11 +80,13 @@ export function FixturePredictionsForm({
           setHomeScore(prediction.homeScore !== null ? String(prediction.homeScore) : "");
           setAwayScore(prediction.awayScore !== null ? String(prediction.awayScore) : "");
           setScorerPicks(prediction.scorerPicks);
+          setHasSavedPick(true);
         } else {
           setPredictedOutcome(null);
           setHomeScore("");
           setAwayScore("");
           setScorerPicks([]);
+          setHasSavedPick(false);
         }
       }
     } finally {
@@ -218,13 +224,59 @@ export function FixturePredictionsForm({
           ...(coachBoard ? {} : { scorerPicks })
         })
       });
-      const payload = (await response.json()) as { error?: string; message?: string };
+      const payload = (await response.json()) as {
+        error?: string;
+        message?: string;
+        change?: string;
+      };
       if (!response.ok) throw new Error(payload.error ?? "Unable to save picks.");
-      setNotice("Saved");
-      onSaved?.();
+      const change = payload.change ?? "updated";
+      setNotice(payload.message ?? "Saved");
+      setHasSavedPick(true);
+      showToast({
+        message: payload.message ?? "Picks saved.",
+        variant: change === "unchanged" ? "info" : "success"
+      });
+      onSaved?.(change);
+      notifyPredictionActivity();
       await load();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Unable to save picks.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeAllPicks() {
+    if (!hasSavedPick) return;
+    if (!window.confirm("Remove all picks for this match? Connections will be notified.")) return;
+
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const params = new URLSearchParams({ fixtureKey });
+      const response = await fetch(`/api/fixture-predictions?${params}`, { method: "DELETE" });
+      const payload = (await response.json()) as { error?: string; message?: string; change?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Unable to remove picks.");
+      setPredictedOutcome(null);
+      setHomeScore("");
+      setAwayScore("");
+      setScorerPicks([]);
+      setHasSavedPick(false);
+      setNotice(payload.message ?? "Removed");
+      showToast({
+        message: payload.message ?? "Picks removed.",
+        variant: "warning"
+      });
+      onSaved?.(payload.change ?? "deleted");
+      notifyPredictionActivity();
+    } catch (removeError) {
+      setError(removeError instanceof Error ? removeError.message : "Unable to remove picks.");
+      showToast({
+        message: removeError instanceof Error ? removeError.message : "Unable to remove picks.",
+        variant: "warning"
+      });
     } finally {
       setBusy(false);
     }
@@ -402,9 +454,21 @@ export function FixturePredictionsForm({
       ) : null}
 
       <div className="fixture-prediction-form-footer">
-        <button className="button primary fixture-prediction-save" disabled={busy || loading} type="submit">
-          {busy ? "Saving…" : PREDICTION_HINTS.saveButton}
-        </button>
+        <div className="fixture-prediction-form-actions">
+          <button className="button primary fixture-prediction-save" disabled={busy || loading} type="submit">
+            {busy ? "Saving…" : PREDICTION_HINTS.saveButton}
+          </button>
+          {hasSavedPick ? (
+            <button
+              className="button secondary fixture-prediction-remove"
+              disabled={busy || loading}
+              type="button"
+              onClick={() => void removeAllPicks()}
+            >
+              Remove all picks
+            </button>
+          ) : null}
+        </div>
         {notice ? <span className="fixture-prediction-notice">{notice}</span> : null}
         {error ? <span className="fixture-prediction-error">{error}</span> : null}
       </div>
