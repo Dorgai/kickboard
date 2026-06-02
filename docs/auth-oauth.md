@@ -70,7 +70,17 @@ On **OAuth consent screen** → **Authorized domains**, add:
 
 Fill **App name**, **User support email**, and **Developer contact email**.
 
-### D. Railway `AUTH_URL` missing
+### D. Railway `AUTH_URL` missing (redirect goes to `0.0.0.0`)
+
+Auth.js builds Google’s `redirect_uri` from **`AUTH_URL`** or **`NEXTAUTH_URL` only** — not from `NEXT_PUBLIC_APP_URL`.
+
+If those are unset, Railway’s internal host (`0.0.0.0:8080`) is used and Google returns **Error 400: invalid_request** even when test users are configured.
+
+1. Railway → kickboard service → **Variables** → set **`AUTH_URL`** = `https://kickboard-production.up.railway.app` (no trailing slash).
+2. Redeploy.
+3. Check `https://kickboard-production.up.railway.app/api/auth/providers` — `callbackUrl` must be your Railway host, **not** `https://0.0.0.0:8080/...`.
+
+Kickboard also copies `NEXT_PUBLIC_APP_URL` → `AUTH_URL` at server boot when possible; setting `AUTH_URL` explicitly is still recommended.
 
 If `/api/auth/config` shows `googleRedirectUri` as `http://localhost:3000/...`, set `AUTH_URL` on Railway to your production URL and redeploy.
 
@@ -96,3 +106,10 @@ After first Google sign-in, fans enter **birth year** (child-safety). Under-13 a
 ## Database
 
 Run `npm run db:schema` (includes `db/auth-extensions.sql`) on production after deploy.
+
+If Google login reaches the callback then shows **Server error / problem with the server configuration**:
+
+1. Open `/api/auth/config` — check `authSchemaReady` is `true`.
+2. If `false`, run **`npm run db:schema`** against production Postgres (GitHub workflow **Apply community schema** applies `auth-extensions.sql` too).
+3. Clear site cookies or use a private window (old `0.0.0.0` OAuth cookies can confuse the callback).
+4. Try sign-in again.
