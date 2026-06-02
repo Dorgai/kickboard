@@ -10,18 +10,10 @@ import {
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
 import { playerRoleLabel } from "@/lib/squads/player-roles";
+import { readPlayerDragData, writePlayerDragData, type PitchDragPlayer } from "@/lib/squads/drag-player";
 import { teamsMatch } from "@/lib/squads/team-names";
 
-const DRAG_PLAYER_MIME = "application/x-kickboard-player";
-
-export type PitchDragPlayer = {
-  playerId: number;
-  name: string;
-  teamName: string;
-  role: SquadLineupSlot["role"];
-  jerseyNumber: number | null;
-  fromPitch?: boolean;
-};
+export type { PitchDragPlayer };
 
 type SquadPitchProps = {
   lineup: SquadLineupSlot[];
@@ -155,11 +147,10 @@ export function SquadPitch({
     const pitch = pitchRef.current?.getBoundingClientRect();
     if (!pitch) return;
 
-    const raw = event.dataTransfer.getData(DRAG_PLAYER_MIME);
-    if (!raw) return;
+    const player = readPlayerDragData(event.dataTransfer);
+    if (!player) return;
 
     try {
-      const player = JSON.parse(raw) as PitchDragPlayer;
       if (player.fromPitch) return;
       const coords = coordsFromPointer(pitch, event.clientX, event.clientY);
       const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
@@ -177,8 +168,8 @@ export function SquadPitch({
     <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
       {!readOnly ? (
         <p className="squad-pitch-hint squad-pitch-hint--compact">
-          Drag from each team&apos;s bench onto their half. Click a player or drag back to the bench to
-          remove.
+          Drag from a team bench onto their half. Drag a player from the pitch into that team&apos;s bench
+          to remove them (or press Delete while selected).
         </p>
       ) : null}
       <div
@@ -219,11 +210,10 @@ export function SquadPitch({
                 onDrop={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
-                  const raw = event.dataTransfer.getData(DRAG_PLAYER_MIME);
-                  if (!raw || slot.label) return;
+                  if (slot.label) return;
                   try {
-                    const player = JSON.parse(raw) as PitchDragPlayer;
-                    if (player.fromPitch) return;
+                    const player = readPlayerDragData(event.dataTransfer);
+                    if (!player || player.fromPitch) return;
                     const playerSide = sideForPlayer(player, homeTeam, awayTeam);
                     if (!playerSide || playerSide !== slotSide(slot)) return;
                     assignPlayerAt(player, { x: slot.x, y: slot.y }, slotIndex);
@@ -256,17 +246,14 @@ export function SquadPitch({
                 readOnly
                   ? undefined
                   : (event) => {
-                      event.dataTransfer.setData(
-                        DRAG_PLAYER_MIME,
-                        JSON.stringify({
-                          playerId: Number(slot.playerId),
-                          name: slot.label,
-                          teamName: slot.teamName ?? "",
-                          role: slot.role,
-                          jerseyNumber: slot.jerseyNumber ?? null,
-                          fromPitch: true
-                        } satisfies PitchDragPlayer)
-                      );
+                      writePlayerDragData(event.dataTransfer, {
+                        playerId: Number(slot.playerId),
+                        name: slot.label,
+                        teamName: slot.teamName ?? "",
+                        role: slot.role,
+                        jerseyNumber: slot.jerseyNumber ?? null,
+                        fromPitch: true
+                      });
                       event.dataTransfer.effectAllowed = "move";
                     }
               }
@@ -278,7 +265,6 @@ export function SquadPitch({
                       const startX = event.clientX;
                       const startY = event.clientY;
                       let moved = false;
-                      event.preventDefault();
                       setDraggingSlot(slot.slot);
                       onSelectSlot(slot.slot);
                       const pitch = pitchRef.current?.getBoundingClientRect();
@@ -286,11 +272,13 @@ export function SquadPitch({
 
                       const onMove = (moveEvent: PointerEvent) => {
                         if (
-                          Math.abs(moveEvent.clientX - startX) > 4 ||
-                          Math.abs(moveEvent.clientY - startY) > 4
+                          Math.abs(moveEvent.clientX - startX) > 6 ||
+                          Math.abs(moveEvent.clientY - startY) > 6
                         ) {
                           moved = true;
+                          moveEvent.preventDefault();
                         }
+                        if (!moved) return;
                         moveSlot(
                           slot.slot,
                           coordsFromPointer(pitch, moveEvent.clientX, moveEvent.clientY)
@@ -301,9 +289,6 @@ export function SquadPitch({
                         setDraggingSlot(null);
                         window.removeEventListener("pointermove", onMove);
                         window.removeEventListener("pointerup", onUp);
-                        if (!moved) {
-                          clearSlot(slot.slot);
-                        }
                       };
 
                       window.addEventListener("pointermove", onMove);
@@ -335,4 +320,5 @@ export function SquadPitch({
   );
 }
 
-export { DRAG_PLAYER_MIME, SLOTS_PER_TEAM };
+export { DRAG_PLAYER_MIME } from "@/lib/squads/drag-player";
+export { SLOTS_PER_TEAM } from "@/lib/squads/lineup";

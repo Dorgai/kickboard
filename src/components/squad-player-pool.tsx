@@ -1,11 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import { FORMATIONS, type SquadFormation, type SquadLineupSlot } from "@/lib/squads/lineup";
-import { playerRoleLabel, SQUAD_PLAYER_ROLES, type SquadPlayerRole } from "@/lib/squads/player-roles";
+import { playerRoleLabel } from "@/lib/squads/player-roles";
 import { slotSide } from "@/lib/squads/lineup";
-import { DRAG_PLAYER_MIME, type PitchDragPlayer } from "@/components/squad-pitch";
+import {
+  isPlayerDragEvent,
+  readPlayerDragData,
+  writePlayerDragData,
+  type PitchDragPlayer
+} from "@/lib/squads/drag-player";
 import { teamsMatch } from "@/lib/squads/team-names";
 
 type SquadPlayerPoolProps = {
@@ -39,22 +44,24 @@ function PlayerChip({
         className={`squad-player-chip${onPitch ? " squad-player-chip--on-pitch" : ""}`}
         draggable
         type="button"
-        title={onPitch ? "Click or drag here to move back to bench" : "Drag onto your team's half of the pitch"}
+        title={
+          onPitch
+            ? "Drag into this team's bench below to remove from the pitch"
+            : "Drag onto your team's half of the pitch"
+        }
         onClick={() => {
           if (onPitch) onRemoveFromPitch(player.playerId);
         }}
         onDragStart={(event) => {
-          event.dataTransfer.setData(
-            DRAG_PLAYER_MIME,
-            JSON.stringify({
-              playerId: player.playerId,
-              name: player.name,
-              teamName: player.teamName,
-              role: player.role,
-              jerseyNumber: player.jerseyNumber,
-              fromPitch: onPitch
-            })
-          );
+          const payload: PitchDragPlayer = {
+            playerId: player.playerId,
+            name: player.name,
+            teamName: player.teamName,
+            role: player.role,
+            jerseyNumber: player.jerseyNumber,
+            fromPitch: onPitch
+          };
+          writePlayerDragData(event.dataTransfer, payload);
           event.dataTransfer.effectAllowed = onPitch ? "move" : "copy";
         }}
       >
@@ -63,7 +70,7 @@ function PlayerChip({
         {player.jerseyNumber ? (
           <span className="squad-player-chip-number">{player.jerseyNumber}</span>
         ) : null}
-        {onPitch ? <span className="squad-player-chip-on-pitch">On pitch · tap to bench</span> : null}
+        {onPitch ? <span className="squad-player-chip-on-pitch">On pitch</span> : null}
       </button>
     </li>
   );
@@ -90,8 +97,7 @@ function SquadTeamPlayerPool({
   onFormationChange: (formation: SquadFormation) => void;
   onRemoveFromPitch: (playerId: number) => void;
 }) {
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<"ALL" | SquadPlayerRole>("ALL");
+  const dragDepthRef = useRef(0);
   const [benchDragOver, setBenchDragOver] = useState(false);
 
   const onPitchIds = useMemo(
@@ -104,41 +110,49 @@ function SquadTeamPlayerPool({
     [lineup, side]
   );
 
-  const filteredPlayers = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return players.filter((player) => {
-      if (roleFilter !== "ALL" && player.role !== roleFilter) return false;
-      if (!query) return true;
-      return player.name.toLowerCase().includes(query);
-    });
-  }, [players, roleFilter, search]);
+  function handleBenchDragEnter(event: React.DragEvent) {
+    if (!isPlayerDragEvent(event)) return;
+    event.preventDefault();
+    dragDepthRef.current += 1;
+    setBenchDragOver(true);
+    event.dataTransfer.dropEffect = "move";
+  }
+
+  function handleBenchDragLeave(event: React.DragEvent) {
+    if (!isPlayerDragEvent(event)) return;
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) {
+      setBenchDragOver(false);
+    }
+  }
 
   function handleBenchDragOver(event: React.DragEvent) {
-    if (!event.dataTransfer.types.includes(DRAG_PLAYER_MIME)) return;
+    if (!isPlayerDragEvent(event)) return;
     event.preventDefault();
+    event.stopPropagation();
     event.dataTransfer.dropEffect = "move";
-    setBenchDragOver(true);
   }
 
   function handleBenchDrop(event: React.DragEvent) {
     event.preventDefault();
+    event.stopPropagation();
+    dragDepthRef.current = 0;
     setBenchDragOver(false);
-    const raw = event.dataTransfer.getData(DRAG_PLAYER_MIME);
-    if (!raw) return;
-    try {
-      const player = JSON.parse(raw) as PitchDragPlayer;
-      if (!player.fromPitch) return;
-      if (!teamsMatch(player.teamName, teamName)) return;
-      onRemoveFromPitch(player.playerId);
-    } catch {
-      /* ignore */
-    }
+
+    const player = readPlayerDragData(event.dataTransfer);
+    if (!player?.fromPitch) return;
+    if (!teamsMatch(player.teamName, teamName)) return;
+    onRemoveFromPitch(player.playerId);
   }
 
   return (
     <aside
-      className={`squad-team-bench squad-team-bench--${side}`}
+      className={`squad-team-bench squad-team-bench--${side}${benchDragOver ? " squad-team-bench--drag-over" : ""}`}
       aria-label={`${teamName} bench`}
+      onDragEnter={handleBenchDragEnter}
+      onDragLeave={handleBenchDragLeave}
+      onDragOver={handleBenchDragOver}
+      onDrop={handleBenchDrop}
     >
       <header className="squad-team-bench-header">
         <h4 className="squad-team-bench-title">{teamName} bench</h4>
@@ -158,47 +172,15 @@ function SquadTeamPlayerPool({
           </select>
         </label>
         <p className="squad-team-bench-lead">
-          {side === "home" ? "Top half" : "Bottom half"} of the pitch · drag players from this list only
+          Drag players onto the {side === "home" ? "top" : "bottom"} half · drop here to remove from pitch
         </p>
       </header>
-
-      <div
-        className={`squad-team-bench-drop${benchDragOver ? " squad-team-bench-drop--active" : ""}`}
-        onDragLeave={() => setBenchDragOver(false)}
-        onDragOver={handleBenchDragOver}
-        onDrop={handleBenchDrop}
-      >
-        Drop {teamName} players here to return to this bench
-      </div>
-
-      <div className="squad-team-bench-filters">
-        <input
-          aria-label={`Search ${teamName} players`}
-          className="feed-control-input"
-          placeholder="Search name"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
-        <select
-          aria-label={`Filter ${teamName} by position`}
-          className="feed-control-input"
-          value={roleFilter}
-          onChange={(event) => setRoleFilter(event.target.value as typeof roleFilter)}
-        >
-          <option value="ALL">All positions</option>
-          {SQUAD_PLAYER_ROLES.map((role) => (
-            <option key={role} value={role}>
-              {playerRoleLabel(role)}
-            </option>
-          ))}
-        </select>
-      </div>
 
       {loading ? <p className="inline-status">Loading players…</p> : null}
       {error ? <p className="inline-status">{error}</p> : null}
 
       <ul className="squad-team-bench-list">
-        {filteredPlayers.map((player) => (
+        {players.map((player) => (
           <PlayerChip
             key={player.playerId}
             onPitch={onPitchIds.has(player.playerId)}
@@ -207,8 +189,8 @@ function SquadTeamPlayerPool({
           />
         ))}
       </ul>
-      {!loading && !error && filteredPlayers.length === 0 ? (
-        <p className="inline-status">No players match.</p>
+      {!loading && !error && players.length === 0 ? (
+        <p className="inline-status">No players loaded for this team.</p>
       ) : null}
     </aside>
   );
