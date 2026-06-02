@@ -1,13 +1,15 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import type { SquadLineupSlot } from "@/lib/squads/lineup";
+import { playerRoleLabel, SQUAD_PLAYER_ROLES, type SquadPlayerRole } from "@/lib/squads/player-roles";
+import { slotSide } from "@/lib/squads/lineup";
 import { DRAG_PLAYER_MIME } from "@/components/squad-pitch";
-import { teamsMatch } from "@/lib/squads/team-names";
 
 type SquadPlayerPoolProps = {
-  players: SquadPoolPlayer[];
+  homePlayers: SquadPoolPlayer[];
+  awayPlayers: SquadPoolPlayer[];
   lineup: SquadLineupSlot[];
   homeTeam: string;
   awayTeam: string;
@@ -37,7 +39,7 @@ function PlayerChip({
   onRemoveFromPitch: (playerId: number) => void;
 }) {
   return (
-    <li key={player.playerId}>
+    <li>
       <button
         className={`squad-player-chip${onPitch ? " squad-player-chip--on-pitch" : ""}`}
         draggable
@@ -61,7 +63,7 @@ function PlayerChip({
           event.dataTransfer.effectAllowed = onPitch ? "move" : "copy";
         }}
       >
-        <span className="squad-player-chip-role">{player.role}</span>
+        <span className="squad-player-chip-role">{playerRoleLabel(player.role)}</span>
         <span className="squad-player-chip-name">{player.name}</span>
         {player.jerseyNumber ? (
           <span className="squad-player-chip-number">{player.jerseyNumber}</span>
@@ -72,47 +74,48 @@ function PlayerChip({
   );
 }
 
-export function SquadPlayerPool({
+function SquadTeamPlayerPool({
+  teamName,
+  side,
   players,
   lineup,
-  homeTeam,
-  awayTeam,
-  sourceLabel,
   loading,
   error,
   onRemoveFromPitch
-}: SquadPlayerPoolProps) {
+}: {
+  teamName: string;
+  side: "home" | "away";
+  players: SquadPoolPlayer[];
+  lineup: SquadLineupSlot[];
+  loading: boolean;
+  error: string | null;
+  onRemoveFromPitch: (playerId: number) => void;
+}) {
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<"ALL" | SquadLineupSlot["role"]>("ALL");
+  const [roleFilter, setRoleFilter] = useState<"ALL" | SquadPlayerRole>("ALL");
   const [benchDragOver, setBenchDragOver] = useState(false);
 
   const onPitchIds = useMemo(
-    () => new Set(lineup.map((slot) => slot.playerId).filter(Boolean)),
-    [lineup]
+    () =>
+      new Set(
+        lineup
+          .filter((slot) => slotSide(slot) === side && slot.playerId)
+          .map((slot) => slot.playerId as number)
+      ),
+    [lineup, side]
   );
 
-  const filterPlayers = useCallback(
-    (teamName: string) => {
-      const query = search.trim().toLowerCase();
-      return players.filter((player) => {
-        if (!teamsMatch(player.teamName, teamName)) return false;
-        if (roleFilter !== "ALL" && player.role !== roleFilter) return false;
-        if (!query) return true;
-        return (
-          player.name.toLowerCase().includes(query) ||
-          player.teamName.toLowerCase().includes(query)
-        );
-      });
-    },
-    [players, roleFilter, search]
-  );
-
-  const homePlayers = useMemo(() => filterPlayers(homeTeam), [filterPlayers, homeTeam]);
-  const awayPlayers = useMemo(() => filterPlayers(awayTeam), [filterPlayers, awayTeam]);
+  const filteredPlayers = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return players.filter((player) => {
+      if (roleFilter !== "ALL" && player.role !== roleFilter) return false;
+      if (!query) return true;
+      return player.name.toLowerCase().includes(query);
+    });
+  }, [players, roleFilter, search]);
 
   function handleBenchDragOver(event: React.DragEvent) {
-    const raw = event.dataTransfer.types.includes(DRAG_PLAYER_MIME);
-    if (!raw) return;
+    if (!event.dataTransfer.types.includes(DRAG_PLAYER_MIME)) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
     setBenchDragOver(true);
@@ -130,8 +133,8 @@ export function SquadPlayerPool({
   return (
     <aside className="squad-player-pool">
       <header className="squad-player-pool-header">
-        <h4>Bench</h4>
-        {sourceLabel ? <p className="squad-player-pool-source">{sourceLabel}</p> : null}
+        <h4>{teamName}</h4>
+        <p className="squad-player-pool-source">Bench · drag players onto the {side} half</p>
       </header>
 
       <div
@@ -140,67 +143,86 @@ export function SquadPlayerPool({
         onDragOver={handleBenchDragOver}
         onDrop={handleBenchDrop}
       >
-        Drop a pitch player here to move back to the bench
+        Drop a {teamName} player here to return to the bench
       </div>
 
       <div className="squad-player-pool-filters">
         <input
-          aria-label="Search players"
+          aria-label={`Search ${teamName} players`}
           className="feed-control-input"
           placeholder="Search name"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
         <select
-          aria-label="Filter by role"
+          aria-label={`Filter ${teamName} by position`}
           className="feed-control-input"
           value={roleFilter}
           onChange={(event) => setRoleFilter(event.target.value as typeof roleFilter)}
         >
-          <option value="ALL">All roles</option>
-          <option value="GK">GK</option>
-          <option value="DEF">DEF</option>
-          <option value="MID">MID</option>
-          <option value="FWD">FWD</option>
+          <option value="ALL">All positions</option>
+          {SQUAD_PLAYER_ROLES.map((role) => (
+            <option key={role} value={role}>
+              {playerRoleLabel(role)}
+            </option>
+          ))}
         </select>
       </div>
 
       {loading ? <p className="inline-status">Loading players…</p> : null}
       {error ? <p className="inline-status">{error}</p> : null}
 
-      <section className="squad-player-team-section">
-        <h5 className="squad-player-team-heading">{homeTeam}</h5>
-        <ul className="squad-player-pool-list">
-          {homePlayers.map((player) => (
-            <PlayerChip
-              key={player.playerId}
-              onPitch={onPitchIds.has(player.playerId)}
-              onRemoveFromPitch={onRemoveFromPitch}
-              player={player}
-            />
-          ))}
-        </ul>
-        {!loading && !error && homePlayers.length === 0 ? (
-          <p className="inline-status">No home players match.</p>
-        ) : null}
-      </section>
-
-      <section className="squad-player-team-section">
-        <h5 className="squad-player-team-heading">{awayTeam}</h5>
-        <ul className="squad-player-pool-list">
-          {awayPlayers.map((player) => (
-            <PlayerChip
-              key={player.playerId}
-              onPitch={onPitchIds.has(player.playerId)}
-              onRemoveFromPitch={onRemoveFromPitch}
-              player={player}
-            />
-          ))}
-        </ul>
-        {!loading && !error && awayPlayers.length === 0 ? (
-          <p className="inline-status">No away players match.</p>
-        ) : null}
-      </section>
+      <ul className="squad-player-pool-list">
+        {filteredPlayers.map((player) => (
+          <PlayerChip
+            key={player.playerId}
+            onPitch={onPitchIds.has(player.playerId)}
+            onRemoveFromPitch={onRemoveFromPitch}
+            player={player}
+          />
+        ))}
+      </ul>
+      {!loading && !error && filteredPlayers.length === 0 ? (
+        <p className="inline-status">No players match.</p>
+      ) : null}
     </aside>
+  );
+}
+
+export function SquadPlayerPool({
+  homePlayers,
+  awayPlayers,
+  lineup,
+  homeTeam,
+  awayTeam,
+  sourceLabel,
+  loading,
+  error,
+  onRemoveFromPitch
+}: SquadPlayerPoolProps) {
+  return (
+    <div className="squad-player-pools">
+      {sourceLabel ? <p className="squad-player-pools-source">{sourceLabel}</p> : null}
+      <div className="squad-player-pools-grid">
+        <SquadTeamPlayerPool
+          error={error}
+          lineup={lineup}
+          loading={loading}
+          players={homePlayers}
+          side="home"
+          teamName={homeTeam}
+          onRemoveFromPitch={onRemoveFromPitch}
+        />
+        <SquadTeamPlayerPool
+          error={error}
+          lineup={lineup}
+          loading={loading}
+          players={awayPlayers}
+          side="away"
+          teamName={awayTeam}
+          onRemoveFromPitch={onRemoveFromPitch}
+        />
+      </div>
+    </div>
   );
 }

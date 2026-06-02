@@ -77,8 +77,21 @@ export function FixturePredictionsForm({
         const params = new URLSearchParams({ homeTeam, awayTeam });
         const response = await fetch(`/api/squads/player-pool?${params}`);
         if (!cancelled && response.ok) {
-          const payload = (await response.json()) as { players?: SquadPoolPlayer[] };
-          setPlayers(payload.players ?? []);
+          const payload = (await response.json()) as {
+            players?: SquadPoolPlayer[];
+            homePlayers?: SquadPoolPlayer[];
+            awayPlayers?: SquadPoolPlayer[];
+          };
+          const combined = [
+            ...(payload.homePlayers ?? []),
+            ...(payload.awayPlayers ?? []),
+            ...(payload.players ?? [])
+          ];
+          const byId = new Map<number, SquadPoolPlayer>();
+          for (const player of combined) {
+            if (!byId.has(player.playerId)) byId.set(player.playerId, player);
+          }
+          setPlayers(Array.from(byId.values()));
         }
       } finally {
         if (!cancelled) setPoolLoading(false);

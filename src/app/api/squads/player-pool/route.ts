@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getFixtureSquadPlayerPool, getWorldCupSquadPlayerPool } from "@/lib/squads/player-pool";
+import {
+  getFixtureSquadPlayerPool,
+  getTeamSquadPlayerPool,
+  getWorldCupSquadPlayerPool
+} from "@/lib/squads/player-pool";
 
 export const dynamic = "force-dynamic";
 
@@ -9,8 +13,16 @@ export async function GET(request: Request) {
   const seasonId = Number(searchParams.get("seasonId"));
   const homeTeam = searchParams.get("homeTeam")?.trim() ?? "";
   const awayTeam = searchParams.get("awayTeam")?.trim() ?? "";
+  const team = searchParams.get("team")?.trim() ?? "";
 
   try {
+    if (team) {
+      const pool = await getTeamSquadPlayerPool(team);
+      return NextResponse.json(pool, {
+        headers: { "Cache-Control": "public, max-age=3600" }
+      });
+    }
+
     if (homeTeam && awayTeam) {
       const pool = await getFixtureSquadPlayerPool(homeTeam, awayTeam);
       return NextResponse.json(pool, {

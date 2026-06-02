@@ -7,6 +7,7 @@ import {
   SLOTS_PER_TEAM,
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
+import { playerRoleLabel } from "@/lib/squads/player-roles";
 import { teamsMatch } from "@/lib/squads/team-names";
 
 const DRAG_PLAYER_MIME = "application/x-kickboard-player";
@@ -204,11 +205,11 @@ export function SquadPitch({
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 type="button"
                 onClick={() => onSelectSlot(slot.slot)}
-                aria-label={`${slotSide(slot)} ${slot.role} slot ${slot.slot}`}
+                aria-label={`${slotSide(slot)} ${playerRoleLabel(slot.role)} slot ${slot.slot}`}
               >
                 {!slot.label ? (
                   <span className="squad-pitch-placeholder-role" aria-hidden>
-                    {slot.role}
+                    {playerRoleLabel(slot.role)}
                   </span>
                 ) : null}
               </button>
@@ -295,7 +296,6 @@ export function SquadPitch({
                     }
               }
             >
-              <span className="squad-pitch-token-role">{slot.role}</span>
               <span className="squad-pitch-token-name">{slot.label}</span>
               {slot.jerseyNumber ? (
                 <span className="squad-pitch-token-number">{slot.jerseyNumber}</span>

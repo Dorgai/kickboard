@@ -1,3 +1,5 @@
+import { isSquadPlayerRole, type SquadPlayerRole } from "@/lib/squads/player-roles";
+
 export const FORMATIONS = ["4-3-3", "4-4-2", "3-5-2", "4-2-3-1"] as const;
 export type SquadFormation = (typeof FORMATIONS)[number];
 
@@ -9,7 +11,7 @@ export type SquadLineupSide = "home" | "away";
 export type SquadLineupSlot = {
   slot: number;
   label: string;
-  role: "GK" | "DEF" | "MID" | "FWD";
+  role: SquadPlayerRole;
   x: number;
   y: number;
   side?: SquadLineupSide;
@@ -239,9 +241,7 @@ function mapLineupEntry(
 
   const label = typeof entry.label === "string" ? entry.label.trim().slice(0, 80) : "";
   const role =
-    entry.role === "GK" || entry.role === "DEF" || entry.role === "MID" || entry.role === "FWD"
-      ? entry.role
-      : slot.role;
+    typeof entry.role === "string" && isSquadPlayerRole(entry.role) ? entry.role : slot.role;
   const x = typeof entry.x === "number" ? clampPitchCoord(entry.x) : slot.x;
   const y = typeof entry.y === "number" ? clampPitchCoord(entry.y) : slot.y;
   const side =

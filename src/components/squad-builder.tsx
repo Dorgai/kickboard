@@ -14,6 +14,7 @@ import {
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
+import { teamsMatch } from "@/lib/squads/team-names";
 
 type LoadedSquad = {
   id: string;
@@ -49,7 +50,8 @@ export function SquadBuilder({
   );
   const [squadId, setSquadId] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
-  const [players, setPlayers] = useState<SquadPoolPlayer[]>([]);
+  const [homePlayers, setHomePlayers] = useState<SquadPoolPlayer[]>([]);
+  const [awayPlayers, setAwayPlayers] = useState<SquadPoolPlayer[]>([]);
   const [poolLabel, setPoolLabel] = useState<string | null>(null);
   const [poolLoading, setPoolLoading] = useState(true);
   const [poolError, setPoolError] = useState<string | null>(null);
@@ -85,11 +87,23 @@ export function SquadBuilder({
         if (!cancelled) {
           if (poolRes.ok) {
             const poolPayload = (await poolRes.json()) as {
-              players: SquadPoolPlayer[];
+              players?: SquadPoolPlayer[];
+              homePlayers?: SquadPoolPlayer[];
+              awayPlayers?: SquadPoolPlayer[];
               seasonName: string;
               matchLabel: string;
             };
-            setPlayers(poolPayload.players ?? []);
+            const all = poolPayload.players ?? [];
+            setHomePlayers(
+              poolPayload.homePlayers?.length
+                ? poolPayload.homePlayers
+                : all.filter((player) => teamsMatch(player.teamName, homeTeam))
+            );
+            setAwayPlayers(
+              poolPayload.awayPlayers?.length
+                ? poolPayload.awayPlayers
+                : all.filter((player) => teamsMatch(player.teamName, awayTeam))
+            );
             setPoolLabel(`${poolPayload.seasonName} · ${poolPayload.matchLabel}`);
             setPoolError(null);
           } else {
@@ -235,13 +249,14 @@ export function SquadBuilder({
 
       <div className="squad-builder-layout">
         <SquadPlayerPool
+          awayPlayers={awayPlayers}
           awayTeam={awayTeam}
           error={poolError}
+          homePlayers={homePlayers}
           homeTeam={homeTeam}
           lineup={lineup}
           loading={poolLoading}
           onRemoveFromPitch={removeFromPitch}
-          players={players}
           sourceLabel={poolLabel}
         />
 
