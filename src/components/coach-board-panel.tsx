@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
+import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
+import { FriendsMatchActivity } from "@/components/friends-match-activity";
 import { SavedSquadsBar } from "@/components/saved-squads-bar";
 import { SquadBuilder } from "@/components/squad-builder";
 import type { SquadSummary } from "@/lib/squads/store";
@@ -115,6 +117,8 @@ export function CoachBoardPanel({ fixtureKey, fixtureLabel }: CoachBoardPanelPro
           onSelect={handleSelectSquad}
         />
 
+        <FixturePredictionPick compact fixtureKey={fixtureKey} fixtureLabel={fixtureLabel} />
+
         <SquadBuilder
           key={`${fixtureKey}:${activeSquadId ?? "new"}:${newBoardNonce}`}
           activeSquadId={activeSquadId}
@@ -122,6 +126,8 @@ export function CoachBoardPanel({ fixtureKey, fixtureLabel }: CoachBoardPanelPro
           fixtureLabel={fixtureLabel}
           onSaved={handleSquadSaved}
         />
+
+        <FriendsMatchActivity fixtureKey={fixtureKey} />
 
         <div className="coach-board-feed">
           <h3>Approved feed</h3>

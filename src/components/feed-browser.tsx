@@ -9,6 +9,7 @@ import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-la
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { FanChatPanel } from "@/components/fan-chat-panel";
+import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { PredictionsPanel } from "@/components/predictions-panel";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 
@@ -486,9 +487,14 @@ function CurrentEventPanel({ currentWorldCup }: { currentWorldCup: CurrentWorldC
         <FanChatPanel />
       </section>
 
+      <section className="data-card surface-flat section-anchor community-section" id="community">
+        <h2>Community</h2>
+        <CommunityConnectionsPanel />
+      </section>
+
       <section className="data-card surface-flat section-anchor predictions-section" id="predictions">
         <h2>Predictions</h2>
-        <PredictionsPanel />
+        <PredictionsPanel groups={groups} />
       </section>
     </section>
   );

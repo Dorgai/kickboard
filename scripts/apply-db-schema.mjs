@@ -29,7 +29,8 @@ const files = [
   "db/schema.sql",
   "db/community-extensions.sql",
   "db/auth-extensions.sql",
-  "db/fixture-scope-extensions.sql"
+  "db/fixture-scope-extensions.sql",
+  "db/connections-social-extensions.sql"
 ];
 
 async function applyFile(client, relativePath) {

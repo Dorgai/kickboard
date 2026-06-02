@@ -18,6 +18,7 @@ type SquadPitchProps = {
   selectedSlot: number | null;
   onSelectSlot: (slot: number | null) => void;
   onLineupChange: (lineup: SquadLineupSlot[]) => void;
+  readOnly?: boolean;
 };
 
 function coordsFromPointer(pitch: DOMRect, clientX: number, clientY: number) {
@@ -36,7 +37,8 @@ export function SquadPitch({
   lineup,
   selectedSlot,
   onSelectSlot,
-  onLineupChange
+  onLineupChange,
+  readOnly = false
 }: SquadPitchProps) {
   const pitchRef = useRef<HTMLDivElement>(null);
   const [draggingSlot, setDraggingSlot] = useState<number | null>(null);
@@ -132,18 +134,20 @@ export function SquadPitch({
   }
 
   return (
-    <div className="squad-pitch-wrap">
-      <p className="squad-pitch-hint">
-        Drag players from the pool onto the pitch. Drag tokens to set exact positions. Click a token
-        then <kbd>Backspace</kbd> to remove.
-      </p>
+    <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
+      {!readOnly ? (
+        <p className="squad-pitch-hint">
+          Drag players from the pool onto the pitch. Drag tokens to set exact positions. Click a token
+          then <kbd>Backspace</kbd> to remove.
+        </p>
+      ) : null}
       <div
         aria-label="Football pitch"
         className="squad-pitch"
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
+        onDragOver={readOnly ? undefined : handleDragOver}
+        onDrop={readOnly ? undefined : handleDrop}
         ref={pitchRef}
-        role="application"
+        role={readOnly ? "img" : "application"}
       >
         <div className="squad-pitch-grass" aria-hidden />
         <div className="squad-pitch-midline" aria-hidden />
@@ -153,18 +157,20 @@ export function SquadPitch({
         <div className="squad-pitch-goal-area squad-pitch-goal-area--top" aria-hidden />
         <div className="squad-pitch-goal-area squad-pitch-goal-area--bottom" aria-hidden />
 
-        {lineup.map((slot) => (
-          <button
-            className={`squad-pitch-ghost${slot.label ? " squad-pitch-ghost--filled" : ""}${
-              selectedSlot === slot.slot ? " squad-pitch-ghost--selected" : ""
-            }`}
-            key={`ghost-${slot.slot}`}
-            style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
-            type="button"
-            onClick={() => onSelectSlot(slot.slot)}
-            aria-label={`${slot.role} slot ${slot.slot}`}
-          />
-        ))}
+        {!readOnly
+          ? lineup.map((slot) => (
+              <button
+                className={`squad-pitch-ghost${slot.label ? " squad-pitch-ghost--filled" : ""}${
+                  selectedSlot === slot.slot ? " squad-pitch-ghost--selected" : ""
+                }`}
+                key={`ghost-${slot.slot}`}
+                style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+                type="button"
+                onClick={() => onSelectSlot(slot.slot)}
+                aria-label={`${slot.role} slot ${slot.slot}`}
+              />
+            ))
+          : null}
 
         {lineup
           .filter((slot) => slot.label)
@@ -173,34 +179,45 @@ export function SquadPitch({
               className={`squad-pitch-token${selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""}`}
               key={slot.slot}
               style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
-              onPointerDown={(event) => {
-                if (event.button !== 0) return;
-                event.preventDefault();
-                setDraggingSlot(slot.slot);
-                onSelectSlot(slot.slot);
-                const pitch = pitchRef.current?.getBoundingClientRect();
-                if (!pitch) return;
+              onPointerDown={
+                readOnly
+                  ? undefined
+                  : (event) => {
+                      if (event.button !== 0) return;
+                      event.preventDefault();
+                      setDraggingSlot(slot.slot);
+                      onSelectSlot(slot.slot);
+                      const pitch = pitchRef.current?.getBoundingClientRect();
+                      if (!pitch) return;
 
-                const onMove = (moveEvent: PointerEvent) => {
-                  moveSlot(slot.slot, coordsFromPointer(pitch, moveEvent.clientX, moveEvent.clientY));
-                };
+                      const onMove = (moveEvent: PointerEvent) => {
+                        moveSlot(
+                          slot.slot,
+                          coordsFromPointer(pitch, moveEvent.clientX, moveEvent.clientY)
+                        );
+                      };
 
-                const onUp = () => {
-                  setDraggingSlot(null);
-                  window.removeEventListener("pointermove", onMove);
-                  window.removeEventListener("pointerup", onUp);
-                };
+                      const onUp = () => {
+                        setDraggingSlot(null);
+                        window.removeEventListener("pointermove", onMove);
+                        window.removeEventListener("pointerup", onUp);
+                      };
 
-                window.addEventListener("pointermove", onMove);
-                window.addEventListener("pointerup", onUp);
-              }}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(event) => {
-                if (event.key === "Backspace" || event.key === "Delete") {
-                  clearSlot(slot.slot);
-                }
-              }}
+                      window.addEventListener("pointermove", onMove);
+                      window.addEventListener("pointerup", onUp);
+                    }
+              }
+              role={readOnly ? "presentation" : "button"}
+              tabIndex={readOnly ? -1 : 0}
+              onKeyDown={
+                readOnly
+                  ? undefined
+                  : (event) => {
+                      if (event.key === "Backspace" || event.key === "Delete") {
+                        clearSlot(slot.slot);
+                      }
+                    }
+              }
             >
               <span className="squad-pitch-token-role">{slot.role}</span>
               <span className="squad-pitch-token-name">{slot.label}</span>
