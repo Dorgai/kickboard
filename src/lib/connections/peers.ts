@@ -1,7 +1,11 @@
 import { query } from "@/lib/db";
 import { areUsersConnected, listAcceptedPeerIds } from "@/lib/connections/store";
-import { normalizeLineupSlots, isValidFormation } from "@/lib/squads/lineup";
-import type { SquadFormation, SquadLineupSlot } from "@/lib/squads/lineup";
+import {
+  formatFormationsLabel,
+  normalizeLineupSlots,
+  parseStoredFormations
+} from "@/lib/squads/lineup";
+import type { SquadLineupSlot } from "@/lib/squads/lineup";
 
 export type PeerSquadSummary = {
   id: string;
@@ -55,12 +59,12 @@ export async function getPeerSquadForViewer(
   const row = result.rows[0];
   if (!row) return null;
 
-  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
+  const formations = parseStoredFormations(row.formation);
   return {
     id: row.id,
     name: row.name,
-    formation,
-    lineup: normalizeLineupSlots(row.lineup, formation) as SquadLineupSlot[],
+    formation: formatFormationsLabel(formations),
+    lineup: normalizeLineupSlots(row.lineup, formations) as SquadLineupSlot[],
     fixtureKey: row.fixture_key
   };
 }
@@ -72,12 +76,12 @@ function mapSquadSummary(row: {
   lineup: unknown;
   updated_at: Date;
 }) {
-  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
-  const lineup = normalizeLineupSlots(row.lineup, formation);
+  const formations = parseStoredFormations(row.formation);
+  const lineup = normalizeLineupSlots(row.lineup, formations);
   return {
     id: row.id,
     name: row.name,
-    formation: row.formation,
+    formation: formatFormationsLabel(formations),
     playersPlaced: lineup.filter((slot) => slot.label).length,
     updatedAt: row.updated_at.toISOString()
   };

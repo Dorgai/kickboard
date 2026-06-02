@@ -3,6 +3,50 @@ import { isSquadPlayerRole, type SquadPlayerRole } from "@/lib/squads/player-rol
 export const FORMATIONS = ["4-3-3", "4-4-2", "3-5-2", "4-2-3-1"] as const;
 export type SquadFormation = (typeof FORMATIONS)[number];
 
+export type MatchFormations = {
+  home: SquadFormation;
+  away: SquadFormation;
+};
+
+const DEFAULT_FORMATION: SquadFormation = "4-3-3";
+
+export function defaultMatchFormations(): MatchFormations {
+  return { home: DEFAULT_FORMATION, away: DEFAULT_FORMATION };
+}
+
+export function parseStoredFormations(value: string): MatchFormations {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed) as { home?: string; away?: string };
+      const home = parsed.home ?? "";
+      const away = parsed.away ?? "";
+      return {
+        home: isValidFormation(home) ? home : DEFAULT_FORMATION,
+        away: isValidFormation(away) ? away : DEFAULT_FORMATION
+      };
+    } catch {
+      return defaultMatchFormations();
+    }
+  }
+  if (isValidFormation(trimmed)) {
+    return { home: trimmed, away: trimmed };
+  }
+  return defaultMatchFormations();
+}
+
+export function serializeFormations(formations: MatchFormations): string {
+  if (formations.home === formations.away) {
+    return formations.home;
+  }
+  return JSON.stringify(formations);
+}
+
+export function formatFormationsLabel(formations: MatchFormations) {
+  if (formations.home === formations.away) return formations.home;
+  return `${formations.home} / ${formations.away}`;
+}
+
 export const SLOTS_PER_TEAM = 11;
 export const MATCH_LINEUP_SIZE = SLOTS_PER_TEAM * 2;
 
@@ -86,6 +130,14 @@ export function clampPitchCoord(value: number) {
   return Math.min(100, Math.max(0, Number(value.toFixed(1))));
 }
 
+/** Keep dragged tokens on the correct half of a dual-team pitch. */
+export function clampCoordsToSide(side: SquadLineupSide, coords: PitchCoords): PitchCoords {
+  if (side === "home") {
+    return { x: coords.x, y: clampPitchCoord(Math.min(coords.y, 48)) };
+  }
+  return { x: coords.x, y: clampPitchCoord(Math.max(coords.y, 52)) };
+}
+
 function coordsForSide(layout: PitchCoords, side: SquadLineupSide): PitchCoords {
   const halfSpan = 44;
   const yHome = 4 + (layout.y / 100) * halfSpan;
@@ -116,28 +168,33 @@ export function defaultLineupWithPositions(formation: SquadFormation): SquadLine
   }));
 }
 
-/** Home (top) + away (bottom) XIs for a fixture — 22 slots total. */
-export function defaultMatchLineupWithPositions(formation: SquadFormation): SquadLineupSlot[] {
+function sideLineupFromFormation(formation: SquadFormation, side: SquadLineupSide): SquadLineupSlot[] {
   const base = defaultLineupWithPositions(formation);
-  const home = base.map((slot, index) => ({
+  const slotOffset = side === "home" ? 0 : SLOTS_PER_TEAM;
+  return base.map((slot, index) => ({
     ...slot,
-    slot: index + 1,
-    side: "home" as const,
-    x: coordsForSide({ x: slot.x, y: slot.y }, "home").x,
-    y: coordsForSide({ x: slot.x, y: slot.y }, "home").y
-  }));
-  const away = base.map((slot, index) => ({
-    ...slot,
-    slot: index + 1 + SLOTS_PER_TEAM,
-    side: "away" as const,
+    slot: index + 1 + slotOffset,
+    side,
     label: "",
     playerId: undefined,
     teamName: undefined,
     jerseyNumber: undefined,
-    x: coordsForSide({ x: slot.x, y: slot.y }, "away").x,
-    y: coordsForSide({ x: slot.x, y: slot.y }, "away").y
+    x: coordsForSide({ x: slot.x, y: slot.y }, side).x,
+    y: coordsForSide({ x: slot.x, y: slot.y }, side).y
   }));
-  return [...home, ...away];
+}
+
+/** Home (top) + away (bottom) XIs for a fixture — 22 slots total. */
+export function defaultMatchLineupWithFormations(formations: MatchFormations): SquadLineupSlot[] {
+  return [
+    ...sideLineupFromFormation(formations.home, "home"),
+    ...sideLineupFromFormation(formations.away, "away")
+  ];
+}
+
+/** @deprecated Use defaultMatchLineupWithFormations — same formation for both teams. */
+export function defaultMatchLineupWithPositions(formation: SquadFormation): SquadLineupSlot[] {
+  return defaultMatchLineupWithFormations({ home: formation, away: formation });
 }
 
 export function slotSide(slot: SquadLineupSlot): SquadLineupSide {
@@ -183,18 +240,23 @@ function mergeFormationChangeForSide(
   });
 }
 
-export function mergeMatchFormationChange(
+export function mergeMatchFormationChangeForSide(
+  side: SquadLineupSide,
   formation: SquadFormation,
   previous: SquadLineupSlot[]
 ): SquadLineupSlot[] {
-  const template = defaultMatchLineupWithPositions(formation);
-  const homeTemplate = template.filter((slot) => slotSide(slot) === "home");
-  const awayTemplate = template.filter((slot) => slotSide(slot) === "away");
-  const homePrior = previous.filter((slot) => slotSide(slot) === "home");
-  const awayPrior = previous.filter((slot) => slotSide(slot) === "away");
+  const template = sideLineupFromFormation(formation, side);
+  const prior = previous.filter((slot) => slotSide(slot) === side);
+  return mergeFormationChangeForSide(template, prior);
+}
+
+export function mergeMatchFormationChange(
+  formations: MatchFormations,
+  previous: SquadLineupSlot[]
+): SquadLineupSlot[] {
   return [
-    ...mergeFormationChangeForSide(homeTemplate, homePrior),
-    ...mergeFormationChangeForSide(awayTemplate, awayPrior)
+    ...mergeMatchFormationChangeForSide("home", formations.home, previous),
+    ...mergeMatchFormationChangeForSide("away", formations.away, previous)
   ];
 }
 
@@ -268,8 +330,13 @@ function mapLineupEntry(
   };
 }
 
-export function normalizeLineupSlots(raw: unknown, formation: SquadFormation): SquadLineupSlot[] {
-  const matchTemplate = defaultMatchLineupWithPositions(formation);
+export function normalizeLineupSlots(
+  raw: unknown,
+  formations: MatchFormations | SquadFormation
+): SquadLineupSlot[] {
+  const matchFormations =
+    typeof formations === "string" ? { home: formations, away: formations } : formations;
+  const matchTemplate = defaultMatchLineupWithFormations(matchFormations);
   if (!Array.isArray(raw) || raw.length === 0) {
     return matchTemplate;
   }
@@ -296,7 +363,9 @@ export function normalizeLineupSlots(raw: unknown, formation: SquadFormation): S
     );
   }
 
-  const legacyTemplate = defaultLineupWithPositions(formation);
+  const legacyFormation =
+    typeof formations === "string" ? formations : matchFormations.home;
+  const legacyTemplate = defaultLineupWithPositions(legacyFormation);
   const legacy = legacyTemplate.map((slot, index) =>
     mapLineupEntry(slot, raw[index] as Record<string, unknown> | undefined)
   );

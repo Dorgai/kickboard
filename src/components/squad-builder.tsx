@@ -5,11 +5,13 @@ import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
 import { SquadPitch } from "@/components/squad-pitch";
 import { SquadPlayerPool } from "@/components/squad-player-pool";
 import {
-  FORMATIONS,
   countFilledBySide,
-  defaultMatchLineupWithPositions,
-  mergeMatchFormationChange,
+  defaultMatchFormations,
+  defaultMatchLineupWithFormations,
+  mergeMatchFormationChangeForSide,
+  parseStoredFormations,
   SLOTS_PER_TEAM,
+  type MatchFormations,
   type SquadFormation,
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
@@ -19,7 +21,8 @@ import { teamsMatch } from "@/lib/squads/team-names";
 type LoadedSquad = {
   id: string;
   name: string;
-  formation: SquadFormation;
+  formation: string;
+  formations?: MatchFormations;
   lineup: SquadLineupSlot[];
 };
 
@@ -44,9 +47,9 @@ export function SquadBuilder({
   activeSquadId,
   onSaved
 }: SquadBuilderProps) {
-  const [formation, setFormation] = useState<SquadFormation>("4-3-3");
+  const [formations, setFormations] = useState<MatchFormations>(defaultMatchFormations);
   const [lineup, setLineup] = useState<SquadLineupSlot[]>(() =>
-    defaultMatchLineupWithPositions("4-3-3")
+    defaultMatchLineupWithFormations(defaultMatchFormations())
   );
   const [squadId, setSquadId] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
@@ -120,7 +123,9 @@ export function SquadBuilder({
             const squad = payload.squad;
             if (squad?.lineup?.length) {
               setSquadId(squad.id);
-              setFormation(squad.formation);
+              const loadedFormations =
+                squad.formations ?? parseStoredFormations(squad.formation ?? "4-3-3");
+              setFormations(loadedFormations);
               setLineup(squad.lineup);
               if (!cancelled) setLoadState("ready");
               return;
@@ -131,8 +136,9 @@ export function SquadBuilder({
           }
         } else {
           setSquadId(null);
-          setFormation("4-3-3");
-          setLineup(defaultMatchLineupWithPositions("4-3-3"));
+          const fresh = defaultMatchFormations();
+          setFormations(fresh);
+          setLineup(defaultMatchLineupWithFormations(fresh));
         }
 
         if (!cancelled) setLoadState("ready");
@@ -151,11 +157,17 @@ export function SquadBuilder({
     };
   }, [activeSquadId, awayTeam, fixtureKey, homeTeam]);
 
-  function changeFormation(next: SquadFormation) {
-    setFormation(next);
-    setLineup((current) => mergeMatchFormationChange(next, current));
+  const changeHomeFormation = useCallback((next: SquadFormation) => {
+    setFormations((current) => ({ ...current, home: next }));
+    setLineup((current) => mergeMatchFormationChangeForSide("home", next, current));
     setSelectedSlot(null);
-  }
+  }, []);
+
+  const changeAwayFormation = useCallback((next: SquadFormation) => {
+    setFormations((current) => ({ ...current, away: next }));
+    setLineup((current) => mergeMatchFormationChangeForSide("away", next, current));
+    setSelectedSlot(null);
+  }, []);
 
   const homeFilled = countFilledBySide(lineup, "home");
   const awayFilled = countFilledBySide(lineup, "away");
@@ -176,7 +188,15 @@ export function SquadBuilder({
       const response = await fetch("/api/squads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ squadId: squadId ?? undefined, fixtureKey, name, formation, lineup })
+        body: JSON.stringify({
+          squadId: squadId ?? undefined,
+          fixtureKey,
+          name,
+          formation: formations,
+          homeFormation: formations.home,
+          awayFormation: formations.away,
+          lineup
+        })
       });
       const payload = (await response.json()) as { error?: string; squadId?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to save squad.");
@@ -215,9 +235,9 @@ export function SquadBuilder({
   }
 
   const resetToFormation = useCallback(() => {
-    setLineup(defaultMatchLineupWithPositions(formation));
+    setLineup(defaultMatchLineupWithFormations(formations));
     setSelectedSlot(null);
-  }, [formation]);
+  }, [formations]);
 
   return (
     <form className="squad-builder" onSubmit={saveSquad}>
@@ -225,37 +245,28 @@ export function SquadBuilder({
         <div className="squad-builder-toolbar-title">
           <h3>Build both XIs</h3>
           <p className="squad-builder-progress">
-            {homeTeam} {homeFilled}/{SLOTS_PER_TEAM} · {awayTeam} {awayFilled}/{SLOTS_PER_TEAM}
+            {homeTeam} {homeFilled}/{SLOTS_PER_TEAM} ({formations.home}) · {awayTeam} {awayFilled}/
+            {SLOTS_PER_TEAM} ({formations.away})
             {squadId ? " · saved board" : " · new board"}
           </p>
         </div>
-        <label className="squad-builder-formation-field">
-          <span>Formation</span>
-          <select
-            className="feed-control-input squad-builder-formation-select"
-            value={formation}
-            onChange={(event) => changeFormation(event.target.value as SquadFormation)}
-          >
-            {FORMATIONS.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-        </label>
       </header>
 
       {loadState === "loading" ? <p className="inline-status">Loading your squad…</p> : null}
 
       <div className="squad-builder-layout">
         <SquadPlayerPool
+          awayFormation={formations.away}
           awayPlayers={awayPlayers}
           awayTeam={awayTeam}
           error={poolError}
+          homeFormation={formations.home}
           homePlayers={homePlayers}
           homeTeam={homeTeam}
           lineup={lineup}
           loading={poolLoading}
+          onAwayFormationChange={changeAwayFormation}
+          onHomeFormationChange={changeHomeFormation}
           onRemoveFromPitch={removeFromPitch}
           sourceLabel={poolLabel}
         />

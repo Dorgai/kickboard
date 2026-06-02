@@ -4,7 +4,7 @@ import { mapDatabaseError } from "@/lib/community/health";
 import { MATCH_LINEUP_SIZE, SLOTS_PER_TEAM } from "@/lib/squads/lineup";
 import {
   getUserSquadById,
-  isValidFormation,
+  parseFormationsFromRequest,
   updateUserSquad,
   type SquadLineupSlot
 } from "@/lib/squads/store";
@@ -46,7 +46,9 @@ export async function PATCH(request: Request, context: RouteContext) {
     const body = (await request.json()) as {
       fixtureKey?: string;
       name?: string;
-      formation?: string;
+      formation?: string | { home?: string; away?: string };
+      homeFormation?: string;
+      awayFormation?: string;
       lineup?: SquadLineupSlot[];
     };
 
@@ -55,8 +57,8 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: "Select a match for this Coach Board." }, { status: 400 });
     }
 
-    const formation = body.formation ?? "4-3-3";
-    if (!isValidFormation(formation)) {
+    const formations = parseFormationsFromRequest(body);
+    if (!formations) {
       return NextResponse.json({ error: "Invalid formation." }, { status: 400 });
     }
 
@@ -74,7 +76,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       squadId,
       userId: user.id,
       name: body.name ?? "My XI",
-      formation,
+      formations,
       lineup: body.lineup,
       fixtureKey
     });

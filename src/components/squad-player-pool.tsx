@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
-import type { SquadLineupSlot } from "@/lib/squads/lineup";
+import { FORMATIONS, type SquadFormation, type SquadLineupSlot } from "@/lib/squads/lineup";
 import { playerRoleLabel, SQUAD_PLAYER_ROLES, type SquadPlayerRole } from "@/lib/squads/player-roles";
 import { slotSide } from "@/lib/squads/lineup";
 import { DRAG_PLAYER_MIME } from "@/components/squad-pitch";
@@ -10,12 +10,16 @@ import { DRAG_PLAYER_MIME } from "@/components/squad-pitch";
 type SquadPlayerPoolProps = {
   homePlayers: SquadPoolPlayer[];
   awayPlayers: SquadPoolPlayer[];
+  homeFormation: SquadFormation;
+  awayFormation: SquadFormation;
   lineup: SquadLineupSlot[];
   homeTeam: string;
   awayTeam: string;
   sourceLabel: string | null;
   loading: boolean;
   error: string | null;
+  onHomeFormationChange: (formation: SquadFormation) => void;
+  onAwayFormationChange: (formation: SquadFormation) => void;
   onRemoveFromPitch: (playerId: number) => void;
 };
 
@@ -77,18 +81,22 @@ function PlayerChip({
 function SquadTeamPlayerPool({
   teamName,
   side,
+  formation,
   players,
   lineup,
   loading,
   error,
+  onFormationChange,
   onRemoveFromPitch
 }: {
   teamName: string;
   side: "home" | "away";
+  formation: SquadFormation;
   players: SquadPoolPlayer[];
   lineup: SquadLineupSlot[];
   loading: boolean;
   error: string | null;
+  onFormationChange: (formation: SquadFormation) => void;
   onRemoveFromPitch: (playerId: number) => void;
 }) {
   const [search, setSearch] = useState("");
@@ -134,7 +142,22 @@ function SquadTeamPlayerPool({
     <aside className="squad-player-pool">
       <header className="squad-player-pool-header">
         <h4>{teamName}</h4>
-        <p className="squad-player-pool-source">Bench · drag players onto the {side} half</p>
+        <label className="squad-player-pool-formation">
+          <span>Formation</span>
+          <select
+            aria-label={`${teamName} formation`}
+            className="feed-control-input"
+            value={formation}
+            onChange={(event) => onFormationChange(event.target.value as SquadFormation)}
+          >
+            {FORMATIONS.map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="squad-player-pool-source">Bench · drag onto the {side} half of the pitch</p>
       </header>
 
       <div
@@ -192,12 +215,16 @@ function SquadTeamPlayerPool({
 export function SquadPlayerPool({
   homePlayers,
   awayPlayers,
+  homeFormation,
+  awayFormation,
   lineup,
   homeTeam,
   awayTeam,
   sourceLabel,
   loading,
   error,
+  onHomeFormationChange,
+  onAwayFormationChange,
   onRemoveFromPitch
 }: SquadPlayerPoolProps) {
   return (
@@ -206,20 +233,24 @@ export function SquadPlayerPool({
       <div className="squad-player-pools-grid">
         <SquadTeamPlayerPool
           error={error}
+          formation={homeFormation}
           lineup={lineup}
           loading={loading}
           players={homePlayers}
           side="home"
           teamName={homeTeam}
+          onFormationChange={onHomeFormationChange}
           onRemoveFromPitch={onRemoveFromPitch}
         />
         <SquadTeamPlayerPool
           error={error}
+          formation={awayFormation}
           lineup={lineup}
           loading={loading}
           players={awayPlayers}
           side="away"
           teamName={awayTeam}
+          onFormationChange={onAwayFormationChange}
           onRemoveFromPitch={onRemoveFromPitch}
         />
       </div>

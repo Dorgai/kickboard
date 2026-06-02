@@ -2227,6 +2227,18 @@ h3 {
   margin: 0;
 }
 
+.squad-player-pool-formation {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.squad-player-pool-formation span {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+}
+
 .squad-player-pool-source {
   color: var(--color-text-secondary);
   font-size: 10px;

@@ -1,19 +1,61 @@
 import { query } from "@/lib/db";
 import { getDefaultTournamentId } from "@/lib/auth/users";
 import {
-  defaultMatchLineupWithPositions,
+  defaultMatchFormations,
+  defaultMatchLineupWithFormations,
+  formatFormationsLabel,
   isValidFormation,
   MATCH_LINEUP_SIZE,
   normalizeLineupSlots,
+  parseStoredFormations,
+  serializeFormations,
+  type MatchFormations,
   type SquadFormation,
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
 
-export type { SquadFormation, SquadLineupSlot } from "@/lib/squads/lineup";
-export { FORMATIONS, isValidFormation } from "@/lib/squads/lineup";
+export type { MatchFormations, SquadFormation, SquadLineupSlot } from "@/lib/squads/lineup";
+export {
+  FORMATIONS,
+  formatFormationsLabel,
+  isValidFormation,
+  parseStoredFormations,
+  serializeFormations
+} from "@/lib/squads/lineup";
 
-export function defaultLineupForFormation(formation: SquadFormation): SquadLineupSlot[] {
-  return defaultMatchLineupWithPositions(formation);
+export function defaultLineupForFormations(formations: MatchFormations): SquadLineupSlot[] {
+  return defaultMatchLineupWithFormations(formations);
+}
+
+export function parseFormationsFromRequest(body: {
+  formation?: unknown;
+  homeFormation?: string;
+  awayFormation?: string;
+}): MatchFormations | null {
+  if (body.homeFormation !== undefined || body.awayFormation !== undefined) {
+    const home = body.homeFormation ?? "4-3-3";
+    const away = body.awayFormation ?? "4-3-3";
+    if (!isValidFormation(home) || !isValidFormation(away)) return null;
+    return { home, away };
+  }
+
+  if (body.formation && typeof body.formation === "object") {
+    const record = body.formation as { home?: string; away?: string };
+    const home = record.home ?? "4-3-3";
+    const away = record.away ?? "4-3-3";
+    if (!isValidFormation(home) || !isValidFormation(away)) return null;
+    return { home, away };
+  }
+
+  if (typeof body.formation === "string") {
+    if (body.formation.trim().startsWith("{")) {
+      return parseStoredFormations(body.formation);
+    }
+    if (!isValidFormation(body.formation)) return null;
+    return { home: body.formation, away: body.formation };
+  }
+
+  return defaultMatchFormations();
 }
 
 function serializeLineup(lineup: SquadLineupSlot[]) {
@@ -33,7 +75,7 @@ function serializeLineup(lineup: SquadLineupSlot[]) {
 export async function createUserSquad(input: {
   userId: string;
   name: string;
-  formation: SquadFormation;
+  formations: MatchFormations;
   lineup: SquadLineupSlot[];
   fixtureKey: string;
 }) {
@@ -41,9 +83,8 @@ export async function createUserSquad(input: {
   if (!tournamentId) throw new Error("TOURNAMENT_NOT_CONFIGURED");
 
   const trimmedName = input.name.trim().slice(0, 60) || "My XI";
-  const lineup = serializeLineup(
-    normalizeLineupSlots(input.lineup, input.formation)
-  );
+  const lineup = serializeLineup(normalizeLineupSlots(input.lineup, input.formations));
+  const formationStored = serializeFormations(input.formations);
 
   const fixtureKey = input.fixtureKey.trim().slice(0, 120);
   if (!fixtureKey) throw new Error("FIXTURE_KEY_REQUIRED");
@@ -52,7 +93,7 @@ export async function createUserSquad(input: {
     `INSERT INTO squads (user_id, tournament_id, name, formation, lineup, is_public, fixture_key)
      VALUES ($1, $2, $3, $4, $5::jsonb, true, $6)
      RETURNING id`,
-    [input.userId, tournamentId, trimmedName, input.formation, JSON.stringify(lineup), fixtureKey]
+    [input.userId, tournamentId, trimmedName, formationStored, JSON.stringify(lineup), fixtureKey]
   );
 
   return result.rows[0]?.id ?? null;
@@ -76,14 +117,17 @@ export async function publishSquadToBoard(squadId: string, userId: string) {
   const row = squad.rows[0];
   if (!row) throw new Error("SQUAD_NOT_FOUND");
 
-  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
-  const lineup = normalizeLineupSlots(row.lineup, formation);
+  const formations = parseStoredFormations(row.formation);
+  const lineup = normalizeLineupSlots(row.lineup, formations);
   const summary = lineup
     .filter((slot) => slot.label)
-    .map((slot) => `${slot.side === "away" ? "A" : "H"} ${slot.role}: ${slot.label}`)
+    .map((slot) => `${slot.side === "away" ? "Away" : "Home"} ${slot.label}`)
     .join(" · ");
 
-  const body = `${row.name} (${row.formation})${summary ? ` — ${summary}` : ""}`.slice(0, 280);
+  const body = `${row.name} (${formatFormationsLabel(formations)})${summary ? ` — ${summary}` : ""}`.slice(
+    0,
+    280
+  );
 
   const post = await query<{ id: string }>(
     `INSERT INTO posts (author_id, post_type, body, squad_id, moderation_status, fixture_key)
@@ -119,13 +163,14 @@ export async function getLatestUserSquad(userId: string, fixtureKey: string) {
   const row = result.rows[0];
   if (!row) return null;
 
-  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
+  const formations = parseStoredFormations(row.formation);
 
   return {
     id: row.id,
     name: row.name,
-    formation,
-    lineup: normalizeLineupSlots(row.lineup, formation),
+    formation: formatFormationsLabel(formations),
+    formations,
+    lineup: normalizeLineupSlots(row.lineup, formations),
     publishedAt: row.published_to_board_at?.toISOString() ?? null,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString()
@@ -136,11 +181,12 @@ export async function updateUserSquad(input: {
   squadId: string;
   userId: string;
   name: string;
-  formation: SquadFormation;
+  formations: MatchFormations;
   lineup: SquadLineupSlot[];
   fixtureKey: string;
 }) {
-  const lineup = serializeLineup(normalizeLineupSlots(input.lineup, input.formation));
+  const lineup = serializeLineup(normalizeLineupSlots(input.lineup, input.formations));
+  const formationStored = serializeFormations(input.formations);
   const trimmedName = input.name.trim().slice(0, 60) || "My XI";
   const fixtureKey = input.fixtureKey.trim().slice(0, 120);
 
@@ -157,7 +203,7 @@ export async function updateUserSquad(input: {
       input.squadId,
       input.userId,
       trimmedName,
-      input.formation,
+      formationStored,
       JSON.stringify(lineup),
       fixtureKey
     ]
@@ -185,12 +231,12 @@ function mapSquadSummary(row: {
   updated_at: Date;
   lineup: unknown;
 }) {
-  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
-  const lineup = normalizeLineupSlots(row.lineup, formation);
+  const formations = parseStoredFormations(row.formation);
+  const lineup = normalizeLineupSlots(row.lineup, formations);
   return {
     id: row.id,
     name: row.name,
-    formation: row.formation,
+    formation: formatFormationsLabel(formations),
     publishedAt: row.published_to_board_at?.toISOString() ?? null,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
@@ -218,12 +264,12 @@ export async function getUserSquadById(squadId: string, userId: string) {
   const row = result.rows[0];
   if (!row) return null;
 
-  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
+  const formations = parseStoredFormations(row.formation);
 
   return {
     ...mapSquadSummary(row),
-    formation,
-    lineup: normalizeLineupSlots(row.lineup, formation),
+    formations,
+    lineup: normalizeLineupSlots(row.lineup, formations),
     fixtureKey: row.fixture_key
   };
 }

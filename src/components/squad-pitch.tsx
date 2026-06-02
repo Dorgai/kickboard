@@ -2,9 +2,11 @@
 
 import { useCallback, useRef, useState } from "react";
 import {
+  clampCoordsToSide,
   clampPitchCoord,
   slotSide,
   SLOTS_PER_TEAM,
+  type SquadLineupSide,
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
 import { playerRoleLabel } from "@/lib/squads/player-roles";
@@ -39,7 +41,7 @@ function coordsFromPointer(pitch: DOMRect, clientX: number, clientY: number) {
 
 function nearestEmptySlot(
   lineup: SquadLineupSlot[],
-  side: SquadLineupSlot["side"],
+  side: SquadLineupSide,
   role?: SquadLineupSlot["role"]
 ) {
   const byRole = lineup.findIndex(
@@ -83,6 +85,8 @@ export function SquadPitch({
       if (slotIndex < 0) return;
       if (slotSide(lineup[slotIndex]) !== playerSide) return;
 
+      const placed = clampCoordsToSide(playerSide, coords);
+
       const next = lineup.map((slot, index) => {
         if (index === slotIndex) {
           return {
@@ -92,8 +96,8 @@ export function SquadPitch({
             playerId: player.playerId,
             teamName: player.teamName,
             jerseyNumber: player.jerseyNumber ?? undefined,
-            x: coords.x,
-            y: coords.y
+            x: placed.x,
+            y: placed.y
           };
         }
         if (slot.playerId === player.playerId) {
@@ -111,9 +115,11 @@ export function SquadPitch({
   const moveSlot = useCallback(
     (slotNumber: number, coords: { x: number; y: number }) => {
       onLineupChange(
-        lineup.map((slot) =>
-          slot.slot === slotNumber ? { ...slot, x: coords.x, y: coords.y } : slot
-        )
+        lineup.map((slot) => {
+          if (slot.slot !== slotNumber) return slot;
+          const placed = clampCoordsToSide(slotSide(slot), coords);
+          return { ...slot, x: placed.x, y: placed.y };
+        })
       );
     },
     [lineup, onLineupChange]
@@ -156,7 +162,7 @@ export function SquadPitch({
       const player = JSON.parse(raw) as PitchDragPlayer;
       if (player.fromPitch) return;
       const coords = coordsFromPointer(pitch, event.clientX, event.clientY);
-      const dropSide: SquadLineupSlot["side"] = coords.y < 50 ? "home" : "away";
+      const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
       const playerSide = sideForPlayer(player, homeTeam, awayTeam);
       if (!playerSide || playerSide !== dropSide) return;
 
@@ -196,7 +202,7 @@ export function SquadPitch({
         <span className="squad-pitch-team-banner squad-pitch-team-banner--away">{awayTeam}</span>
 
         {!readOnly
-          ? lineup.map((slot) => (
+          ? lineup.map((slot, slotIndex) => (
               <button
                 className={`squad-pitch-ghost${slot.label ? " squad-pitch-ghost--filled" : " squad-pitch-ghost--empty"}${
                   selectedSlot === slot.slot ? " squad-pitch-ghost--selected" : ""
@@ -205,6 +211,26 @@ export function SquadPitch({
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 type="button"
                 onClick={() => onSelectSlot(slot.slot)}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.dataTransfer.dropEffect = "copy";
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  const raw = event.dataTransfer.getData(DRAG_PLAYER_MIME);
+                  if (!raw || slot.label) return;
+                  try {
+                    const player = JSON.parse(raw) as PitchDragPlayer;
+                    if (player.fromPitch) return;
+                    const playerSide = sideForPlayer(player, homeTeam, awayTeam);
+                    if (!playerSide || playerSide !== slotSide(slot)) return;
+                    assignPlayerAt(player, { x: slot.x, y: slot.y }, slotIndex);
+                  } catch {
+                    /* ignore */
+                  }
+                }}
                 aria-label={`${slotSide(slot)} ${playerRoleLabel(slot.role)} slot ${slot.slot}`}
               >
                 {!slot.label ? (

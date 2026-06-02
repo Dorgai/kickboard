@@ -4,11 +4,11 @@ import { mapDatabaseError } from "@/lib/community/health";
 import { MATCH_LINEUP_SIZE } from "@/lib/squads/lineup";
 import {
   createUserSquad,
-  defaultLineupForFormation,
+  defaultLineupForFormations,
   getLatestUserSquad,
-  isValidFormation,
   listUserSquads,
   listUserSquadsForFixture,
+  parseFormationsFromRequest,
   updateUserSquad,
   type SquadLineupSlot
 } from "@/lib/squads/store";
@@ -52,7 +52,9 @@ export async function POST(request: Request) {
       squadId?: string;
       fixtureKey?: string;
       name?: string;
-      formation?: string;
+      formation?: string | { home?: string; away?: string };
+      homeFormation?: string;
+      awayFormation?: string;
       lineup?: SquadLineupSlot[];
     };
 
@@ -61,8 +63,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Select a match for this Coach Board." }, { status: 400 });
     }
 
-    const formation = body.formation ?? "4-3-3";
-    if (!isValidFormation(formation)) {
+    const formations = parseFormationsFromRequest(body);
+    if (!formations) {
       return NextResponse.json({ error: "Invalid formation." }, { status: 400 });
     }
 
@@ -70,7 +72,7 @@ export async function POST(request: Request) {
       Array.isArray(body.lineup) &&
       (body.lineup.length === MATCH_LINEUP_SIZE || body.lineup.length === 11)
         ? body.lineup
-        : defaultLineupForFormation(formation);
+        : defaultLineupForFormations(formations);
 
     const existingId = typeof body.squadId === "string" ? body.squadId.trim() : "";
     let squadId: string | null = null;
@@ -80,7 +82,7 @@ export async function POST(request: Request) {
         squadId: existingId,
         userId: user.id,
         name: body.name ?? "My XI",
-        formation,
+        formations,
         lineup,
         fixtureKey
       });
@@ -91,7 +93,7 @@ export async function POST(request: Request) {
       squadId = await createUserSquad({
         userId: user.id,
         name: body.name ?? "My XI",
-        formation,
+        formations,
         lineup,
         fixtureKey
       });
