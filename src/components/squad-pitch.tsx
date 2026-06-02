@@ -145,11 +145,13 @@ export function SquadPitch({
         ref={pitchRef}
         role="application"
       >
-        <div className="squad-pitch-grass" />
-        <div className="squad-pitch-midline" />
-        <div className="squad-pitch-circle" />
-        <div className="squad-pitch-box squad-pitch-box--top" />
-        <div className="squad-pitch-box squad-pitch-box--bottom" />
+        <div className="squad-pitch-grass" aria-hidden />
+        <div className="squad-pitch-midline" aria-hidden />
+        <div className="squad-pitch-circle" aria-hidden />
+        <div className="squad-pitch-box squad-pitch-box--top" aria-hidden />
+        <div className="squad-pitch-box squad-pitch-box--bottom" aria-hidden />
+        <div className="squad-pitch-goal-area squad-pitch-goal-area--top" aria-hidden />
+        <div className="squad-pitch-goal-area squad-pitch-goal-area--bottom" aria-hidden />
 
         {lineup.map((slot) => (
           <button

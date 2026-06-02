@@ -1409,8 +1409,11 @@ h3 {
   font-weight: 700;
 }
 
+/* FIFA reference pitch: 105m (goal-to-goal) × 68m (touchline). Goals at top/bottom. */
 .squad-pitch {
-  aspect-ratio: 68 / 105;
+  --pitch-length: 105;
+  --pitch-width: 68;
+  aspect-ratio: var(--pitch-width) / var(--pitch-length);
   background: linear-gradient(
     180deg,
     color-mix(in srgb, #1a4d2e 88%, #0d2818) 0%,
@@ -1418,21 +1421,24 @@ h3 {
     color-mix(in srgb, #1a4d2e 88%, #0d2818) 100%
   );
   border: 2px solid color-mix(in srgb, #f5f5f5 35%, transparent);
-  border-radius: 10px;
+  border-radius: 6px;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 25%, transparent);
-  max-height: 32rem;
+  height: auto;
+  margin-inline: auto;
+  max-height: min(36rem, 72vh);
+  max-width: 100%;
   position: relative;
   touch-action: none;
-  width: 100%;
+  width: min(100%, calc(min(36rem, 72vh) * var(--pitch-width) / var(--pitch-length)));
 }
 
 .squad-pitch-grass {
   background-image: repeating-linear-gradient(
     90deg,
     color-mix(in srgb, #fff 4%, transparent) 0,
-    color-mix(in srgb, #fff 4%, transparent) 10%,
-    transparent 10%,
-    transparent 20%
+    color-mix(in srgb, #fff 4%, transparent) 9.52%,
+    transparent 9.52%,
+    transparent 19.05%
   );
   inset: 0;
   pointer-events: none;
@@ -1441,7 +1447,8 @@ h3 {
 
 .squad-pitch-midline,
 .squad-pitch-circle,
-.squad-pitch-box {
+.squad-pitch-box,
+.squad-pitch-goal-area {
   border: 1px solid color-mix(in srgb, #fff 55%, transparent);
   pointer-events: none;
   position: absolute;
@@ -1454,19 +1461,21 @@ h3 {
   top: 50%;
 }
 
+/* Centre circle: 9.15m radius → 18.3m diameter */
 .squad-pitch-circle {
   border-radius: 50%;
-  height: 18%;
+  height: calc(18.3 / var(--pitch-length) * 100%);
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 24%;
+  width: calc(18.3 / var(--pitch-width) * 100%);
 }
 
+/* Penalty area: 16.5m × 40.32m */
 .squad-pitch-box {
-  height: 16%;
-  left: 22%;
-  width: 56%;
+  height: calc(16.5 / var(--pitch-length) * 100%);
+  left: calc((var(--pitch-width) - 40.32) / 2 / var(--pitch-width) * 100%);
+  width: calc(40.32 / var(--pitch-width) * 100%);
 }
 
 .squad-pitch-box--top {
@@ -1474,6 +1483,21 @@ h3 {
 }
 
 .squad-pitch-box--bottom {
+  bottom: 0;
+}
+
+/* Goal area: 5.5m × 18.32m */
+.squad-pitch-goal-area {
+  height: calc(5.5 / var(--pitch-length) * 100%);
+  left: calc((var(--pitch-width) - 18.32) / 2 / var(--pitch-width) * 100%);
+  width: calc(18.32 / var(--pitch-width) * 100%);
+}
+
+.squad-pitch-goal-area--top {
+  top: 0;
+}
+
+.squad-pitch-goal-area--bottom {
   bottom: 0;
 }
 
