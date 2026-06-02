@@ -28,6 +28,14 @@ export function AuthGate({
       .catch(() => setOauthConfigured(null));
   }, []);
 
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.user?.onboardingComplete) return;
+
+    void fetch("/api/invitations/redeem", { method: "POST" }).catch(() => {
+      /* invite cookie absent or already redeemed */
+    });
+  }, [session?.user?.onboardingComplete, status]);
+
   if (status === "loading") {
     return <p className="inline-status">Checking sign-in…</p>;
   }
