@@ -4,6 +4,7 @@ import { Bell, ChevronDown, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HeaderUserMenu } from "@/components/header-user-menu";
+import { ThemeSelector } from "@/components/theme-selector";
 import { navigation } from "@/lib/kickboard-data";
 
 type AppChromeProps = {
@@ -85,6 +86,7 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
         </nav>
 
         <div className="nav-actions">
+          <ThemeSelector />
           <button type="button" aria-label="Open global search">
             <Search size={18} aria-hidden="true" />
           </button>

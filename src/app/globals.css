@@ -1,38 +1,45 @@
-:root {
+[data-theme="light"],
+:root:not([data-theme]) {
   --color-brand: #1a56db;
   --color-brand-light: #dbeafe;
+  --color-accent: #1a56db;
   --color-surface: #ffffff;
-  --color-bg: #f9fafb;
+  --color-bg: #f3f4f6;
   --color-text-primary: #111827;
   --color-text-secondary: #6b7280;
-  --color-border: #e5e7eb;
+  --color-border: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
   --color-live: #10b981;
   --color-danger: #ef4444;
   --color-goal: #f59e0b;
-  --shadow-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-elevation-2: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-elevation-3: 0 10px 32px rgba(0, 0, 0, 0.1);
+  --shadow-surface: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 14px rgba(15, 23, 42, 0.055);
+  --shadow-surface-hover: 0 2px 4px rgba(15, 23, 42, 0.05), 0 8px 22px rgba(15, 23, 42, 0.08);
+  --shadow-header: 0 1px 0 rgba(15, 23, 42, 0.04), 0 6px 16px rgba(15, 23, 42, 0.05);
+  --shadow-elevation-1: var(--shadow-surface);
+  --shadow-elevation-2: var(--shadow-surface);
+  --shadow-elevation-3: 0 4px 8px rgba(15, 23, 42, 0.06), 0 16px 40px rgba(15, 23, 42, 0.1);
   --radius-card: 12px;
   --radius-modal: 16px;
   --max-page: 1280px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-brand: #60a5fa;
-    --color-brand-light: #1e3a5f;
-    --color-surface: #1f2937;
-    --color-bg: #111827;
-    --color-text-primary: #f9fafb;
-    --color-text-secondary: #9ca3af;
-    --color-border: #374151;
-    --color-live: #34d399;
-    --color-danger: #f87171;
-    --color-goal: #fcd34d;
-    --shadow-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.25);
-    --shadow-elevation-2: 0 2px 8px rgba(0, 0, 0, 0.2);
-    --shadow-elevation-3: 0 12px 36px rgba(0, 0, 0, 0.45);
-  }
+[data-theme="dark"] {
+  --color-brand: #60a5fa;
+  --color-brand-light: #1e3a5f;
+  --color-accent: #60a5fa;
+  --color-surface: #1f2937;
+  --color-bg: #111827;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-border: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  --color-live: #34d399;
+  --color-danger: #f87171;
+  --color-goal: #fcd34d;
+  --shadow-surface: 0 1px 2px rgba(0, 0, 0, 0.32), 0 4px 16px rgba(0, 0, 0, 0.22);
+  --shadow-surface-hover: 0 2px 6px rgba(0, 0, 0, 0.35), 0 10px 24px rgba(0, 0, 0, 0.28);
+  --shadow-header: 0 1px 0 rgba(0, 0, 0, 0.35), 0 8px 20px rgba(0, 0, 0, 0.28);
+  --shadow-elevation-1: var(--shadow-surface);
+  --shadow-elevation-2: var(--shadow-surface);
+  --shadow-elevation-3: 0 8px 20px rgba(0, 0, 0, 0.35), 0 20px 48px rgba(0, 0, 0, 0.45);
 }
 
 * {
@@ -94,7 +101,8 @@ button:disabled {
 .app-header {
   backdrop-filter: blur(20px);
   background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
+  box-shadow: var(--shadow-header);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -140,10 +148,11 @@ button:disabled {
 }
 
 .tournament-switcher,
-.nav-actions button {
+.nav-actions button:not(.theme-selector button) {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 9999px;
+  box-shadow: var(--shadow-surface);
   color: var(--color-text-primary);
   cursor: pointer;
   gap: 8px;
@@ -211,8 +220,9 @@ button:disabled {
 .header-user-menu {
   align-items: center;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 9999px;
+  box-shadow: var(--shadow-surface);
   display: inline-flex;
   gap: 8px;
   min-height: 44px;
@@ -701,11 +711,19 @@ h3 {
 
 .data-card,
 .squad-card,
-.feed-status-card {
+.feed-status-card,
+.match-coach-row,
+.squad-builder,
+.saved-squads-bar,
+.friends-match-activity,
+.fixture-prediction-pick--card,
+.fan-chat-float-panel,
+.community-post-card,
+.predictions-coming-soon {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-elevation-2);
+  box-shadow: var(--shadow-surface);
   padding: 18px;
 }
 
@@ -714,7 +732,8 @@ h3 {
 }
 
 .surface-muted {
-  box-shadow: var(--shadow-elevation-1);
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-bg));
+  box-shadow: var(--shadow-surface);
 }
 
 .widget-elevated {
@@ -1277,9 +1296,6 @@ h3 {
 }
 
 .match-coach-row {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
   display: grid;
   gap: 10px;
   margin-bottom: 24px;
@@ -1316,9 +1332,10 @@ h3 {
 }
 
 .match-fixture-picker-btn {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border: none;
   border-radius: 10px;
+  box-shadow: var(--shadow-surface);
   cursor: pointer;
   display: grid;
   gap: 4px;
@@ -1328,8 +1345,9 @@ h3 {
 }
 
 .match-fixture-picker-btn.selected {
-  border-color: var(--color-brand);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-brand) 35%, transparent);
+  box-shadow:
+    var(--shadow-surface-hover),
+    0 0 0 1px color-mix(in srgb, var(--color-brand) 40%, transparent);
 }
 
 .match-fixture-picker-status {
@@ -1409,9 +1427,10 @@ h3 {
 }
 
 .saved-squads-bar {
-  background: color-mix(in srgb, var(--color-bg) 65%, transparent);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border: none;
   border-radius: 12px;
+  box-shadow: var(--shadow-surface);
   display: grid;
   gap: 10px;
   padding: 12px 14px;
@@ -1451,28 +1470,28 @@ h3 {
 }
 
 .saved-squad-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg) 55%, var(--color-surface));
+  border: none;
   border-radius: 10px;
+  box-shadow: var(--shadow-surface);
   cursor: pointer;
   display: grid;
   gap: 2px;
   max-width: 16rem;
   padding: 8px 10px;
   text-align: left;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+  transition: box-shadow 0.15s ease;
   width: 100%;
 }
 
 .saved-squad-card:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  box-shadow: var(--shadow-surface-hover);
 }
 
 .saved-squad-card.selected {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  box-shadow:
+    var(--shadow-surface-hover),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .saved-squad-card-name {
@@ -1562,9 +1581,10 @@ h3 {
 }
 
 .fixture-prediction-pick {
-  background: color-mix(in srgb, var(--color-bg) 65%, transparent);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border: none;
   border-radius: 10px;
+  box-shadow: var(--shadow-surface);
   display: grid;
   gap: 8px;
   padding: 10px 12px;
@@ -1645,9 +1665,10 @@ h3 {
 }
 
 .friends-match-activity {
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-bg));
-  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-surface));
+  border: none;
   border-radius: 12px;
+  box-shadow: var(--shadow-surface);
   display: grid;
   gap: 12px;
   padding: 12px 14px;
@@ -1760,8 +1781,7 @@ h3 {
 }
 
 .squad-builder {
-  background: color-mix(in srgb, var(--color-bg) 70%, transparent);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   border-radius: 12px;
   display: grid;
   gap: 10px;
@@ -2331,9 +2351,9 @@ h3 {
 .event-tab-bar {
   align-items: center;
   background: color-mix(in srgb, var(--color-surface) 94%, transparent);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 9999px;
-  box-shadow: var(--shadow-elevation-2);
+  box-shadow: var(--shadow-surface);
   display: inline-flex;
   gap: 6px;
   margin: 0 0 28px;
@@ -2341,6 +2361,23 @@ h3 {
   position: sticky;
   top: 84px;
   z-index: 15;
+}
+
+.theme-selector.event-tab-bar {
+  margin: 0;
+  padding: 4px;
+  position: static;
+  top: auto;
+}
+
+.theme-selector.event-tab-bar button {
+  font-size: 12px;
+  min-height: 36px;
+  padding: 0 12px;
+}
+
+.nav-actions .theme-selector {
+  flex-shrink: 0;
 }
 
 .event-tab-bar button {
@@ -2368,9 +2405,10 @@ h3 {
 }
 
 .feed-tab-bar button {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border: none;
   border-radius: 9999px;
+  box-shadow: var(--shadow-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
   font: inherit;
@@ -2382,7 +2420,7 @@ h3 {
 
 .feed-tab-bar button.active {
   background: var(--color-text-primary);
-  border-color: var(--color-text-primary);
+  box-shadow: var(--shadow-surface-hover);
   color: var(--color-bg);
 }
 
@@ -2747,8 +2785,9 @@ h3 {
 .current-world-cup-card,
 .bracket-tree-card {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-surface);
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -5220,6 +5259,12 @@ code {
 
   .event-tab-bar {
     top: 72px;
+  }
+
+  .theme-selector.event-tab-bar button {
+    font-size: 11px;
+    min-height: 32px;
+    padding: 0 8px;
   }
 
   .site-footer {
