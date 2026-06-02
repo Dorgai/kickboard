@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { FormEvent, useEffect, useState } from "react";
 
 type AuthConfig = {
@@ -138,18 +138,5 @@ export function AuthGate({
     );
   }
 
-  return (
-    <div className="auth-gate-shell">
-      <div className="auth-session-bar">
-        <span>
-          Signed in as <strong>{session.user.name ?? session.user.email}</strong> ·{" "}
-          {session.user.pointsBalance} pts
-        </span>
-        <button className="text-button" type="button" onClick={() => void signOut()}>
-          Sign out
-        </button>
-      </div>
-      {children}
-    </div>
-  );
+  return <div className="auth-gate-shell">{children}</div>;
 }
