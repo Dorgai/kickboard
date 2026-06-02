@@ -302,6 +302,17 @@ export function mergeMatchFormationChangeForSide(
   return mergeFormationChangeForSide(template, prior);
 }
 
+/** Remap one side to a new formation and keep the other side's slots unchanged. */
+export function applyFormationChangeForSide(
+  side: SquadLineupSide,
+  formation: SquadFormation,
+  previous: SquadLineupSlot[]
+): SquadLineupSlot[] {
+  const filled = mergeMatchFormationChangeForSide(side, formation, previous);
+  const otherSide = previous.filter((slot) => slotSide(slot) !== side);
+  return side === "home" ? [...filled, ...otherSide] : [...otherSide, ...filled];
+}
+
 export type BenchPlayerPick = {
   playerId: number;
   name: string;

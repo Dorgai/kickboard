@@ -10,7 +10,7 @@ import {
   defaultMatchLineupWithFormations,
   alignLineupSlotCoordinates,
   applyBenchSelectionToSideFormation,
-  mergeMatchFormationChangeForSide,
+  applyFormationChangeForSide,
   normalizeLineupTeamLabels,
   type BenchPlayerPick,
   parseStoredFormations,
@@ -253,17 +253,20 @@ export function SquadBuilder({
 
   const changeHomeFormation = useCallback(
     (next: SquadFormation) => {
-      setFormations((current) => ({ ...current, home: next }));
-      setLineup((current) => {
-        const benchPicks = benchPicksForSide(homeSelectedIds, homePlayers, homeTeam);
-        if (benchPicks.length > 0) {
-          return normalizeLineupTeamLabels(
-            applyBenchSelectionToSideFormation("home", next, current, benchPicks),
-            homeTeam,
-            awayTeam
+      setFormations((currentFormations) => {
+        const nextFormations = { ...currentFormations, home: next };
+        setLineup((current) => {
+          const benchPicks = benchPicksForSide(homeSelectedIds, homePlayers, homeTeam);
+          const merged =
+            benchPicks.length > 0
+              ? applyBenchSelectionToSideFormation("home", next, current, benchPicks)
+              : applyFormationChangeForSide("home", next, current);
+          return alignLineupSlotCoordinates(
+            normalizeLineupTeamLabels(merged, homeTeam, awayTeam),
+            nextFormations
           );
-        }
-        return mergeMatchFormationChangeForSide("home", next, current);
+        });
+        return nextFormations;
       });
       setHomeSelectedIds(new Set());
       setSelectedSlot(null);
@@ -273,17 +276,20 @@ export function SquadBuilder({
 
   const changeAwayFormation = useCallback(
     (next: SquadFormation) => {
-      setFormations((current) => ({ ...current, away: next }));
-      setLineup((current) => {
-        const benchPicks = benchPicksForSide(awaySelectedIds, awayPlayers, awayTeam);
-        if (benchPicks.length > 0) {
-          return normalizeLineupTeamLabels(
-            applyBenchSelectionToSideFormation("away", next, current, benchPicks),
-            homeTeam,
-            awayTeam
+      setFormations((currentFormations) => {
+        const nextFormations = { ...currentFormations, away: next };
+        setLineup((current) => {
+          const benchPicks = benchPicksForSide(awaySelectedIds, awayPlayers, awayTeam);
+          const merged =
+            benchPicks.length > 0
+              ? applyBenchSelectionToSideFormation("away", next, current, benchPicks)
+              : applyFormationChangeForSide("away", next, current);
+          return alignLineupSlotCoordinates(
+            normalizeLineupTeamLabels(merged, homeTeam, awayTeam),
+            nextFormations
           );
-        }
-        return mergeMatchFormationChangeForSide("away", next, current);
+        });
+        return nextFormations;
       });
       setAwaySelectedIds(new Set());
       setSelectedSlot(null);
