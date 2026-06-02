@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import { FORMATIONS, type SquadFormation, type SquadLineupSlot } from "@/lib/squads/lineup";
-import { playerRoleLabel } from "@/lib/squads/player-roles";
+import { playerRoleLabel, SQUAD_PLAYER_ROLES, type SquadPlayerRole } from "@/lib/squads/player-roles";
 import { slotSide } from "@/lib/squads/lineup";
 import {
   isPlayerDragEvent,
@@ -12,7 +12,6 @@ import {
   type PitchDragPlayer
 } from "@/lib/squads/drag-player";
 import { teamsMatch } from "@/lib/squads/team-names";
-import { teamKitInlineStyle } from "@/lib/team-kit-colors";
 
 type SquadPlayerPoolProps = {
   homePlayers: SquadPoolPlayer[];
@@ -30,7 +29,7 @@ type SquadPlayerPoolProps = {
   onRemoveFromPitch: (playerId: number) => void;
 };
 
-function PlayerChip({
+function BenchPlayerChip({
   player,
   side,
   onPitch,
@@ -44,7 +43,7 @@ function PlayerChip({
   return (
     <li>
       <button
-        className={`squad-player-chip${onPitch ? " squad-player-chip--on-pitch" : ""}`}
+        className={`squad-player-chip squad-player-chip--bench${onPitch ? " squad-player-chip--on-pitch" : ""}`}
         draggable
         type="button"
         title={
@@ -68,15 +67,22 @@ function PlayerChip({
           event.dataTransfer.effectAllowed = onPitch ? "move" : "copy";
         }}
       >
-        <span className="squad-player-chip-role">{playerRoleLabel(player.role)}</span>
         <span className="squad-player-chip-name">{player.name}</span>
-        {player.jerseyNumber ? (
-          <span className="squad-player-chip-number">{player.jerseyNumber}</span>
-        ) : null}
-        {onPitch ? <span className="squad-player-chip-on-pitch">On pitch</span> : null}
+        {onPitch ? <span className="squad-player-chip-on-pitch">· on pitch</span> : null}
       </button>
     </li>
   );
+}
+
+function groupPlayersByRole(players: SquadPoolPlayer[]) {
+  const groups: { role: SquadPlayerRole; players: SquadPoolPlayer[] }[] = [];
+  for (const role of SQUAD_PLAYER_ROLES) {
+    const list = players
+      .filter((player) => player.role === role)
+      .sort((a, b) => a.name.localeCompare(b.name));
+    if (list.length > 0) groups.push({ role, players: list });
+  }
+  return groups;
 }
 
 export function SquadTeamBench({
@@ -112,6 +118,8 @@ export function SquadTeamBench({
       ),
     [lineup, side]
   );
+
+  const playersByRole = useMemo(() => groupPlayersByRole(players), [players]);
 
   function handleBenchDragEnter(event: React.DragEvent) {
     if (!isPlayerDragEvent(event)) return;
@@ -150,9 +158,8 @@ export function SquadTeamBench({
 
   return (
     <aside
-      className={`squad-team-bench squad-team-bench--${side}${benchDragOver ? " squad-team-bench--drag-over" : ""}`}
+      className={`squad-team-bench${benchDragOver ? " squad-team-bench--drag-over" : ""}`}
       aria-label={`${teamName} bench`}
-      style={teamKitInlineStyle(teamName, side)}
       onDragEnter={handleBenchDragEnter}
       onDragLeave={handleBenchDragLeave}
       onDragOver={handleBenchDragOver}
@@ -183,17 +190,24 @@ export function SquadTeamBench({
       {loading ? <p className="inline-status">Loading players…</p> : null}
       {error ? <p className="inline-status">{error}</p> : null}
 
-      <ul className="squad-team-bench-list">
-        {players.map((player) => (
-          <PlayerChip
-            key={player.playerId}
-            onPitch={onPitchIds.has(player.playerId)}
-            onRemoveFromPitch={onRemoveFromPitch}
-            player={player}
-            side={side}
-          />
+      <div className="squad-team-bench-groups">
+        {playersByRole.map(({ role, players: rolePlayers }) => (
+          <section className="squad-team-bench-group" key={role}>
+            <h5 className="squad-team-bench-group-label">{playerRoleLabel(role)}</h5>
+            <ul className="squad-team-bench-row">
+              {rolePlayers.map((player) => (
+                <BenchPlayerChip
+                  key={player.playerId}
+                  onPitch={onPitchIds.has(player.playerId)}
+                  onRemoveFromPitch={onRemoveFromPitch}
+                  player={player}
+                  side={side}
+                />
+              ))}
+            </ul>
+          </section>
         ))}
-      </ul>
+      </div>
       {!loading && !error && players.length === 0 ? (
         <p className="inline-status">No players loaded for this team.</p>
       ) : null}

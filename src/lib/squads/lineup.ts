@@ -149,34 +149,31 @@ export function clampCoordsToSide(side: SquadLineupSide, coords: PitchCoords): P
   };
 }
 
-/** 0 = own goal line, 1 = near the halfway line (within one team's half). */
-function formationDepthNormalized(layout: PitchCoords, formation: SquadFormation) {
-  const points = FORMATION_LAYOUTS[formation];
-  let minY = Infinity;
-  let maxY = -Infinity;
-  for (const point of points) {
-    minY = Math.min(minY, point.y);
-    maxY = Math.max(maxY, point.y);
-  }
-  if (!Number.isFinite(minY) || maxY <= minY) return 0.5;
-  return (layout.y - minY) / (maxY - minY);
-}
+/** Depth within a team's half by role (0 = own goal → 1 = near halfway). */
+const ROLE_DEPTH_IN_HALF: Record<SquadPlayerRole, number> = {
+  GK: 0.05,
+  DEF: 0.22,
+  MID: 0.52,
+  FWD: 0.88
+};
 
-function coordsForSide(
-  layout: PitchCoords,
-  side: SquadLineupSide,
-  formation: SquadFormation
+function coordsForSlot(
+  role: SquadPlayerRole,
+  x: number,
+  roleIndex: number,
+  roleCount: number,
+  side: SquadLineupSide
 ): PitchCoords {
-  const depth = formationDepthNormalized(layout, formation);
+  const band = ROLE_DEPTH_IN_HALF[role];
+  const spread = roleCount > 1 ? 0.1 : 0;
+  const t = roleCount > 1 ? roleIndex / (roleCount - 1) : 0.5;
+  const depth = Math.min(1, Math.max(0, band + (t - 0.5) * spread));
+  const span = HOME_HALF.advance - HOME_HALF.deep;
 
   if (side === "home") {
-    const y =
-      HOME_HALF.deep + depth * (HOME_HALF.advance - HOME_HALF.deep);
-    return { x: layout.x, y: clampPitchCoord(y) };
+    return { x, y: clampPitchCoord(HOME_HALF.deep + depth * span) };
   }
-
-  const y = AWAY_HALF.deep - depth * (AWAY_HALF.deep - AWAY_HALF.advance);
-  return { x: layout.x, y: clampPitchCoord(y) };
+  return { x, y: clampPitchCoord(AWAY_HALF.deep - depth * span) };
 }
 
 /** One XI in the attacking half of a shared pitch (legacy / single-team). */
@@ -203,17 +200,40 @@ export function defaultLineupWithPositions(formation: SquadFormation): SquadLine
 function sideLineupFromFormation(formation: SquadFormation, side: SquadLineupSide): SquadLineupSlot[] {
   const base = defaultLineupWithPositions(formation);
   const slotOffset = side === "home" ? 0 : SLOTS_PER_TEAM;
-  return base.map((slot, index) => ({
-    ...slot,
-    slot: index + 1 + slotOffset,
-    side,
-    label: "",
-    playerId: undefined,
-    teamName: undefined,
-    jerseyNumber: undefined,
-    x: coordsForSide({ x: slot.x, y: slot.y }, side, formation).x,
-    y: coordsForSide({ x: slot.x, y: slot.y }, side, formation).y
-  }));
+  const roleIndexBySlot = new Map<number, number>();
+  const roleCounts = new Map<SquadPlayerRole, number>();
+
+  for (const slot of base) {
+    roleCounts.set(slot.role, (roleCounts.get(slot.role) ?? 0) + 1);
+  }
+
+  const roleSeen = new Map<SquadPlayerRole, number>();
+  base.forEach((slot, index) => {
+    const seen = roleSeen.get(slot.role) ?? 0;
+    roleIndexBySlot.set(index, seen);
+    roleSeen.set(slot.role, seen + 1);
+  });
+
+  return base.map((slot, index) => {
+    const coords = coordsForSlot(
+      slot.role,
+      slot.x,
+      roleIndexBySlot.get(index) ?? 0,
+      roleCounts.get(slot.role) ?? 1,
+      side
+    );
+    return {
+      ...slot,
+      slot: index + 1 + slotOffset,
+      side,
+      label: "",
+      playerId: undefined,
+      teamName: undefined,
+      jerseyNumber: undefined,
+      x: coords.x,
+      y: coords.y
+    };
+  });
 }
 
 /** Home (top) + away (bottom) XIs for a fixture — 22 slots total. */
