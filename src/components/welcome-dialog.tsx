@@ -65,6 +65,7 @@ export function WelcomeDialog() {
     markWelcomeSeen();
     setForced(false);
     setOpen(false);
+    window.dispatchEvent(new Event("kickboard:welcome-dismissed"));
   }
 
   if (hasSeenWelcome() && !open && !forced) {

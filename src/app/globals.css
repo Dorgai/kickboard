@@ -7032,6 +7032,204 @@ h3 {
   text-align: center;
 }
 
+.session-checkpoint-dialog {
+  max-width: min(34rem, calc(100vw - 24px));
+}
+
+.session-checkpoint-panel {
+  display: grid;
+  gap: 0;
+  max-height: min(90vh, 720px);
+  overflow: hidden;
+}
+
+.session-checkpoint-header {
+  align-items: flex-start;
+}
+
+.session-checkpoint-eyebrow {
+  color: var(--color-brand);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.session-checkpoint-body {
+  display: grid;
+  gap: 18px;
+  max-height: min(58vh, 520px);
+  overflow: auto;
+  padding-block: 4px 8px;
+}
+
+.session-checkpoint-section {
+  display: grid;
+  gap: 10px;
+}
+
+.session-checkpoint-section-title {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+  gap: 8px;
+  margin: 0;
+}
+
+.session-checkpoint-empty {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  margin: 0;
+}
+
+.session-checkpoint-matches {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.session-checkpoint-match {
+  align-items: center;
+  background: var(--color-surface-muted, color-mix(in srgb, var(--color-surface) 92%, var(--color-border)));
+  border-radius: 12px;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.session-checkpoint-match-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.session-checkpoint-match-copy strong {
+  font-size: 14px;
+}
+
+.session-checkpoint-match-copy span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.session-checkpoint-match-meta {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.session-checkpoint-match .button {
+  flex-shrink: 0;
+  gap: 6px;
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.session-checkpoint-stats {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 480px) {
+  .session-checkpoint-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.session-checkpoint-stat {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-surface);
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.session-checkpoint-stat--primary {
+  background: color-mix(in srgb, var(--color-brand) 12%, var(--color-surface));
+}
+
+.session-checkpoint-stat-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.session-checkpoint-stat-label {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.session-checkpoint-recent-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin: 4px 0 0;
+  text-transform: uppercase;
+}
+
+.session-checkpoint-recent {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.session-checkpoint-recent-item {
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding-top: 8px;
+}
+
+.session-checkpoint-recent-item div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.session-checkpoint-recent-item strong {
+  font-size: 13px;
+}
+
+.session-checkpoint-recent-item span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.session-checkpoint-recent-points {
+  color: var(--color-brand);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.session-checkpoint-footer {
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.session-checkpoint-footnote {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 0;
+  text-align: center;
+}
+
 .sr-only {
   border: 0;
   clip: rect(0, 0, 0, 0);
