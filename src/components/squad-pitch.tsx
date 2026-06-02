@@ -19,7 +19,12 @@ import {
   type SquadLineupSlot
 } from "@/lib/squads/lineup";
 import { playerRoleLabel } from "@/lib/squads/player-roles";
-import { readPlayerDragData, writePlayerDragData, type PitchDragPlayer } from "@/lib/squads/drag-player";
+import {
+  playerIdsMatch,
+  readPlayerDragData,
+  writePlayerDragData,
+  type PitchDragPlayer
+} from "@/lib/squads/drag-player";
 import { teamsMatch } from "@/lib/squads/team-names";
 import { teamKitInlineStyle } from "@/lib/team-kit-colors";
 
@@ -36,6 +41,7 @@ type SquadPitchProps = {
   selectedSlot: number | null;
   onSelectSlot: (slot: number | null) => void;
   onLineupChange: (lineup: SquadLineupSlot[]) => void;
+  onRemovePlayer?: (playerId: number) => void;
   readOnly?: boolean;
 };
 
@@ -97,6 +103,13 @@ function isPointOnPitch(pitch: DOMRect, clientX: number, clientY: number) {
   );
 }
 
+function benchSideFromPoint(clientX: number, clientY: number): SquadLineupSide | null {
+  const element = document.elementFromPoint(clientX, clientY);
+  const bench = element?.closest("[data-squad-bench-side]");
+  const side = bench?.getAttribute("data-squad-bench-side");
+  return side === "home" || side === "away" ? side : null;
+}
+
 export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function SquadPitch(
   {
     lineup,
@@ -105,6 +118,7 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     selectedSlot,
     onSelectSlot,
     onLineupChange,
+    onRemovePlayer,
     readOnly = false
   },
   ref
@@ -112,6 +126,8 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
   const pitchRef = useRef<HTMLDivElement>(null);
   const lineupRef = useRef(lineup);
   const onLineupChangeRef = useRef(onLineupChange);
+  const onRemovePlayerRef = useRef(onRemovePlayer);
+  const lastSwapTargetRef = useRef<number | null>(null);
   const [draggingPlayerId, setDraggingPlayerId] = useState<number | string | null>(null);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
 
@@ -123,24 +139,28 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     onLineupChangeRef.current = onLineupChange;
   }, [onLineupChange]);
 
+  useEffect(() => {
+    onRemovePlayerRef.current = onRemovePlayer;
+  }, [onRemovePlayer]);
+
+  const commitLineup = useCallback((next: SquadLineupSlot[]) => {
+    lineupRef.current = next;
+    onLineupChangeRef.current(next);
+  }, []);
+
   const assignPlayerAt = useCallback(
-    (player: PitchDragPlayer, coords: { x: number; y: number }, targetSlot?: number) => {
+    (player: PitchDragPlayer, targetIndex: number) => {
+      const currentLineup = lineupRef.current;
       const playerSide = sideForPlayer(player, homeTeam, awayTeam);
       if (!playerSide) return false;
+      if (targetIndex < 0) return false;
+      if (slotSide(currentLineup[targetIndex]) !== playerSide) return false;
 
-      const slotIndex =
-        targetSlot !== undefined
-          ? targetSlot
-          : nearestEmptySlot(lineup, playerSide, player.role);
-
-      if (slotIndex < 0) return false;
-      if (slotSide(lineup[slotIndex]) !== playerSide) return false;
-
-      const anchor = lineup[slotIndex];
+      const anchor = currentLineup[targetIndex];
       const canonicalTeam = playerSide === "home" ? homeTeam : awayTeam;
 
-      const next = lineup.map((slot, index) => {
-        if (index === slotIndex) {
+      const next = currentLineup.map((slot, index) => {
+        if (index === targetIndex) {
           return {
             ...slot,
             label: player.name,
@@ -152,17 +172,17 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
             y: anchor.y
           };
         }
-        if (slot.playerId === player.playerId) {
+        if (playerIdsMatch(slot.playerId, player.playerId)) {
           return { ...slot, label: "", playerId: undefined, teamName: undefined, jerseyNumber: undefined };
         }
         return slot;
       });
 
-      onLineupChange(next);
-      onSelectSlot(lineup[slotIndex]?.slot ?? slotIndex + 1);
+      commitLineup(next);
+      onSelectSlot(currentLineup[targetIndex]?.slot ?? targetIndex + 1);
       return true;
     },
-    [awayTeam, homeTeam, lineup, onLineupChange, onSelectSlot]
+    [awayTeam, commitLineup, homeTeam, onSelectSlot]
   );
 
   const tryDropPlayer = useCallback(
@@ -178,10 +198,11 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
       const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
       if (playerSide !== dropSide) return false;
 
+      const currentLineup = lineupRef.current;
       let targetIndex = -1;
       let bestDist = Infinity;
-      for (let index = 0; index < lineup.length; index += 1) {
-        const slot = lineup[index];
+      for (let index = 0; index < currentLineup.length; index += 1) {
+        const slot = currentLineup[index];
         if (slot.label || slotSide(slot) !== playerSide) continue;
         const dist = (slot.x - coords.x) ** 2 + (slot.y - coords.y) ** 2;
         if (dist < bestDist) {
@@ -190,59 +211,61 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
         }
       }
       if (targetIndex < 0) {
-        targetIndex = nearestEmptySlot(lineup, playerSide, player.role);
+        targetIndex = nearestEmptySlot(currentLineup, playerSide, player.role);
       }
       if (targetIndex < 0) return false;
-      const anchor = lineup[targetIndex];
-      return assignPlayerAt(player, { x: anchor.x, y: anchor.y }, targetIndex);
+      return assignPlayerAt(player, targetIndex);
     },
-    [assignPlayerAt, awayTeam, homeTeam, lineup]
+    [assignPlayerAt, awayTeam, homeTeam]
   );
 
   useImperativeHandle(ref, () => ({ tryDropPlayer }), [tryDropPlayer]);
 
   const swapPlayerToNearestSlot = useCallback(
     (playerId: number | string, clientX: number, clientY: number) => {
-    const currentLineup = lineupRef.current;
-    const pitch = pitchRef.current?.getBoundingClientRect();
-    if (!pitch) return;
+      const currentLineup = lineupRef.current;
+      const pitch = pitchRef.current?.getBoundingClientRect();
+      if (!pitch) return;
 
-    const moving = currentLineup.find((slot) => slot.playerId === playerId && slot.label);
-    if (!moving) return;
+      const moving = currentLineup.find((slot) => playerIdsMatch(slot.playerId, playerId) && slot.label);
+      if (!moving) return;
 
-    const coords = coordsFromPointer(pitch, clientX, clientY);
-    const side = slotSide(moving);
-    const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
-    if (side !== dropSide) return;
+      const coords = coordsFromPointer(pitch, clientX, clientY);
+      const side = slotSide(moving);
+      const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
+      if (side !== dropSide) return;
 
-    const targetSlot = nearestFormationSlotNumber(currentLineup, side, coords);
-    if (!targetSlot || targetSlot === moving.slot) return;
+      const targetSlot = nearestFormationSlotNumber(currentLineup, side, coords);
+      if (!targetSlot || targetSlot === moving.slot) {
+        lastSwapTargetRef.current = null;
+        return;
+      }
+      if (targetSlot === lastSwapTargetRef.current) return;
 
-    onLineupChangeRef.current(
-      swapLineupSlots(currentLineup, moving.slot, targetSlot)
-    );
+      lastSwapTargetRef.current = targetSlot;
+      const next = swapLineupSlots(currentLineup, moving.slot, targetSlot);
+      commitLineup(next);
     },
-    []
+    [commitLineup]
   );
 
   const clearSlot = useCallback(
     (slotNumber: number) => {
-      onLineupChange(
-        lineup.map((slot) =>
-          slot.slot === slotNumber
-            ? {
-                ...slot,
-                label: "",
-                playerId: undefined,
-                teamName: undefined,
-                jerseyNumber: undefined
-              }
-            : slot
-        )
+      const next = lineupRef.current.map((slot) =>
+        slot.slot === slotNumber
+          ? {
+              ...slot,
+              label: "",
+              playerId: undefined,
+              teamName: undefined,
+              jerseyNumber: undefined
+            }
+          : slot
       );
+      commitLineup(next);
       onSelectSlot(null);
     },
-    [lineup, onLineupChange, onSelectSlot]
+    [commitLineup, onSelectSlot]
   );
 
   function handleDragOver(event: React.DragEvent) {
@@ -257,6 +280,18 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     tryDropPlayer(player, event.clientX, event.clientY);
   }
 
+  function dragPayloadForSlot(slot: SquadLineupSlot): PitchDragPlayer | null {
+    if (!slot.playerId || !slot.label) return null;
+    return {
+      playerId: Number(slot.playerId),
+      name: slot.label,
+      teamName: slot.teamName ?? (slotSide(slot) === "home" ? homeTeam : awayTeam),
+      role: slot.role,
+      jerseyNumber: slot.jerseyNumber ?? null,
+      fromPitch: true
+    };
+  }
+
   function handleTokenPointerDown(
     event: ReactPointerEvent<HTMLDivElement>,
     slot: SquadLineupSlot
@@ -266,14 +301,12 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     event.stopPropagation();
 
     const playerId = slot.playerId;
-    const target = event.currentTarget;
-    target.setPointerCapture(event.pointerId);
-
     const startX = event.clientX;
     const startY = event.clientY;
     let dragging = false;
     setDraggingPlayerId(playerId);
     setDragOffset({ x: 0, y: 0 });
+    lastSwapTargetRef.current = null;
     onSelectSlot(slot.slot);
 
     const onMove = (moveEvent: PointerEvent) => {
@@ -291,33 +324,44 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     };
 
     const end = (endEvent: PointerEvent) => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", end);
+      window.removeEventListener("pointercancel", end);
+
       if (dragging) {
-        swapPlayerToNearestSlot(playerId, endEvent.clientX, endEvent.clientY);
+        const benchSide = benchSideFromPoint(endEvent.clientX, endEvent.clientY);
+        const moving = lineupRef.current.find(
+          (entry) => playerIdsMatch(entry.playerId, playerId) && entry.label
+        );
+        if (benchSide && moving && slotSide(moving) === benchSide) {
+          const numericId = Number(playerId);
+          if (Number.isFinite(numericId)) {
+            onRemovePlayerRef.current?.(numericId);
+          }
+        } else {
+          swapPlayerToNearestSlot(playerId, endEvent.clientX, endEvent.clientY);
+        }
       }
+
       setDraggingPlayerId(null);
       setDragOffset(null);
-      if (target.hasPointerCapture(endEvent.pointerId)) {
-        target.releasePointerCapture(endEvent.pointerId);
-      }
-      target.removeEventListener("pointermove", onMove);
-      target.removeEventListener("pointerup", end);
-      target.removeEventListener("pointercancel", end);
+      lastSwapTargetRef.current = null;
 
-      const current = lineupRef.current.find((entry) => entry.playerId === playerId);
+      const current = lineupRef.current.find((entry) => playerIdsMatch(entry.playerId, playerId));
       if (current) onSelectSlot(current.slot);
     };
 
-    target.addEventListener("pointermove", onMove);
-    target.addEventListener("pointerup", end);
-    target.addEventListener("pointercancel", end);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", end);
   }
 
   return (
     <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
       {!readOnly ? (
         <p className="squad-pitch-hint squad-pitch-hint--compact">
-          Drag from the bench onto that team&apos;s half. Drag a name on the pitch to swap positions. Tap a
-          bench chip marked on pitch to remove (or press Delete while selected).
+          Drag from the bench onto that team&apos;s half. Drag a name on the pitch to swap or drop on their
+          bench to remove. Tap an on-pitch bench chip or press Delete while selected.
         </p>
       ) : null}
       <div
@@ -341,7 +385,7 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
         <span className="squad-pitch-team-banner squad-pitch-team-banner--away">{awayTeam}</span>
 
         {!readOnly
-          ? lineup.map((slot, slotIndex) => {
+          ? lineup.map((slot) => {
               if (slot.label) return null;
               return (
                 <button
@@ -371,19 +415,22 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
           : null}
 
         {lineup
-          .filter((slot) => slot.label)
+          .filter((slot) => slot.label && slot.playerId !== undefined)
           .map((slot) => {
             const side = slotSide(slot);
             const canonicalTeam = side === "home" ? homeTeam : awayTeam;
-            const isDragging = draggingPlayerId === slot.playerId;
+            const isDragging =
+              draggingPlayerId !== null && playerIdsMatch(draggingPlayerId, slot.playerId);
             const offset = isDragging ? dragOffset : null;
+            const payload = dragPayloadForSlot(slot);
             return (
               <div
                 aria-label={slot.label}
                 className={`squad-pitch-token squad-pitch-token--${side}${
                   selectedSlot === slot.slot ? " squad-pitch-token--selected" : ""
                 }${isDragging ? " squad-pitch-token--dragging" : ""}`}
-                key={`token-${slot.slot}`}
+                draggable={!readOnly && Boolean(payload)}
+                key={`player-${slot.playerId}`}
                 role={readOnly ? "presentation" : "button"}
                 style={{
                   left: `${slot.x}%`,
@@ -394,12 +441,25 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
                   ...teamKitInlineStyle(canonicalTeam, side, { homeTeam, awayTeam })
                 }}
                 tabIndex={readOnly ? -1 : 0}
+                onDragStart={
+                  readOnly || !payload
+                    ? undefined
+                    : (event) => {
+                        writePlayerDragData(event.dataTransfer, payload);
+                        event.dataTransfer.effectAllowed = "move";
+                      }
+                }
                 onKeyDown={
                   readOnly
                     ? undefined
                     : (event) => {
                         if (event.key === "Backspace" || event.key === "Delete") {
-                          clearSlot(slot.slot);
+                          const numericId = Number(slot.playerId);
+                          if (Number.isFinite(numericId)) {
+                            onRemovePlayerRef.current?.(numericId);
+                          } else {
+                            clearSlot(slot.slot);
+                          }
                         }
                       }
                 }

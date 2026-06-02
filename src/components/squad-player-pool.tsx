@@ -80,7 +80,7 @@ function BenchPlayerChip({
         className={`squad-player-chip squad-player-chip--bench${onPitch ? " squad-player-chip--on-pitch" : ""}${
           selected ? " squad-player-chip--selected" : ""
         }${pointerDragging ? " squad-player-chip--pointer-drag" : ""}`}
-        draggable={!onPitch}
+        draggable
         role="button"
         tabIndex={0}
         title={
@@ -106,6 +106,9 @@ function BenchPlayerChip({
         onDragStart={(event) => {
           writePlayerDragData(event.dataTransfer, dragPayload);
           event.dataTransfer.effectAllowed = onPitch ? "move" : "copy";
+          if (onPitch) {
+            event.dataTransfer.setDragImage(event.currentTarget, 24, 16);
+          }
         }}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -118,7 +121,8 @@ function BenchPlayerChip({
           }
         }}
         onPointerDown={(event) => {
-          if (onPitch || event.button !== 0) return;
+          if (event.button !== 0) return;
+          if (onPitch) return;
           event.preventDefault();
 
           const startX = event.clientX;
@@ -255,6 +259,7 @@ export function SquadTeamBench({
   return (
     <aside
       className={`squad-team-bench${benchDragOver ? " squad-team-bench--drag-over" : ""}`}
+      data-squad-bench-side={side}
       aria-label={`${teamName} bench`}
       onDragEnter={handleBenchDragEnter}
       onDragLeave={handleBenchDragLeave}

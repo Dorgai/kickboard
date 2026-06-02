@@ -2,6 +2,14 @@ import type { SquadLineupSlot } from "@/lib/squads/lineup";
 
 export const DRAG_PLAYER_MIME = "application/x-kickboard-player";
 
+export function playerIdsMatch(
+  left: number | string | undefined,
+  right: number | string | undefined
+) {
+  if (left === undefined || right === undefined) return false;
+  return left === right || String(left) === String(right);
+}
+
 export type PitchDragPlayer = {
   playerId: number;
   name: string;
