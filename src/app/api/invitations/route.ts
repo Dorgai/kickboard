@@ -7,7 +7,7 @@ import {
   listRegistrationInvitationsForInviter
 } from "@/lib/invitations/store";
 import { resolveAuthBaseUrl } from "@/auth";
-import { assertEmailDeliveryReady, EmailFromAddressError } from "@/lib/email/config";
+import { EmailFromAddressError, requireEmailConfig } from "@/lib/email/config";
 import { EmailNotConfiguredError, EmailSendFailedError } from "@/lib/email/resend";
 import { sendRegistrationInvitationEmail } from "@/lib/email/registration-invitation";
 
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       if (!process.env.RESEND_API_KEY?.trim() || !process.env.EMAIL_FROM?.trim()) {
         throw new EmailNotConfiguredError();
       }
-      assertEmailDeliveryReady();
+      requireEmailConfig();
     }
 
     const invitation = await createRegistrationInvitation({

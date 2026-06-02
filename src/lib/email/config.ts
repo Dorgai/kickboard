@@ -38,8 +38,13 @@ export function isEmailDeliveryConfigured() {
   return true;
 }
 
-/** Throws EmailFromAddressError or EmailNotConfiguredError when send is requested. */
-export function assertEmailDeliveryReady() {
+/** Throws EmailFromAddressError when EMAIL_FROM is invalid; returns config or null. */
+export function requireEmailConfig(): EmailConfig {
   const config = getEmailConfig();
-  if (!config) throw new EmailNotConfiguredError();
+  if (!config) {
+    throw new EmailFromAddressError(
+      "Email delivery is not configured. Set RESEND_API_KEY and EMAIL_FROM on the server."
+    );
+  }
+  return config;
 }
