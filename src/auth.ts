@@ -28,10 +28,12 @@ export function resolveAuthBaseUrl() {
   return ensureAuthUrlEnv();
 }
 
-ensureAuthUrlEnv();
+const authBaseUrl = ensureAuthUrlEnv();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
+  /** Forces Google redirect_uri to the public site (Railway Host is often 0.0.0.0:PORT). */
+  ...(authBaseUrl ? { redirectProxyUrl: `${authBaseUrl}/api/auth` } : {}),
   secret: process.env.AUTH_SECRET?.trim() || process.env.JWT_SECRET?.trim(),
   providers: googleEnabled
     ? [
