@@ -650,6 +650,75 @@ function PastEventsPanel({
     setSelectedPlayerId(null);
   }
 
+  const matchDetailColumn =
+    selectedMatch && matchDetail ? (
+      <article className="data-card surface-muted match-focus-col match-detail-widget">
+        <header className="match-focus-scoreline">
+          <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
+          <MatchTeamsLine
+            awayScore={selectedMatch.awayScore}
+            awayTeam={selectedMatch.awayTeam}
+            homeScore={selectedMatch.homeScore}
+            homeTeam={selectedMatch.homeTeam}
+            layout="inline"
+            size="sm"
+          />
+          <p className="match-focus-meta">
+            {selectedMatch.date}
+            {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+          </p>
+        </header>
+        <MatchTeamStatsGrid columns={orderedTeamStats} />
+      </article>
+    ) : selectedMatch ? (
+      <article className="data-card surface-muted match-focus-col match-detail-widget">
+        <header className="match-focus-scoreline">
+          <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
+          <MatchTeamsLine
+            awayScore={selectedMatch.awayScore}
+            awayTeam={selectedMatch.awayTeam}
+            homeScore={selectedMatch.homeScore}
+            homeTeam={selectedMatch.homeTeam}
+            layout="inline"
+            size="sm"
+          />
+          <p className="match-focus-meta">
+            {selectedMatch.date}
+            {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
+          </p>
+        </header>
+        <p className="inline-status">Loading match stats…</p>
+      </article>
+    ) : null;
+
+  const stageFixturesPanel =
+    isGroupStageView && groupBuckets.length ? (
+      activeGroupFixtures.length ? (
+        <StageFixtureStrip
+          fixtures={activeGroupFixtures}
+          selectedMatchId={selectedMatchId}
+          onSelect={selectMatch}
+        />
+      ) : (
+        <p className="inline-status">No fixtures for this group.</p>
+      )
+    ) : activeKnockoutRound ? (
+      activeKnockoutFixtures.length ? (
+        <StageFixtureStrip
+          fixtures={activeKnockoutFixtures}
+          round={activeKnockoutRound}
+          selectedMatchId={selectedMatchId}
+          onSelect={selectMatch}
+        />
+      ) : (
+        <p className="inline-status">No fixtures for this stage.</p>
+      )
+    ) : competitionStageTabs.length ? (
+      <p className="inline-status">No fixtures for this stage.</p>
+    ) : (
+      <p className="inline-status">No stages in this feed.</p>
+    );
+
   return (
     <>
       <div className="knockout-workspace" id="group-stage">
@@ -687,43 +756,17 @@ function PastEventsPanel({
             </button>
           </div>
           {isGroupStageView && groupBuckets.length ? (
-            <>
-              <FeedTabBar
-                ariaLabel="Group stage groups"
-                className="bracket-group-tabs bracket-stage-tabs"
-                tabs={groupBuckets.map((bucket) => ({
-                  id: bucket.letter,
-                  label: `Group ${bucket.letter}`
-                }))}
-                value={activeGroupLetter}
-                onChange={setActiveGroupLetter}
-              />
-              {activeGroupFixtures.length ? (
-                <StageFixtureStrip
-                  fixtures={activeGroupFixtures}
-                  selectedMatchId={selectedMatchId}
-                  onSelect={selectMatch}
-                />
-              ) : (
-                <p className="inline-status">No fixtures for this group.</p>
-              )}
-            </>
-          ) : activeKnockoutRound ? (
-            activeKnockoutFixtures.length ? (
-              <StageFixtureStrip
-                fixtures={activeKnockoutFixtures}
-                round={activeKnockoutRound}
-                selectedMatchId={selectedMatchId}
-                onSelect={selectMatch}
-              />
-            ) : (
-              <p className="inline-status">No fixtures for this stage.</p>
-            )
-          ) : competitionStageTabs.length ? (
-            <p className="inline-status">No fixtures for this stage.</p>
-          ) : (
-            <p className="inline-status">No stages in this feed.</p>
-          )}
+            <FeedTabBar
+              ariaLabel="Group stage groups"
+              className="bracket-group-tabs bracket-stage-tabs"
+              tabs={groupBuckets.map((bucket) => ({
+                id: bucket.letter,
+                label: `Group ${bucket.letter}`
+              }))}
+              value={activeGroupLetter}
+              onChange={setActiveGroupLetter}
+            />
+          ) : null}
         </section>
 
         <div className="knockout-widgets knockout-widgets--below-strip" id="match-detail-panel">
@@ -773,118 +816,79 @@ function PastEventsPanel({
             </article>
           ) : null}
 
-          {!selectedMatch && !showMatchesList ? (
-            <div className="knockout-widgets-row knockout-widgets-row--primary">
-              <article className="data-card surface-flat match-placeholder">
-                <h2>Select a match</h2>
-                <p>Pick a fixture above to load match details below.</p>
-              </article>
+          {!showMatchesList ? (
+            <div className="knockout-widgets-row knockout-widgets-row--fixtures-detail">
+              <div className="match-stage-fixtures-column data-card surface-muted">{stageFixturesPanel}</div>
+              {selectedMatch ? (
+                matchDetailColumn
+              ) : (
+                <article className="data-card surface-flat match-focus-col match-placeholder">
+                  <h2>Select a match</h2>
+                  <p>Pick a fixture beside this panel to load match details.</p>
+                </article>
+              )}
             </div>
           ) : null}
 
-          {selectedMatch ? (
-            <div
-              className={`knockout-widgets-row knockout-widgets-row--match-split${
-                matchDetail ? " knockout-widgets-row--with-lineups" : ""
-              }`}
-            >
-              {matchDetail ? (
-                <div className="knockout-widgets-row knockout-widgets-row--stats-pair">
-                  <article className="data-card surface-muted match-focus-col match-detail-widget">
-                    <header className="match-focus-scoreline">
-                      <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
-                      <MatchTeamsLine
-                        awayScore={selectedMatch.awayScore}
-                        awayTeam={selectedMatch.awayTeam}
-                        homeScore={selectedMatch.homeScore}
-                        homeTeam={selectedMatch.homeTeam}
-                        layout="inline"
-                        size="sm"
-                      />
-                      <p className="match-focus-meta">
-                        {selectedMatch.date}
-                        {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
-                      </p>
-                    </header>
-                    <MatchTeamStatsGrid columns={orderedTeamStats} />
-                  </article>
+          {showMatchesList && selectedMatch ? (
+            <div className="knockout-widgets-row knockout-widgets-row--primary">{matchDetailColumn}</div>
+          ) : null}
 
-                  <article
-                    className="data-card surface-muted match-focus-col match-player-stats-column"
-                    id="players"
-                  >
-                    {matchDetail.playerStats.length > 0 ? (
-                      <PlayerStatsPanel
-                        compact
-                        competitionId={competitionId}
-                        competitionLabel={competitionLabel}
-                        matchMeta={{
-                          matchId: selectedMatch.matchId,
-                          date: selectedMatch.date,
-                          stage: selectedMatch.stage,
-                          homeTeam: selectedMatch.homeTeam,
-                          awayTeam: selectedMatch.awayTeam,
-                          homeScore: selectedMatch.homeScore,
-                          awayScore: selectedMatch.awayScore,
-                          stadium: selectedMatch.stadium
-                        }}
-                        players={matchDetail.playerStats}
-                        seasonId={seasonId}
-                        selectedPlayerId={selectedPlayerId}
-                        onSelectPlayer={setSelectedPlayerId}
-                      />
-                    ) : (
-                      <p className="inline-status">No player stats for this match.</p>
-                    )}
-                    <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
-                  </article>
-                </div>
-              ) : (
-                <article className="data-card surface-muted match-focus-col match-detail-widget">
-                  <header className="match-focus-scoreline">
-                    <p className="eyebrow">{selectedMatch.stage ?? "Match"}</p>
-                    <MatchTeamsLine
-                      awayScore={selectedMatch.awayScore}
-                      awayTeam={selectedMatch.awayTeam}
-                      homeScore={selectedMatch.homeScore}
-                      homeTeam={selectedMatch.homeTeam}
-                      layout="inline"
-                      size="sm"
-                    />
-                    <p className="match-focus-meta">
-                      {selectedMatch.date}
-                      {selectedMatch.stadium ? ` · ${selectedMatch.stadium}` : ""}
-                    </p>
-                  </header>
-                  <p className="inline-status">Loading match stats…</p>
-                </article>
-              )}
-
-              {matchDetail ? (
-                <article className="data-card surface-muted match-focus-col match-lineups-column" id="squads">
-                  <div className="section-heading compact match-lineups-heading">
-                    <div>
-                      <h3>Lineups</h3>
-                      <p className="match-lineups-note">Select a player to view stats above.</p>
-                    </div>
-                    <input
-                      aria-label="Search lineup"
-                      className="lineup-search feed-control-input"
-                      placeholder="Filter"
-                      type="search"
-                      value={lineupSearch}
-                      onChange={(event) => setLineupSearch(event.target.value)}
-                    />
+          {selectedMatch && matchDetail ? (
+            <div className="knockout-widgets-row knockout-widgets-row--squads-pair">
+              <article className="data-card surface-muted match-focus-col match-lineups-column" id="squads">
+                <div className="section-heading compact match-lineups-heading">
+                  <div>
+                    <h3>Lineups</h3>
+                    <p className="match-lineups-note">Select a player to view stats beside.</p>
                   </div>
-                  <MatchLineupList
+                  <input
+                    aria-label="Search lineup"
+                    className="lineup-search feed-control-input"
+                    placeholder="Filter"
+                    type="search"
+                    value={lineupSearch}
+                    onChange={(event) => setLineupSearch(event.target.value)}
+                  />
+                </div>
+                <MatchLineupList
+                  compact
+                  layout={filteredLineups.length === 2 ? "paired" : "stacked"}
+                  selectedPlayerId={selectedPlayerId}
+                  teams={filteredLineups}
+                  onSelectPlayer={setSelectedPlayerId}
+                />
+              </article>
+
+              <article
+                className="data-card surface-muted match-focus-col match-player-stats-column"
+                id="players"
+              >
+                {matchDetail.playerStats.length > 0 ? (
+                  <PlayerStatsPanel
                     compact
-                    layout={filteredLineups.length === 2 ? "paired" : "stacked"}
+                    competitionId={competitionId}
+                    competitionLabel={competitionLabel}
+                    matchMeta={{
+                      matchId: selectedMatch.matchId,
+                      date: selectedMatch.date,
+                      stage: selectedMatch.stage,
+                      homeTeam: selectedMatch.homeTeam,
+                      awayTeam: selectedMatch.awayTeam,
+                      homeScore: selectedMatch.homeScore,
+                      awayScore: selectedMatch.awayScore,
+                      stadium: selectedMatch.stadium
+                    }}
+                    players={matchDetail.playerStats}
+                    seasonId={seasonId}
                     selectedPlayerId={selectedPlayerId}
-                    teams={filteredLineups}
                     onSelectPlayer={setSelectedPlayerId}
                   />
-                </article>
-              ) : null}
+                ) : (
+                  <p className="inline-status">No player stats for this match.</p>
+                )}
+                <MatchEventTimelineLauncher matchId={selectedMatch.matchId} />
+              </article>
             </div>
           ) : null}
         </div>
