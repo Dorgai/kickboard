@@ -1,31 +1,30 @@
 import { query } from "@/lib/db";
 import { getDefaultTournamentId } from "@/lib/auth/users";
+import {
+  defaultLineupWithPositions,
+  isValidFormation,
+  normalizeLineupSlots,
+  type SquadFormation,
+  type SquadLineupSlot
+} from "@/lib/squads/lineup";
 
-export type SquadLineupSlot = {
-  slot: number;
-  label: string;
-  role: "GK" | "DEF" | "MID" | "FWD";
-};
-
-const FORMATIONS = ["4-3-3", "4-4-2", "3-5-2", "4-2-3-1"] as const;
-export type SquadFormation = (typeof FORMATIONS)[number];
-
-export function isValidFormation(value: string): value is SquadFormation {
-  return (FORMATIONS as readonly string[]).includes(value);
-}
+export type { SquadFormation, SquadLineupSlot } from "@/lib/squads/lineup";
+export { FORMATIONS, isValidFormation } from "@/lib/squads/lineup";
 
 export function defaultLineupForFormation(formation: SquadFormation): SquadLineupSlot[] {
-  const templates: Record<SquadFormation, SquadLineupSlot["role"][]> = {
-    "4-3-3": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "FWD", "FWD", "FWD"],
-    "4-4-2": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "FWD", "FWD"],
-    "3-5-2": ["GK", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "MID", "FWD", "FWD"],
-    "4-2-3-1": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "MID", "FWD"]
-  };
+  return defaultLineupWithPositions(formation);
+}
 
-  return templates[formation].map((role, index) => ({
+function serializeLineup(lineup: SquadLineupSlot[]) {
+  return lineup.slice(0, 11).map((slot, index) => ({
     slot: index + 1,
-    label: "",
-    role
+    label: slot.label.trim().slice(0, 80),
+    role: slot.role,
+    x: slot.x,
+    y: slot.y,
+    ...(slot.playerId !== undefined ? { playerId: slot.playerId } : {}),
+    ...(slot.teamName ? { teamName: slot.teamName.slice(0, 80) } : {}),
+    ...(slot.jerseyNumber !== undefined ? { jerseyNumber: slot.jerseyNumber } : {})
   }));
 }
 
@@ -39,11 +38,9 @@ export async function createUserSquad(input: {
   if (!tournamentId) throw new Error("TOURNAMENT_NOT_CONFIGURED");
 
   const trimmedName = input.name.trim().slice(0, 60) || "My XI";
-  const lineup = input.lineup.slice(0, 11).map((slot, index) => ({
-    slot: index + 1,
-    label: slot.label.trim().slice(0, 80),
-    role: slot.role
-  }));
+  const lineup = serializeLineup(
+    normalizeLineupSlots(input.lineup, input.formation)
+  );
 
   const result = await query<{ id: string }>(
     `INSERT INTO squads (user_id, tournament_id, name, formation, lineup, is_public)
@@ -72,12 +69,8 @@ export async function publishSquadToBoard(squadId: string, userId: string) {
   const row = squad.rows[0];
   if (!row) throw new Error("SQUAD_NOT_FOUND");
 
-  const rawLineup = row.lineup as unknown;
-  const lineup = Array.isArray(rawLineup)
-    ? (rawLineup as SquadLineupSlot[])
-    : typeof rawLineup === "string"
-      ? (JSON.parse(rawLineup) as SquadLineupSlot[])
-      : [];
+  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
+  const lineup = normalizeLineupSlots(row.lineup, formation);
   const summary = lineup
     .filter((slot) => slot.label)
     .map((slot) => `${slot.role}: ${slot.label}`)
@@ -93,6 +86,64 @@ export async function publishSquadToBoard(squadId: string, userId: string) {
   );
 
   return { squadId: row.id, postId: post.rows[0]?.id ?? null, body };
+}
+
+export async function getLatestUserSquad(userId: string) {
+  const result = await query<{
+    id: string;
+    name: string;
+    formation: string;
+    lineup: unknown;
+    published_to_board_at: Date | null;
+    created_at: Date;
+    updated_at: Date;
+  }>(
+    `SELECT id, name, formation, lineup, published_to_board_at, created_at, updated_at
+     FROM squads
+     WHERE user_id = $1
+     ORDER BY updated_at DESC
+     LIMIT 1`,
+    [userId]
+  );
+
+  const row = result.rows[0];
+  if (!row) return null;
+
+  const formation = isValidFormation(row.formation) ? row.formation : "4-3-3";
+
+  return {
+    id: row.id,
+    name: row.name,
+    formation,
+    lineup: normalizeLineupSlots(row.lineup, formation),
+    publishedAt: row.published_to_board_at?.toISOString() ?? null,
+    createdAt: row.created_at.toISOString(),
+    updatedAt: row.updated_at.toISOString()
+  };
+}
+
+export async function updateUserSquad(input: {
+  squadId: string;
+  userId: string;
+  name: string;
+  formation: SquadFormation;
+  lineup: SquadLineupSlot[];
+}) {
+  const lineup = serializeLineup(normalizeLineupSlots(input.lineup, input.formation));
+  const trimmedName = input.name.trim().slice(0, 60) || "My XI";
+
+  const result = await query<{ id: string }>(
+    `UPDATE squads
+     SET name = $3,
+         formation = $4,
+         lineup = $5::jsonb,
+         updated_at = now()
+     WHERE id = $1 AND user_id = $2
+     RETURNING id`,
+    [input.squadId, input.userId, trimmedName, input.formation, JSON.stringify(lineup)]
+  );
+
+  return result.rows[0]?.id ?? null;
 }
 
 export async function listUserSquads(userId: string) {

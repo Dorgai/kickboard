@@ -1111,6 +1111,265 @@ h3 {
   gap: 8px;
 }
 
+.squad-builder-layout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(11rem, 16rem) minmax(0, 1fr);
+}
+
+@media (max-width: 820px) {
+  .squad-builder-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.squad-builder-progress {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  margin: 0;
+}
+
+.squad-player-pool {
+  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  display: grid;
+  gap: 8px;
+  max-height: 28rem;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.squad-player-pool-header h4 {
+  font-size: 13px;
+  margin: 0;
+}
+
+.squad-player-pool-source {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  line-height: 1.35;
+  margin: 4px 0 0;
+}
+
+.squad-player-pool-filters {
+  display: grid;
+  gap: 6px;
+}
+
+.squad-player-pool-list {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  overflow: auto;
+  padding: 0;
+}
+
+.squad-player-chip {
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: grab;
+  display: grid;
+  gap: 2px;
+  padding: 6px 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.squad-player-chip:active {
+  cursor: grabbing;
+}
+
+.squad-player-chip--on-pitch {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.squad-player-chip-role {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.squad-player-chip-name {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.squad-player-chip-meta {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+}
+
+.squad-pitch-wrap {
+  display: grid;
+  gap: 6px;
+}
+
+.squad-pitch-hint {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.squad-pitch-hint kbd {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.squad-pitch {
+  aspect-ratio: 68 / 105;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #1a4d2e 88%, #0d2818) 0%,
+    color-mix(in srgb, #1e5631 90%, #0d2818) 50%,
+    color-mix(in srgb, #1a4d2e 88%, #0d2818) 100%
+  );
+  border: 2px solid color-mix(in srgb, #f5f5f5 35%, transparent);
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 25%, transparent);
+  max-height: 32rem;
+  position: relative;
+  touch-action: none;
+  width: 100%;
+}
+
+.squad-pitch-grass {
+  background-image: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, #fff 4%, transparent) 0,
+    color-mix(in srgb, #fff 4%, transparent) 10%,
+    transparent 10%,
+    transparent 20%
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.squad-pitch-midline,
+.squad-pitch-circle,
+.squad-pitch-box {
+  border: 1px solid color-mix(in srgb, #fff 55%, transparent);
+  pointer-events: none;
+  position: absolute;
+}
+
+.squad-pitch-midline {
+  height: 0;
+  left: 0;
+  right: 0;
+  top: 50%;
+}
+
+.squad-pitch-circle {
+  border-radius: 50%;
+  height: 18%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24%;
+}
+
+.squad-pitch-box {
+  height: 16%;
+  left: 22%;
+  width: 56%;
+}
+
+.squad-pitch-box--top {
+  top: 0;
+}
+
+.squad-pitch-box--bottom {
+  bottom: 0;
+}
+
+.squad-pitch-ghost,
+.squad-pitch-token {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.squad-pitch-ghost {
+  background: color-mix(in srgb, #fff 12%, transparent);
+  border: 1px dashed color-mix(in srgb, #fff 35%, transparent);
+  border-radius: 50%;
+  height: 10%;
+  min-height: 1.4rem;
+  min-width: 1.4rem;
+  padding: 0;
+  width: 10%;
+}
+
+.squad-pitch-ghost--filled {
+  opacity: 0.15;
+}
+
+.squad-pitch-ghost--selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.squad-pitch-token {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-bg) 92%, #fff);
+  border: 2px solid color-mix(in srgb, var(--color-accent) 70%, #fff);
+  border-radius: 999px;
+  box-shadow: 0 4px 12px color-mix(in srgb, #000 35%, transparent);
+  cursor: grab;
+  display: grid;
+  gap: 0;
+  justify-items: center;
+  min-width: 3.2rem;
+  padding: 4px 8px 6px;
+  user-select: none;
+}
+
+.squad-pitch-token--selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+.squad-pitch-token-role {
+  color: var(--color-text-secondary);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.squad-pitch-token-name {
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.15;
+  max-width: 5.5rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.squad-pitch-token-number {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.squad-pitch-drag-overlay {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
+}
+
 .predictions-panel {
   display: grid;
   gap: 12px;

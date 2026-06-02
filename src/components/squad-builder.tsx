@@ -1,47 +1,108 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
+import { SquadPitch } from "@/components/squad-pitch";
+import { SquadPlayerPool } from "@/components/squad-player-pool";
+import {
+  FORMATIONS,
+  defaultLineupWithPositions,
+  mergeFormationChange,
+  type SquadFormation,
+  type SquadLineupSlot
+} from "@/lib/squads/lineup";
+import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 
-const FORMATIONS = ["4-3-3", "4-4-2", "3-5-2", "4-2-3-1"] as const;
-
-type Slot = { slot: number; label: string; role: string };
-
-function defaultSlots(formation: string): Slot[] {
-  const roles: Record<string, string[]> = {
-    "4-3-3": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "FWD", "FWD", "FWD"],
-    "4-4-2": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "FWD", "FWD"],
-    "3-5-2": ["GK", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "MID", "FWD", "FWD"],
-    "4-2-3-1": ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "MID", "FWD"]
-  };
-  return (roles[formation] ?? roles["4-3-3"]).map((role, index) => ({
-    slot: index + 1,
-    label: "",
-    role
-  }));
-}
+type LatestSquad = {
+  id: string;
+  name: string;
+  formation: SquadFormation;
+  lineup: SquadLineupSlot[];
+};
 
 export function SquadBuilder() {
-  const [formation, setFormation] = useState<string>("4-3-3");
+  const [formation, setFormation] = useState<SquadFormation>("4-3-3");
   const [name, setName] = useState("My World Cup XI");
-  const [slots, setSlots] = useState<Slot[]>(() => defaultSlots("4-3-3"));
-  const [lastSquadId, setLastSquadId] = useState<string | null>(null);
+  const [lineup, setLineup] = useState<SquadLineupSlot[]>(() => defaultLineupWithPositions("4-3-3"));
+  const [squadId, setSquadId] = useState<string | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+  const [players, setPlayers] = useState<SquadPoolPlayer[]>([]);
+  const [poolLabel, setPoolLabel] = useState<string | null>(null);
+  const [poolLoading, setPoolLoading] = useState(true);
+  const [poolError, setPoolError] = useState<string | null>(null);
+  const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  function changeFormation(next: string) {
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoadState("loading");
+      try {
+        const [squadsRes, poolRes] = await Promise.all([
+          fetch("/api/squads"),
+          fetch("/api/squads/player-pool")
+        ]);
+
+        if (!cancelled && squadsRes.ok) {
+          const squadsPayload = (await squadsRes.json()) as { latest?: LatestSquad | null };
+          const latest = squadsPayload.latest;
+          if (latest?.lineup?.length === 11) {
+            setSquadId(latest.id);
+            setName(latest.name);
+            setFormation(latest.formation);
+            setLineup(latest.lineup);
+          }
+        }
+
+        if (!cancelled) {
+          if (poolRes.ok) {
+            const poolPayload = (await poolRes.json()) as {
+              players: SquadPoolPlayer[];
+              seasonName: string;
+              matchLabel: string;
+            };
+            setPlayers(poolPayload.players ?? []);
+            setPoolLabel(`${poolPayload.seasonName} · ${poolPayload.matchLabel}`);
+            setPoolError(null);
+          } else {
+            const poolFail = (await poolRes.json()) as { error?: string };
+            setPoolError(poolFail.error ?? "Unable to load player pool.");
+          }
+          setPoolLoading(false);
+        }
+
+        if (!cancelled) setLoadState("ready");
+      } catch {
+        if (!cancelled) {
+          setLoadState("error");
+          setPoolLoading(false);
+          setPoolError("Unable to load squad data.");
+        }
+      }
+    }
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function changeFormation(next: SquadFormation) {
     setFormation(next);
-    setSlots(defaultSlots(next));
+    setLineup((current) => mergeFormationChange(next, current));
   }
 
-  function updateSlot(index: number, label: string) {
-    setSlots((current) =>
-      current.map((slot, slotIndex) => (slotIndex === index ? { ...slot, label } : slot))
-    );
-  }
+  const filledCount = lineup.filter((slot) => slot.label).length;
 
   async function saveSquad(event: FormEvent) {
     event.preventDefault();
+    if (filledCount < 11) {
+      setError("Place all 11 players on the pitch before saving.");
+      return;
+    }
+
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -49,11 +110,11 @@ export function SquadBuilder() {
       const response = await fetch("/api/squads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, formation, lineup: slots })
+        body: JSON.stringify({ squadId: squadId ?? undefined, name, formation, lineup })
       });
       const payload = (await response.json()) as { error?: string; squadId?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to save squad.");
-      setLastSquadId(payload.squadId ?? null);
+      setSquadId(payload.squadId ?? squadId);
       setNotice(payload.message ?? "Squad saved.");
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Unable to save squad.");
@@ -63,7 +124,7 @@ export function SquadBuilder() {
   }
 
   async function publishSquad() {
-    if (!lastSquadId) {
+    if (!squadId) {
       setError("Save your squad first.");
       return;
     }
@@ -71,7 +132,7 @@ export function SquadBuilder() {
     setError(null);
     setNotice(null);
     try {
-      const response = await fetch(`/api/squads/${lastSquadId}/publish`, { method: "POST" });
+      const response = await fetch(`/api/squads/${squadId}/publish`, { method: "POST" });
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to publish.");
       setNotice(payload.message ?? "Published to Coach Board.");
@@ -82,14 +143,19 @@ export function SquadBuilder() {
     }
   }
 
+  const resetToFormation = useCallback(() => {
+    setLineup(defaultLineupWithPositions(formation));
+    setSelectedSlot(null);
+  }, [formation]);
+
   return (
     <form className="squad-builder" onSubmit={saveSquad}>
       <header className="section-heading compact">
         <div>
           <h3>Build your XI</h3>
           <p className="community-panel-lead">
-            Name your lineup, pick a formation, and enter players. Publish to share a{" "}
-            <code>squad_share</code> post (moderated like Fan Chat).
+            Drag players onto the pitch to set formation and exact positions. Your latest saved squad
+            loads automatically.
           </p>
         </div>
         <label className="feed-control-field">
@@ -97,7 +163,7 @@ export function SquadBuilder() {
           <select
             className="feed-control-input"
             value={formation}
-            onChange={(event) => changeFormation(event.target.value)}
+            onChange={(event) => changeFormation(event.target.value as SquadFormation)}
           >
             {FORMATIONS.map((value) => (
               <option key={value} value={value}>
@@ -118,28 +184,38 @@ export function SquadBuilder() {
         />
       </label>
 
-      <div className="squad-builder-grid">
-        {slots.map((slot, index) => (
-          <label className="squad-builder-slot feed-control-field" key={slot.slot}>
-            <span>
-              {slot.role} #{slot.slot}
-            </span>
-            <input
-              className="feed-control-input"
-              placeholder="Player name"
-              value={slot.label}
-              onChange={(event) => updateSlot(index, event.target.value)}
-            />
-          </label>
-        ))}
+      {loadState === "loading" ? <p className="inline-status">Loading your squad…</p> : null}
+
+      <div className="squad-builder-layout">
+        <SquadPlayerPool
+          error={poolError}
+          lineup={lineup}
+          loading={poolLoading}
+          players={players}
+          sourceLabel={poolLabel}
+        />
+        <SquadPitch
+          lineup={lineup}
+          selectedSlot={selectedSlot}
+          onLineupChange={setLineup}
+          onSelectSlot={setSelectedSlot}
+        />
       </div>
 
+      <p className="squad-builder-progress">
+        {filledCount}/11 players placed
+        {squadId ? ` · editing squad ${squadId.slice(0, 8)}…` : ""}
+      </p>
+
       <div className="squad-builder-actions">
-        <button className="button primary" disabled={busy} type="submit">
-          {busy ? "Saving…" : "Save squad"}
+        <button className="button primary" disabled={busy || filledCount < 11} type="submit">
+          {busy ? "Saving…" : squadId ? "Update squad" : "Save squad"}
         </button>
-        <button className="button secondary" disabled={busy || !lastSquadId} type="button" onClick={publishSquad}>
+        <button className="button secondary" disabled={busy || !squadId} type="button" onClick={publishSquad}>
           Publish to Coach Board
+        </button>
+        <button className="button secondary" disabled={busy} type="button" onClick={resetToFormation}>
+          Reset positions
         </button>
       </div>
 

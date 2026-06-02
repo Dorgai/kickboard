@@ -4,8 +4,10 @@ import { mapDatabaseError } from "@/lib/community/health";
 import {
   createUserSquad,
   defaultLineupForFormation,
+  getLatestUserSquad,
   isValidFormation,
   listUserSquads,
+  updateUserSquad,
   type SquadLineupSlot
 } from "@/lib/squads/store";
 
@@ -20,8 +22,8 @@ export async function GET() {
     return NextResponse.json({ error: "Complete onboarding first." }, { status: 403 });
   }
 
-  const squads = await listUserSquads(user.id);
-  return NextResponse.json({ squads });
+  const [squads, latest] = await Promise.all([listUserSquads(user.id), getLatestUserSquad(user.id)]);
+  return NextResponse.json({ squads, latest });
 }
 
 export async function POST(request: Request) {
@@ -35,6 +37,7 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as {
+      squadId?: string;
       name?: string;
       formation?: string;
       lineup?: SquadLineupSlot[];
@@ -50,18 +53,38 @@ export async function POST(request: Request) {
         ? body.lineup
         : defaultLineupForFormation(formation);
 
-    const squadId = await createUserSquad({
-      userId: user.id,
-      name: body.name ?? "My XI",
-      formation,
-      lineup
-    });
+    const existingId = typeof body.squadId === "string" ? body.squadId.trim() : "";
+    let squadId: string | null = null;
 
-    if (!squadId) {
-      return NextResponse.json({ error: "Unable to save squad." }, { status: 500 });
+    if (existingId) {
+      squadId = await updateUserSquad({
+        squadId: existingId,
+        userId: user.id,
+        name: body.name ?? "My XI",
+        formation,
+        lineup
+      });
+      if (!squadId) {
+        return NextResponse.json({ error: "Squad not found." }, { status: 404 });
+      }
+    } else {
+      squadId = await createUserSquad({
+        userId: user.id,
+        name: body.name ?? "My XI",
+        formation,
+        lineup
+      });
+      if (!squadId) {
+        return NextResponse.json({ error: "Unable to save squad." }, { status: 500 });
+      }
     }
 
-    return NextResponse.json({ squadId, message: "Squad saved. Publish it to the Coach Board when ready." });
+    return NextResponse.json({
+      squadId,
+      message: existingId
+        ? "Squad updated. Publish when ready."
+        : "Squad saved. Publish it to the Coach Board when ready."
+    });
   } catch (error) {
     const mapped = mapDatabaseError(error);
     if (mapped) {
