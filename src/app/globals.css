@@ -2763,10 +2763,6 @@ h3 {
   gap: 20px;
 }
 
-.predictions-panel-lead {
-  margin: 0;
-}
-
 .predictions-overview {
   display: grid;
   gap: 0;

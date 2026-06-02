@@ -34,13 +34,6 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   return (
     <AuthGate featureLabel="Predictions">
       <div className="predictions-panel">
-        <p className="community-panel-lead predictions-panel-lead">
-          Predictions are <strong>free-to-play skill games</strong> — virtual points only, not betting or
-          real-money stakes (see <code>docs/predictions-legal.md</code>). For each match you can pick a{" "}
-          <strong>winner or draw</strong>, an <strong>exact score</strong>, and <strong>goal scorers</strong>{" "}
-          — each settled separately for points.
-        </p>
-
         {fixtures.length > 0 && selected ? (
           <div className="predictions-match-row">
             <FixtureMatchPicker
