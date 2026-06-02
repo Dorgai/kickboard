@@ -1661,7 +1661,27 @@ h3 {
   padding: 0;
 }
 
+.match-fixture-picker-search {
+  margin: 0 0 8px;
+}
+
+.match-fixture-picker-search input {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 12px;
+  padding: 6px 8px;
+  width: 100%;
+}
+
+.match-fixture-picker-search input::placeholder {
+  color: color-mix(in srgb, var(--color-text-primary) 45%, var(--color-text-secondary));
+}
+
 .match-fixture-picker-btn {
+  -webkit-appearance: none;
+  appearance: none;
   background: var(--color-surface);
   border: none;
   border-radius: 10px;
@@ -1669,10 +1689,24 @@ h3 {
   color: var(--color-text-primary);
   cursor: pointer;
   display: grid;
+  font: inherit;
   gap: 4px;
   padding: 8px 10px;
   text-align: left;
   width: 100%;
+}
+
+.match-fixture-picker-btn--draggable {
+  cursor: grab;
+}
+
+.match-fixture-picker-btn--draggable:active {
+  cursor: grabbing;
+}
+
+.match-fixture-picker-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .match-fixture-picker-btn .team-label-text {
@@ -1721,6 +1755,16 @@ h3 {
   color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
   font-size: 10px;
   line-height: 1.3;
+}
+
+.match-coach-board-panel--fixture-drag-over {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  border-radius: 12px;
+}
+
+.match-coach-board-panel-empty {
+  margin: 0;
+  padding: 12px 0;
 }
 
 .match-coach-board-panel {
@@ -1813,6 +1857,24 @@ h3 {
   color: var(--color-text-primary);
   font-size: 14px;
   margin: 0;
+}
+
+.saved-squads-bar-hint {
+  color: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-text-secondary));
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.saved-squads-bar-hint strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.saved-squads-bar--fixture-drag-over {
+  box-shadow:
+    var(--shadow-surface),
+    0 0 0 2px color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .saved-squads-new {
