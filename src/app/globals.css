@@ -2465,16 +2465,197 @@ h3 {
   margin-bottom: 4px;
 }
 
+.predictions-results-board {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.predictions-results-board-header {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  justify-content: space-between;
+}
+
+.predictions-results-board-header h3 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.predictions-results-board-lead {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.predictions-results-table {
+  border-collapse: collapse;
+  font-size: 12px;
+  width: 100%;
+}
+
+.predictions-results-table th,
+.predictions-results-table td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.predictions-results-table th {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .predictions-overview-grid {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (max-width: 960px) {
   .predictions-overview-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.fixture-predictions-form {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-surface);
+  display: grid;
+  gap: 14px;
+  padding: 14px 16px;
+}
+
+.fixture-predictions-form--compact {
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.fixture-prediction-section {
+  display: grid;
+  gap: 8px;
+}
+
+.fixture-prediction-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.fixture-prediction-section-note {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  margin: 0;
+}
+
+.fixture-outcome-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fixture-outcome-btn {
+  align-items: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 6px;
+  min-height: 2.25rem;
+  padding: 6px 10px;
+}
+
+.fixture-outcome-btn--active {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.fixture-outcome-btn--clear {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.fixture-scorer-pool-list,
+.fixture-scorer-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  max-height: 10rem;
+  overflow: auto;
+  padding: 0;
+}
+
+.fixture-scorer-chip {
+  align-items: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  flex-wrap: wrap;
+  font-size: 11px;
+  font-weight: 600;
+  gap: 4px 8px;
+  padding: 4px 10px;
+}
+
+.fixture-scorer-chip--selected {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  border-color: var(--color-accent);
+}
+
+.fixture-scorer-chip-side {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+}
+
+.predictions-type-lines {
+  display: grid;
+  gap: 6px;
+}
+
+.predictions-type-line {
+  align-items: baseline;
+  display: grid;
+  gap: 4px 8px;
+  grid-template-columns: 4.5rem 1fr auto;
+  font-size: 11px;
+}
+
+.predictions-type-line-label {
+  color: var(--color-text-secondary);
+  font-weight: 700;
+}
+
+.predictions-type-line-value {
+  font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.predictions-result--void {
+  background: color-mix(in srgb, var(--color-text-secondary) 10%, transparent);
+  color: var(--color-text-secondary);
+}
+
+.predictions-settle-note {
+  margin-top: 0;
 }
 
 .predictions-overview-card {

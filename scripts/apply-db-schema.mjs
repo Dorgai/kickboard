@@ -32,7 +32,8 @@ const files = [
   "db/fixture-scope-extensions.sql",
   "db/connections-social-extensions.sql",
   "db/fixture-prediction-settlement-extensions.sql",
-  "db/registration-invitations-extensions.sql"
+  "db/registration-invitations-extensions.sql",
+  "db/fixture-prediction-types-extensions.sql"
 ];
 
 async function applyFile(client, relativePath) {

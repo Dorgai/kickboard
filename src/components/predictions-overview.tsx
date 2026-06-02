@@ -1,39 +1,50 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { outcomeShort, type FixtureOutcome, type ScorerPick } from "@/lib/fixture-predictions/types";
+
+type CategoryStats = {
+  won: number;
+  lost: number;
+  pending: number;
+  points: number;
+};
 
 type PredictionPickSummary = {
   id: string;
   fixtureKey: string;
   fixtureLabel: string;
-  homeScore: number;
-  awayScore: number;
-  resultStatus: string;
-  pointsAwarded: number;
+  predictedOutcome: FixtureOutcome | null;
+  homeScore: number | null;
+  awayScore: number | null;
+  scorerPicks: ScorerPick[];
+  outcomeStatus: string;
+  scoreStatus: string;
+  scorersStatus: string;
+  outcomePointsAwarded: number;
+  scorePointsAwarded: number;
+  scorersPointsAwarded: number;
   updatedAt: string;
 };
 
-type ConnectionPredictionSummary = {
+type ConnectionPredictionSummary = PredictionPickSummary & {
   userId: string;
   username: string;
   displayName: string;
-  fixtureKey: string;
-  fixtureLabel: string;
-  homeScore: number;
-  awayScore: number;
-  resultStatus: string;
-  pointsAwarded: number;
-  updatedAt: string;
 };
 
 type PredictionsOverviewData = {
   wallet: {
     balance: number;
     pointsWon: number;
-    pointsLost: number;
     picksWon: number;
     picksLost: number;
     picksPending: number;
+    byCategory: {
+      outcome: CategoryStats;
+      score: CategoryStats;
+      scorers: CategoryStats;
+    };
   };
   myPredictions: PredictionPickSummary[];
   connectionsPredictions: ConnectionPredictionSummary[];
@@ -48,25 +59,95 @@ function resultBadge(status: string) {
   if (status === "won") return { label: "Won", className: "predictions-result--won" };
   if (status === "lost") return { label: "Lost", className: "predictions-result--lost" };
   if (status === "partial") return { label: "Partial", className: "predictions-result--partial" };
+  if (status === "void") return { label: "Void", className: "predictions-result--void" };
   return { label: "Pending", className: "predictions-result--pending" };
 }
 
-function PickRow({
+function StatusLine({
   label,
-  score,
-  meta
+  value,
+  status,
+  points
 }: {
   label: string;
-  score: string;
-  meta?: React.ReactNode;
+  value: string;
+  status: string;
+  points: number;
 }) {
+  const badge = resultBadge(status);
+  return (
+    <div className="predictions-type-line">
+      <span className="predictions-type-line-label">{label}</span>
+      <span className="predictions-type-line-value">{value}</span>
+      <span className={`predictions-result-badge ${badge.className}`}>
+        {badge.label}
+        {points > 0 ? ` · +${points}` : ""}
+      </span>
+    </div>
+  );
+}
+
+function formatPickSummary(pick: PredictionPickSummary) {
+  const lines: { label: string; value: string; status: string; points: number }[] = [];
+
+  if (pick.predictedOutcome) {
+    lines.push({
+      label: "Outcome",
+      value: outcomeShort(pick.predictedOutcome),
+      status: pick.outcomeStatus,
+      points: pick.outcomePointsAwarded
+    });
+  }
+  if (pick.homeScore !== null && pick.awayScore !== null) {
+    lines.push({
+      label: "Score",
+      value: `${pick.homeScore}–${pick.awayScore}`,
+      status: pick.scoreStatus,
+      points: pick.scorePointsAwarded
+    });
+  }
+  if (pick.scorerPicks.length > 0) {
+    lines.push({
+      label: "Scorers",
+      value: pick.scorerPicks.map((s) => s.playerName).join(", "),
+      status: pick.scorersStatus,
+      points: pick.scorersPointsAwarded
+    });
+  }
+
+  return lines;
+}
+
+function PickCard({
+  title,
+  pick,
+  peer
+}: {
+  title: string;
+  pick: PredictionPickSummary;
+  peer?: { displayName: string; username: string };
+}) {
+  const lines = formatPickSummary(pick);
   return (
     <li className="predictions-overview-pick">
       <div className="predictions-overview-pick-main">
-        <span className="predictions-overview-pick-label">{label}</span>
-        <strong className="predictions-overview-pick-score">{score}</strong>
+        <span className="predictions-overview-pick-label">{title}</span>
+        {peer ? (
+          <span className="predictions-overview-peer">
+            <strong>{peer.displayName}</strong>
+            <span className="connections-search-username">@{peer.username}</span>
+          </span>
+        ) : null}
       </div>
-      {meta ? <div className="predictions-overview-pick-meta">{meta}</div> : null}
+      {lines.length === 0 ? (
+        <p className="predictions-overview-empty">No picks saved.</p>
+      ) : (
+        <div className="predictions-type-lines">
+          {lines.map((line) => (
+            <StatusLine key={line.label} {...line} />
+          ))}
+        </div>
+      )}
     </li>
   );
 }
@@ -109,13 +190,57 @@ export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: Prediction
   if (!data) return null;
 
   const { wallet, myPredictions, connectionsPredictions } = data;
-
   const connectionsForMatch = fixtureKey
     ? connectionsPredictions
     : connectionsPredictions.slice(0, 8);
 
+  const categories = [
+    { key: "outcome" as const, label: "Winner / draw" },
+    { key: "score" as const, label: "Exact score" },
+    { key: "scorers" as const, label: "Goal scorers" }
+  ];
+
   return (
     <div className="predictions-overview">
+      <section className="predictions-results-board data-card">
+        <header className="predictions-results-board-header">
+          <h3>Results & balance</h3>
+          <p className="predictions-wallet-balance">
+            <span className="predictions-wallet-balance-value">{wallet.balance}</span>
+            <span className="predictions-wallet-balance-label">points total</span>
+          </p>
+        </header>
+        <p className="predictions-results-board-lead">
+          Won <strong>{wallet.pointsWon}</strong> pts from settled picks ·{" "}
+          <strong>{wallet.picksPending}</strong> categories still pending
+        </p>
+        <table className="predictions-results-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Won</th>
+              <th>Lost</th>
+              <th>Pending</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map(({ key, label }) => {
+              const row = wallet.byCategory[key];
+              return (
+                <tr key={key}>
+                  <td>{label}</td>
+                  <td>{row.won}</td>
+                  <td>{row.lost}</td>
+                  <td>{row.pending}</td>
+                  <td>{row.points > 0 ? `+${row.points}` : "—"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+
       <div className="predictions-overview-grid">
         <section className="predictions-overview-card">
           <header className="predictions-overview-card-header">
@@ -123,25 +248,12 @@ export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: Prediction
             <span className="predictions-overview-count">{myPredictions.length}</span>
           </header>
           {myPredictions.length === 0 ? (
-            <p className="predictions-overview-empty">No score picks saved yet.</p>
+            <p className="predictions-overview-empty">No picks saved yet.</p>
           ) : (
             <ul className="predictions-overview-list">
-              {myPredictions.map((pick) => {
-                const badge = resultBadge(pick.resultStatus);
-                return (
-                  <PickRow
-                    key={pick.id}
-                    label={pick.fixtureLabel}
-                    score={`${pick.homeScore}–${pick.awayScore}`}
-                    meta={
-                      <span className={`predictions-result-badge ${badge.className}`}>
-                        {badge.label}
-                        {pick.pointsAwarded > 0 ? ` · +${pick.pointsAwarded}` : ""}
-                      </span>
-                    }
-                  />
-                );
-              })}
+              {myPredictions.map((pick) => (
+                <PickCard key={pick.id} pick={pick} title={pick.fixtureLabel} />
+              ))}
             </ul>
           )}
         </section>
@@ -160,47 +272,15 @@ export function PredictionsOverview({ fixtureKey, refreshToken = 0 }: Prediction
           ) : (
             <ul className="predictions-overview-list">
               {connectionsForMatch.map((pick) => (
-                <PickRow
+                <PickCard
                   key={`${pick.userId}-${pick.fixtureKey}-${pick.updatedAt}`}
-                  label={pick.fixtureLabel}
-                  score={`${pick.homeScore}–${pick.awayScore}`}
-                  meta={
-                    <span className="predictions-overview-peer">
-                      <strong>{pick.displayName}</strong>
-                      <span className="connections-search-username">@{pick.username}</span>
-                    </span>
-                  }
+                  pick={pick}
+                  peer={{ displayName: pick.displayName, username: pick.username }}
+                  title={pick.fixtureLabel}
                 />
               ))}
             </ul>
           )}
-        </section>
-
-        <section className="predictions-overview-card predictions-overview-card--wallet">
-          <header className="predictions-overview-card-header">
-            <h3>Balance</h3>
-          </header>
-          <p className="predictions-wallet-balance">
-            <span className="predictions-wallet-balance-value">{wallet.balance}</span>
-            <span className="predictions-wallet-balance-label">points</span>
-          </p>
-          <dl className="predictions-wallet-stats">
-            <div>
-              <dt>Won</dt>
-              <dd>
-                {wallet.pointsWon > 0 ? `+${wallet.pointsWon} pts` : `${wallet.picksWon} picks`}
-              </dd>
-            </div>
-            <div>
-              <dt>Lost</dt>
-              <dd>{wallet.picksLost > 0 ? `${wallet.picksLost} picks` : "—"}</dd>
-            </div>
-            <div>
-              <dt>Pending</dt>
-              <dd>{wallet.picksPending}</dd>
-            </div>
-          </dl>
-          <p className="predictions-wallet-note">Virtual points only — not cash. Settles after matches.</p>
         </section>
       </div>
     </div>

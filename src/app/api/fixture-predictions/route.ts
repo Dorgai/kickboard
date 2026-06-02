@@ -5,6 +5,7 @@ import {
   getUserFixturePrediction,
   upsertUserFixturePrediction
 } from "@/lib/fixture-predictions/store";
+import { parseScorerPicks, type FixtureOutcome } from "@/lib/fixture-predictions/types";
 
 export const dynamic = "force-dynamic";
 
@@ -47,15 +48,28 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
       fixtureKey?: string;
-      homeScore?: number;
-      awayScore?: number;
+      predictedOutcome?: FixtureOutcome | null;
+      homeScore?: number | null;
+      awayScore?: number | null;
+      scorerPicks?: unknown;
     };
+
+    const outcome =
+      body.predictedOutcome === "home" ||
+      body.predictedOutcome === "draw" ||
+      body.predictedOutcome === "away"
+        ? body.predictedOutcome
+        : body.predictedOutcome === null
+          ? null
+          : undefined;
 
     const id = await upsertUserFixturePrediction({
       userId: user.id,
       fixtureKey: body.fixtureKey ?? "",
-      homeScore: Number(body.homeScore),
-      awayScore: Number(body.awayScore)
+      predictedOutcome: outcome,
+      homeScore: body.homeScore,
+      awayScore: body.awayScore,
+      scorerPicks: body.scorerPicks !== undefined ? parseScorerPicks(body.scorerPicks) : undefined
     });
 
     if (!id) {
@@ -65,14 +79,23 @@ export async function POST(request: Request) {
     const prediction = await getUserFixturePrediction(user.id, body.fixtureKey ?? "");
     return NextResponse.json({
       prediction,
-      message: "Score pick saved. Connected friends can see it for this match."
+      message: "Predictions saved for this match."
     });
   } catch (error) {
     if (error instanceof Error && error.message === "FIXTURE_KEY_REQUIRED") {
       return NextResponse.json({ error: "Select a match first." }, { status: 400 });
     }
     if (error instanceof Error && error.message === "INVALID_SCORE") {
-      return NextResponse.json({ error: "Scores must be between 0 and 20." }, { status: 400 });
+      return NextResponse.json({ error: "Enter both goal counts (0–20) or leave score empty." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "PICK_REQUIRED") {
+      return NextResponse.json(
+        { error: "Add at least one: winner/draw, exact score, or goal scorers." },
+        { status: 400 }
+      );
+    }
+    if (error instanceof Error && error.message === "TOO_MANY_SCORERS") {
+      return NextResponse.json({ error: "You can pick up to 5 goal scorers." }, { status: 400 });
     }
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });

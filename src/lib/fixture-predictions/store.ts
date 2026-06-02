@@ -1,27 +1,70 @@
 import { query } from "@/lib/db";
+import {
+  MAX_SCORER_PICKS,
+  normalizeResultStatus,
+  parseScorerPicks,
+  type FixtureOutcome,
+  type FixturePredictionRecord,
+  type ScorerPick
+} from "@/lib/fixture-predictions/types";
 
-export type FixturePrediction = {
+type PredictionRow = {
   id: string;
-  fixtureKey: string;
-  homeScore: number;
-  awayScore: number;
-  createdAt: string;
-  updatedAt: string;
+  fixture_key: string;
+  predicted_outcome: string | null;
+  home_score: number | null;
+  away_score: number | null;
+  scorer_picks: unknown;
+  outcome_status: string;
+  score_status: string;
+  scorers_status: string;
+  outcome_points_awarded: number;
+  score_points_awarded: number;
+  scorers_points_awarded: number;
+  result_status: string | null;
+  points_awarded: number | null;
+  created_at: Date;
+  updated_at: Date;
 };
+
+function mapRow(row: PredictionRow): FixturePredictionRecord {
+  const legacyScoreStatus = row.result_status ? normalizeResultStatus(row.result_status) : null;
+  return {
+    id: row.id,
+    fixtureKey: row.fixture_key,
+    predictedOutcome:
+      row.predicted_outcome === "home" || row.predicted_outcome === "draw" || row.predicted_outcome === "away"
+        ? row.predicted_outcome
+        : null,
+    homeScore: row.home_score,
+    awayScore: row.away_score,
+    scorerPicks: parseScorerPicks(row.scorer_picks),
+    outcomeStatus: normalizeResultStatus(row.outcome_status),
+    scoreStatus: normalizeResultStatus(row.score_status ?? legacyScoreStatus ?? "pending"),
+    scorersStatus: normalizeResultStatus(row.scorers_status),
+    outcomePointsAwarded: row.outcome_points_awarded ?? 0,
+    scorePointsAwarded: row.score_points_awarded ?? row.points_awarded ?? 0,
+    scorersPointsAwarded: row.scorers_points_awarded ?? 0,
+    createdAt: row.created_at.toISOString(),
+    updatedAt: row.updated_at.toISOString()
+  };
+}
+
+const SELECT_PREDICTION = `SELECT id, fixture_key, predicted_outcome, home_score, away_score, scorer_picks,
+  COALESCE(outcome_status, 'pending') AS outcome_status,
+  COALESCE(score_status, result_status, 'pending') AS score_status,
+  COALESCE(scorers_status, 'pending') AS scorers_status,
+  COALESCE(outcome_points_awarded, 0) AS outcome_points_awarded,
+  COALESCE(score_points_awarded, points_awarded, 0) AS score_points_awarded,
+  COALESCE(scorers_points_awarded, 0) AS scorers_points_awarded,
+  result_status, points_awarded, created_at, updated_at`;
 
 export async function getUserFixturePrediction(userId: string, fixtureKey: string) {
   const key = fixtureKey.trim().slice(0, 120);
   if (!key) return null;
 
-  const result = await query<{
-    id: string;
-    fixture_key: string;
-    home_score: number;
-    away_score: number;
-    created_at: Date;
-    updated_at: Date;
-  }>(
-    `SELECT id, fixture_key, home_score, away_score, created_at, updated_at
+  const result = await query<PredictionRow>(
+    `${SELECT_PREDICTION}
      FROM fixture_predictions
      WHERE user_id = $1 AND fixture_key = $2`,
     [userId, key]
@@ -29,42 +72,84 @@ export async function getUserFixturePrediction(userId: string, fixtureKey: strin
 
   const row = result.rows[0];
   if (!row) return null;
+  return mapRow(row);
+}
 
-  return {
-    id: row.id,
-    fixtureKey: row.fixture_key,
-    homeScore: row.home_score,
-    awayScore: row.away_score,
-    createdAt: row.created_at.toISOString(),
-    updatedAt: row.updated_at.toISOString()
-  } satisfies FixturePrediction;
+function normalizeOutcome(value: unknown): FixtureOutcome | null {
+  if (value === "home" || value === "draw" || value === "away") return value;
+  return null;
+}
+
+function normalizeScore(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const score = Math.round(Number(value));
+  if (!Number.isFinite(score) || score < 0 || score > 20) return null;
+  return score;
 }
 
 export async function upsertUserFixturePrediction(input: {
   userId: string;
   fixtureKey: string;
-  homeScore: number;
-  awayScore: number;
+  predictedOutcome?: FixtureOutcome | null;
+  homeScore?: number | null;
+  awayScore?: number | null;
+  scorerPicks?: ScorerPick[];
 }) {
   const key = input.fixtureKey.trim().slice(0, 120);
   if (!key) throw new Error("FIXTURE_KEY_REQUIRED");
 
-  const homeScore = Math.round(input.homeScore);
-  const awayScore = Math.round(input.awayScore);
-  if (homeScore < 0 || homeScore > 20 || awayScore < 0 || awayScore > 20) {
+  const existing = await getUserFixturePrediction(input.userId, key);
+
+  const predictedOutcome =
+    input.predictedOutcome !== undefined
+      ? input.predictedOutcome
+      : (existing?.predictedOutcome ?? null);
+
+  const homeScore =
+    input.homeScore !== undefined ? normalizeScore(input.homeScore) : (existing?.homeScore ?? null);
+  const awayScore =
+    input.awayScore !== undefined ? normalizeScore(input.awayScore) : (existing?.awayScore ?? null);
+
+  const scorerPicks =
+    input.scorerPicks !== undefined
+      ? parseScorerPicks(input.scorerPicks)
+      : (existing?.scorerPicks ?? []);
+
+  if (scorerPicks.length > MAX_SCORER_PICKS) throw new Error("TOO_MANY_SCORERS");
+
+  const hasOutcome = Boolean(predictedOutcome);
+  const hasScore = homeScore !== null && awayScore !== null;
+  const hasScorers = scorerPicks.length > 0;
+
+  if (!hasOutcome && !hasScore && !hasScorers) {
+    throw new Error("PICK_REQUIRED");
+  }
+
+  if ((homeScore !== null && awayScore === null) || (homeScore === null && awayScore !== null)) {
     throw new Error("INVALID_SCORE");
   }
 
   const result = await query<{ id: string }>(
-    `INSERT INTO fixture_predictions (user_id, fixture_key, home_score, away_score)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO fixture_predictions (
+       user_id, fixture_key, predicted_outcome, home_score, away_score, scorer_picks
+     )
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb)
      ON CONFLICT (user_id, fixture_key)
      DO UPDATE SET
+       predicted_outcome = EXCLUDED.predicted_outcome,
        home_score = EXCLUDED.home_score,
        away_score = EXCLUDED.away_score,
+       scorer_picks = EXCLUDED.scorer_picks,
        updated_at = now()
      RETURNING id`,
-    [input.userId, key, homeScore, awayScore]
+    [
+      input.userId,
+      key,
+      predictedOutcome,
+      homeScore,
+      awayScore,
+      JSON.stringify(scorerPicks)
+    ]
   );
 
   return result.rows[0]?.id ?? null;

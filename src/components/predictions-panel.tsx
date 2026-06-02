@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
-import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
+import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
 import { PredictionsOverview } from "@/components/predictions-overview";
 import {
   FixtureMatchPicker,
@@ -38,8 +38,9 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
 
         <p className="community-panel-lead">
           Predictions are <strong>free-to-play skill games</strong> — virtual points only, not betting or
-          real-money stakes (see <code>docs/predictions-legal.md</code>). Pick a match, then enter your
-          score. Connected friends can compare picks on the Coach Board for the same game.
+          real-money stakes (see <code>docs/predictions-legal.md</code>). For each match you can pick a{" "}
+          <strong>winner or draw</strong>, an <strong>exact score</strong>, and <strong>goal scorers</strong>{" "}
+          — each settled separately for points.
         </p>
 
         {fixtures.length > 0 && selected ? (
@@ -52,7 +53,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
             />
 
             <div className="predictions-match-detail">
-              <FixturePredictionPick
+              <FixturePredictionsForm
                 awayTeam={selected.awayTeam}
                 fixtureKey={selected.key}
                 homeTeam={selected.homeTeam}
@@ -67,18 +68,10 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
           </div>
         )}
 
-        <div className="predictions-coming-soon data-card surface-muted">
-          <h3>Points & MOTM — coming next</h3>
-          <p>
-            The database already has <code>predictions</code> and <code>wallet_ledger</code> tables. The
-            worker will settle points after matches when API-Football live data is connected.
-          </p>
-          <ul className="predictions-spec-list">
-            <li>Lock picks before kickoff</li>
-            <li>Points credited via wallet ledger (no cash value)</li>
-            <li>Leaderboard widget per <code>docs/widget-contract.md</code></li>
-          </ul>
-        </div>
+        <p className="community-panel-lead predictions-settle-note">
+          Results and balances above update when matches finish and picks are settled (API-Football live
+          data). Until then, each category shows <strong>Pending</strong>.
+        </p>
       </div>
     </AuthGate>
   );
