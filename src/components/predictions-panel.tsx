@@ -49,6 +49,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
               ariaLabel="Select a match for your prediction"
               fixtures={fixtures}
               selectedKey={selectedKey}
+              timeline
               onSelect={setSelectedKey}
             />
 

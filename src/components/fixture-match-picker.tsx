@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { MatchTeamsLine } from "@/components/team-label";
 import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
-import type { FixtureOption } from "@/lib/fixtures/fixture-key";
+import { groupFixturesByDate, type FixtureOption } from "@/lib/fixtures/fixture-key";
 
 export type WorldCupGroupInput = {
   group: string;
@@ -65,6 +65,8 @@ type FixtureMatchPickerProps = {
   onSelect: (key: string) => void;
   ariaLabel?: string;
   emptyMessage?: string;
+  /** Group matches by day with a vertical timeline rail (Predictions / Coach Board picker). */
+  timeline?: boolean;
 };
 
 export function FixtureMatchPicker({
@@ -72,12 +74,41 @@ export function FixtureMatchPicker({
   selectedKey,
   onSelect,
   ariaLabel = "Select a match",
-  emptyMessage = "Fixture list is loading from the tournament feed."
+  emptyMessage = "Fixture list is loading from the tournament feed.",
+  timeline = true
 }: FixtureMatchPickerProps) {
+  const dateGroups = useMemo(
+    () => (timeline ? groupFixturesByDate(fixtures) : []),
+    [fixtures, timeline]
+  );
+
   return (
     <aside className="match-fixture-picker" aria-label={ariaLabel}>
       {fixtures.length === 0 ? (
         <p className="inline-status">{emptyMessage}</p>
+      ) : timeline && dateGroups.length > 0 ? (
+        <ul className="match-fixture-picker-list match-fixture-picker-list--timeline">
+          {dateGroups.map((group) => (
+            <li className="match-fixture-picker-date-group" key={group.dateKey}>
+              <div className="match-fixture-picker-timeline-heading">
+                <span aria-hidden className="match-fixture-picker-timeline-node" />
+                <span className="match-fixture-picker-timeline-date">{group.label}</span>
+              </div>
+              <ul className="match-fixture-picker-date-matches">
+                {group.fixtures.map((fixture) => (
+                  <li key={fixture.key}>
+                    <FixturePickerButton
+                      fixture={fixture}
+                      selected={fixture.key === selectedKey}
+                      showDate={false}
+                      onSelect={() => onSelect(fixture.key)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
       ) : (
         <ul className="match-fixture-picker-list">
           {fixtures.map((fixture) => (
@@ -98,11 +129,13 @@ export function FixtureMatchPicker({
 export function FixturePickerButton({
   fixture,
   selected,
-  onSelect
+  onSelect,
+  showDate = true
 }: {
   fixture: FixtureOption;
   selected: boolean;
   onSelect: () => void;
+  showDate?: boolean;
 }) {
   return (
     <button
@@ -124,7 +157,9 @@ export function FixturePickerButton({
           {fixture.homeGoals} – {fixture.awayGoals}
         </span>
       ) : null}
-      {fixture.date ? <span className="match-fixture-picker-date">{fixture.date}</span> : null}
+      {showDate && fixture.date ? (
+        <span className="match-fixture-picker-date">{fixture.date}</span>
+      ) : null}
     </button>
   );
 }

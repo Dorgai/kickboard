@@ -79,3 +79,51 @@ export function parseFixtureSortKey(date: string | null) {
   if (Number.isNaN(parsed)) return date;
   return new Date(parsed).toISOString();
 }
+
+/** Stable day bucket for grouping fixtures in lists (YYYY-MM-DD or fallback). */
+export function fixtureDateGroupKey(date: string | null) {
+  if (!date?.trim()) return "unknown";
+  const parsed = Date.parse(date);
+  if (Number.isNaN(parsed)) return date.trim().toLowerCase();
+  return new Date(parsed).toISOString().slice(0, 10);
+}
+
+/** Human-readable date heading for fixture picker timelines. */
+export function formatFixtureDateDivider(date: string | null) {
+  if (!date?.trim()) return "Date TBD";
+  const parsed = Date.parse(date);
+  if (Number.isNaN(parsed)) return date.trim();
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date(parsed));
+}
+
+export type FixtureDateGroup = {
+  dateKey: string;
+  label: string;
+  fixtures: FixtureOption[];
+};
+
+/** Preserve fixture sort order while splitting into day groups. */
+export function groupFixturesByDate(fixtures: FixtureOption[]): FixtureDateGroup[] {
+  const groups: FixtureDateGroup[] = [];
+
+  for (const fixture of fixtures) {
+    const dateKey = fixtureDateGroupKey(fixture.date);
+    const last = groups[groups.length - 1];
+    if (!last || last.dateKey !== dateKey) {
+      groups.push({
+        dateKey,
+        label: formatFixtureDateDivider(fixture.date),
+        fixtures: [fixture]
+      });
+    } else {
+      last.fixtures.push(fixture);
+    }
+  }
+
+  return groups;
+}
