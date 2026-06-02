@@ -68,8 +68,8 @@ const KIT_BY_CODE: Record<string, TeamKitColors> = {
 };
 
 const SIDE_FALLBACK: Record<"home" | "away", TeamKitColors> = {
-  home: { primary: "#6366F1", secondary: "#A855F7", text: "#FFFFFF" },
-  away: { primary: "#F43F5E", secondary: "#FB923C", text: "#FFFFFF" }
+  home: { primary: "#3B82F6", secondary: "#93C5FD", text: "#FFFFFF" },
+  away: { primary: "#F97316", secondary: "#FDBA74", text: "#1B1B1B" }
 };
 
 function hexLuminance(hex: string) {
