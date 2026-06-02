@@ -69,14 +69,13 @@ Details are in [`docs/railway-services.md`](docs/railway-services.md).
 
 ## Admin data source dashboard
 
-The data-source operations dashboard is protected by `ADMIN_DATA_SOURCES_TOKEN` until user auth and
-admin roles are implemented.
+Open **`/admin/data-sources`** as an allowlisted Google account (`ADMIN_EMAILS`, default
+`laszlo.dorgai@gmail.com`) or with a legacy operator token.
 
-- Page: `/admin/data-sources?token=<ADMIN_DATA_SOURCES_TOKEN>`
-- API: `/api/admin/data-sources` with `Authorization: Bearer <ADMIN_DATA_SOURCES_TOKEN>` or `x-admin-token`
+- Page: `/admin/data-sources` (Google sign-in) or `/admin/data-sources?token=<ADMIN_DATA_SOURCES_TOKEN>`
+- API: `/api/admin/*` with session cookies (OAuth admin) or `Authorization: Bearer <ADMIN_DATA_SOURCES_TOKEN>` / `x-admin-token`
 
-It shows which sources are connected, last checked/refreshed metadata, refresh cadence, and what data
-each source updates.
+It shows feed connections, refresh cadence, infrastructure status, user activity, and moderation tools.
 
 ## Worker
 

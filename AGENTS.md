@@ -42,7 +42,7 @@ Wait for `curl -sf http://localhost:3000/api/health` before browser or API tests
 
 ### Admin dashboard (optional)
 
-`/admin/data-sources` requires `ADMIN_DATA_SOURCES_TOKEN` in `.env` (see `.env.example`). On Railway, set the same variable via the dashboard or `npm run railway:variables` with `RAILWAY_TOKEN` exported.
+`/admin/data-sources` accepts **Google OAuth** on `ADMIN_EMAILS` (default `laszlo.dorgai@gmail.com`) or optional legacy `ADMIN_DATA_SOURCES_TOKEN` (see `.env.example`).
 
 ### Railway deploy
 
