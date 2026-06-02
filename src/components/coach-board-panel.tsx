@@ -105,8 +105,8 @@ export function CoachBoardPanel({ fixtureKey, fixtureLabel }: CoachBoardPanelPro
     <AuthGate featureLabel="Coach Board">
       <div className="coach-board-panel">
         <p className="community-panel-lead">
-          <strong>{fixtureLabel}</strong> — squads and posts here are only for this fixture. New shares
-          are held for moderation before they appear in the feed below.
+          <strong>{fixtureLabel}</strong> — squads and published lineups here are scoped to this fixture.
+          Fan Chat text posts are still moderated separately.
         </p>
 
         <SavedSquadsBar

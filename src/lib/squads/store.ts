@@ -85,7 +85,7 @@ export async function publishSquadToBoard(squadId: string, userId: string) {
 
   const post = await query<{ id: string }>(
     `INSERT INTO posts (author_id, post_type, body, squad_id, moderation_status, fixture_key)
-     VALUES ($1, 'squad_share', $2, $3, 'withheld', $4)
+     VALUES ($1, 'squad_share', $2, $3, 'approved', $4)
      RETURNING id`,
     [userId, body, row.id, row.fixture_key]
   );

@@ -22,7 +22,7 @@ export async function POST(_request: Request, context: RouteContext) {
     const result = await publishSquadToBoard(squadId, user.id);
     return NextResponse.json({
       ...result,
-      message: "Squad shared to Coach Board. It will appear after moderation."
+      message: "Squad shared to Coach Board."
     });
   } catch (error) {
     if (error instanceof Error && error.message === "SQUAD_NOT_FOUND") {

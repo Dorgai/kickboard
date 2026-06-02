@@ -12,7 +12,8 @@ Moderated public posting for the **Current event** tab. Historical match data st
 ## Safety model
 
 - Accounts under **13** cannot register for posting (Fan Mode).
-- New posts are stored as `moderation_status = withheld` until an admin approves them.
+- **Fan Chat** text posts are stored as `moderation_status = withheld` until an admin approves them.
+- **Coach Board squad shares** (`post_type = squad_share`) publish as `approved` immediately (structured lineup summary from saved squads).
 - Reporting a post hides it (`withheld`) until review.
 - Full user auth, DMs, and child profiles are later phases.
 
