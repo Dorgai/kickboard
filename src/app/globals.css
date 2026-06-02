@@ -1816,41 +1816,54 @@ h3 {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.knockout-widgets-row--match-split,
-.knockout-widgets-row--match-split.knockout-widgets-row--with-lineups {
+.knockout-widgets-row--fixtures-detail,
+.knockout-widgets-row--squads-pair {
   align-items: stretch;
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.knockout-widgets-row--stats-pair {
-  align-items: stretch;
-  display: grid;
-  gap: 10px;
-  grid-column: 1 / -1;
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
 }
 
 @media (min-width: 900px) {
-  .knockout-widgets-row--stats-pair {
+  .knockout-widgets-row--fixtures-detail {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 1.05fr);
+  }
+
+  .knockout-widgets-row--squads-pair {
     grid-template-columns: minmax(0, 1.05fr) minmax(240px, 0.95fr);
   }
 }
 
-.knockout-widgets-row--match-split .match-lineups-column {
-  grid-column: 1 / -1;
+.match-stage-fixtures-column {
+  align-self: stretch;
+  box-sizing: border-box;
+  display: grid;
+  gap: 8px;
   min-height: 0;
+  min-width: 0;
+  padding: 12px 14px;
 }
 
-.knockout-widgets-row--stats-pair .match-detail-widget,
-.knockout-widgets-row--stats-pair .match-player-stats-column {
+.match-stage-fixtures-column .bracket-stage-panel {
+  min-width: 0;
+}
+
+.knockout-widgets-row--fixtures-detail .match-detail-widget,
+.knockout-widgets-row--fixtures-detail .match-placeholder {
   align-self: stretch;
   box-sizing: border-box;
   height: 100%;
   min-height: 0;
 }
 
-.knockout-widgets-row--stats-pair .match-player-stats-column .player-stats-panel {
+.knockout-widgets-row--squads-pair .match-lineups-column,
+.knockout-widgets-row--squads-pair .match-player-stats-column {
+  align-self: stretch;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+}
+
+.knockout-widgets-row--squads-pair .match-player-stats-column .player-stats-panel {
   min-height: 100%;
 }
 
