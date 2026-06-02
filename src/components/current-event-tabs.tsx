@@ -1,7 +1,7 @@
 "use client";
 
 import { Info } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { FloatingFanChat } from "@/components/floating-fan-chat";
@@ -92,6 +92,78 @@ function SummaryTile({ label, value, compact = false }: SummaryTileProps) {
   );
 }
 
+type TournamentSummary = CurrentWorldCup["summary"];
+
+function TournamentSummaryDialog({
+  title,
+  summary
+}: {
+  title: string;
+  summary: TournamentSummary;
+}) {
+  const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && !dialog.open) {
+      dialog.showModal();
+    }
+    if (!open && dialog.open) {
+      dialog.close();
+    }
+  }, [open]);
+
+  function close() {
+    setOpen(false);
+  }
+
+  return (
+    <>
+      <button
+        className="button secondary current-event-summary-trigger"
+        type="button"
+        onClick={() => setOpen(true)}
+      >
+        Tournament details
+      </button>
+
+      <dialog
+        ref={dialogRef}
+        aria-labelledby={titleId}
+        className="timeline-modal tournament-summary-modal"
+        onCancel={(event) => {
+          event.preventDefault();
+          close();
+        }}
+        onClose={close}
+      >
+        <div className="timeline-modal-panel">
+          <header className="timeline-modal-header">
+            <div>
+              <p className="eyebrow">Overview</p>
+              <h2 id={titleId}>{title}</h2>
+            </div>
+            <button className="button secondary timeline-modal-close" type="button" onClick={close}>
+              Close
+            </button>
+          </header>
+          <div className="timeline-modal-body">
+            <div className="current-summary-grid current-summary-grid--popup">
+              <SummaryTile label="Hosts" value={summary.hostCountries ?? "—"} />
+              <SummaryTile label="Dates" value={summary.dates ?? "—"} />
+              <SummaryTile label="Teams" value={summary.teams ?? "—"} />
+              <SummaryTile label="Venues" value={summary.venueCount ?? "—"} />
+            </div>
+          </div>
+        </div>
+      </dialog>
+    </>
+  );
+}
+
 export function CurrentEventTabs({
   currentWorldCup
 }: {
@@ -154,31 +226,30 @@ export function CurrentEventTabs({
       <div className="current-event-overview">
         <div className="current-event-overview-heading">
           <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
-          <button
-            aria-label="About tournament squads and data sources"
-            className="info-tooltip"
-            type="button"
-          >
-            <Info aria-hidden className="info-tooltip-icon" size={18} />
-            <span className="info-tooltip-bubble" role="tooltip">
-              {currentWorldCup?.note ? (
-                <>
-                  {currentWorldCup.note}
-                  {" "}
-                </>
-              ) : null}
-              Tournament summary and groups come from public pages. Live scores appear when
-              API-Football and the worker are configured.
-            </span>
-          </button>
+          <div className="current-event-overview-actions">
+            <TournamentSummaryDialog
+              summary={summary}
+              title={currentWorldCup?.title ?? "2026 FIFA World Cup"}
+            />
+            <button
+              aria-label="About tournament squads and data sources"
+              className="info-tooltip"
+              type="button"
+            >
+              <Info aria-hidden className="info-tooltip-icon" size={18} />
+              <span className="info-tooltip-bubble" role="tooltip">
+                {currentWorldCup?.note ? (
+                  <>
+                    {currentWorldCup.note}
+                    {" "}
+                  </>
+                ) : null}
+                Tournament summary and groups come from public pages. Live scores appear when
+                API-Football and the worker are configured.
+              </span>
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div className="current-summary-grid current-summary-grid--compact">
-        <SummaryTile compact label="Hosts" value={summary.hostCountries ?? "—"} />
-        <SummaryTile compact label="Dates" value={summary.dates ?? "—"} />
-        <SummaryTile compact label="Teams" value={summary.teams ?? "—"} />
-        <SummaryTile compact label="Venues" value={summary.venueCount ?? "—"} />
       </div>
 
       <nav className="event-tab-bar current-event-section-tabs" aria-label="Current event sections">
