@@ -7,8 +7,15 @@ import {
   listRegistrationInvitationsForInviter
 } from "@/lib/invitations/store";
 import { resolveAuthBaseUrl } from "@/auth";
+import { isEmailDeliveryConfigured } from "@/lib/email/config";
+import { EmailNotConfiguredError, EmailSendFailedError } from "@/lib/email/resend";
+import { sendRegistrationInvitationEmail } from "@/lib/email/registration-invitation";
 
 export const dynamic = "force-dynamic";
+
+export type InvitationEmailDelivery =
+  | { sent: true; id: string }
+  | { sent: false; reason: "skipped" | "not_configured" | "send_failed"; detail?: string };
 
 function resolvePublicBaseUrl(request: Request) {
   const fromAuth = resolveAuthBaseUrl();
@@ -60,7 +67,15 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       inviteeEmail?: string;
       personalMessage?: string;
+      sendEmail?: boolean;
     };
+
+    const inviteeEmail = body.inviteeEmail?.trim() ?? "";
+    const shouldSendEmail = body.sendEmail !== false && Boolean(inviteeEmail);
+
+    if (shouldSendEmail && !isEmailDeliveryConfigured()) {
+      throw new EmailNotConfiguredError();
+    }
 
     const invitation = await createRegistrationInvitation({
       inviterId: user.id,
@@ -69,9 +84,44 @@ export async function POST(request: Request) {
       baseUrl: resolvePublicBaseUrl(request)
     });
 
+    let emailDelivery: InvitationEmailDelivery = inviteeEmail
+      ? { sent: false, reason: "skipped" }
+      : { sent: false, reason: "skipped" };
+
+    if (shouldSendEmail && invitation.inviteeEmail) {
+      try {
+        const sent = await sendRegistrationInvitationEmail({
+          inviterDisplayName: user.displayName ?? user.username,
+          inviterEmail: user.email,
+          inviteeEmail: invitation.inviteeEmail,
+          inviteUrl: invitation.inviteUrl,
+          personalMessage: invitation.personalMessage,
+          expiresAt: invitation.expiresAt
+        });
+        emailDelivery = { sent: true, id: sent.id };
+      } catch (error) {
+        if (error instanceof EmailNotConfiguredError) throw error;
+        const detail =
+          error instanceof EmailSendFailedError
+            ? `${error.status}: ${error.detail}`
+            : error instanceof Error
+              ? error.message
+              : "unknown";
+        console.error("[invitations] email send failed", detail);
+        emailDelivery = { sent: false, reason: "send_failed", detail };
+      }
+    }
+
+    const message = emailDelivery.sent
+      ? `Invitation email sent to ${invitation.inviteeEmail}. They can also use the link below.`
+      : emailDelivery.reason === "send_failed"
+        ? "Invitation created, but the email could not be sent. Copy the link and share it manually."
+        : "Invitation created. Share the link so they can register with Google.";
+
     return NextResponse.json({
       invitation,
-      message: "Invitation created. Share the link so they can register with Google."
+      emailDelivery,
+      message
     });
   } catch (error) {
     const mapped = mapInvitationError(error) ?? mapDatabaseError(error);

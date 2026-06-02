@@ -91,6 +91,20 @@ if [ -n "${AUTH_SECRET:-}" ]; then
   set_var "AUTH_SECRET=${AUTH_SECRET}"
 fi
 
+if [ -n "${RESEND_API_KEY:-}" ]; then
+  echo "Setting RESEND_API_KEY..."
+  set_var "RESEND_API_KEY=${RESEND_API_KEY}"
+else
+  echo "skip RESEND_API_KEY (registration invite email — see docs/registration-invitations.md)"
+fi
+
+if [ -n "${EMAIL_FROM:-}" ]; then
+  echo "Setting EMAIL_FROM..."
+  set_var "EMAIL_FROM=${EMAIL_FROM}"
+else
+  echo "skip EMAIL_FROM"
+fi
+
 if [ "${SKIP_FINAL_REDEPLOY:-}" != "1" ]; then
   echo "Redeploying kickboard service..."
   railway_cli up --detach "${RAILWAY_TARGET_ARGS[@]}"

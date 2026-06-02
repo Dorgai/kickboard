@@ -21,6 +21,7 @@ export function RegistrationInvitationsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [lastInviteUrl, setLastInviteUrl] = useState<string | null>(null);
+  const [sendEmail, setSendEmail] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -53,16 +54,21 @@ export function RegistrationInvitationsPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           inviteeEmail: inviteeEmail.trim() || undefined,
-          personalMessage: personalMessage.trim() || undefined
+          personalMessage: personalMessage.trim() || undefined,
+          sendEmail: inviteeEmail.trim() ? sendEmail : false
         })
       });
       const payload = (await response.json()) as {
         error?: string;
         message?: string;
         invitation?: InvitationRow;
+        emailDelivery?: { sent: boolean; reason?: string; detail?: string };
       };
       if (!response.ok) throw new Error(payload.error ?? "Unable to create invitation.");
       setNotice(payload.message ?? "Invitation created.");
+      if (payload.emailDelivery?.reason === "send_failed" && payload.emailDelivery.detail) {
+        setError(`Email error: ${payload.emailDelivery.detail}`);
+      }
       setLastInviteUrl(payload.invitation?.inviteUrl ?? null);
       setInviteeEmail("");
       setPersonalMessage("");
@@ -103,7 +109,8 @@ export function RegistrationInvitationsPanel() {
     <section className="registration-invitations-section">
       <h3>Invite someone to register</h3>
       <p className="community-panel-lead">
-        Send a personal link. They register with Google, complete onboarding, and you&apos;ll be
+        Enter their email to send an invitation (and lock the invite to that Google account), or leave
+        email blank to generate a link you can share anywhere. After they register, you&apos;ll be
         connected automatically.
       </p>
 
@@ -129,8 +136,22 @@ export function RegistrationInvitationsPanel() {
             onChange={(event) => setPersonalMessage(event.target.value)}
           />
         </label>
+        {inviteeEmail.trim() ? (
+          <label className="registration-invite-send-email">
+            <input
+              checked={sendEmail}
+              type="checkbox"
+              onChange={(event) => setSendEmail(event.target.checked)}
+            />
+            Send invitation email to {inviteeEmail.trim()}
+          </label>
+        ) : null}
         <button className="button primary" disabled={busy} type="submit">
-          {busy ? "Creating…" : "Create invite link"}
+          {busy
+            ? "Sending…"
+            : inviteeEmail.trim() && sendEmail
+              ? "Send invitation"
+              : "Create invite link"}
         </button>
       </form>
 

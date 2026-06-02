@@ -1870,6 +1870,15 @@ h3 {
   gap: 8px;
 }
 
+.registration-invite-send-email {
+  align-items: center;
+  color: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-text-secondary));
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+  line-height: 1.4;
+}
+
 .registration-invite-message {
   min-height: 3.5rem;
   resize: vertical;

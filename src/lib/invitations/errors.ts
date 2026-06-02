@@ -23,6 +23,15 @@ export function mapInvitationError(error: unknown) {
     ALREADY_REGISTERED: {
       status: 409,
       error: "This invitation was already used. Sign in with your existing account."
+    },
+    EMAIL_NOT_CONFIGURED: {
+      status: 503,
+      error:
+        "Email delivery is not configured. Set RESEND_API_KEY and EMAIL_FROM on the server, or share the invite link manually."
+    },
+    EMAIL_SEND_FAILED: {
+      status: 502,
+      error: "The invitation was created but the email could not be sent. Copy the link and send it yourself."
     }
   };
 
