@@ -20,6 +20,12 @@ echo ""
 echo "Whoami:"
 railway_cli whoami
 
+PRODUCTION_URL="$(node -e "try{console.log(JSON.parse(require('fs').readFileSync('deploy/railway.project.json','utf8')).productionUrl||'')}catch(e){}" 2>/dev/null || true)"
+if [ -n "$PRODUCTION_URL" ]; then
+  echo ""
+  echo "Production: $PRODUCTION_URL"
+fi
+
 echo ""
 echo "Connected. Useful commands:"
 echo "  npm run railway:list          # projects and services (account token)"
