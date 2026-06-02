@@ -1,9 +1,10 @@
 "use client";
 
-import { Bell, ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HeaderUserMenu } from "@/components/header-user-menu";
+import { NotificationsCenter } from "@/components/notifications-center";
 import { ThemeSelector } from "@/components/theme-selector";
 import { navigation } from "@/lib/kickboard-data";
 
@@ -90,10 +91,7 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
           <button type="button" aria-label="Open global search">
             <Search size={18} aria-hidden="true" />
           </button>
-          <button className="notification-button" type="button" aria-label="Open notifications">
-            <Bell size={18} aria-hidden="true" />
-            <span aria-label="3 unread notifications">3</span>
-          </button>
+          <NotificationsCenter />
           <HeaderUserMenu />
         </div>
       </div>
