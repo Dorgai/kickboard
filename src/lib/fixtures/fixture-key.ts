@@ -48,6 +48,31 @@ export function formatFixtureLabel(input: {
   return meta ? `${teams} — ${meta}` : teams;
 }
 
+function titleCaseSlug(slug: string) {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+/** Human-readable label from a stored fixture_key (best-effort for wc26 keys). */
+export function fixtureKeyToShortLabel(fixtureKey: string) {
+  const key = fixtureKey.trim();
+  if (!key) return "Match";
+  if (key.startsWith("api-football:")) return "Live match";
+
+  const parts = key.split(":");
+  if (parts[0] === "wc26" && parts.length >= 5) {
+    const home = titleCaseSlug(parts[2] ?? "home");
+    const away = titleCaseSlug(parts[3] ?? "away");
+    const group = parts[1] && parts[1] !== "x" ? ` · Group ${parts[1].toUpperCase()}` : "";
+    return `${home} vs ${away}${group}`;
+  }
+
+  return key;
+}
+
 export function parseFixtureSortKey(date: string | null) {
   if (!date) return "9999-99-99";
   const parsed = Date.parse(date);

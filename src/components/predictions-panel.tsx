@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
 import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
+import { PredictionsOverview } from "@/components/predictions-overview";
 import {
   FixtureMatchPicker,
   useFixtureOptions,
@@ -16,6 +17,7 @@ type PredictionsPanelProps = {
 export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [overviewRefresh, setOverviewRefresh] = useState(0);
 
   useEffect(() => {
     if (!fixtures.length) {
@@ -32,6 +34,8 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   return (
     <AuthGate featureLabel="Predictions">
       <div className="predictions-panel">
+        <PredictionsOverview fixtureKey={selectedKey} refreshToken={overviewRefresh} />
+
         <p className="community-panel-lead">
           Predictions are <strong>free-to-play skill games</strong> — virtual points only, not betting or
           real-money stakes (see <code>docs/predictions-legal.md</code>). Pick a match, then enter your
@@ -52,6 +56,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                 awayTeam={selected.awayTeam}
                 fixtureKey={selected.key}
                 homeTeam={selected.homeTeam}
+                onSaved={() => setOverviewRefresh((token) => token + 1)}
               />
             </div>
           </div>

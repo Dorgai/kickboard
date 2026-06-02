@@ -8,13 +8,15 @@ type FixturePredictionPickProps = {
   homeTeam: string;
   awayTeam: string;
   inline?: boolean;
+  onSaved?: () => void;
 };
 
 export function FixturePredictionPick({
   fixtureKey,
   homeTeam,
   awayTeam,
-  inline = false
+  inline = false,
+  onSaved
 }: FixturePredictionPickProps) {
   const [homeScore, setHomeScore] = useState("1");
   const [awayScore, setAwayScore] = useState("0");
@@ -64,6 +66,7 @@ export function FixturePredictionPick({
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to save pick.");
       setNotice("Saved");
+      onSaved?.();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Unable to save pick.");
     } finally {
