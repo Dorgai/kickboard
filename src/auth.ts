@@ -6,6 +6,16 @@ const googleEnabled = Boolean(
   process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim()
 );
 
+/** Public site URL — required so Google receives the correct redirect_uri (not localhost). */
+export function resolveAuthBaseUrl() {
+  const raw =
+    process.env.AUTH_URL?.trim() ||
+    process.env.NEXTAUTH_URL?.trim() ||
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    "";
+  return raw.replace(/\/$/, "");
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET?.trim() || process.env.JWT_SECRET?.trim(),

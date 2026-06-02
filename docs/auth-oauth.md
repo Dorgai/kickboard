@@ -28,13 +28,51 @@ In Railway → **kickboard** project → **kickboard** service → **Variables**
 |----------|--------|
 | `GOOGLE_CLIENT_ID` | From Google Cloud |
 | `GOOGLE_CLIENT_SECRET` | From Google Cloud |
+| `AUTH_URL` | `https://kickboard-production.up.railway.app` (**important**) |
 | `AUTH_SECRET` | Optional; if unset, `JWT_SECRET` is used |
 | `JWT_SECRET` | Already set (session signing) |
 | `NEXT_PUBLIC_APP_URL` | `https://kickboard-production.up.railway.app` |
 
+`AUTH_URL` must match the public site URL so Google gets redirect_uri  
+`https://kickboard-production.up.railway.app/api/auth/callback/google` (not `localhost`).
+
 **Redeploy** the service after saving variables (Railway usually redeploys automatically).
 
-Verify: open `https://kickboard-production.up.railway.app/api/auth/config` — expect `"oauthConfigured":true`.
+Verify: open `https://kickboard-production.up.railway.app/api/auth/config` — expect:
+
+- `"oauthConfigured": true`
+- `"googleRedirectUri": "https://kickboard-production.up.railway.app/api/auth/callback/google"`
+
+## 3. OAuth consent screen (fixes “Access blocked” / Error 400)
+
+If Google shows **“doesn't comply with OAuth 2.0 policy”** or **Error 400: invalid_request**:
+
+### A. App in **Testing** mode (most common)
+
+1. Google Cloud → **APIs & Services** → **OAuth consent screen**.
+2. If **Publishing status** is **Testing**, only **Test users** can sign in.
+3. Under **Test users** → **Add users** → add `laszlo.dorgai@gmail.com` (every fan email you want during testing).
+4. Or complete verification and **Publish app** (needs privacy policy URL for public use).
+
+### B. Redirect URI mismatch
+
+In **Credentials** → your OAuth client → **Authorized redirect URIs**, must include **exactly**:
+
+`https://kickboard-production.up.railway.app/api/auth/callback/google`
+
+Compare with `googleRedirectUri` from `/api/auth/config`.
+
+### C. Authorized domains
+
+On **OAuth consent screen** → **Authorized domains**, add:
+
+- `railway.app` (covers `*.up.railway.app` Railway hosts)
+
+Fill **App name**, **User support email**, and **Developer contact email**.
+
+### D. Railway `AUTH_URL` missing
+
+If `/api/auth/config` shows `googleRedirectUri` as `http://localhost:3000/...`, set `AUTH_URL` on Railway to your production URL and redeploy.
 
 ## CLI sync (optional)
 
