@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,17 +35,23 @@ jobs:
           RAILWAY_POSTGRES_SERVICE_NAME: ${{ vars.RAILWAY_POSTGRES_SERVICE_NAME }}
         run: |
           set -euo pipefail
+          echo "Schema workflow v2 (public DATABASE_URL — does not use railway run)"
+          git rev-parse HEAD
           if [ -z "${RAILWAY_TOKEN:-}" ] && [ -z "${DATABASE_URL:-}" ]; then
             echo "::error::Add GitHub secret RAILWAY_TOKEN or DATABASE_URL (public Postgres URL)."
             exit 1
           fi
-          if [ -z "${DATABASE_URL:-}" ]; then
+          if [ -n "${DATABASE_URL:-}" ]; then
+            echo "Using DATABASE_URL from GitHub secret…"
+            if echo "$DATABASE_URL" | grep -q 'railway\.internal'; then
+              echo "::error::DATABASE_URL secret points at postgres.railway.internal. Replace it with Railway Postgres → Connect → Public URL."
+              exit 1
+            fi
+          else
             npm install -g @railway/cli
-            echo "Resolving public Postgres URL from Railway (not railway run — private host is unreachable from CI)…"
+            echo "Resolving DATABASE_PUBLIC_URL from Railway CLI…"
             export DATABASE_URL="$(node scripts/resolve-railway-database-url.mjs)"
             node -e "const u=new URL(process.env.DATABASE_URL); console.log('Postgres host:', u.hostname)"
-          else
-            echo "Applying schema via DATABASE_URL GitHub secret…"
           fi
           node scripts/apply-db-schema.mjs
 
