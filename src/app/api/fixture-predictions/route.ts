@@ -95,7 +95,10 @@ export async function POST(request: Request) {
       );
     }
     if (error instanceof Error && error.message === "TOO_MANY_SCORERS") {
-      return NextResponse.json({ error: "You can pick up to 5 goal scorers." }, { status: 400 });
+      return NextResponse.json(
+        { error: "You can pick up to 8 individual goals (same player allowed more than once)." },
+        { status: 400 }
+      );
     }
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });

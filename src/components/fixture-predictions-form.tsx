@@ -5,6 +5,7 @@ import { TeamLabel } from "@/components/team-label";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import { teamsMatch } from "@/lib/squads/team-names";
 import {
+  groupScorerPicks,
   MAX_SCORER_PICKS,
   outcomeLabel,
   outcomeShort,
@@ -116,11 +117,13 @@ export function FixturePredictionsForm({
     });
   }, [players, scorerSearch]);
 
-  function toggleScorer(player: SquadPoolPlayer) {
+  function scorerCount(playerId: number) {
+    return scorerPicks.filter((pick) => pick.playerId === playerId).length;
+  }
+
+  function addScorerGoal(player: SquadPoolPlayer) {
     const teamSide = teamsMatch(player.teamName, homeTeam) ? "home" : "away";
     setScorerPicks((current) => {
-      const exists = current.find((pick) => pick.playerId === player.playerId);
-      if (exists) return current.filter((pick) => pick.playerId !== player.playerId);
       if (current.length >= MAX_SCORER_PICKS) return current;
       return [
         ...current,
@@ -132,6 +135,23 @@ export function FixturePredictionsForm({
       ];
     });
   }
+
+  function addScorerGoalFromPick(pick: ScorerPick) {
+    setScorerPicks((current) => {
+      if (current.length >= MAX_SCORER_PICKS) return current;
+      return [...current, pick];
+    });
+  }
+
+  function removeOneScorerGoal(playerId: number) {
+    setScorerPicks((current) => {
+      const index = current.findIndex((pick) => pick.playerId === playerId);
+      if (index === -1) return current;
+      return [...current.slice(0, index), ...current.slice(index + 1)];
+    });
+  }
+
+  const groupedScorerPicks = useMemo(() => groupScorerPicks(scorerPicks), [scorerPicks]);
 
   async function savePick(event: FormEvent) {
     event.preventDefault();
@@ -170,15 +190,15 @@ export function FixturePredictionsForm({
     >
       <section className="fixture-prediction-section">
         <h4 className="fixture-prediction-section-title">1 · Winner or draw</h4>
-        <div className="fixture-outcome-picks" role="group" aria-label="Match outcome">
+        <div className="fixture-prediction-choices" role="group" aria-label="Match outcome">
           {(["home", "draw", "away"] as const).map((value) => (
             <button
               key={value}
-              className={`fixture-outcome-btn${predictedOutcome === value ? " fixture-outcome-btn--active" : ""}`}
+              className={`fixture-prediction-choice${predictedOutcome === value ? " fixture-prediction-choice--active" : ""}`}
               type="button"
               onClick={() => setPredictedOutcome(value)}
             >
-              <span className="fixture-outcome-btn-label">
+              <span className="fixture-prediction-choice-label">
                 {value === "home" ? <TeamLabel name={homeTeam} size="xs" /> : null}
                 {value === "away" ? <TeamLabel name={awayTeam} size="xs" /> : null}
                 {value === "draw" ? "Draw" : outcomeShort(value)}
@@ -186,7 +206,7 @@ export function FixturePredictionsForm({
             </button>
           ))}
           <button
-            className="fixture-outcome-btn fixture-outcome-btn--clear"
+            className="fixture-prediction-choice fixture-prediction-choice--clear"
             type="button"
             onClick={() => setPredictedOutcome(null)}
           >
@@ -200,44 +220,42 @@ export function FixturePredictionsForm({
 
       <section className="fixture-prediction-section">
         <h4 className="fixture-prediction-section-title">2 · Exact score</h4>
-        <div className="fixture-prediction-scores">
-          <div className="fixture-prediction-score-pair" role="group" aria-label="Predicted score">
-            <label className="fixture-prediction-side">
-              <span className="fixture-prediction-side-team">
-                <TeamLabel name={homeTeam} size={compact ? "xs" : "sm"} />
-              </span>
-              <input
-                aria-label={`${homeTeam} goals`}
-                className="fixture-prediction-input"
-                inputMode="numeric"
-                max={20}
-                min={0}
-                placeholder="—"
-                type="number"
-                value={homeScore}
-                onChange={(event) => setHomeScore(event.target.value)}
-              />
-            </label>
-            <span aria-hidden className="fixture-prediction-separator">
-              :
+        <div className="fixture-prediction-choices fixture-prediction-choices--score" role="group" aria-label="Predicted score">
+          <label className="fixture-prediction-choice fixture-prediction-choice--score">
+            <span className="fixture-prediction-choice-label">
+              <TeamLabel name={homeTeam} size="xs" />
             </span>
-            <label className="fixture-prediction-side">
-              <span className="fixture-prediction-side-team">
-                <TeamLabel name={awayTeam} size={compact ? "xs" : "sm"} />
-              </span>
-              <input
-                aria-label={`${awayTeam} goals`}
-                className="fixture-prediction-input"
-                inputMode="numeric"
-                max={20}
-                min={0}
-                placeholder="—"
-                type="number"
-                value={awayScore}
-                onChange={(event) => setAwayScore(event.target.value)}
-              />
-            </label>
-          </div>
+            <input
+              aria-label={`${homeTeam} goals`}
+              className="fixture-prediction-score-input"
+              inputMode="numeric"
+              max={20}
+              min={0}
+              placeholder="—"
+              type="number"
+              value={homeScore}
+              onChange={(event) => setHomeScore(event.target.value)}
+            />
+          </label>
+          <span aria-hidden className="fixture-prediction-score-separator">
+            :
+          </span>
+          <label className="fixture-prediction-choice fixture-prediction-choice--score">
+            <span className="fixture-prediction-choice-label">
+              <TeamLabel name={awayTeam} size="xs" />
+            </span>
+            <input
+              aria-label={`${awayTeam} goals`}
+              className="fixture-prediction-score-input"
+              inputMode="numeric"
+              max={20}
+              min={0}
+              placeholder="—"
+              type="number"
+              value={awayScore}
+              onChange={(event) => setAwayScore(event.target.value)}
+            />
+          </label>
         </div>
       </section>
 
@@ -245,26 +263,44 @@ export function FixturePredictionsForm({
         <section className="fixture-prediction-section">
           <h4 className="fixture-prediction-section-title">3 · Goal scorers</h4>
           <p className="fixture-prediction-section-note">
-            Pick up to {MAX_SCORER_PICKS} players who will score (any team).
+            Pick up to {MAX_SCORER_PICKS} goals (tap a player to add; same player can score more than
+            once).
           </p>
-          {scorerPicks.length > 0 ? (
+          {groupedScorerPicks.length > 0 ? (
             <ul className="fixture-scorer-selected">
-              {scorerPicks.map((pick) => (
+              {groupedScorerPicks.map(({ pick, goals }) => (
                 <li key={pick.playerId}>
-                  <button
-                    className="fixture-scorer-chip fixture-scorer-chip--selected"
-                    type="button"
-                    onClick={() =>
-                      setScorerPicks((current) =>
-                        current.filter((row) => row.playerId !== pick.playerId)
-                      )
-                    }
-                  >
-                    {pick.playerName}
+                  <div className="fixture-scorer-chip fixture-scorer-chip--selected">
+                    <span className="fixture-scorer-chip-name">
+                      {pick.playerName}
+                      {goals > 1 ? (
+                        <span className="fixture-scorer-chip-count"> ×{goals}</span>
+                      ) : null}
+                    </span>
                     <span className="fixture-scorer-chip-side">
                       {pick.teamSide === "home" ? homeTeam : awayTeam}
                     </span>
-                  </button>
+                    <span className="fixture-scorer-chip-actions">
+                      <button
+                        aria-label={`Remove one goal for ${pick.playerName}`}
+                        className="fixture-scorer-step"
+                        disabled={busy}
+                        type="button"
+                        onClick={() => removeOneScorerGoal(pick.playerId)}
+                      >
+                        −
+                      </button>
+                      <button
+                        aria-label={`Add one goal for ${pick.playerName}`}
+                        className="fixture-scorer-step"
+                        disabled={busy || scorerPicks.length >= MAX_SCORER_PICKS}
+                        type="button"
+                        onClick={() => addScorerGoalFromPick(pick)}
+                      >
+                        +
+                      </button>
+                    </span>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -279,15 +315,21 @@ export function FixturePredictionsForm({
           {poolLoading ? <p className="inline-status">Loading players…</p> : null}
           <ul className="fixture-scorer-pool-list">
             {filteredPlayers.slice(0, 40).map((player) => {
-              const selected = scorerPicks.some((pick) => pick.playerId === player.playerId);
+              const goals = scorerCount(player.playerId);
               return (
                 <li key={player.playerId}>
                   <button
-                    className={`fixture-scorer-chip${selected ? " fixture-scorer-chip--selected" : ""}`}
+                    className={`fixture-scorer-chip${goals > 0 ? " fixture-scorer-chip--selected" : ""}`}
+                    disabled={scorerPicks.length >= MAX_SCORER_PICKS}
                     type="button"
-                    onClick={() => toggleScorer(player)}
+                    onClick={() => addScorerGoal(player)}
                   >
-                    <span>{player.name}</span>
+                    <span className="fixture-scorer-chip-name">
+                      {player.name}
+                      {goals > 0 ? (
+                        <span className="fixture-scorer-chip-count"> ×{goals}</span>
+                      ) : null}
+                    </span>
                     <span className="fixture-scorer-chip-side">{player.teamName}</span>
                   </button>
                 </li>

@@ -27,7 +27,31 @@ export type FixturePredictionRecord = {
 
 export type PredictionCategory = "outcome" | "score" | "scorers";
 
-export const MAX_SCORER_PICKS = 5;
+/** Max individual goal picks (same player may appear multiple times). */
+export const MAX_SCORER_PICKS = 8;
+
+export function groupScorerPicks(picks: ScorerPick[]) {
+  const order: number[] = [];
+  const map = new Map<number, { pick: ScorerPick; goals: number }>();
+
+  for (const pick of picks) {
+    if (!map.has(pick.playerId)) order.push(pick.playerId);
+    const row = map.get(pick.playerId);
+    if (row) {
+      row.goals += 1;
+    } else {
+      map.set(pick.playerId, { pick, goals: 1 });
+    }
+  }
+
+  return order.map((playerId) => map.get(playerId)!);
+}
+
+export function formatScorerPicksSummary(picks: ScorerPick[]) {
+  return groupScorerPicks(picks)
+    .map((row) => (row.goals > 1 ? `${row.pick.playerName} ×${row.goals}` : row.pick.playerName))
+    .join(", ");
+}
 
 export function outcomeLabel(outcome: FixtureOutcome, homeTeam: string, awayTeam: string) {
   if (outcome === "home") return `${homeTeam} win`;
@@ -51,7 +75,6 @@ export function parseScorerPicks(raw: unknown): ScorerPick[] {
     const playerName = typeof row.playerName === "string" ? row.playerName.trim() : "";
     const teamSide = row.teamSide === "home" || row.teamSide === "away" ? row.teamSide : null;
     if (!Number.isFinite(playerId) || !playerName || !teamSide) continue;
-    if (picks.some((pick) => pick.playerId === playerId)) continue;
     picks.push({ playerId, playerName: playerName.slice(0, 80), teamSide });
     if (picks.length >= MAX_SCORER_PICKS) break;
   }

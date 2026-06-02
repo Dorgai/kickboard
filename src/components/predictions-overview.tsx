@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { outcomeShort, type FixtureOutcome, type ScorerPick } from "@/lib/fixture-predictions/types";
+import {
+  formatScorerPicksSummary,
+  outcomeShort,
+  type FixtureOutcome,
+  type ScorerPick
+} from "@/lib/fixture-predictions/types";
 
 type CategoryStats = {
   won: number;
@@ -109,7 +114,7 @@ function formatPickSummary(pick: PredictionPickSummary) {
   if (pick.scorerPicks.length > 0) {
     lines.push({
       label: "Scorers",
-      value: pick.scorerPicks.map((s) => s.playerName).join(", "),
+      value: formatScorerPicksSummary(pick.scorerPicks),
       status: pick.scorersStatus,
       points: pick.scorersPointsAwarded
     });

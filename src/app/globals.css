@@ -2739,32 +2739,6 @@ h3 {
   }
 }
 
-.fixture-predictions-form--coach-board .fixture-outcome-picks {
-  gap: 8px;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-scores {
-  align-items: center;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-score-pair {
-  align-items: flex-end;
-  flex-direction: row;
-  justify-content: center;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-input {
-  font-size: clamp(1.25rem, 3vw, 1.65rem);
-  max-width: 3.5rem;
-  min-height: 2.75rem;
-  min-width: 2.75rem;
-}
-
-.fixture-predictions-form--coach-board .fixture-prediction-separator {
-  font-size: 1.35rem;
-  padding-bottom: 0.45rem;
-}
-
 .fixture-prediction-section {
   display: grid;
   gap: 8px;
@@ -2785,13 +2759,19 @@ h3 {
   margin: 0;
 }
 
-.fixture-outcome-picks {
+.fixture-prediction-choices {
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.fixture-outcome-btn {
+.fixture-prediction-choices--score {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+
+.fixture-prediction-choice {
   align-items: center;
   background: color-mix(in srgb, var(--color-text-primary) 5%, var(--color-bg));
   border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, var(--color-border));
@@ -2799,28 +2779,102 @@ h3 {
   color: var(--color-text-primary);
   cursor: pointer;
   display: inline-flex;
+  flex-direction: column;
   font-size: 12px;
   font-weight: 700;
-  gap: 6px;
+  gap: 4px;
+  justify-content: center;
   min-height: 2.25rem;
   padding: 6px 10px;
 }
 
-.fixture-outcome-btn .team-label-text {
+[data-theme="light"] .fixture-prediction-choice,
+:root:not([data-theme]) .fixture-prediction-choice {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.fixture-prediction-choice .team-label-text {
   color: inherit;
   font-weight: 700;
 }
 
-.fixture-outcome-btn--active {
+.fixture-prediction-choice-label {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.fixture-prediction-choice--active {
   background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
   border-color: color-mix(in srgb, var(--color-accent) 70%, var(--color-border));
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 22%, transparent);
   color: var(--color-text-primary);
 }
 
-.fixture-outcome-btn--clear {
+[data-theme="light"] .fixture-prediction-choice--active,
+:root:not([data-theme]) .fixture-prediction-choice--active {
+  background: color-mix(in srgb, var(--color-accent) 14%, #ffffff);
+  color: #111827;
+}
+
+.fixture-prediction-choice--clear {
   color: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-text-secondary));
+  cursor: pointer;
   font-weight: 600;
+}
+
+.fixture-prediction-choice--score {
+  cursor: default;
+  min-width: 4.5rem;
+  padding: 6px 8px;
+}
+
+.fixture-prediction-score-input {
+  appearance: textfield;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: text;
+  font-family: inherit;
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+  margin: 0;
+  max-width: 2.5rem;
+  min-height: 1.5rem;
+  padding: 0;
+  text-align: center;
+  width: 2.25rem;
+}
+
+.fixture-prediction-score-input::-webkit-outer-spin-button,
+.fixture-prediction-score-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.fixture-prediction-score-input:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.fixture-prediction-score-input::placeholder {
+  color: color-mix(in srgb, var(--color-text-primary) 35%, var(--color-text-secondary));
+  font-weight: 600;
+}
+
+.fixture-prediction-score-separator {
+  color: color-mix(in srgb, var(--color-text-primary) 55%, var(--color-text-secondary));
+  flex: 0 0 auto;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0 2px;
 }
 
 .fixture-scorer-pool-list,
@@ -2837,26 +2891,98 @@ h3 {
 
 .fixture-scorer-chip {
   align-items: center;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text-primary) 5%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, var(--color-border));
+  border-radius: 8px;
+  color: var(--color-text-primary);
   cursor: pointer;
   display: inline-flex;
   flex-wrap: wrap;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   gap: 4px 8px;
-  padding: 4px 10px;
+  padding: 6px 10px;
+}
+
+[data-theme="light"] .fixture-scorer-chip,
+:root:not([data-theme]) .fixture-scorer-chip {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.fixture-scorer-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .fixture-scorer-chip--selected {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
-  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 70%, var(--color-border));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+[data-theme="light"] .fixture-scorer-chip--selected,
+:root:not([data-theme]) .fixture-scorer-chip--selected {
+  background: color-mix(in srgb, var(--color-accent) 14%, #ffffff);
+  color: #111827;
+}
+
+.fixture-scorer-chip-name {
+  color: inherit;
+  font-weight: 700;
+}
+
+.fixture-scorer-chip-count {
+  color: color-mix(in srgb, var(--color-accent) 75%, var(--color-text-primary));
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
 }
 
 .fixture-scorer-chip-side {
-  color: var(--color-text-secondary);
+  color: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-text-secondary));
   font-size: 10px;
+  font-weight: 600;
+}
+
+[data-theme="light"] .fixture-scorer-chip-side,
+:root:not([data-theme]) .fixture-scorer-chip-side {
+  color: #4b5563;
+}
+
+.fixture-scorer-chip-actions {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 2px;
+}
+
+.fixture-scorer-step {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 20%, var(--color-border));
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 800;
+  height: 1.5rem;
+  justify-content: center;
+  line-height: 1;
+  min-width: 1.5rem;
+  padding: 0;
+}
+
+[data-theme="light"] .fixture-scorer-step,
+:root:not([data-theme]) .fixture-scorer-step {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.fixture-scorer-step:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .predictions-type-lines {
