@@ -2658,6 +2658,7 @@ h3 {
   flex-wrap: nowrap;
   gap: 6px;
   padding: 5px 10px;
+  touch-action: manipulation;
   white-space: nowrap;
   width: auto;
 }
@@ -2682,6 +2683,12 @@ h3 {
 
 .squad-player-chip:active {
   cursor: grabbing;
+}
+
+.squad-player-chip--pointer-drag {
+  cursor: grabbing;
+  opacity: 0.72;
+  touch-action: none;
 }
 
 .squad-player-chip--on-pitch {
@@ -2968,6 +2975,17 @@ h3 {
 
 .squad-pitch-token--selected {
   box-shadow: 0 6px 18px color-mix(in srgb, var(--pitch-kit-primary, #3b82f6) 45%, transparent);
+}
+
+.squad-pitch-token--dragging {
+  cursor: grabbing;
+  opacity: 0.88;
+  touch-action: none;
+  z-index: 4;
+}
+
+.squad-pitch--token-drag {
+  touch-action: none;
 }
 
 .squad-pitch-token:focus-visible {

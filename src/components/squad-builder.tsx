@@ -1,8 +1,8 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
-import { SquadPitch } from "@/components/squad-pitch";
+import { SquadPitch, type SquadPitchHandle } from "@/components/squad-pitch";
 import { SquadTeamBench } from "@/components/squad-player-pool";
 import {
   countFilledBySide,
@@ -68,6 +68,7 @@ export function SquadBuilder({
   const [busy, setBusy] = useState(false);
   const [homeSelectedIds, setHomeSelectedIds] = useState<Set<number>>(() => new Set());
   const [awaySelectedIds, setAwaySelectedIds] = useState<Set<number>>(() => new Set());
+  const pitchDropRef = useRef<SquadPitchHandle>(null);
 
   const setAlignedLineup = useCallback(
     (next: SquadLineupSlot[]) => {
@@ -384,6 +385,7 @@ export function SquadBuilder({
             formation={formations.home}
             lineup={lineup}
             loading={poolLoading}
+            pitchDropRef={pitchDropRef}
             players={homePlayers}
             selectedPlayerIds={homeSelectedIds}
             side="home"
@@ -395,6 +397,7 @@ export function SquadBuilder({
           <div className="squad-builder-pitch-column">
             <div className="squad-builder-pitch-stage">
               <SquadPitch
+                ref={pitchDropRef}
                 awayTeam={awayTeam}
                 homeTeam={homeTeam}
                 lineup={lineup}
@@ -418,6 +421,7 @@ export function SquadBuilder({
             formation={formations.away}
             lineup={lineup}
             loading={poolLoading}
+            pitchDropRef={pitchDropRef}
             players={awayPlayers}
             selectedPlayerIds={awaySelectedIds}
             side="away"
