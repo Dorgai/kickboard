@@ -109,7 +109,12 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
 
         <div className="match-coach-board-panel">
           {selected ? (
-            <CoachBoardPanel fixtureKey={selected.key} fixtureLabel={selected.label} />
+            <CoachBoardPanel
+              awayTeam={selected.awayTeam}
+              fixtureKey={selected.key}
+              fixtureLabel={selected.label}
+              homeTeam={selected.homeTeam}
+            />
           ) : (
             <p className="inline-status">Select a match to open its Coach Board.</p>
           )}

@@ -103,16 +103,33 @@ export function mergeFormationChange(
   previous: SquadLineupSlot[]
 ): SquadLineupSlot[] {
   const template = defaultLineupWithPositions(formation);
-  return template.map((slot, index) => {
-    const prior = previous[index];
-    if (!prior?.label) return slot;
+  const used = new Set<number>();
+
+  function takePrior(prior: SquadLineupSlot) {
     return {
-      ...slot,
       label: prior.label,
       playerId: prior.playerId,
       teamName: prior.teamName,
       jerseyNumber: prior.jerseyNumber
     };
+  }
+
+  return template.map((slot) => {
+    const sameRoleIndex = previous.findIndex(
+      (prior, index) => !used.has(index) && prior.label && prior.role === slot.role
+    );
+    if (sameRoleIndex >= 0) {
+      used.add(sameRoleIndex);
+      return { ...slot, ...takePrior(previous[sameRoleIndex]) };
+    }
+
+    const anyIndex = previous.findIndex((prior, index) => !used.has(index) && prior.label);
+    if (anyIndex >= 0) {
+      used.add(anyIndex);
+      return { ...slot, ...takePrior(previous[anyIndex]) };
+    }
+
+    return slot;
   });
 }
 

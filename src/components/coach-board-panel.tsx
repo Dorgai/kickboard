@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
-import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
 import { FriendsMatchActivity } from "@/components/friends-match-activity";
 import { SavedSquadsBar } from "@/components/saved-squads-bar";
 import { SquadBuilder } from "@/components/squad-builder";
@@ -19,9 +18,16 @@ type BoardPost = {
 type CoachBoardPanelProps = {
   fixtureKey: string;
   fixtureLabel: string;
+  homeTeam: string;
+  awayTeam: string;
 };
 
-export function CoachBoardPanel({ fixtureKey, fixtureLabel }: CoachBoardPanelProps) {
+export function CoachBoardPanel({
+  fixtureKey,
+  fixtureLabel,
+  homeTeam,
+  awayTeam
+}: CoachBoardPanelProps) {
   const [posts, setPosts] = useState<BoardPost[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [squads, setSquads] = useState<SquadSummary[]>([]);
@@ -117,13 +123,13 @@ export function CoachBoardPanel({ fixtureKey, fixtureLabel }: CoachBoardPanelPro
           onSelect={handleSelectSquad}
         />
 
-        <FixturePredictionPick compact fixtureKey={fixtureKey} fixtureLabel={fixtureLabel} />
-
         <SquadBuilder
           key={`${fixtureKey}:${activeSquadId ?? "new"}:${newBoardNonce}`}
           activeSquadId={activeSquadId}
+          awayTeam={awayTeam}
           fixtureKey={fixtureKey}
           fixtureLabel={fixtureLabel}
+          homeTeam={homeTeam}
           onSaved={handleSquadSaved}
         />
 

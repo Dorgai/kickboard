@@ -1,17 +1,20 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { TeamLabel } from "@/components/team-label";
 
 type FixturePredictionPickProps = {
   fixtureKey: string;
-  fixtureLabel: string;
-  compact?: boolean;
+  homeTeam: string;
+  awayTeam: string;
+  inline?: boolean;
 };
 
 export function FixturePredictionPick({
   fixtureKey,
-  fixtureLabel,
-  compact = false
+  homeTeam,
+  awayTeam,
+  inline = false
 }: FixturePredictionPickProps) {
   const [homeScore, setHomeScore] = useState("1");
   const [awayScore, setAwayScore] = useState("0");
@@ -60,7 +63,7 @@ export function FixturePredictionPick({
       });
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to save pick.");
-      setNotice(payload.message ?? "Pick saved.");
+      setNotice("Saved");
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Unable to save pick.");
     } finally {
@@ -70,26 +73,17 @@ export function FixturePredictionPick({
 
   return (
     <form
-      className={`fixture-prediction-pick${compact ? " fixture-prediction-pick--compact" : ""}`}
+      className={`fixture-prediction-pick${inline ? " fixture-prediction-pick--inline" : ""}`}
       onSubmit={savePick}
     >
-      <div className="fixture-prediction-pick-header">
-        <h3>{compact ? "Your score pick" : "Predict the score"}</h3>
-        {!compact ? (
-          <p className="community-panel-lead">
-            Free-to-play pick for <strong>{fixtureLabel}</strong>. Connected friends see this on the
-            same match.
-          </p>
-        ) : null}
-      </div>
-
-      {loading ? <p className="inline-status">Loading your pick…</p> : null}
+      <span className="fixture-prediction-pick-label">Score pick</span>
 
       <div className="fixture-prediction-scores">
-        <label className="feed-control-field fixture-prediction-score-field">
-          Home
+        <label className="fixture-prediction-team-score">
+          <TeamLabel name={homeTeam} size="xs" />
           <input
-            className="feed-control-input"
+            aria-label={`${homeTeam} goals`}
+            className="feed-control-input fixture-prediction-input"
             inputMode="numeric"
             max={20}
             min={0}
@@ -99,10 +93,11 @@ export function FixturePredictionPick({
           />
         </label>
         <span className="fixture-prediction-separator">:</span>
-        <label className="feed-control-field fixture-prediction-score-field">
-          Away
+        <label className="fixture-prediction-team-score">
+          <TeamLabel name={awayTeam} size="xs" />
           <input
-            className="feed-control-input"
+            aria-label={`${awayTeam} goals`}
+            className="feed-control-input fixture-prediction-input"
             inputMode="numeric"
             max={20}
             min={0}
@@ -111,13 +106,13 @@ export function FixturePredictionPick({
             onChange={(event) => setAwayScore(event.target.value)}
           />
         </label>
-        <button className="button primary" disabled={busy || loading} type="submit">
-          {busy ? "Saving…" : "Save pick"}
+        <button className="button primary fixture-prediction-save" disabled={busy || loading} type="submit">
+          {busy ? "…" : "Save"}
         </button>
       </div>
 
-      {notice ? <p className="inline-status community-notice">{notice}</p> : null}
-      {error ? <p className="inline-status">{error}</p> : null}
+      {notice ? <span className="fixture-prediction-notice">{notice}</span> : null}
+      {error ? <span className="fixture-prediction-error">{error}</span> : null}
     </form>
   );
 }

@@ -59,7 +59,11 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                 ))}
               </select>
             </label>
-            <FixturePredictionPick fixtureKey={selected.key} fixtureLabel={selected.label} />
+            <FixturePredictionPick
+              awayTeam={selected.awayTeam}
+              fixtureKey={selected.key}
+              homeTeam={selected.homeTeam}
+            />
           </div>
         ) : (
           <div className="predictions-coming-soon data-card surface-muted">

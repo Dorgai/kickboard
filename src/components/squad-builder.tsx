@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
 import { SquadPitch } from "@/components/squad-pitch";
 import { SquadPlayerPool } from "@/components/squad-player-pool";
 import {
@@ -22,22 +23,25 @@ type LoadedSquad = {
 type SquadBuilderProps = {
   fixtureKey: string;
   fixtureLabel: string;
+  homeTeam: string;
+  awayTeam: string;
   activeSquadId: string | null;
   onSaved: (squadId: string) => void | Promise<void>;
 };
 
-function defaultSquadName(fixtureLabel: string) {
-  return `${fixtureLabel.split("—")[0]?.trim() ?? "My XI"}`;
+function autoSquadName(fixtureLabel: string) {
+  return `${fixtureLabel.split("—")[0]?.trim() ?? "My XI"}`.slice(0, 60);
 }
 
 export function SquadBuilder({
   fixtureKey,
   fixtureLabel,
+  homeTeam,
+  awayTeam,
   activeSquadId,
   onSaved
 }: SquadBuilderProps) {
   const [formation, setFormation] = useState<SquadFormation>("4-3-3");
-  const [name, setName] = useState("My World Cup XI");
   const [lineup, setLineup] = useState<SquadLineupSlot[]>(() => defaultLineupWithPositions("4-3-3"));
   const [squadId, setSquadId] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
@@ -85,7 +89,6 @@ export function SquadBuilder({
             const squad = payload.squad;
             if (squad?.lineup?.length === 11) {
               setSquadId(squad.id);
-              setName(squad.name);
               setFormation(squad.formation);
               setLineup(squad.lineup);
               if (!cancelled) setLoadState("ready");
@@ -99,7 +102,6 @@ export function SquadBuilder({
           setSquadId(null);
           setFormation("4-3-3");
           setLineup(defaultLineupWithPositions("4-3-3"));
-          setName(defaultSquadName(fixtureLabel));
         }
 
         if (!cancelled) setLoadState("ready");
@@ -121,6 +123,7 @@ export function SquadBuilder({
   function changeFormation(next: SquadFormation) {
     setFormation(next);
     setLineup((current) => mergeFormationChange(next, current));
+    setSelectedSlot(null);
   }
 
   const filledCount = lineup.filter((slot) => slot.label).length;
@@ -136,6 +139,7 @@ export function SquadBuilder({
     setError(null);
     setNotice(null);
     try {
+      const name = autoSquadName(fixtureLabel);
       const response = await fetch("/api/squads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -184,18 +188,17 @@ export function SquadBuilder({
 
   return (
     <form className="squad-builder" onSubmit={saveSquad}>
-      <header className="section-heading compact">
-        <div>
+      <header className="squad-builder-toolbar">
+        <div className="squad-builder-toolbar-title">
           <h3>Build your XI</h3>
-          <p className="community-panel-lead">
-            Pick a saved board above or start fresh. Drag players onto the pitch for{" "}
-            <strong>{fixtureLabel}</strong>.
+          <p className="squad-builder-progress">
+            {filledCount}/11 · {squadId ? "saved board" : "new board"}
           </p>
         </div>
-        <label className="feed-control-field">
-          Formation
+        <label className="squad-builder-formation-field">
+          <span>Formation</span>
           <select
-            className="feed-control-input"
+            className="feed-control-input squad-builder-formation-select"
             value={formation}
             onChange={(event) => changeFormation(event.target.value as SquadFormation)}
           >
@@ -208,16 +211,6 @@ export function SquadBuilder({
         </label>
       </header>
 
-      <label className="feed-control-field">
-        Squad name
-        <input
-          className="feed-control-input"
-          maxLength={60}
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-      </label>
-
       {loadState === "loading" ? <p className="inline-status">Loading your squad…</p> : null}
 
       <div className="squad-builder-layout">
@@ -228,18 +221,24 @@ export function SquadBuilder({
           players={players}
           sourceLabel={poolLabel}
         />
-        <SquadPitch
-          lineup={lineup}
-          selectedSlot={selectedSlot}
-          onLineupChange={setLineup}
-          onSelectSlot={setSelectedSlot}
-        />
-      </div>
 
-      <p className="squad-builder-progress">
-        {filledCount}/11 players placed
-        {squadId ? ` · editing saved board` : " · new board"}
-      </p>
+        <div className="squad-builder-pitch-column">
+          <div className="squad-builder-pitch-row">
+            <SquadPitch
+              lineup={lineup}
+              selectedSlot={selectedSlot}
+              onLineupChange={setLineup}
+              onSelectSlot={setSelectedSlot}
+            />
+            <FixturePredictionPick
+              awayTeam={awayTeam}
+              fixtureKey={fixtureKey}
+              homeTeam={homeTeam}
+              inline
+            />
+          </div>
+        </div>
+      </div>
 
       <div className="squad-builder-actions">
         <button className="button primary" disabled={busy || filledCount < 11} type="submit">

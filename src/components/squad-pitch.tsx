@@ -136,9 +136,8 @@ export function SquadPitch({
   return (
     <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
       {!readOnly ? (
-        <p className="squad-pitch-hint">
-          Drag players from the pool onto the pitch. Drag tokens to set exact positions. Click a token
-          then <kbd>Backspace</kbd> to remove.
+        <p className="squad-pitch-hint squad-pitch-hint--compact">
+          Drag players onto a role slot. Change formation to update placeholders.
         </p>
       ) : null}
       <div
@@ -160,7 +159,7 @@ export function SquadPitch({
         {!readOnly
           ? lineup.map((slot) => (
               <button
-                className={`squad-pitch-ghost${slot.label ? " squad-pitch-ghost--filled" : ""}${
+                className={`squad-pitch-ghost${slot.label ? " squad-pitch-ghost--filled" : " squad-pitch-ghost--empty"}${
                   selectedSlot === slot.slot ? " squad-pitch-ghost--selected" : ""
                 }`}
                 key={`ghost-${slot.slot}`}
@@ -168,7 +167,13 @@ export function SquadPitch({
                 type="button"
                 onClick={() => onSelectSlot(slot.slot)}
                 aria-label={`${slot.role} slot ${slot.slot}`}
-              />
+              >
+                {!slot.label ? (
+                  <span className="squad-pitch-placeholder-role" aria-hidden>
+                    {slot.role}
+                  </span>
+                ) : null}
+              </button>
             ))
           : null}
 
