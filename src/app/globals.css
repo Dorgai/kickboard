@@ -7144,6 +7144,7 @@ h3 {
 
 .session-checkpoint-section-title {
   align-items: center;
+  color: var(--color-text-primary);
   display: flex;
   font-size: 14px;
   gap: 8px;
@@ -7166,12 +7167,19 @@ h3 {
 
 .session-checkpoint-match {
   align-items: center;
-  background: var(--color-surface-muted, color-mix(in srgb, var(--color-surface) 92%, var(--color-border)));
+  background: color-mix(in srgb, var(--color-bg) 65%, var(--color-surface));
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   display: flex;
   gap: 10px;
   justify-content: space-between;
   padding: 10px 12px;
+}
+
+[data-theme="light"] .session-checkpoint-match,
+:root:not([data-theme]) .session-checkpoint-match {
+  background: #f3f4f6;
+  border-color: #d1d5db;
 }
 
 .session-checkpoint-match-copy {
@@ -7180,13 +7188,39 @@ h3 {
   min-width: 0;
 }
 
-.session-checkpoint-match-copy strong {
-  font-size: 14px;
+.session-checkpoint-match-teams {
+  align-items: center;
+  color: var(--color-text-primary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
 }
 
+.session-checkpoint-match-vs {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.session-checkpoint-match-kickoff,
 .session-checkpoint-match-copy span {
   color: var(--color-text-secondary);
   font-size: 12px;
+}
+
+.session-checkpoint-match-teams .team-label {
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.session-checkpoint-recent-fixture,
+.session-checkpoint-recent-item strong {
+  color: var(--color-text-primary);
+  font-size: 13px;
 }
 
 .session-checkpoint-match-meta {
@@ -7228,9 +7262,14 @@ h3 {
 }
 
 .session-checkpoint-stat-value {
+  color: var(--color-text-primary);
   font-size: 1.35rem;
   font-weight: 800;
   line-height: 1.1;
+}
+
+.session-checkpoint-dialog .timeline-modal-header h2 {
+  color: var(--color-text-primary);
 }
 
 .session-checkpoint-stat-label {
@@ -7270,10 +7309,6 @@ h3 {
   display: grid;
   gap: 2px;
   min-width: 0;
-}
-
-.session-checkpoint-recent-item strong {
-  font-size: 13px;
 }
 
 .session-checkpoint-recent-item span {
