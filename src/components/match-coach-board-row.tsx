@@ -13,7 +13,22 @@ type MatchCoachBoardRowProps = {
   groups: WorldCupGroupInput[];
 };
 
+function useNarrowCoachViewport() {
+  const [narrow, setNarrow] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)");
+    const update = () => setNarrow(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  return narrow;
+}
+
 export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
+  const touchLayout = useNarrowCoachViewport();
   const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const fixtureDragDepthRef = useRef(0);
@@ -69,17 +84,21 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
           <p className="eyebrow">Per match</p>
           <h2>Coach Board</h2>
           <p className="match-coach-row-lead">
-            Pick an upcoming fixture, then build and share a squad for that game only.
+            {touchLayout
+              ? "Tap a match below, then build your squad on the pitch."
+              : "Pick an upcoming fixture, then build and share a squad for that game only."}
           </p>
         </div>
       </div>
 
       <div className="match-coach-row-body">
         <FixtureMatchPicker
-          draggableMatches
+          draggableMatches={!touchLayout}
           fixtures={fixtures}
+          rail={touchLayout}
           searchable
           selectedKey={selectedKey}
+          timeline={!touchLayout}
           onSelect={setSelectedKey}
         />
 
@@ -98,11 +117,14 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
               fixtureKey={selected.key}
               fixtureLabel={selected.label}
               homeTeam={selected.homeTeam}
-              onFixtureDrop={setSelectedKey}
+              touchLayout={touchLayout}
+              onFixtureDrop={touchLayout ? undefined : setSelectedKey}
             />
           ) : (
             <p className="inline-status match-coach-board-panel-empty">
-              Select a match from the list, or drag one here to open its Coach Board.
+              {touchLayout
+                ? "Tap a match above to open its Coach Board."
+                : "Select a match from the list, or drag one here to open its Coach Board."}
             </p>
           )}
         </div>

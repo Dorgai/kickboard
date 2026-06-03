@@ -1730,6 +1730,32 @@ h3 {
   }
 }
 
+.match-fixture-picker-list--rail {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  max-height: none;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  padding: 4px 2px 10px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.match-fixture-picker-list--rail > li {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.match-fixture-picker-list--rail .match-fixture-picker-btn {
+  flex: 0 0 auto;
+  min-width: 8.25rem;
+  width: min(72vw, 10.75rem);
+}
+
 .match-fixture-picker-search {
   margin: 0 0 8px;
 }
@@ -1840,12 +1866,73 @@ h3 {
   min-width: 0;
 }
 
+@media (max-width: 1023px) {
+  .match-coach-row {
+    padding: 12px;
+  }
+
+  .match-coach-row-body {
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+
+  .match-coach-row-body .match-fixture-picker {
+    min-width: 0;
+  }
+
+  .match-coach-board-panel .coach-board-panel {
+    gap: 12px;
+  }
+
+  .match-coach-board-panel .community-panel-lead {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .match-coach-board-panel .squad-pitch {
+    --pitch-max-height: min(18.5rem, 40vh);
+  }
+
+  .match-coach-board-panel .squad-pitch-hint {
+    display: none;
+  }
+
+  .match-coach-board-panel .squad-pitch {
+    touch-action: pan-y;
+  }
+
+  .match-coach-board-panel .saved-squads-list {
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .match-coach-board-panel .saved-squad-card {
+    max-width: 14rem;
+    width: auto;
+  }
+
+  .match-coach-board-panel .squad-team-bench-groups {
+    max-height: min(12rem, 24vh);
+  }
+
+  .match-coach-board-panel .squad-builder-toolbar-title .squad-builder-progress {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+}
+
 @media (max-width: 900px) {
   .match-coach-row-body {
     grid-template-columns: 1fr;
   }
 
-  .match-fixture-picker-list:not(.match-fixture-picker-list--timeline) {
+  .match-fixture-picker-list:not(.match-fixture-picker-list--timeline):not(
+      .match-fixture-picker-list--rail
+    ) {
     max-height: 12rem;
   }
 }

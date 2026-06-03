@@ -82,6 +82,8 @@ type FixtureMatchPickerProps = {
   emptyMessage?: string;
   /** Group matches by day with a vertical timeline rail (Predictions / Coach Board picker). */
   timeline?: boolean;
+  /** Single horizontal row of matches (mobile Coach Board). */
+  rail?: boolean;
   /** Compact search filter (Coach Board). */
   searchable?: boolean;
   /** Allow dragging a match to drop on saved boards (Coach Board). */
@@ -95,6 +97,7 @@ export function FixtureMatchPicker({
   ariaLabel = "Select a match",
   emptyMessage = "Fixture list is loading from the tournament feed.",
   timeline = true,
+  rail = false,
   searchable = false,
   draggableMatches = false
 }: FixtureMatchPickerProps) {
@@ -129,6 +132,20 @@ export function FixtureMatchPicker({
         <p className="inline-status">{emptyMessage}</p>
       ) : searchable && searchQuery.trim() && filteredFixtures.length === 0 ? (
         <p className="inline-status">No matches match your search.</p>
+      ) : rail && filteredFixtures.length > 0 ? (
+        <ul className="match-fixture-picker-list match-fixture-picker-list--rail">
+          {filteredFixtures.map((fixture) => (
+            <li key={fixture.key}>
+              <FixturePickerButton
+                draggable={draggableMatches}
+                fixture={fixture}
+                selected={fixture.key === selectedKey}
+                showDate={Boolean(fixture.date)}
+                onSelect={() => onSelect(fixture.key)}
+              />
+            </li>
+          ))}
+        </ul>
       ) : timeline && dateGroups.length > 0 ? (
         <ul className="match-fixture-picker-list match-fixture-picker-list--timeline">
           {dateGroups.map((group) => (

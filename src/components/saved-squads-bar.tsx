@@ -9,6 +9,7 @@ type SavedSquadsBarProps = {
   activeSquadId: string | null;
   loading: boolean;
   fixtureLabel?: string;
+  touchLayout?: boolean;
   onSelect: (squadId: string) => void;
   onNew: () => void;
   onFixtureDrop?: (fixtureKey: string) => void;
@@ -19,6 +20,7 @@ export function SavedSquadsBar({
   activeSquadId,
   loading,
   fixtureLabel,
+  touchLayout = false,
   onSelect,
   onNew,
   onFixtureDrop
@@ -74,16 +76,16 @@ export function SavedSquadsBar({
         </button>
       </div>
 
-      {onFixtureDrop ? (
+      {onFixtureDrop || (touchLayout && fixtureLabel) ? (
         <p className="saved-squads-bar-hint">
           {fixtureLabel ? (
             <>
-              Boards for <strong>{fixtureLabel}</strong>. Drag a match from the list to switch, or
-              click a match.
+              Boards for <strong>{fixtureLabel}</strong>.
+              {onFixtureDrop ? " Drag a match from the list to switch, or click a match." : " Tap another match above to switch."}
             </>
-          ) : (
+          ) : onFixtureDrop ? (
             <>Drag a match from the list onto this area to open its boards.</>
-          )}
+          ) : null}
         </p>
       ) : null}
 

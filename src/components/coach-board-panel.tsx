@@ -20,6 +20,7 @@ type CoachBoardPanelProps = {
   fixtureLabel: string;
   homeTeam: string;
   awayTeam: string;
+  touchLayout?: boolean;
   onFixtureDrop?: (fixtureKey: string) => void;
 };
 
@@ -28,6 +29,7 @@ export function CoachBoardPanel({
   fixtureLabel,
   homeTeam,
   awayTeam,
+  touchLayout = false,
   onFixtureDrop
 }: CoachBoardPanelProps) {
   const [posts, setPosts] = useState<BoardPost[]>([]);
@@ -122,6 +124,7 @@ export function CoachBoardPanel({
           fixtureLabel={fixtureLabel}
           loading={squadsLoading}
           squads={squads}
+          touchLayout={touchLayout}
           onFixtureDrop={onFixtureDrop}
           onNew={handleNewBoard}
           onSelect={handleSelectSquad}
