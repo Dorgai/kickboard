@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Target, Trophy, X } from "lucide-react";
+import { Calendar, Sparkles, Target, Trophy, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
@@ -13,6 +13,7 @@ import { hasSeenWelcome } from "@/lib/welcome";
 import { TeamLabel } from "@/components/team-label";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 import type { SessionCheckpointPayload } from "@/lib/session-checkpoint/data";
+import { startWelcomeBackCelebration } from "@/lib/welcome-celebration";
 
 function formatKickoff(iso: string | null) {
   if (!iso) return "Time TBC";
@@ -35,8 +36,37 @@ function formatRelativeUpdated(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function checkpointDialogTitle(payload: SessionCheckpointPayload | null, loading: boolean) {
-  if (loading || !payload) return "Hey, good to see you!";
+function firstNameFromDisplayName(displayName: string | null | undefined) {
+  const trimmed = displayName?.trim();
+  if (!trimmed) return null;
+  return trimmed.split(/\s+/)[0] ?? null;
+}
+
+function checkpointHeadline(
+  payload: SessionCheckpointPayload | null,
+  loading: boolean,
+  displayName: string | null | undefined
+) {
+  const name = firstNameFromDisplayName(displayName);
+  const greeting = name ? `Welcome back, ${name}!` : "Welcome back!";
+
+  if (loading || !payload) return greeting;
+
+  const needsPick = payload.upcoming.some((fixture) => !fixture.hasPrediction);
+  const hasPerformance =
+    payload.recentPicks.length > 0 ||
+    (payload.wallet?.balance ?? 0) > 0 ||
+    (payload.wallet?.picksPending ?? 0) > 0;
+
+  if (needsPick) return name ? `Welcome back, ${name} — match day!` : "Welcome back — match day!";
+  if (hasPerformance && (payload.wallet?.pointsWon ?? 0) > 0) {
+    return name ? `Welcome back, ${name} — nice run!` : "Welcome back — nice run!";
+  }
+  return greeting;
+}
+
+function checkpointLead(payload: SessionCheckpointPayload | null, loading: boolean) {
+  if (loading || !payload) return "Here's your quick tour of what's live on Kickboard.";
 
   const needsPick = payload.upcoming.some((fixture) => !fixture.hasPrediction);
   const hasUpcoming = payload.upcoming.length > 0;
@@ -45,24 +75,24 @@ function checkpointDialogTitle(payload: SessionCheckpointPayload | null, loading
     (payload.wallet?.balance ?? 0) > 0 ||
     (payload.wallet?.picksPending ?? 0) > 0;
 
-  if (needsPick) return "Hey, it's match day!";
-  if (hasPerformance) return "Hey, check out your performance!";
-  if (hasUpcoming) return "Hey, it's match day!";
-  return "Hey, good to see you back!";
+  if (needsPick) return "Games are lining up — drop your picks before kickoff and stay in the fight.";
+  if (hasPerformance && (payload.wallet?.pointsWon ?? 0) > 0) {
+    return "Your calls are paying off. Peek at points, wins, and what's still in play.";
+  }
+  if (hasUpcoming) return "Kickoffs are on the horizon. Jump in whenever you're ready to play.";
+  if (hasPerformance) return "Your board is warming up — every pick is a chance to climb.";
+  return "Good to have you back in the stands. Let's see what's next.";
 }
 
-function checkpointUpcomingSectionTitle(
-  payload: SessionCheckpointPayload,
-  mainTitle: string
-) {
+function checkpointUpcomingSectionTitle(payload: SessionCheckpointPayload) {
   if (payload.upcoming.length === 0) return "What's next";
-  if (mainTitle === "Hey, it's match day!") return "Your next kickoffs";
-  return "Hey, it's match day!";
+  const needsPick = payload.upcoming.some((fixture) => !fixture.hasPrediction);
+  if (needsPick) return "Matches waiting for your picks";
+  return "Your upcoming fixtures";
 }
 
-function checkpointPerformanceSectionTitle(mainTitle: string) {
-  if (mainTitle === "Hey, check out your performance!") return "Your points & picks";
-  return "Hey, check out your performance!";
+function checkpointPerformanceSectionTitle() {
+  return "Your scoreboard";
 }
 
 export function SessionCheckpointDialog() {
@@ -148,6 +178,11 @@ export function SessionCheckpointDialog() {
   }, [open]);
 
   useEffect(() => {
+    if (!open) return;
+    return startWelcomeBackCelebration();
+  }, [open]);
+
+  useEffect(() => {
     if (status !== "authenticated") {
       fetchedRef.current = false;
       setData(null);
@@ -187,13 +222,14 @@ export function SessionCheckpointDialog() {
   }
 
   const wallet = data?.wallet;
-  const dialogTitle = checkpointDialogTitle(data, loading && !data);
+  const dialogTitle = checkpointHeadline(data, loading && !data, session?.user?.name);
+  const dialogLead = checkpointLead(data, loading && !data);
 
   return (
     <dialog
       ref={dialogRef}
       aria-labelledby={titleId}
-      className="timeline-modal session-checkpoint-dialog"
+      className="timeline-modal session-checkpoint-dialog session-checkpoint-dialog--joyful"
       onCancel={(event) => {
         event.preventDefault();
         dismiss();
@@ -202,20 +238,22 @@ export function SessionCheckpointDialog() {
       onClose={dismiss}
     >
       <div className="session-checkpoint-panel timeline-modal-panel">
-        <header className="timeline-modal-header session-checkpoint-header">
-          <div>
-            <h2 className="session-checkpoint-title" id={titleId}>
-              {dialogTitle}
-            </h2>
-          </div>
+        <header className="session-checkpoint-hero">
           <button
             aria-label="Close"
-            className="button secondary timeline-modal-close"
+            className="button secondary session-checkpoint-close"
             type="button"
             onClick={dismiss}
           >
             <X size={18} />
           </button>
+          <div aria-hidden className="session-checkpoint-hero-icon">
+            <Sparkles size={32} strokeWidth={2} />
+          </div>
+          <h2 className="session-checkpoint-title" id={titleId}>
+            {dialogTitle}
+          </h2>
+          <p className="session-checkpoint-lead">{dialogLead}</p>
         </header>
 
         <div className="timeline-modal-body session-checkpoint-body">
@@ -224,14 +262,14 @@ export function SessionCheckpointDialog() {
 
           {data ? (
             <>
-              <section className="session-checkpoint-section" aria-labelledby="checkpoint-upcoming">
+              <section className="session-checkpoint-section session-checkpoint-section--upcoming" aria-labelledby="checkpoint-upcoming">
                 <h3 className="session-checkpoint-section-title" id="checkpoint-upcoming">
                   <Calendar aria-hidden size={18} />
-                  {checkpointUpcomingSectionTitle(data, dialogTitle)}
+                  {checkpointUpcomingSectionTitle(data)}
                 </h3>
                 {data.upcoming.length === 0 ? (
                   <p className="session-checkpoint-empty">
-                    Nothing on the schedule right now — check back soon for the next kickoff.
+                    Nothing on the schedule right now — we&apos;ll have the next kickoff for you soon.
                   </p>
                 ) : (
                   <ul className="session-checkpoint-matches">
@@ -262,10 +300,10 @@ export function SessionCheckpointDialog() {
                 )}
               </section>
 
-              <section className="session-checkpoint-section" aria-labelledby="checkpoint-performance">
+              <section className="session-checkpoint-section session-checkpoint-section--performance" aria-labelledby="checkpoint-performance">
                 <h3 className="session-checkpoint-section-title" id="checkpoint-performance">
                   <Trophy aria-hidden size={18} />
-                  {checkpointPerformanceSectionTitle(dialogTitle)}
+                  {checkpointPerformanceSectionTitle()}
                 </h3>
                 {wallet ? (
                   <div className="session-checkpoint-stats">
@@ -309,7 +347,7 @@ export function SessionCheckpointDialog() {
                   </>
                 ) : (
                   <p className="session-checkpoint-empty">
-                    No picks yet — jump in above and start stacking points!
+                    No picks yet — jump in above and start stacking points. You&apos;ve got this!
                   </p>
                 )}
               </section>
@@ -318,10 +356,12 @@ export function SessionCheckpointDialog() {
         </div>
 
         <footer className="session-checkpoint-footer">
-          <button className="button primary" type="button" onClick={dismiss}>
-            Continue
+          <button className="button primary session-checkpoint-cta" type="button" onClick={dismiss}>
+            Let&apos;s play
           </button>
-          <p className="session-checkpoint-footnote">Shown after sign-in and every 2 hours while you use Kickboard.</p>
+          <p className="session-checkpoint-footnote">
+            Pops up after sign-in and every 2 hours — your fan HQ check-in.
+          </p>
         </footer>
       </div>
     </dialog>

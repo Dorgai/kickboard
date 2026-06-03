@@ -1,8 +1,9 @@
 "use client";
 
-import { LayoutGrid, Target, Trophy, Users } from "lucide-react";
+import { LayoutGrid, PartyPopper, Sparkles, Target, Trophy, Users } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { OPEN_WELCOME_EVENT } from "@/lib/help/events";
+import { startWelcomeFireworks } from "@/lib/welcome-celebration";
 import { hasSeenWelcome, markWelcomeSeen } from "@/lib/welcome";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 
@@ -10,22 +11,22 @@ const HIGHLIGHTS = [
   {
     icon: Target,
     title: "Predictions",
-    line: "Pick scores and outcomes. Climb the points board."
+    line: "Call the score, stack points, and share your hottest takes."
   },
   {
     icon: LayoutGrid,
     title: "Coach Board",
-    line: "Set lineups for any match — drag players onto the pitch."
+    line: "Build XIs for any match — drag players straight onto the pitch."
   },
   {
     icon: Trophy,
     title: "Tournament",
-    line: "Groups, fixtures, and the road to the final."
+    line: "Follow groups, knockouts, and every step to the final."
   },
   {
     icon: Users,
     title: "Community",
-    line: "Add friends, share boards, and compare picks."
+    line: "Add friends, compare picks, and cheer together."
   }
 ] as const;
 
@@ -61,6 +62,11 @@ export function WelcomeDialog() {
     }
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    return startWelcomeFireworks();
+  }, [open]);
+
   function dismiss() {
     markWelcomeSeen();
     setForced(false);
@@ -86,9 +92,17 @@ export function WelcomeDialog() {
     >
       <div className="welcome-dialog-panel">
         <header className="welcome-dialog-header">
-          <p className="welcome-dialog-eyebrow">World Cup 2026</p>
-          <h2 id={titleId}>Welcome to Kickboard</h2>
-          <p className="welcome-dialog-lead">Everything fans need — in four tabs below.</p>
+          <p className="welcome-dialog-eyebrow">
+            <Sparkles aria-hidden size={14} strokeWidth={2.5} />
+            You&apos;re in — World Cup 2026
+          </p>
+          <div aria-hidden className="welcome-dialog-hero-icon">
+            <PartyPopper size={40} strokeWidth={1.75} />
+          </div>
+          <h2 id={titleId}>Welcome to Kickboard!</h2>
+          <p className="welcome-dialog-lead">
+            Your fan HQ is live. Predict, coach, follow the bracket, and rally your crew.
+          </p>
         </header>
 
         <ul className="welcome-dialog-highlights">
@@ -107,7 +121,7 @@ export function WelcomeDialog() {
 
         <footer className="welcome-dialog-footer">
           <button className="button welcome-dialog-cta" type="button" onClick={dismiss}>
-            Start exploring
+            Let&apos;s kick off
           </button>
           <p className="welcome-dialog-footnote">Sign in anytime for squads, chat, and saved picks.</p>
         </footer>
