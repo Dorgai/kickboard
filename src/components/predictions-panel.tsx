@@ -19,6 +19,7 @@ import {
   NAVIGATE_PREDICTIONS_EVENT,
   type NavigatePredictionsDetail
 } from "@/lib/session-checkpoint/navigate";
+import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 
 type PredictionsPanelProps = {
   groups?: WorldCupGroupInput[];
@@ -26,6 +27,7 @@ type PredictionsPanelProps = {
 
 export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   const { data: session } = useSession();
+  const touchLayout = useNarrowViewport();
   const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [overviewRefresh, setOverviewRefresh] = useState(0);
@@ -54,7 +56,6 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   }, [fixtures]);
 
   const handleFixtureSelect = useCallback((key: string) => {
-    scrollToOutcomeAfterSelect.current = true;
     setSelectedKey(key);
   }, []);
 
@@ -62,6 +63,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     (key: string) => {
       const exists = fixtures.some((fixture) => fixture.key === key);
       if (!exists) return;
+      scrollToOutcomeAfterSelect.current = true;
       setSelectedKey(key);
       if (typeof window !== "undefined") {
         const url = new URL(window.location.href);
@@ -105,8 +107,9 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
             <FixtureMatchPicker
               ariaLabel="Select a match for your prediction"
               fixtures={fixtures}
+              rail={touchLayout}
               selectedKey={selectedKey}
-              timeline
+              timeline={!touchLayout}
               onSelect={handleFixtureSelect}
             />
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CoachBoardPanel } from "@/components/coach-board-panel";
 import {
   FixtureMatchPicker,
@@ -13,22 +14,8 @@ type MatchCoachBoardRowProps = {
   groups: WorldCupGroupInput[];
 };
 
-function useNarrowCoachViewport() {
-  const [narrow, setNarrow] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 1023px)");
-    const update = () => setNarrow(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
-
-  return narrow;
-}
-
 export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
-  const touchLayout = useNarrowCoachViewport();
+  const touchLayout = useNarrowViewport();
   const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const fixtureDragDepthRef = useRef(0);

@@ -1577,6 +1577,12 @@ h3 {
   grid-template-columns: minmax(10.5rem, 13.5rem) minmax(0, 1fr);
 }
 
+.match-fixture-picker {
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+
 .match-fixture-picker-list {
   display: grid;
   gap: 6px;
@@ -1585,6 +1591,7 @@ h3 {
   max-height: min(32rem, 70vh);
   overflow: auto;
   padding: 0 4px 0 0;
+  width: 100%;
 }
 
 .match-fixture-picker-list--timeline {
@@ -1728,6 +1735,21 @@ h3 {
   .predictions-match-row .match-fixture-picker-list {
     max-height: none;
   }
+
+  .predictions-match-row .match-fixture-picker,
+  .match-coach-row-body .match-fixture-picker {
+    overflow: visible;
+  }
+
+  .match-fixture-picker-list--rail,
+  .match-fixture-picker-list--timeline {
+    touch-action: pan-x;
+  }
+
+  .match-fixture-picker-list--rail .match-fixture-picker-btn,
+  .match-fixture-picker-list--timeline .match-fixture-picker-btn {
+    touch-action: manipulation;
+  }
 }
 
 .match-fixture-picker-list--rail {
@@ -1786,6 +1808,7 @@ h3 {
   display: grid;
   font: inherit;
   gap: 4px;
+  margin: 0;
   padding: 8px 10px;
   text-align: left;
   width: 100%;
@@ -2566,10 +2589,17 @@ h3 {
   display: grid;
   gap: 16px;
   grid-template-columns: minmax(10.5rem, 13.5rem) minmax(0, 1fr);
+  min-width: 0;
 }
 
 .predictions-match-detail {
   min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  .predictions-match-row {
+    gap: 12px;
+  }
 }
 
 @media (max-width: 900px) {

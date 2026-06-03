@@ -202,13 +202,12 @@ export function FixturePickerButton({
   draggable?: boolean;
 }) {
   return (
-    <div
+    <button
       className={`match-fixture-picker-btn${selected ? " selected" : ""}${
         draggable ? " match-fixture-picker-btn--draggable" : ""
       }`}
       draggable={draggable}
-      role="button"
-      tabIndex={0}
+      type="button"
       onClick={onSelect}
       onDragStart={
         draggable
@@ -218,12 +217,6 @@ export function FixturePickerButton({
             }
           : undefined
       }
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          onSelect();
-        }
-      }}
     >
       <span className="match-fixture-picker-status" data-status={fixture.status}>
         {fixture.status === "live" ? "Live" : fixture.status === "finished" ? "FT" : "Upcoming"}
@@ -242,6 +235,6 @@ export function FixturePickerButton({
       {showDate && fixture.date ? (
         <span className="match-fixture-picker-date">{fixture.date}</span>
       ) : null}
-    </div>
+    </button>
   );
 }
