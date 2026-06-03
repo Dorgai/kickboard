@@ -6,15 +6,24 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Kickboard | World Cup fan and analytics platform",
   description:
-    "A Railway-ready Kickboard scaffold for live match widgets, squad building, predictions, social features and safe analytics.",
-  applicationName: "Kickboard"
+    "World Cup predictions, Coach Board squads, and fan community on Kickboard.",
+  applicationName: "Kickboard",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Kickboard"
+  },
+  formatDetection: {
+    telephone: false
+  }
 };
 
 export const viewport: Viewport = {
   themeColor: THEME_META_LIGHT,
   colorScheme: "light dark",
   width: "device-width",
-  initialScale: 1
+  initialScale: 1,
+  viewportFit: "cover"
 };
 
 export default function RootLayout({

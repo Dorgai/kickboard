@@ -8655,6 +8655,10 @@ code {
     padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   }
 
+  .feed-browser {
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  }
+
   .event-tab-bar {
     top: 72px;
   }
@@ -8685,6 +8689,74 @@ code {
   .squad-player-row {
     grid-template-columns: 1fr;
   }
+}
+
+.pwa-install-hint {
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  left: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+  pointer-events: none;
+  position: fixed;
+  right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  z-index: 55;
+}
+
+.pwa-install-hint-inner {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-elevation-3);
+  display: grid;
+  gap: 8px;
+  padding: 12px 40px 12px 14px;
+  pointer-events: auto;
+  position: relative;
+}
+
+.pwa-install-hint-title {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.pwa-install-hint-copy {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pwa-install-hint-copy strong {
+  color: var(--color-text-primary);
+}
+
+.pwa-install-hint-icon {
+  display: inline-block;
+  vertical-align: -2px;
+}
+
+.pwa-install-hint-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pwa-install-hint-close {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  padding: 6px;
+  position: absolute;
+  right: 6px;
+  top: 6px;
+}
+
+.pwa-install-hint-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
