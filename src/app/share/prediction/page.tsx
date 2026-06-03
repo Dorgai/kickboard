@@ -3,9 +3,11 @@ import { redirect } from "next/navigation";
 import { SharePredictionUnavailable } from "@/components/share-prediction-view";
 import {
   buildPredictionShareCaption,
-  decodePredictionShare,
-  readShareTokenFromSearchParams
+  readShareTokenFromSearchParams,
+  readShortShareIdFromSearchParams
 } from "@/lib/predictions/share";
+import { isShortShareId } from "@/lib/predictions/share-store";
+import { resolvePredictionSharePayload } from "@/lib/predictions/share-resolve";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +17,9 @@ type PageProps = {
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const params = await searchParams;
-  const token = readShareTokenFromSearchParams(params);
-  const payload = token ? decodePredictionShare(token) : null;
+  const shortId = readShortShareIdFromSearchParams(params);
+  const legacyToken = readShareTokenFromSearchParams(params);
+  const payload = await resolvePredictionSharePayload(shortId || legacyToken);
   if (!payload) {
     return {
       title: "Kickboard prediction",
@@ -36,15 +39,22 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   };
 }
 
-/** Legacy `?d=` links — redirect to path-based URL when possible. */
 export default async function SharePredictionLegacyPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const token = readShareTokenFromSearchParams(params);
+  const shortId = readShortShareIdFromSearchParams(params);
 
-  if (token) {
-    const payload = decodePredictionShare(token);
+  if (shortId && isShortShareId(shortId)) {
+    redirect(`/share/p/${encodeURIComponent(shortId)}`);
+  }
+
+  const legacyToken = readShareTokenFromSearchParams(params);
+  if (legacyToken) {
+    const payload = await resolvePredictionSharePayload(legacyToken);
     if (payload) {
-      redirect(`/share/prediction/${token}`);
+      if (isShortShareId(legacyToken)) {
+        redirect(`/share/p/${encodeURIComponent(legacyToken)}`);
+      }
+      redirect(`/share/prediction/${legacyToken}`);
     }
   }
 

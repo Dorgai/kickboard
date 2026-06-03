@@ -14,9 +14,9 @@ export function SharePredictionUnavailable() {
       <div className="share-prediction-card data-card">
         <h1>Prediction link unavailable</h1>
         <p className="inline-status">
-          This share link is invalid, incomplete, or was shortened by another app. Ask your friend to
-          share again using <strong>Copy</strong> or <strong>More…</strong> so the full Kickboard link
-          is included.
+          This link is missing or no longer available. Ask your friend to open Predictions, tap{" "}
+          <strong>Copy</strong> again, and send the new short Kickboard link (it looks like{" "}
+          <strong>/share/p/…</strong>).
         </p>
         <Link className="button primary" href="/">
           Go to Kickboard

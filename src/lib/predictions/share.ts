@@ -60,13 +60,18 @@ export function normalizePredictionShareToken(raw: string | null | undefined): s
   try {
     if (/^https?:\/\//i.test(token)) {
       const url = new URL(token);
+      const fromShort = url.searchParams.get("s") ?? url.searchParams.get("id");
       const fromQuery = url.searchParams.get("d");
-      if (fromQuery) {
+      if (fromShort) {
+        token = fromShort;
+      } else if (fromQuery) {
         token = fromQuery;
       } else {
         const segments = url.pathname.split("/").filter(Boolean);
         const shareIdx = segments.findIndex((part) => part === "share");
-        if (shareIdx >= 0 && segments[shareIdx + 1] === "prediction" && segments[shareIdx + 2]) {
+        if (shareIdx >= 0 && segments[shareIdx + 1] === "p" && segments[shareIdx + 2]) {
+          token = segments[shareIdx + 2] ?? token;
+        } else if (shareIdx >= 0 && segments[shareIdx + 1] === "prediction" && segments[shareIdx + 2]) {
           token = segments[shareIdx + 2] ?? token;
         }
       }
@@ -154,18 +159,26 @@ export function resolveAppOrigin() {
   return fromEnv.replace(/\/$/, "") || "https://kickboard-production.up.railway.app";
 }
 
-/** Canonical share URL — token in the path so in-app browsers keep the full payload. */
-export function buildPredictionSharePageUrl(payload: PredictionSharePayload) {
+/** Short share URL stored server-side (preferred). */
+export function buildPredictionSharePageUrl(shareId: string) {
+  const origin = resolveAppOrigin();
+  const id = shareId.trim();
+  return `${origin}/share/p/${encodeURIComponent(id)}`;
+}
+
+/** Fallback when DB is unavailable — embeds pick data in the URL (may break in some apps). */
+export function buildPredictionSharePageUrlEmbedded(payload: PredictionSharePayload) {
   const origin = resolveAppOrigin();
   const token = encodePredictionShare(payload);
   return `${origin}/share/prediction/${token}`;
 }
 
-/** Legacy query form; still supported via redirect on /share/prediction?d=… */
-export function buildPredictionSharePageUrlLegacy(payload: PredictionSharePayload) {
-  const origin = resolveAppOrigin();
-  const token = encodePredictionShare(payload);
-  return `${origin}/share/prediction?d=${encodeURIComponent(token)}`;
+export function readShortShareIdFromSearchParams(
+  searchParams: Record<string, string | string[] | undefined>
+) {
+  const raw = searchParams.s ?? searchParams.id;
+  if (Array.isArray(raw)) return raw[0]?.trim() ?? "";
+  return raw?.trim() ?? "";
 }
 
 export function buildPredictionAppDeepLink(fixtureKey: string) {

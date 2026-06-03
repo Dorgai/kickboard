@@ -1,23 +1,20 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import {
   SharePredictionUnavailable,
   SharePredictionView
 } from "@/components/share-prediction-view";
 import { buildPredictionShareCaption } from "@/lib/predictions/share";
-import { isShortShareId } from "@/lib/predictions/share-store";
 import { resolvePredictionSharePayload } from "@/lib/predictions/share-resolve";
-import { normalizePredictionShareToken } from "@/lib/predictions/share";
 
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ token: string }>;
+  params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { token: raw } = await params;
-  const payload = await resolvePredictionSharePayload(raw);
+  const { id } = await params;
+  const payload = await resolvePredictionSharePayload(id);
   if (!payload) {
     return {
       title: "Kickboard prediction",
@@ -37,15 +34,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function SharePredictionTokenPage({ params }: PageProps) {
-  const { token: raw } = await params;
-  const token = normalizePredictionShareToken(raw);
-
-  if (isShortShareId(token)) {
-    redirect(`/share/p/${encodeURIComponent(token)}`);
-  }
-
-  const payload = await resolvePredictionSharePayload(token);
+export default async function SharePredictionShortPage({ params }: PageProps) {
+  const { id } = await params;
+  const payload = await resolvePredictionSharePayload(id);
 
   if (!payload) {
     return <SharePredictionUnavailable />;

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   buildPredictionSharePageUrl,
+  buildPredictionSharePageUrlEmbedded,
   decodePredictionShare,
   encodePredictionShare,
   normalizePredictionShareToken
@@ -22,9 +23,15 @@ const payload = {
 const token = encodePredictionShare(payload);
 assert.ok(decodePredictionShare(token));
 
-const pathUrl = buildPredictionSharePageUrl(payload);
-const fromPath = pathUrl.split("/share/prediction/")[1];
+const pathUrl = buildPredictionSharePageUrl("testShareId12");
+assert.ok(pathUrl.includes("/share/p/testShareId12"));
+
+const embeddedUrl = buildPredictionSharePageUrlEmbedded(payload);
+const fromPath = embeddedUrl.split("/share/prediction/")[1];
 assert.ok(decodePredictionShare(fromPath));
+
+const shortPath = "https://kickboard.app/share/p/abc12345XY";
+assert.equal(normalizePredictionShareToken(shortPath), "abc12345XY");
 
 const legacy = `https://kickboard.app/share/prediction?d=${encodeURIComponent(token)}`;
 assert.equal(normalizePredictionShareToken(legacy), token);
