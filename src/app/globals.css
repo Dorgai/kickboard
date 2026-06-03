@@ -7254,45 +7254,144 @@ h3 {
   max-width: min(28rem, 94vw);
 }
 
+.welcome-dialog::backdrop {
+  background: color-mix(in srgb, var(--color-brand) 18%, var(--color-text-primary) 45%);
+}
+
 .welcome-dialog-panel {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid color-mix(in srgb, var(--color-brand) 35%, var(--color-border));
   border-radius: var(--radius-modal);
-  box-shadow: var(--shadow-elevation-3);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #fbbf24 25%, transparent),
+    0 24px 48px color-mix(in srgb, var(--color-brand) 22%, transparent),
+    var(--shadow-elevation-3);
   display: grid;
   gap: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.welcome-dialog-panel::before {
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    color-mix(in srgb, #fde047 35%, transparent) 45%,
+    transparent 70%
+  );
+  content: "";
+  inset: 0;
+  opacity: 0.35;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-120%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .welcome-dialog-panel::before {
+    animation: welcome-dialog-shimmer 2.8s ease-in-out 0.4s 1;
+  }
+}
+
+@keyframes welcome-dialog-shimmer {
+  to {
+    transform: translateX(120%);
+  }
 }
 
 .welcome-dialog-header {
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--color-brand) 22%, var(--color-surface)) 0%,
+    color-mix(in srgb, #fbbf24 12%, var(--color-surface)) 55%,
+    var(--color-surface) 100%
+  );
   display: grid;
-  gap: 8px;
-  padding: 28px 24px 8px;
+  gap: 10px;
+  justify-items: center;
+  padding: 26px 24px 12px;
+  position: relative;
   text-align: center;
+  z-index: 1;
 }
 
 .welcome-dialog-eyebrow {
-  color: var(--color-brand);
-  font-size: 12px;
+  align-items: center;
+  color: color-mix(in srgb, var(--color-brand) 88%, var(--color-text-primary));
+  display: inline-flex;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  gap: 6px;
+  letter-spacing: 0.1em;
   margin: 0;
   text-transform: uppercase;
 }
 
+.welcome-dialog-hero-icon {
+  align-items: center;
+  animation: welcome-dialog-pop 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  background: color-mix(in srgb, #fbbf24 28%, var(--color-bg));
+  border-radius: 999px;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-brand) 28%, transparent);
+  color: var(--color-brand);
+  display: inline-flex;
+  height: 4.25rem;
+  justify-content: center;
+  width: 4.25rem;
+}
+
+@keyframes welcome-dialog-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .welcome-dialog-header h2 {
-  font-size: clamp(1.85rem, 6vw, 2.35rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  background: linear-gradient(
+    120deg,
+    var(--color-text-primary) 0%,
+    color-mix(in srgb, var(--color-brand) 55%, var(--color-text-primary)) 100%
+  );
+  background-clip: text;
+  font-size: clamp(1.9rem, 6vw, 2.45rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
   line-height: 1.05;
   margin: 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@supports not (background-clip: text) {
+  .welcome-dialog-header h2 {
+    -webkit-text-fill-color: unset;
+    color: var(--color-text-primary);
+  }
 }
 
 .welcome-dialog-lead {
   color: var(--color-text-secondary);
   font-size: clamp(1rem, 2.8vw, 1.125rem);
-  line-height: 1.35;
+  font-weight: 600;
+  line-height: 1.4;
   margin: 0 auto;
   max-width: 22rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-dialog-hero-icon {
+    animation: none;
+  }
+
+  .welcome-dialog-panel::before {
+    display: none;
+  }
 }
 
 .welcome-dialog-highlights {
@@ -7348,7 +7447,8 @@ h3 {
 }
 
 .welcome-dialog-cta {
-  font-size: 1rem;
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--color-brand) 35%, transparent);
+  font-size: 1.05rem;
   font-weight: 800;
   min-height: 48px;
   padding-inline: 28px;
