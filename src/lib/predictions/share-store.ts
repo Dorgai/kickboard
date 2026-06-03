@@ -67,6 +67,7 @@ export async function savePredictionShareLink(
     } catch (error) {
       const code = (error as { code?: string }).code;
       if (code === "23505") continue;
+      if (isMissingRelationError(error)) return null;
       throw error;
     }
   }
@@ -74,14 +75,24 @@ export async function savePredictionShareLink(
   return null;
 }
 
+function isMissingRelationError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  return "code" in error && String(error.code) === "42P01";
+}
+
 export async function loadPredictionShareLink(id: string): Promise<PredictionSharePayload | null> {
   if (!isDatabaseConfigured() || !isShortShareId(id)) return null;
 
-  const result = await query<{ payload: unknown }>(
-    `SELECT payload FROM prediction_share_links WHERE id = $1 LIMIT 1`,
-    [id.trim()]
-  );
+  try {
+    const result = await query<{ payload: unknown }>(
+      `SELECT payload FROM prediction_share_links WHERE id = $1 LIMIT 1`,
+      [id.trim()]
+    );
 
-  if (!result.rows[0]) return null;
-  return payloadFromStored(result.rows[0].payload);
+    if (!result.rows[0]) return null;
+    return payloadFromStored(result.rows[0].payload);
+  } catch (error) {
+    if (isMissingRelationError(error)) return null;
+    throw error;
+  }
 }
