@@ -9,6 +9,7 @@ import {
 } from "@/lib/session-checkpoint/storage";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 import { hasSeenWelcome } from "@/lib/welcome";
+import { TeamLabel } from "@/components/team-label";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 import type { SessionCheckpointPayload } from "@/lib/session-checkpoint/data";
 
@@ -193,8 +194,12 @@ export function SessionCheckpointDialog() {
                     {data.upcoming.map((fixture) => (
                       <li className="session-checkpoint-match" key={fixture.fixtureKey}>
                         <div className="session-checkpoint-match-copy">
-                          <strong>{fixture.shortLabel}</strong>
-                          <span>{formatKickoff(fixture.kickoff)}</span>
+                          <div className="session-checkpoint-match-teams" title={fixture.shortLabel}>
+                            <TeamLabel layout="stacked" name={fixture.homeTeam} size="xs" />
+                            <span className="session-checkpoint-match-vs">vs</span>
+                            <TeamLabel layout="stacked" name={fixture.awayTeam} size="xs" />
+                          </div>
+                          <span className="session-checkpoint-match-kickoff">{formatKickoff(fixture.kickoff)}</span>
                           {fixture.group ? (
                             <span className="session-checkpoint-match-meta">Group {fixture.group}</span>
                           ) : null}
@@ -246,7 +251,7 @@ export function SessionCheckpointDialog() {
                       {data.recentPicks.map((pick) => (
                         <li className="session-checkpoint-recent-item" key={`${pick.fixtureKey}-${pick.updatedAt}`}>
                           <div>
-                            <strong>{pick.fixtureLabel}</strong>
+                            <strong className="session-checkpoint-recent-fixture">{pick.fixtureLabel}</strong>
                             <span>
                               {pick.summary} · {formatRelativeUpdated(pick.updatedAt)}
                             </span>

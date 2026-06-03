@@ -3,7 +3,7 @@ import {
   getCurrentWorldCupFeedCached,
   parseWorldCupFixtureDate
 } from "@/lib/feeds/current-world-cup";
-import { fixtureKeyToShortLabel } from "@/lib/fixtures/fixture-key";
+import { fixtureKeyToShortLabel, formatFixtureTeamsLabel } from "@/lib/fixtures/fixture-key";
 import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
 import type { FixtureOption } from "@/lib/fixtures/fixture-key";
 import {
@@ -24,6 +24,8 @@ export type SessionCheckpointFixture = {
   fixtureKey: string;
   label: string;
   shortLabel: string;
+  homeTeam: string;
+  awayTeam: string;
   kickoff: string | null;
   group: string | null;
   hasPrediction: boolean;
@@ -108,14 +110,24 @@ function isCheckpointRelevant(option: FixtureOption, now: number) {
 
 function toCheckpointFixture(option: FixtureOption): SessionCheckpointFixture {
   const kickoff = parseWorldCupFixtureDate(option.date);
+  const teamsLabel =
+    formatFixtureTeamsLabel(option.homeTeam, option.awayTeam) || fixtureKeyToShortLabel(option.key);
   return {
     fixtureKey: option.key,
     label: option.label,
-    shortLabel: fixtureKeyToShortLabel(option.key),
+    shortLabel: teamsLabel,
+    homeTeam: option.homeTeam,
+    awayTeam: option.awayTeam,
     kickoff: kickoff?.toISOString() ?? null,
     group: option.group,
     hasPrediction: false
   };
+}
+
+function teamLabelForFixtureKey(options: FixtureOption[], fixtureKey: string) {
+  const match = options.find((option) => option.key === fixtureKey);
+  if (!match) return fixtureKeyToShortLabel(fixtureKey);
+  return formatFixtureTeamsLabel(match.homeTeam, match.awayTeam) || fixtureKeyToShortLabel(fixtureKey);
 }
 
 export async function listUpcomingCheckpointFixtures(): Promise<SessionCheckpointFixture[]> {
@@ -159,12 +171,25 @@ function summarizePick(pick: PredictionPickSummary): SessionCheckpointRecentPick
 }
 
 export async function getSessionCheckpointPayload(userId: string): Promise<SessionCheckpointPayload> {
-  const [upcoming, wallet, recentRows, predictedKeys] = await Promise.all([
-    listUpcomingCheckpointFixtures(),
+  const [fixtureOptions, wallet, recentRows, predictedKeys] = await Promise.all([
+    loadLiveAndApiOptions(),
     getPredictionsWalletSummary(userId),
     listUserFixturePredictions(userId, 5),
     userPredictionFixtureKeys(userId)
   ]);
+
+  const now = Date.now();
+  const upcoming = fixtureOptions
+    .filter((option) => isCheckpointRelevant(option, now))
+    .map((option) => {
+      const kickoff = parseWorldCupFixtureDate(option.date);
+      const kickoffMs =
+        option.status === "live" ? now - 1 : kickoff?.getTime() ?? Number.MAX_SAFE_INTEGER;
+      return { kickoffMs, fixture: toCheckpointFixture(option) };
+    })
+    .sort((a, b) => a.kickoffMs - b.kickoffMs)
+    .slice(0, MAX_UPCOMING)
+    .map((entry) => entry.fixture);
 
   const upcomingWithFlags = upcoming.map((fixture) => ({
     ...fixture,
@@ -174,6 +199,9 @@ export async function getSessionCheckpointPayload(userId: string): Promise<Sessi
   return {
     upcoming: upcomingWithFlags,
     wallet,
-    recentPicks: recentRows.map(summarizePick)
+    recentPicks: recentRows.map((pick) => ({
+      ...summarizePick(pick),
+      fixtureLabel: teamLabelForFixtureKey(fixtureOptions, pick.fixtureKey)
+    }))
   };
 }

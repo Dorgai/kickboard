@@ -44,13 +44,22 @@ export function parseApiFootballFixtureId(fixtureKey: string | null | undefined)
   return Number.isFinite(id) && id > 0 ? id : null;
 }
 
+export function formatFixtureTeamsLabel(homeTeam: string, awayTeam: string) {
+  const home = homeTeam.trim();
+  const away = awayTeam.trim();
+  if (home && away) return `${home} vs ${away}`;
+  if (home) return home;
+  if (away) return away;
+  return "";
+}
+
 export function formatFixtureLabel(input: {
   homeTeam: string;
   awayTeam: string;
   date: string | null;
   group?: string | null;
 }) {
-  const teams = `${input.homeTeam} vs ${input.awayTeam}`;
+  const teams = formatFixtureTeamsLabel(input.homeTeam, input.awayTeam) || "Match";
   const meta = [input.group ? `Group ${input.group}` : null, input.date].filter(Boolean).join(" · ");
   return meta ? `${teams} — ${meta}` : teams;
 }
@@ -67,7 +76,7 @@ function titleCaseSlug(slug: string) {
 export function fixtureKeyToShortLabel(fixtureKey: string) {
   const key = fixtureKey.trim();
   if (!key) return "Match";
-  if (key.startsWith("api-football:")) return "Live match";
+  if (key.startsWith("api-football:")) return "Match";
 
   const parts = key.split(":");
   if (parts[0] === "wc26" && parts.length >= 5) {
