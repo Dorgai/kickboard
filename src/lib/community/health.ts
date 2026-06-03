@@ -13,7 +13,7 @@ export type CommunityHealth = {
 function isMissingRelationError(error: unknown) {
   if (!error || typeof error !== "object") return false;
   const code = "code" in error ? String(error.code) : "";
-  return code === "42P01";
+  return code === "42P01" || code === "42703";
 }
 
 export function mapDatabaseError(error: unknown) {
@@ -27,7 +27,7 @@ export function mapDatabaseError(error: unknown) {
     return {
       status: 503,
       error:
-        "Community tables are missing. From your laptop or GitHub Actions, set DATABASE_URL to Railway Postgres → Connect → Public URL (not postgres.railway.internal), then run npm run db:schema. Or run the “Apply community schema (production)” workflow. Verify GET /api/community/status shows schemaReady:true."
+        "Community or messaging tables are missing or out of date. From your laptop or GitHub Actions, set DATABASE_URL to Railway Postgres → Connect → Public URL (not postgres.railway.internal), then run npm run db:schema. Or run the “Apply community schema (production)” workflow. Verify GET /api/community/status shows schemaReady:true."
     };
   }
   const pgMessage = formatPgError(error);

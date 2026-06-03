@@ -2,26 +2,21 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { FanChatBroadcastSummary, FanChatMessage } from "@/lib/fan-chat/store";
+import type { FanChatBroadcastSummary, FanChatInboxThread, FanChatMessage } from "@/lib/fan-chat/store";
+import { CONNECTIONS_CHANGED_EVENT } from "@/lib/social/events";
 
-type ConnectionPeer = {
-  id: string;
-  username: string;
-  displayName: string | null;
-};
+function peerLabel(thread: Pick<FanChatInboxThread, "peerDisplayName" | "peerUsername">) {
+  return thread.peerDisplayName?.trim() || thread.peerUsername;
+}
 
-type RecipientOption = {
-  value: string;
-  label: string;
-};
-
-function peerLabel(peer: ConnectionPeer) {
-  return peer.displayName?.trim() || peer.username;
+function previewText(body: string | null) {
+  if (!body) return "No messages yet";
+  return body.length > 56 ? `${body.slice(0, 53)}…` : body;
 }
 
 export function FanChatMessenger() {
-  const [connections, setConnections] = useState<ConnectionPeer[]>([]);
-  const [recipientId, setRecipientId] = useState<string>("");
+  const [threads, setThreads] = useState<FanChatInboxThread[]>([]);
+  const [activePeerId, setActivePeerId] = useState<string>("");
   const [messages, setMessages] = useState<FanChatMessage[]>([]);
   const [broadcasts, setBroadcasts] = useState<FanChatBroadcastSummary[]>([]);
   const [draft, setDraft] = useState("");
@@ -31,39 +26,29 @@ export function FanChatMessenger() {
   const [notice, setNotice] = useState<string | null>(null);
   const threadEndRef = useRef<HTMLDivElement>(null);
 
-  const recipientOptions: RecipientOption[] = [
-    { value: "all", label: "All connections" },
-    ...connections.map((peer) => ({
-      value: peer.id,
-      label: peerLabel(peer)
-    }))
-  ];
+  const viewingBroadcasts = activePeerId === "all";
+  const activeThread = threads.find((thread) => thread.peerId === activePeerId);
 
-  const loadConnections = useCallback(async () => {
-    const response = await fetch("/api/connections", { cache: "no-store" });
+  const loadInbox = useCallback(async () => {
+    const response = await fetch("/api/fan-chat/messages?scope=inbox", { cache: "no-store" });
     if (!response.ok) {
-      setConnections([]);
-      return;
+      const payload = (await response.json()) as { error?: string };
+      throw new Error(payload.error ?? "Unable to load conversations.");
     }
-    const payload = (await response.json()) as {
-      accepted?: Array<{ peer: ConnectionPeer }>;
-    };
-    const accepted = (payload.accepted ?? []).map((row) => row.peer);
-    setConnections(accepted);
-    setRecipientId((current) => {
-      if (current === "all" || accepted.some((peer) => peer.id === current)) return current;
-      return accepted[0]?.id ?? "all";
-    });
+    const payload = (await response.json()) as { threads?: FanChatInboxThread[] };
+    const nextThreads = payload.threads ?? [];
+    setThreads(nextThreads);
+    return nextThreads;
   }, []);
 
-  const loadThread = useCallback(async () => {
-    if (!recipientId) {
+  const loadThread = useCallback(async (peerId: string) => {
+    if (!peerId) {
       setMessages([]);
       setBroadcasts([]);
       return;
     }
 
-    if (recipientId === "all") {
+    if (peerId === "all") {
       const response = await fetch("/api/fan-chat/messages?scope=broadcasts", { cache: "no-store" });
       if (!response.ok) {
         const payload = (await response.json()) as { error?: string };
@@ -75,7 +60,7 @@ export function FanChatMessenger() {
       return;
     }
 
-    const params = new URLSearchParams({ peerId: recipientId });
+    const params = new URLSearchParams({ peerId });
     const response = await fetch(`/api/fan-chat/messages?${params}`, { cache: "no-store" });
     if (!response.ok) {
       const payload = (await response.json()) as { error?: string };
@@ -84,47 +69,67 @@ export function FanChatMessenger() {
     const payload = (await response.json()) as { messages?: FanChatMessage[] };
     setMessages(payload.messages ?? []);
     setBroadcasts([]);
-  }, [recipientId]);
+  }, []);
 
-  const refresh = useCallback(async () => {
+  const refreshAll = useCallback(async () => {
     setError(null);
-    try {
-      await loadConnections();
-      await loadThread();
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Unable to load Fan Chat.");
-    } finally {
-      setLoading(false);
-    }
-  }, [loadConnections, loadThread]);
-
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
-  useEffect(() => {
-    if (loading) return;
-    void loadThread().catch((loadError) => {
-      setError(loadError instanceof Error ? loadError.message : "Unable to load messages.");
+    const nextThreads = await loadInbox();
+    setActivePeerId((current) => {
+      if (current === "all") return current;
+      if (current && nextThreads.some((thread) => thread.peerId === current)) return current;
+      const firstUnread = nextThreads.find((thread) => thread.unreadCount > 0);
+      if (firstUnread) return firstUnread.peerId;
+      return nextThreads[0]?.peerId ?? "";
     });
-  }, [recipientId, loadThread, loading]);
+  }, [loadInbox]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      void loadThread().catch(() => {
-        /* silent poll */
+    void (async () => {
+      setLoading(true);
+      try {
+        await refreshAll();
+      } catch (loadError) {
+        setError(loadError instanceof Error ? loadError.message : "Unable to load Fan Chat.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [refreshAll]);
+
+  useEffect(() => {
+    function onConnectionsChanged() {
+      void refreshAll().catch(() => undefined);
+    }
+    window.addEventListener(CONNECTIONS_CHANGED_EVENT, onConnectionsChanged);
+    return () => window.removeEventListener(CONNECTIONS_CHANGED_EVENT, onConnectionsChanged);
+  }, [refreshAll]);
+
+  useEffect(() => {
+    if (loading || !activePeerId) return;
+    void loadThread(activePeerId)
+      .then(() => loadInbox())
+      .catch((loadError) => {
+        setError(loadError instanceof Error ? loadError.message : "Unable to load messages.");
       });
+  }, [activePeerId, loadInbox, loadThread, loading]);
+
+  useEffect(() => {
+    if (!activePeerId) return;
+    const interval = window.setInterval(() => {
+      void loadThread(activePeerId)
+        .then(() => loadInbox())
+        .catch(() => undefined);
     }, 12_000);
     return () => window.clearInterval(interval);
-  }, [loadThread]);
+  }, [activePeerId, loadInbox, loadThread]);
 
   useEffect(() => {
     threadEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, broadcasts, recipientId]);
+  }, [messages, broadcasts, activePeerId]);
 
   async function handleSend(event: FormEvent) {
     event.preventDefault();
-    if (!recipientId || !draft.trim()) return;
+    if (!activePeerId || !draft.trim()) return;
 
     setBusy(true);
     setError(null);
@@ -133,13 +138,14 @@ export function FanChatMessenger() {
       const response = await fetch("/api/fan-chat/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recipientId, body: draft })
+        body: JSON.stringify({ recipientId: activePeerId, body: draft })
       });
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to send.");
       setDraft("");
       setNotice(payload.message ?? "Sent.");
-      await loadThread();
+      await loadThread(activePeerId);
+      await loadInbox();
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : "Unable to send.");
     } finally {
@@ -147,108 +153,168 @@ export function FanChatMessenger() {
     }
   }
 
-  const viewingBroadcasts = recipientId === "all";
+  const totalUnread = threads.reduce((sum, thread) => sum + thread.unreadCount, 0);
 
   return (
-    <div className="fan-chat-messenger">
+    <div className="fan-chat-messenger fan-chat-messenger--inbox">
       <p className="fan-chat-messenger-lead">
-        Private messages to one connection or everyone you&apos;re connected with. Add friends in{" "}
-        <Link href="/#community">Community</Link>.
+        Message your connections in private threads. Add friends in{" "}
+        <Link href="/#community">Community</Link> and accept requests to unlock chat.
       </p>
 
-      <label className="feed-control-field fan-chat-recipient-field">
-        <span>To</span>
-        <select
-          className="feed-control-input"
-          disabled={busy || loading}
-          value={recipientId}
-          onChange={(event) => setRecipientId(event.target.value)}
-        >
-          {recipientOptions.length === 1 ? (
-            <option value="all">All connections (none yet)</option>
-          ) : (
-            recipientOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))
-          )}
-        </select>
-      </label>
-
-      {loading ? <p className="inline-status">Loading messages…</p> : null}
+      {loading ? <p className="inline-status">Loading conversations…</p> : null}
       {error ? <p className="inline-error">{error}</p> : null}
       {notice ? <p className="inline-status community-notice">{notice}</p> : null}
 
-      <div className="fan-chat-thread" aria-live="polite">
-        {!loading && viewingBroadcasts ? (
-          broadcasts.length ? (
-            <ul className="fan-chat-broadcast-list">
-              {broadcasts.map((item) => (
-                <li className="fan-chat-broadcast-item" key={item.broadcastId}>
-                  <p className="fan-chat-bubble-text">{item.body}</p>
-                  <p className="fan-chat-bubble-meta">
-                    Sent to {item.recipientCount} connection{item.recipientCount === 1 ? "" : "s"} ·{" "}
-                    {new Date(item.createdAt).toLocaleString()}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="fan-chat-thread-empty">
-              No broadcasts yet. Choose <strong>All connections</strong> and send a message below.
-            </p>
-          )
-        ) : null}
+      <div className="fan-chat-inbox-layout">
+        <aside aria-label="Conversations" className="fan-chat-inbox-list">
+          <p className="fan-chat-inbox-list-heading">
+            Conversations
+            {totalUnread > 0 ? (
+              <span className="fan-chat-inbox-unread-total">{totalUnread} unread</span>
+            ) : null}
+          </p>
 
-        {!loading && !viewingBroadcasts ? (
-          messages.length ? (
-            <ul className="fan-chat-message-list">
-              {messages.map((message) => (
-                <li
-                  className={`fan-chat-message${message.direction === "outgoing" ? " fan-chat-message--outgoing" : " fan-chat-message--incoming"}`}
-                  key={message.id}
+          <ul className="fan-chat-inbox-threads">
+            <li>
+              <button
+                className={`fan-chat-inbox-thread${viewingBroadcasts ? " fan-chat-inbox-thread--active" : ""}`}
+                disabled={busy}
+                type="button"
+                onClick={() => setActivePeerId("all")}
+              >
+                <span className="fan-chat-inbox-thread-name">All connections</span>
+                <span className="fan-chat-inbox-thread-preview">Broadcast to everyone you&apos;re connected with</span>
+              </button>
+            </li>
+            {threads.length === 0 && !loading ? (
+              <li className="fan-chat-inbox-empty">
+                No connections yet. Accept a request in Community to start chatting.
+              </li>
+            ) : null}
+            {threads.map((thread) => (
+              <li key={thread.peerId}>
+                <button
+                  className={`fan-chat-inbox-thread${activePeerId === thread.peerId ? " fan-chat-inbox-thread--active" : ""}${thread.unreadCount > 0 ? " fan-chat-inbox-thread--unread" : ""}`}
+                  disabled={busy}
+                  type="button"
+                  onClick={() => setActivePeerId(thread.peerId)}
                 >
-                  <p className="fan-chat-bubble-text">{message.body}</p>
-                  <p className="fan-chat-bubble-meta">
-                    {message.direction === "outgoing" ? "You" : message.senderDisplayName ?? message.senderUsername} ·{" "}
-                    {new Date(message.createdAt).toLocaleString()}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="fan-chat-thread-empty">
-              No messages with {recipientOptions.find((option) => option.value === recipientId)?.label ?? "this fan"} yet.
-              Say hello below.
-            </p>
-          )
-        ) : null}
+                  <span className="fan-chat-inbox-thread-row">
+                    <span className="fan-chat-inbox-thread-name">{peerLabel(thread)}</span>
+                    {thread.unreadCount > 0 ? (
+                      <span className="fan-chat-inbox-unread-badge">{thread.unreadCount}</span>
+                    ) : null}
+                  </span>
+                  <span className="fan-chat-inbox-thread-preview">
+                    {thread.lastDirection === "outgoing" ? "You: " : ""}
+                    {previewText(thread.lastMessageBody)}
+                  </span>
+                  {thread.lastMessageAt ? (
+                    <span className="fan-chat-inbox-thread-time">
+                      {new Date(thread.lastMessageAt).toLocaleString()}
+                    </span>
+                  ) : null}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-        <div ref={threadEndRef} />
+        <section className="fan-chat-inbox-pane">
+          {!activePeerId && !loading ? (
+            <p className="fan-chat-thread-empty">Choose a conversation to read or send messages.</p>
+          ) : null}
+
+          {activePeerId ? (
+            <>
+              <header className="fan-chat-inbox-pane-header">
+                <h3>
+                  {viewingBroadcasts
+                    ? "Broadcast"
+                    : peerLabel(activeThread ?? { peerDisplayName: null, peerUsername: "Fan" })}
+                </h3>
+              </header>
+
+              <div className="fan-chat-thread" aria-live="polite">
+                {!loading && viewingBroadcasts ? (
+                  broadcasts.length ? (
+                    <ul className="fan-chat-broadcast-list">
+                      {broadcasts.map((item) => (
+                        <li className="fan-chat-broadcast-item" key={item.broadcastId}>
+                          <p className="fan-chat-bubble-text">{item.body}</p>
+                          <p className="fan-chat-bubble-meta">
+                            Sent to {item.recipientCount} connection
+                            {item.recipientCount === 1 ? "" : "s"} ·{" "}
+                            {new Date(item.createdAt).toLocaleString()}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="fan-chat-thread-empty">
+                      No broadcasts yet. Write a message below to reach all connections at once.
+                    </p>
+                  )
+                ) : null}
+
+                {!loading && !viewingBroadcasts ? (
+                  messages.length ? (
+                    <ul className="fan-chat-message-list">
+                      {messages.map((message) => (
+                        <li
+                          className={`fan-chat-message${message.direction === "outgoing" ? " fan-chat-message--outgoing" : " fan-chat-message--incoming"}`}
+                          key={message.id}
+                        >
+                          <p className="fan-chat-bubble-text">{message.body}</p>
+                          <p className="fan-chat-bubble-meta">
+                            {message.direction === "outgoing"
+                              ? "You"
+                              : message.senderDisplayName ?? message.senderUsername}{" "}
+                            · {new Date(message.createdAt).toLocaleString()}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="fan-chat-thread-empty">
+                      No messages with {activeThread ? peerLabel(activeThread) : "this fan"} yet. Say hello below.
+                    </p>
+                  )
+                ) : null}
+
+                <div ref={threadEndRef} />
+              </div>
+
+              <form className="fan-chat-compose" onSubmit={handleSend}>
+                <label className="feed-control-field fan-chat-compose-field">
+                  <span>Message</span>
+                  <textarea
+                    className="feed-control-input fan-chat-compose-input"
+                    disabled={busy || loading}
+                    maxLength={500}
+                    placeholder={
+                      viewingBroadcasts
+                        ? "Message all connections…"
+                        : `Message ${activeThread ? peerLabel(activeThread) : "your connection"}…`
+                    }
+                    rows={3}
+                    value={draft}
+                    onChange={(event) => setDraft(event.target.value)}
+                  />
+                </label>
+                <button
+                  className="button primary"
+                  disabled={busy || loading || !draft.trim()}
+                  type="submit"
+                >
+                  {busy ? "Sending…" : viewingBroadcasts ? "Send to all" : "Send"}
+                </button>
+              </form>
+            </>
+          ) : null}
+        </section>
       </div>
-
-      <form className="fan-chat-compose" onSubmit={handleSend}>
-        <label className="feed-control-field fan-chat-compose-field">
-          <span>Message</span>
-          <textarea
-            className="feed-control-input fan-chat-compose-input"
-            disabled={busy || loading || !recipientId}
-            maxLength={500}
-            placeholder={
-              recipientId === "all"
-                ? "Message all connections…"
-                : "Write a private message…"
-            }
-            rows={3}
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-          />
-        </label>
-        <button className="button primary" disabled={busy || loading || !draft.trim() || !recipientId} type="submit">
-          {busy ? "Sending…" : recipientId === "all" ? "Send to all" : "Send"}
-        </button>
-      </form>
     </div>
   );
 }

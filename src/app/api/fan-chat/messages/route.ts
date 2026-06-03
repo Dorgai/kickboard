@@ -5,6 +5,7 @@ import { mapDatabaseError } from "@/lib/community/health";
 import { mapFanChatError } from "@/lib/fan-chat/errors";
 import {
   listFanChatBroadcasts,
+  listFanChatInbox,
   listFanChatThread,
   sendFanChatMessage
 } from "@/lib/fan-chat/store";
@@ -39,8 +40,16 @@ export async function GET(request: Request) {
       return NextResponse.json({ broadcasts });
     }
 
+    if (scope === "inbox") {
+      const threads = await listFanChatInbox(user!.id);
+      return NextResponse.json({ threads });
+    }
+
     if (!peerId) {
-      return NextResponse.json({ error: "peerId or scope=broadcasts is required." }, { status: 400 });
+      return NextResponse.json(
+        { error: "peerId or scope=broadcasts|inbox is required." },
+        { status: 400 }
+      );
     }
 
     const messages = await listFanChatThread(user!.id, peerId);

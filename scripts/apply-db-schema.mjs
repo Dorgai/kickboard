@@ -36,6 +36,7 @@ const files = [
   "db/fixture-prediction-types-extensions.sql",
   "db/user-alerts-extensions.sql",
   "db/fan-chat-messages-extensions.sql",
+  "db/fan-chat-thread-reads-extensions.sql",
   "db/admin-moderation-extensions.sql",
   "db/user-activity-extensions.sql",
   "db/help-support-extensions.sql",

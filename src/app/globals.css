@@ -1430,6 +1430,144 @@ h3 {
   min-height: 0;
 }
 
+.fan-chat-inbox-layout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+}
+
+@media (min-width: 640px) {
+  .fan-chat-inbox-layout {
+    grid-template-columns: minmax(9.5rem, 34%) minmax(0, 1fr);
+    min-height: min(20rem, 48vh);
+  }
+}
+
+.fan-chat-inbox-list {
+  background: color-mix(in srgb, var(--color-bg) 50%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  display: grid;
+  gap: 6px;
+  max-height: min(20rem, 48vh);
+  min-height: 8rem;
+  overflow: auto;
+  padding: 8px;
+}
+
+.fan-chat-inbox-list-heading {
+  align-items: center;
+  color: var(--color-text-primary);
+  display: flex;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 8px;
+  justify-content: space-between;
+  margin: 0;
+  padding: 2px 4px 4px;
+}
+
+.fan-chat-inbox-unread-total {
+  background: color-mix(in srgb, var(--color-brand) 18%, var(--color-bg));
+  border-radius: 999px;
+  color: var(--color-brand);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+}
+
+.fan-chat-inbox-threads {
+  display: grid;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fan-chat-inbox-thread {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.fan-chat-inbox-thread:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-brand) 8%, var(--color-bg));
+  border-color: color-mix(in srgb, var(--color-brand) 20%, var(--color-border));
+}
+
+.fan-chat-inbox-thread--active {
+  background: color-mix(in srgb, var(--color-brand) 14%, var(--color-bg));
+  border-color: color-mix(in srgb, var(--color-brand) 35%, var(--color-border));
+}
+
+.fan-chat-inbox-thread--unread .fan-chat-inbox-thread-name {
+  font-weight: 900;
+}
+
+.fan-chat-inbox-thread-row {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.fan-chat-inbox-thread-name {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.fan-chat-inbox-unread-badge {
+  background: var(--color-brand);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  min-width: 1.25rem;
+  padding: 3px 6px;
+  text-align: center;
+}
+
+.fan-chat-inbox-thread-preview {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.fan-chat-inbox-thread-time {
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.fan-chat-inbox-empty {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 8px 10px;
+}
+
+.fan-chat-inbox-pane {
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+  min-width: 0;
+}
+
+.fan-chat-inbox-pane-header h3 {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+}
+
 .fan-chat-messenger-lead {
   color: color-mix(in srgb, var(--color-text-primary) 68%, var(--color-text-secondary));
   font-size: 12px;
@@ -1537,9 +1675,11 @@ h3 {
   .fan-chat-float-panel {
     border-radius: 14px 0 0 14px;
     bottom: 16px;
-    height: min(80vh, 36rem);
+    height: min(80vh, 40rem);
+    max-width: min(28rem, 92vw);
     right: 16px;
     transform: translateX(calc(100% + 24px));
+    width: min(28rem, 92vw);
   }
 
   .fan-chat-float-panel--open {

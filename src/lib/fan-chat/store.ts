@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { areUsersConnected, listAcceptedPeerIds } from "@/lib/connections/store";
 import { upsertUserAlert } from "@/lib/alerts/store";
 import { query } from "@/lib/db";
+import { ensureFanChatSchema } from "@/lib/fan-chat/ensure-schema";
 
 const MAX_BODY_LENGTH = 500;
 const MAX_THREAD_MESSAGES = 120;
@@ -25,6 +26,16 @@ export type FanChatBroadcastSummary = {
   body: string;
   recipientCount: number;
   createdAt: string;
+};
+
+export type FanChatInboxThread = {
+  peerId: string;
+  peerUsername: string;
+  peerDisplayName: string | null;
+  lastMessageBody: string | null;
+  lastMessageAt: string | null;
+  lastDirection: "incoming" | "outgoing" | null;
+  unreadCount: number;
 };
 
 function mapMessage(row: {
@@ -86,6 +97,7 @@ export async function sendFanChatMessage(
   senderDisplayName: string,
   input: { recipientId: string | "all"; body: string }
 ) {
+  await ensureFanChatSchema();
   const body = normalizeFanChatBody(input.body);
   if (!body) throw new Error("MESSAGE_EMPTY");
 
@@ -146,7 +158,108 @@ export async function sendFanChatMessage(
   return { mode: "direct" as const, messageId: row.id, createdAt: row.created_at.toISOString() };
 }
 
+export async function markFanChatThreadRead(viewerId: string, peerId: string) {
+  await ensureFanChatSchema();
+  const connected = await areUsersConnected(viewerId, peerId);
+  if (!connected) return;
+
+  await query(
+    `INSERT INTO fan_chat_thread_reads (user_id, peer_id, last_read_at)
+     VALUES ($1, $2, now())
+     ON CONFLICT (user_id, peer_id)
+     DO UPDATE SET last_read_at = EXCLUDED.last_read_at`,
+    [viewerId, peerId]
+  );
+}
+
+export async function listFanChatInbox(viewerId: string): Promise<FanChatInboxThread[]> {
+  await ensureFanChatSchema();
+
+  const result = await query<{
+    peer_id: string;
+    peer_username: string;
+    peer_display_name: string | null;
+    last_message_body: string | null;
+    last_message_at: Date | null;
+    last_sender_id: string | null;
+    unread_count: string;
+  }>(
+    `WITH accepted_peers AS (
+       SELECT CASE WHEN c.requester_id = $1 THEN c.addressee_id ELSE c.requester_id END AS peer_id
+       FROM connections c
+       WHERE c.status = 'accepted'
+         AND (c.requester_id = $1 OR c.addressee_id = $1)
+     ),
+     thread_messages AS (
+       SELECT
+         CASE WHEN m.sender_id = $1 THEN m.recipient_id ELSE m.sender_id END AS peer_id,
+         m.body,
+         m.created_at,
+         m.sender_id
+       FROM fan_chat_messages m
+       WHERE m.deleted_at IS NULL
+         AND (m.sender_id = $1 OR m.recipient_id = $1)
+     ),
+     last_per_peer AS (
+       SELECT DISTINCT ON (peer_id)
+         peer_id,
+         body,
+         created_at,
+         sender_id
+       FROM thread_messages
+       ORDER BY peer_id, created_at DESC
+     ),
+     unread_per_peer AS (
+       SELECT
+         m.sender_id AS peer_id,
+         count(*)::text AS unread_count
+       FROM fan_chat_messages m
+       LEFT JOIN fan_chat_thread_reads r
+         ON r.user_id = $1 AND r.peer_id = m.sender_id
+       WHERE m.deleted_at IS NULL
+         AND m.recipient_id = $1
+         AND m.created_at > COALESCE(r.last_read_at, to_timestamp(0))
+       GROUP BY m.sender_id
+     )
+     SELECT
+       p.peer_id,
+       u.username AS peer_username,
+       u.display_name AS peer_display_name,
+       l.body AS last_message_body,
+       l.created_at AS last_message_at,
+       l.sender_id AS last_sender_id,
+       COALESCE(uu.unread_count, '0') AS unread_count
+     FROM accepted_peers p
+     INNER JOIN users u ON u.id = p.peer_id
+       AND u.deleted_at IS NULL
+       AND u.is_suspended = false
+       AND COALESCE(u.is_banned, false) = false
+     LEFT JOIN last_per_peer l ON l.peer_id = p.peer_id
+     LEFT JOIN unread_per_peer uu ON uu.peer_id = p.peer_id
+     ORDER BY
+       COALESCE(l.created_at, to_timestamp(0)) DESC,
+       u.username ASC`,
+    [viewerId]
+  );
+
+  return result.rows.map((row) => ({
+    peerId: row.peer_id,
+    peerUsername: row.peer_username,
+    peerDisplayName: row.peer_display_name,
+    lastMessageBody: row.last_message_body,
+    lastMessageAt: row.last_message_at?.toISOString() ?? null,
+    lastDirection:
+      row.last_sender_id === null
+        ? null
+        : row.last_sender_id === viewerId
+          ? "outgoing"
+          : "incoming",
+    unreadCount: Number(row.unread_count) || 0
+  }));
+}
+
 export async function listFanChatThread(viewerId: string, peerId: string) {
+  await ensureFanChatSchema();
   const connected = await areUsersConnected(viewerId, peerId);
   if (!connected) throw new Error("NOT_CONNECTED");
 
@@ -165,26 +278,35 @@ export async function listFanChatThread(viewerId: string, peerId: string) {
     `SELECT m.id, m.sender_id, m.recipient_id, m.broadcast_id, m.body, m.created_at,
             s.username AS sender_username, s.display_name AS sender_display_name,
             r.username AS recipient_username, r.display_name AS recipient_display_name
-     FROM fan_chat_messages m
+     FROM (
+       SELECT m.id, m.sender_id, m.recipient_id, m.broadcast_id, m.body, m.created_at
+       FROM fan_chat_messages m
+       WHERE m.deleted_at IS NULL
+         AND ((m.sender_id = $1 AND m.recipient_id = $2)
+           OR (m.sender_id = $2 AND m.recipient_id = $1))
+       ORDER BY m.created_at DESC
+       LIMIT $3
+     ) m
      INNER JOIN users s ON s.id = m.sender_id
      INNER JOIN users r ON r.id = m.recipient_id
-     WHERE m.deleted_at IS NULL
-       AND ((m.sender_id = $1 AND m.recipient_id = $2)
-         OR (m.sender_id = $2 AND m.recipient_id = $1))
-     ORDER BY m.created_at ASC
-     LIMIT $3`,
+     ORDER BY m.created_at ASC`,
     [viewerId, peerId, MAX_THREAD_MESSAGES]
   );
 
-  return result.rows.map((row) =>
+  const messages = result.rows.map((row) =>
     mapMessage({
       ...row,
       viewer_id: viewerId
     })
   );
+
+  await markFanChatThreadRead(viewerId, peerId);
+
+  return messages;
 }
 
 export async function listFanChatBroadcasts(viewerId: string) {
+  await ensureFanChatSchema();
   const result = await query<{
     broadcast_id: string;
     body: string;

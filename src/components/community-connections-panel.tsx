@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
 import { ConnectionActivityTimeline } from "@/components/connection-activity-timeline";
 import { RegistrationInvitationsPanel } from "@/components/registration-invitations-panel";
+import { notifyConnectionsChanged } from "@/lib/social/events";
 
 type PublicUserCard = {
   id: string;
@@ -105,6 +106,7 @@ function ConnectionsPanelInner() {
       setConnectUsername("");
       setSearchQuery("");
       await refresh();
+      notifyConnectionsChanged();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Unable to connect.");
     } finally {
@@ -131,6 +133,7 @@ function ConnectionsPanelInner() {
       if (!response.ok) throw new Error(payload.error ?? "Unable to update request.");
       setNotice(action === "accept" ? "Connected." : "Request updated.");
       await refresh();
+      notifyConnectionsChanged();
     } catch (actionError) {
       setError(actionError instanceof Error ? actionError.message : "Unable to update request.");
     } finally {
@@ -146,6 +149,7 @@ function ConnectionsPanelInner() {
       const payload = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to cancel.");
       await refresh();
+      notifyConnectionsChanged();
     } catch (cancelError) {
       setError(cancelError instanceof Error ? cancelError.message : "Unable to cancel.");
     } finally {
