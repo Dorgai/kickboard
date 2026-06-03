@@ -5,7 +5,6 @@ import {
   buildFacebookShareUrl,
   buildPredictionAppDeepLink,
   buildPredictionShareCaption,
-  buildPredictionSharePageUrlEmbedded,
   type PredictionSharePayload
 } from "@/lib/predictions/share";
 
@@ -55,31 +54,40 @@ export function PredictionShareButtons({
 
         if (cancelled) return;
 
-        if (response.ok && body.url) {
+        if (response.ok && body.url && body.mode === "short") {
           setShareLink({
             status: "ready",
             url: body.url,
-            mode: body.mode === "embedded" ? "embedded" : "short"
+            mode: "short"
           });
           return;
         }
 
-        setShareLink({
-          status: "ready",
-          url: buildPredictionSharePageUrlEmbedded(payload),
-          mode: "embedded"
-        });
-        if (!response.ok && body.error) {
-          setError(body.error);
+        if (response.ok && body.url && body.mode === "embedded") {
+          setShareLink({
+            status: "ready",
+            url: body.url,
+            mode: "embedded"
+          });
+          setError(
+            "Using a long link — Instagram and Facebook may break it. Prefer a short /share/p/… link after database setup."
+          );
+          return;
         }
+
+        setShareLink({
+          status: "error",
+          message:
+            body.error ??
+            "Could not create a short share link. Wait a moment and try again, or use Copy after “Short link ready” appears."
+        });
       } catch (requestError) {
         if (cancelled || (requestError instanceof Error && requestError.name === "AbortError")) {
           return;
         }
         setShareLink({
-          status: "ready",
-          url: buildPredictionSharePageUrlEmbedded(payload),
-          mode: "embedded"
+          status: "error",
+          message: "Could not reach the server to create a share link. Check your connection and try again."
         });
       }
     }
@@ -115,7 +123,8 @@ export function PredictionShareButtons({
     setError(null);
   }, []);
 
-  const linkNotReady = shareLink.status !== "ready" || !sharePageUrl;
+  const linkNotReady =
+    shareLink.status !== "ready" || !sharePageUrl || shareLink.mode === "embedded";
 
   async function copyCaption() {
     clearFeedback();
@@ -181,7 +190,10 @@ export function PredictionShareButtons({
     <div className={`prediction-share${className ? ` ${className}` : ""}`}>
       <p className="prediction-share-label">Share your pick</p>
       {shareLink.status === "loading" ? (
-        <p className="inline-status">Preparing share link…</p>
+        <p className="inline-status">Preparing short share link…</p>
+      ) : null}
+      {shareLink.status === "error" ? (
+        <p className="inline-status">{shareLink.message}</p>
       ) : null}
       {shareLink.status === "ready" && shareLink.mode === "short" ? (
         <p className="prediction-share-hint">

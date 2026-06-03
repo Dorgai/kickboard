@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
+import { isDatabaseConfigured } from "@/lib/db";
 import { payloadFromStored, savePredictionShareLink } from "@/lib/predictions/share-store";
 import {
   buildPredictionSharePageUrl,
   buildPredictionSharePageUrlEmbedded,
   type PredictionSharePayload
 } from "@/lib/predictions/share";
+
+function isMissingRelationError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  return "code" in error && String(error.code) === "42P01";
+}
 
 export async function POST(request: Request) {
   try {
@@ -15,25 +21,43 @@ export async function POST(request: Request) {
     }
 
     const shareId = await savePredictionShareLink(payload);
-    if (!shareId) {
-      const fallbackUrl = buildPredictionSharePageUrlEmbedded(payload);
+    if (shareId) {
       return NextResponse.json({
-        shareId: null,
-        url: fallbackUrl,
-        mode: "embedded" as const
+        shareId,
+        url: buildPredictionSharePageUrl(shareId),
+        mode: "short" as const
       });
     }
 
+    if (isDatabaseConfigured()) {
+      return NextResponse.json(
+        {
+          error:
+            "Short share links are not ready yet. Run npm run db:schema (or the Apply community schema workflow) so prediction_share_links exists."
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({
-      shareId,
-      url: buildPredictionSharePageUrl(shareId),
-      mode: "short" as const
+      shareId: null,
+      url: buildPredictionSharePageUrlEmbedded(payload),
+      mode: "embedded" as const
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to create share link.";
     if (message === "DATABASE_NOT_CONFIGURED") {
       return NextResponse.json(
         { error: "Share links require the database. Try again after setup." },
+        { status: 503 }
+      );
+    }
+    if (isMissingRelationError(error)) {
+      return NextResponse.json(
+        {
+          error:
+            "Share link storage is missing. Run npm run db:schema (prediction_share_links table)."
+        },
         { status: 503 }
       );
     }

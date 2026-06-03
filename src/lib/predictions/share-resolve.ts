@@ -11,6 +11,7 @@ export async function resolvePredictionSharePayload(
   if (isShortShareId(token)) {
     const fromDb = await loadPredictionShareLink(token);
     if (fromDb) return fromDb;
+    return null;
   }
 
   return decodePredictionShare(token);
