@@ -35,6 +35,36 @@ function formatRelativeUpdated(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
+function checkpointDialogTitle(payload: SessionCheckpointPayload | null, loading: boolean) {
+  if (loading || !payload) return "Hey, good to see you!";
+
+  const needsPick = payload.upcoming.some((fixture) => !fixture.hasPrediction);
+  const hasUpcoming = payload.upcoming.length > 0;
+  const hasPerformance =
+    payload.recentPicks.length > 0 ||
+    (payload.wallet?.balance ?? 0) > 0 ||
+    (payload.wallet?.picksPending ?? 0) > 0;
+
+  if (needsPick) return "Hey, it's match day!";
+  if (hasPerformance) return "Hey, check out your performance!";
+  if (hasUpcoming) return "Hey, it's match day!";
+  return "Hey, good to see you back!";
+}
+
+function checkpointUpcomingSectionTitle(
+  payload: SessionCheckpointPayload,
+  mainTitle: string
+) {
+  if (payload.upcoming.length === 0) return "What's next";
+  if (mainTitle === "Hey, it's match day!") return "Your next kickoffs";
+  return "Hey, it's match day!";
+}
+
+function checkpointPerformanceSectionTitle(mainTitle: string) {
+  if (mainTitle === "Hey, check out your performance!") return "Your points & picks";
+  return "Hey, check out your performance!";
+}
+
 export function SessionCheckpointDialog() {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
@@ -157,6 +187,7 @@ export function SessionCheckpointDialog() {
   }
 
   const wallet = data?.wallet;
+  const dialogTitle = checkpointDialogTitle(data, loading && !data);
 
   return (
     <dialog
@@ -173,8 +204,9 @@ export function SessionCheckpointDialog() {
       <div className="session-checkpoint-panel timeline-modal-panel">
         <header className="timeline-modal-header session-checkpoint-header">
           <div>
-            <p className="session-checkpoint-eyebrow">Your Kickboard check-in</p>
-            <h2 id={titleId}>Matches & performance</h2>
+            <h2 className="session-checkpoint-title" id={titleId}>
+              {dialogTitle}
+            </h2>
           </div>
           <button
             aria-label="Close"
@@ -195,10 +227,12 @@ export function SessionCheckpointDialog() {
               <section className="session-checkpoint-section" aria-labelledby="checkpoint-upcoming">
                 <h3 className="session-checkpoint-section-title" id="checkpoint-upcoming">
                   <Calendar aria-hidden size={18} />
-                  Upcoming matches
+                  {checkpointUpcomingSectionTitle(data, dialogTitle)}
                 </h3>
                 {data.upcoming.length === 0 ? (
-                  <p className="session-checkpoint-empty">No upcoming fixtures in the schedule right now.</p>
+                  <p className="session-checkpoint-empty">
+                    Nothing on the schedule right now — check back soon for the next kickoff.
+                  </p>
                 ) : (
                   <ul className="session-checkpoint-matches">
                     {data.upcoming.map((fixture) => (
@@ -231,7 +265,7 @@ export function SessionCheckpointDialog() {
               <section className="session-checkpoint-section" aria-labelledby="checkpoint-performance">
                 <h3 className="session-checkpoint-section-title" id="checkpoint-performance">
                   <Trophy aria-hidden size={18} />
-                  Your performance
+                  {checkpointPerformanceSectionTitle(dialogTitle)}
                 </h3>
                 {wallet ? (
                   <div className="session-checkpoint-stats">
@@ -274,7 +308,9 @@ export function SessionCheckpointDialog() {
                     </ul>
                   </>
                 ) : (
-                  <p className="session-checkpoint-empty">No picks yet — predict your first match above.</p>
+                  <p className="session-checkpoint-empty">
+                    No picks yet — jump in above and start stacking points!
+                  </p>
                 )}
               </section>
             </>
