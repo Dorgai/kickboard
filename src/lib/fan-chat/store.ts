@@ -7,6 +7,8 @@ import { ensureFanChatSchema } from "@/lib/fan-chat/ensure-schema";
 const MAX_BODY_LENGTH = 500;
 const MAX_THREAD_MESSAGES = 120;
 
+export type FanChatDeliveryStatus = "pending" | "sent" | "read";
+
 export type FanChatMessage = {
   id: string;
   senderId: string;
@@ -19,6 +21,8 @@ export type FanChatMessage = {
   recipientUsername: string;
   recipientDisplayName: string | null;
   direction: "outgoing" | "incoming";
+  /** Outgoing 1:1 messages only — pending is client-only while sending. */
+  deliveryStatus: FanChatDeliveryStatus | null;
 };
 
 export type FanChatBroadcastSummary = {
@@ -50,7 +54,14 @@ function mapMessage(row: {
   recipient_username: string;
   recipient_display_name: string | null;
   viewer_id: string;
+  delivery_status: string | null;
 }): FanChatMessage {
+  const direction = row.sender_id === row.viewer_id ? "outgoing" : "incoming";
+  let deliveryStatus: FanChatDeliveryStatus | null = null;
+  if (direction === "outgoing" && !row.broadcast_id) {
+    deliveryStatus = row.delivery_status === "read" ? "read" : "sent";
+  }
+
   return {
     id: row.id,
     senderId: row.sender_id,
@@ -62,7 +73,8 @@ function mapMessage(row: {
     senderDisplayName: row.sender_display_name,
     recipientUsername: row.recipient_username,
     recipientDisplayName: row.recipient_display_name,
-    direction: row.sender_id === row.viewer_id ? "outgoing" : "incoming"
+    direction,
+    deliveryStatus
   };
 }
 
@@ -274,10 +286,19 @@ export async function listFanChatThread(viewerId: string, peerId: string) {
     sender_display_name: string | null;
     recipient_username: string;
     recipient_display_name: string | null;
+    delivery_status: string | null;
   }>(
     `SELECT m.id, m.sender_id, m.recipient_id, m.broadcast_id, m.body, m.created_at,
             s.username AS sender_username, s.display_name AS sender_display_name,
-            r.username AS recipient_username, r.display_name AS recipient_display_name
+            r.username AS recipient_username, r.display_name AS recipient_display_name,
+            CASE
+              WHEN m.sender_id = $1 AND m.broadcast_id IS NULL THEN
+                CASE
+                  WHEN pr.last_read_at IS NOT NULL AND pr.last_read_at >= m.created_at THEN 'read'
+                  ELSE 'sent'
+                END
+              ELSE NULL
+            END AS delivery_status
      FROM (
        SELECT m.id, m.sender_id, m.recipient_id, m.broadcast_id, m.body, m.created_at
        FROM fan_chat_messages m
@@ -289,6 +310,8 @@ export async function listFanChatThread(viewerId: string, peerId: string) {
      ) m
      INNER JOIN users s ON s.id = m.sender_id
      INNER JOIN users r ON r.id = m.recipient_id
+     LEFT JOIN fan_chat_thread_reads pr
+       ON pr.user_id = m.recipient_id AND pr.peer_id = m.sender_id
      ORDER BY m.created_at ASC`,
     [viewerId, peerId, MAX_THREAD_MESSAGES]
   );

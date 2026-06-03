@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { FanChatMessageStatus } from "@/components/fan-chat-message-status";
 import type { FanChatBroadcastSummary, FanChatInboxThread, FanChatMessage } from "@/lib/fan-chat/store";
 import { CONNECTIONS_CHANGED_EVENT } from "@/lib/social/events";
 
@@ -67,7 +68,10 @@ export function FanChatMessenger() {
       throw new Error(payload.error ?? "Unable to load messages.");
     }
     const payload = (await response.json()) as { messages?: FanChatMessage[] };
-    setMessages(payload.messages ?? []);
+    setMessages((current) => {
+      const pending = current.filter((message) => message.deliveryStatus === "pending");
+      return [...(payload.messages ?? []), ...pending];
+    });
     setBroadcasts([]);
   }, []);
 
@@ -131,22 +135,68 @@ export function FanChatMessenger() {
     event.preventDefault();
     if (!activePeerId || !draft.trim()) return;
 
+    const body = draft.trim();
+
+    if (viewingBroadcasts) {
+      setBusy(true);
+      setError(null);
+      setNotice(null);
+      try {
+        const response = await fetch("/api/fan-chat/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ recipientId: activePeerId, body })
+        });
+        const payload = (await response.json()) as { error?: string; message?: string };
+        if (!response.ok) throw new Error(payload.error ?? "Unable to send.");
+        setDraft("");
+        setNotice(payload.message ?? "Sent.");
+        await loadThread(activePeerId);
+        await loadInbox();
+      } catch (sendError) {
+        setError(sendError instanceof Error ? sendError.message : "Unable to send.");
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
+    const pendingId = `pending-${Date.now()}`;
+    const optimistic: FanChatMessage = {
+      id: pendingId,
+      senderId: "self",
+      recipientId: activePeerId,
+      broadcastId: null,
+      body,
+      createdAt: new Date().toISOString(),
+      senderUsername: "you",
+      senderDisplayName: "You",
+      recipientUsername: activeThread?.peerUsername ?? "",
+      recipientDisplayName: activeThread?.peerDisplayName ?? null,
+      direction: "outgoing",
+      deliveryStatus: "pending"
+    };
+
+    setMessages((current) => [...current, optimistic]);
+    setDraft("");
     setBusy(true);
     setError(null);
     setNotice(null);
+
     try {
       const response = await fetch("/api/fan-chat/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recipientId: activePeerId, body: draft })
+        body: JSON.stringify({ recipientId: activePeerId, body })
       });
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to send.");
-      setDraft("");
       setNotice(payload.message ?? "Sent.");
       await loadThread(activePeerId);
       await loadInbox();
     } catch (sendError) {
+      setMessages((current) => current.filter((message) => message.id !== pendingId));
+      setDraft(body);
       setError(sendError instanceof Error ? sendError.message : "Unable to send.");
     } finally {
       setBusy(false);
@@ -268,10 +318,15 @@ export function FanChatMessenger() {
                         >
                           <p className="fan-chat-bubble-text">{message.body}</p>
                           <p className="fan-chat-bubble-meta">
-                            {message.direction === "outgoing"
-                              ? "You"
-                              : message.senderDisplayName ?? message.senderUsername}{" "}
-                            · {new Date(message.createdAt).toLocaleString()}
+                            <span className="fan-chat-bubble-meta-main">
+                              {message.direction === "outgoing"
+                                ? "You"
+                                : message.senderDisplayName ?? message.senderUsername}{" "}
+                              · {new Date(message.createdAt).toLocaleString()}
+                            </span>
+                            {message.direction === "outgoing" && message.deliveryStatus ? (
+                              <FanChatMessageStatus status={message.deliveryStatus} />
+                            ) : null}
                           </p>
                         </li>
                       ))}

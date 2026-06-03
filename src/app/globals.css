@@ -1647,10 +1647,55 @@ h3 {
 }
 
 .fan-chat-bubble-meta {
+  align-items: center;
   color: var(--color-text-secondary);
+  display: flex;
   font-size: 10px;
+  gap: 6px;
+  justify-content: space-between;
   line-height: 1.35;
   margin: 4px 0 0;
+}
+
+.fan-chat-bubble-meta-main {
+  min-width: 0;
+}
+
+.fan-chat-delivery {
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.fan-chat-delivery-icon {
+  height: 12px;
+  width: 12px;
+}
+
+.fan-chat-delivery-icon--double {
+  height: 12px;
+  width: 15px;
+}
+
+.fan-chat-delivery--pending {
+  color: var(--color-text-muted);
+  opacity: 0.85;
+}
+
+.fan-chat-delivery--sent {
+  color: var(--color-text-muted);
+}
+
+.fan-chat-delivery--read {
+  color: color-mix(in srgb, var(--color-brand) 75%, #38bdf8);
+}
+
+.fan-chat-message--outgoing .fan-chat-bubble-meta {
+  justify-content: flex-end;
+}
+
+.fan-chat-message--outgoing .fan-chat-bubble-meta-main {
+  text-align: right;
 }
 
 .fan-chat-compose {
