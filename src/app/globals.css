@@ -3280,37 +3280,48 @@ h3 {
   border: 1px solid var(--color-border);
   border-radius: 10px;
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-@media (min-width: 520px) {
-  .fixture-prediction-outcome-list {
-    flex-direction: row;
-  }
+  flex-direction: row;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
 }
 
 .fixture-prediction-outcome-option {
   align-items: stretch;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
+  border-right: 1px solid var(--color-border);
   cursor: pointer;
   display: flex;
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: min(42vw, 11.5rem);
+  scroll-snap-align: start;
 }
 
 .fixture-prediction-outcome-option:last-child {
-  border-bottom: none;
+  border-right: none;
 }
 
-@media (min-width: 520px) {
-  .fixture-prediction-outcome-option {
-    border-bottom: none;
-    border-right: 1px solid var(--color-border);
+/* Mobile + tablet: swipe through home / draw / away */
+@media (max-width: 1023px) {
+  .fixture-prediction-outcome-list {
+    overscroll-behavior-x: contain;
+  }
+}
+
+/* Desktop: three equal columns, no horizontal scroll */
+@media (min-width: 1024px) {
+  .fixture-prediction-outcome-list {
+    overflow-x: visible;
+    scroll-snap-type: none;
   }
 
-  .fixture-prediction-outcome-option:last-child {
-    border-right: none;
+  .fixture-prediction-outcome-option {
+    flex: 1 1 0;
+    min-width: 0;
+    scroll-snap-align: unset;
   }
 }
 
