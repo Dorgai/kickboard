@@ -8,6 +8,38 @@ function createShareId() {
   return randomBytes(9).toString("base64url");
 }
 
+let shareLinksTableReady: Promise<boolean> | null = null;
+
+/** Idempotent — creates prediction_share_links if migrations were not applied yet. */
+export async function ensurePredictionShareLinksTable(): Promise<boolean> {
+  if (!isDatabaseConfigured()) return false;
+
+  if (!shareLinksTableReady) {
+    shareLinksTableReady = (async () => {
+      try {
+        await query(`
+          CREATE TABLE IF NOT EXISTS prediction_share_links (
+            id text PRIMARY KEY,
+            payload jsonb NOT NULL,
+            created_at timestamptz NOT NULL DEFAULT now()
+          )
+        `);
+        await query(`
+          CREATE INDEX IF NOT EXISTS idx_prediction_share_links_created
+            ON prediction_share_links (created_at DESC)
+        `);
+        return true;
+      } catch (error) {
+        console.error("[prediction-share-links] ensure table failed", error);
+        shareLinksTableReady = null;
+        return false;
+      }
+    })();
+  }
+
+  return shareLinksTableReady;
+}
+
 export function isShortShareId(value: string) {
   const id = value.trim();
   return id.length >= 8 && id.length <= 24 && /^[A-Za-z0-9_-]+$/.test(id);
@@ -54,6 +86,7 @@ export async function savePredictionShareLink(
   payload: PredictionSharePayload
 ): Promise<string | null> {
   if (!isDatabaseConfigured()) return null;
+  if (!(await ensurePredictionShareLinksTable())) return null;
 
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const id = createShareId();
@@ -82,6 +115,7 @@ function isMissingRelationError(error: unknown) {
 
 export async function loadPredictionShareLink(id: string): Promise<PredictionSharePayload | null> {
   if (!isDatabaseConfigured() || !isShortShareId(id)) return null;
+  if (!(await ensurePredictionShareLinksTable())) return null;
 
   try {
     const result = await query<{ payload: unknown }>(

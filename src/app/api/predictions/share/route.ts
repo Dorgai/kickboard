@@ -32,8 +32,7 @@ export async function POST(request: Request) {
     if (isDatabaseConfigured()) {
       return NextResponse.json(
         {
-          error:
-            "Short share links are not ready yet. Run npm run db:schema (or the Apply community schema workflow) so prediction_share_links exists."
+          error: "Share links are not available right now. Please try again in a moment."
         },
         { status: 503 }
       );
@@ -54,10 +53,7 @@ export async function POST(request: Request) {
     }
     if (isMissingRelationError(error)) {
       return NextResponse.json(
-        {
-          error:
-            "Share link storage is missing. Run npm run db:schema (prediction_share_links table)."
-        },
+        { error: "Share links are not available right now. Please try again in a moment." },
         { status: 503 }
       );
     }
