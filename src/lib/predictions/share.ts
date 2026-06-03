@@ -1,6 +1,8 @@
+import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
 import {
   formatScorerPicksSummary,
   outcomeLabel,
+  parseScorerPicks,
   type FixtureOutcome,
   type ScorerPick
 } from "@/lib/fixture-predictions/types";
@@ -49,18 +51,76 @@ export function encodePredictionShare(payload: PredictionSharePayload): string {
   return base64UrlEncode(JSON.stringify(payload));
 }
 
-export function decodePredictionShare(token: string): PredictionSharePayload | null {
-  const trimmed = token.trim();
-  if (!trimmed) return null;
+/** Normalize tokens from URLs, query strings, or pasted text (messengers often break `?d=` links). */
+export function normalizePredictionShareToken(raw: string | null | undefined): string {
+  if (!raw) return "";
+  let token = raw.trim();
+  if (!token) return "";
+
   try {
-    const parsed = JSON.parse(base64UrlDecode(trimmed)) as PredictionSharePayload;
-    if (parsed?.v !== 1 || !parsed.fixtureKey || !parsed.homeTeam || !parsed.awayTeam) return null;
+    if (/^https?:\/\//i.test(token)) {
+      const url = new URL(token);
+      const fromQuery = url.searchParams.get("d");
+      if (fromQuery) {
+        token = fromQuery;
+      } else {
+        const segments = url.pathname.split("/").filter(Boolean);
+        const shareIdx = segments.findIndex((part) => part === "share");
+        if (shareIdx >= 0 && segments[shareIdx + 1] === "prediction" && segments[shareIdx + 2]) {
+          token = segments[shareIdx + 2] ?? token;
+        }
+      }
+    }
+  } catch {
+    /* not a full URL */
+  }
+
+  token = token.replace(/\s/g, "");
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const decoded = decodeURIComponent(token);
+      if (decoded !== token) {
+        token = decoded.replace(/\s/g, "");
+        continue;
+      }
+    } catch {
+      break;
+    }
+    break;
+  }
+
+  return token;
+}
+
+export function decodePredictionShare(rawToken: string): PredictionSharePayload | null {
+  const token = normalizePredictionShareToken(rawToken);
+  if (!token) return null;
+
+  try {
+    const parsed = JSON.parse(base64UrlDecode(token)) as Partial<PredictionSharePayload>;
+    const fixtureKey = typeof parsed.fixtureKey === "string" ? parsed.fixtureKey.trim() : "";
+    if (!fixtureKey) return null;
+    if (parsed.v !== undefined && parsed.v !== 1) return null;
+
+    const teamsFromKey = parseFixtureKeyTeams(fixtureKey);
+    const homeTeam =
+      typeof parsed.homeTeam === "string" && parsed.homeTeam.trim()
+        ? parsed.homeTeam.trim()
+        : teamsFromKey.homeTeam;
+    const awayTeam =
+      typeof parsed.awayTeam === "string" && parsed.awayTeam.trim()
+        ? parsed.awayTeam.trim()
+        : teamsFromKey.awayTeam;
+
+    if (!homeTeam || !awayTeam) return null;
+
     return {
       v: 1,
-      fixtureKey: String(parsed.fixtureKey).slice(0, 120),
-      fixtureLabel: String(parsed.fixtureLabel ?? `${parsed.homeTeam} vs ${parsed.awayTeam}`).slice(0, 120),
-      homeTeam: String(parsed.homeTeam).slice(0, 80),
-      awayTeam: String(parsed.awayTeam).slice(0, 80),
+      fixtureKey: fixtureKey.slice(0, 120),
+      fixtureLabel: String(parsed.fixtureLabel ?? `${homeTeam} vs ${awayTeam}`).slice(0, 120),
+      homeTeam: homeTeam.slice(0, 80),
+      awayTeam: awayTeam.slice(0, 80),
       predictedOutcome:
         parsed.predictedOutcome === "home" ||
         parsed.predictedOutcome === "away" ||
@@ -69,14 +129,20 @@ export function decodePredictionShare(token: string): PredictionSharePayload | n
           : null,
       homeScore: typeof parsed.homeScore === "number" ? parsed.homeScore : null,
       awayScore: typeof parsed.awayScore === "number" ? parsed.awayScore : null,
-      scorerPicks: Array.isArray(parsed.scorerPicks)
-        ? (parsed.scorerPicks as PredictionSharePayload["scorerPicks"])
-        : [],
+      scorerPicks: parseScorerPicks(parsed.scorerPicks),
       displayName: parsed.displayName ? String(parsed.displayName).slice(0, 80) : null
     };
   } catch {
     return null;
   }
+}
+
+export function readShareTokenFromSearchParams(
+  searchParams: Record<string, string | string[] | undefined>
+) {
+  const raw = searchParams.d ?? searchParams.token;
+  if (Array.isArray(raw)) return normalizePredictionShareToken(raw[0]);
+  return normalizePredictionShareToken(raw);
 }
 
 export function resolveAppOrigin() {
@@ -88,7 +154,15 @@ export function resolveAppOrigin() {
   return fromEnv.replace(/\/$/, "") || "https://kickboard-production.up.railway.app";
 }
 
+/** Canonical share URL — token in the path so in-app browsers keep the full payload. */
 export function buildPredictionSharePageUrl(payload: PredictionSharePayload) {
+  const origin = resolveAppOrigin();
+  const token = encodePredictionShare(payload);
+  return `${origin}/share/prediction/${token}`;
+}
+
+/** Legacy query form; still supported via redirect on /share/prediction?d=… */
+export function buildPredictionSharePageUrlLegacy(payload: PredictionSharePayload) {
   const origin = resolveAppOrigin();
   const token = encodePredictionShare(payload);
   return `${origin}/share/prediction?d=${encodeURIComponent(token)}`;
