@@ -6,8 +6,16 @@ const MOBILE_PREDICTIONS_MEDIA = "(max-width: 900px)";
 export function scrollToPredictionOutcomeOnMobile() {
   if (typeof window === "undefined") return;
   if (!window.matchMedia(MOBILE_PREDICTIONS_MEDIA).matches) return;
+  scrollToPredictionsEditor();
+}
 
-  const target = document.getElementById(PREDICTION_OUTCOME_SECTION_ID);
+/** Scroll the prediction form into view (match picker + pick fields). */
+export function scrollToPredictionsEditor() {
+  if (typeof window === "undefined") return;
+
+  const target =
+    document.querySelector<HTMLElement>(".predictions-match-detail") ??
+    document.getElementById(PREDICTION_OUTCOME_SECTION_ID);
   if (!target) return;
 
   target.scrollIntoView({ behavior: "smooth", block: "start" });

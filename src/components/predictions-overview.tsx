@@ -62,6 +62,7 @@ type PredictionsOverviewData = {
 type PredictionsOverviewProps = {
   fixtureKey?: string | null;
   refreshToken?: number;
+  onEditPick?: (fixtureKey: string) => void;
 };
 
 function resultBadge(status: string) {
@@ -150,12 +151,14 @@ function PickCard({
   title,
   pick,
   peer,
-  shareDisplayName
+  shareDisplayName,
+  onEdit
 }: {
   title: string;
   pick: PredictionPickSummary;
   peer?: { displayName: string; username: string };
   shareDisplayName?: string | null;
+  onEdit?: () => void;
 }) {
   const lines = formatPickSummary(pick);
   const sharePayload =
@@ -180,17 +183,32 @@ function PickCard({
           ))}
         </div>
       )}
-      {sharePayload ? (
-        <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
+      {onEdit || sharePayload ? (
+        <div className="predictions-overview-pick-actions">
+          {onEdit ? (
+            <button className="button secondary predictions-overview-edit" type="button" onClick={onEdit}>
+              Edit picks
+            </button>
+          ) : null}
+          {sharePayload ? (
+            <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
+          ) : null}
+        </div>
       ) : null}
     </li>
   );
 }
 
+function overviewCardMinHeight(itemCount: number) {
+  if (itemCount <= 0) return "8rem";
+  return `${Math.min(32, 8 + itemCount * 3.75)}rem`;
+}
+
 export function PredictionsOverview({
   fixtureKey,
   refreshToken = 0,
-  viewerDisplayName = null
+  viewerDisplayName = null,
+  onEditPick
 }: PredictionsOverviewProps & { viewerDisplayName?: string | null }) {
   const [data, setData] = useState<PredictionsOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -283,7 +301,10 @@ export function PredictionsOverview({
       <div className="predictions-overview-divider" aria-hidden />
 
       <div className="predictions-overview-grid">
-        <section className="predictions-overview-card">
+        <section
+          className="predictions-overview-card predictions-overview-card--yours"
+          style={{ minHeight: overviewCardMinHeight(myPredictions.length) }}
+        >
           <header className="predictions-overview-card-header">
             <h3>Your picks</h3>
             <span className="predictions-overview-count">{myPredictions.length}</span>
@@ -298,13 +319,23 @@ export function PredictionsOverview({
                   pick={pick}
                   shareDisplayName={viewerDisplayName}
                   title={pick.fixtureLabel}
+                  onEdit={
+                    onEditPick
+                      ? () => {
+                          onEditPick(pick.fixtureKey);
+                        }
+                      : undefined
+                  }
                 />
               ))}
             </ul>
           )}
         </section>
 
-        <section className="predictions-overview-card">
+        <section
+          className="predictions-overview-card predictions-overview-card--friends"
+          style={{ minHeight: overviewCardMinHeight(connectionsForMatch.length) }}
+        >
           <header className="predictions-overview-card-header">
             <h3>Friends&apos; picks</h3>
             <span className="predictions-overview-count">{connectionsForMatch.length}</span>
