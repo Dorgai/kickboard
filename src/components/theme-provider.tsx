@@ -11,6 +11,8 @@ import {
 import {
   MOBILE_THEME_MEDIA,
   resolveTheme,
+  THEME_META_DARK,
+  THEME_META_LIGHT,
   THEME_STORAGE_KEY,
   type ThemeMode
 } from "@/lib/theme";
@@ -34,7 +36,7 @@ function applyResolvedTheme(resolved: "light" | "dark") {
   document.documentElement.dataset.theme = resolved;
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    meta.setAttribute("content", resolved === "dark" ? "#111827" : "#1A56DB");
+    meta.setAttribute("content", resolved === "dark" ? THEME_META_DARK : THEME_META_LIGHT);
   }
 }
 

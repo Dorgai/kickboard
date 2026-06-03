@@ -2,6 +2,15 @@ export type ThemeMode = "light" | "dark" | "system";
 
 export const THEME_STORAGE_KEY = "kickboard-theme";
 
+/** Browser chrome / meta theme-color when light theme is active. */
+export const THEME_META_LIGHT = "#16a34a";
+export const THEME_META_DARK = "#111827";
+
+/** Light UI brand (youthful green). Keep in sync with globals.css `:root` tokens. */
+export const LIGHT_BRAND = "#16a34a";
+export const LIGHT_BRAND_LIGHT = "#dcfce7";
+export const LIGHT_ACCENT = "#16a34a";
+
 /** Viewports treated as mobile for default light theme when mode is Auto. */
 export const MOBILE_THEME_MEDIA = "(max-width: 768px)";
 
