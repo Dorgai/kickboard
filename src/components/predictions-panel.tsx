@@ -11,7 +11,10 @@ import {
   useFixtureOptions,
   type WorldCupGroupInput
 } from "@/components/fixture-match-picker";
-import { scrollToPredictionOutcomeOnMobile } from "@/lib/scroll-to-prediction-outcome";
+import {
+  scrollToPredictionOutcomeOnMobile,
+  scrollToPredictionsEditor
+} from "@/lib/scroll-to-prediction-outcome";
 
 type PredictionsPanelProps = {
   groups?: WorldCupGroupInput[];
@@ -50,6 +53,22 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     scrollToOutcomeAfterSelect.current = true;
     setSelectedKey(key);
   }, []);
+
+  const handleEditPick = useCallback(
+    (key: string) => {
+      const exists = fixtures.some((fixture) => fixture.key === key);
+      if (!exists) return;
+      setSelectedKey(key);
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("predictionsFixture", key);
+        url.hash = "predictions";
+        window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+      window.requestAnimationFrame(() => scrollToPredictionsEditor());
+    },
+    [fixtures]
+  );
 
   useEffect(() => {
     if (!selectedKey || !scrollToOutcomeAfterSelect.current) return;
@@ -98,6 +117,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
           fixtureKey={selectedKey}
           refreshToken={overviewRefresh}
           viewerDisplayName={viewerDisplayName}
+          onEditPick={handleEditPick}
         />
 
         <UserPickActivityPanel refreshToken={activityRefresh} />
