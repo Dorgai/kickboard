@@ -1,8 +1,8 @@
-/** Fireworks + confetti while the welcome dialog is open (new joiners). */
+/** Confetti bursts for welcome / returning-user dialogs. */
 
-const WELCOME_Z_INDEX = 10060;
+const CELEBRATION_Z_INDEX = 10060;
 
-const WELCOME_COLORS = [
+const CELEBRATION_COLORS = [
   "#16a34a",
   "#22c55e",
   "#86efac",
@@ -36,9 +36,9 @@ export function startWelcomeFireworks(): () => void {
     if (cancelled) return;
 
     const defaults = {
-      zIndex: WELCOME_Z_INDEX,
+      zIndex: CELEBRATION_Z_INDEX,
       disableForReducedMotion: true,
-      colors: WELCOME_COLORS
+      colors: CELEBRATION_COLORS
     };
 
     function burst(options: Parameters<typeof confetti>[0]) {
@@ -117,6 +117,76 @@ export function startWelcomeFireworks(): () => void {
   return () => {
     cancelled = true;
     if (intervalId !== undefined) window.clearInterval(intervalId);
+    for (const id of timeoutIds) window.clearTimeout(id);
+    timeoutIds.length = 0;
+  };
+}
+
+/** Shorter, softer burst when returning users open the checkpoint dialog. */
+export function startWelcomeBackCelebration(): () => void {
+  if (typeof window === "undefined") return () => undefined;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => undefined;
+
+  let cancelled = false;
+  const timeoutIds: number[] = [];
+
+  function schedule(fn: () => void, ms: number) {
+    const id = window.setTimeout(() => {
+      if (!cancelled) fn();
+    }, ms);
+    timeoutIds.push(id);
+  }
+
+  void import("canvas-confetti").then(({ default: confetti }) => {
+    if (cancelled) return;
+
+    const defaults = {
+      zIndex: CELEBRATION_Z_INDEX,
+      disableForReducedMotion: true,
+      colors: CELEBRATION_COLORS
+    };
+
+    function burst(options: Parameters<typeof confetti>[0]) {
+      if (cancelled) return;
+      void confetti({ ...defaults, ...options });
+    }
+
+    burst({
+      particleCount: 64,
+      spread: 72,
+      origin: { y: 0.58 },
+      startVelocity: 42
+    });
+    schedule(() => {
+      burst({
+        particleCount: 36,
+        angle: 60,
+        spread: 52,
+        origin: { x: 0.18, y: 0.65 },
+        startVelocity: 46
+      });
+      burst({
+        particleCount: 36,
+        angle: 120,
+        spread: 52,
+        origin: { x: 0.82, y: 0.65 },
+        startVelocity: 46
+      });
+    }, 160);
+    schedule(() => {
+      burst({
+        particleCount: 28,
+        spread: 360,
+        origin: { x: randomInRange(0.35, 0.65), y: 0.42 },
+        startVelocity: 24,
+        shapes: ["star"],
+        scalar: 0.9
+      });
+    }, 420);
+  });
+
+  return () => {
+    cancelled = true;
     for (const id of timeoutIds) window.clearTimeout(id);
     timeoutIds.length = 0;
   };

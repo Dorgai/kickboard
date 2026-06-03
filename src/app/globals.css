@@ -7467,24 +7467,93 @@ h3 {
   max-width: min(34rem, calc(100vw - 24px));
 }
 
+.session-checkpoint-dialog--joyful::backdrop {
+  background: color-mix(in srgb, var(--color-brand) 16%, var(--color-text-primary) 42%);
+}
+
 .session-checkpoint-panel {
+  border: 1px solid color-mix(in srgb, var(--color-brand) 30%, var(--color-border));
   display: grid;
   gap: 0;
   max-height: min(90vh, 720px);
   overflow: hidden;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #fbbf24 18%, transparent),
+    0 20px 40px color-mix(in srgb, var(--color-brand) 18%, transparent),
+    var(--shadow-elevation-3);
 }
 
-.session-checkpoint-header {
-  align-items: flex-start;
+.session-checkpoint-hero {
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--color-brand) 24%, var(--color-surface)) 0%,
+    color-mix(in srgb, #38bdf8 10%, var(--color-surface)) 45%,
+    color-mix(in srgb, #fbbf24 14%, var(--color-surface)) 100%
+  );
+  border-bottom: 1px solid color-mix(in srgb, var(--color-brand) 22%, var(--color-border));
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 22px 48px 16px 20px;
+  position: relative;
+  text-align: center;
+}
+
+.session-checkpoint-close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+}
+
+.session-checkpoint-hero-icon {
+  align-items: center;
+  animation: welcome-dialog-pop 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  background: color-mix(in srgb, #fde047 32%, var(--color-bg));
+  border-radius: 999px;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-brand) 24%, transparent);
+  color: var(--color-brand);
+  display: inline-flex;
+  height: 3.5rem;
+  justify-content: center;
+  width: 3.5rem;
 }
 
 .session-checkpoint-title {
-  color: var(--color-text-primary);
-  font-size: clamp(1.25rem, 4vw, 1.5rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  background: linear-gradient(
+    115deg,
+    var(--color-text-primary) 0%,
+    color-mix(in srgb, var(--color-brand) 50%, var(--color-text-primary)) 100%
+  );
+  background-clip: text;
+  font-size: clamp(1.35rem, 4.5vw, 1.65rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
   margin: 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@supports not (background-clip: text) {
+  .session-checkpoint-title {
+    -webkit-text-fill-color: unset;
+    color: var(--color-text-primary);
+  }
+}
+
+.session-checkpoint-lead {
+  color: var(--color-text-secondary);
+  font-size: clamp(0.9rem, 2.6vw, 1rem);
+  font-weight: 600;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 26rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-checkpoint-hero-icon {
+    animation: none;
+  }
 }
 
 .session-checkpoint-body {
@@ -7502,14 +7571,31 @@ h3 {
 
 .session-checkpoint-section-title {
   align-items: center;
+  background: color-mix(in srgb, var(--color-brand) 10%, var(--color-bg));
+  border-radius: 999px;
   color: var(--color-text-primary);
-  display: flex;
-  font-size: 15px;
+  display: inline-flex;
+  font-size: 13px;
   font-weight: 800;
   gap: 8px;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
   line-height: 1.2;
   margin: 0;
+  padding: 6px 12px;
+  width: fit-content;
+}
+
+.session-checkpoint-section--upcoming .session-checkpoint-section-title {
+  background: color-mix(in srgb, #38bdf8 14%, var(--color-bg));
+}
+
+.session-checkpoint-section--performance .session-checkpoint-section-title {
+  background: color-mix(in srgb, #fbbf24 18%, var(--color-bg));
+}
+
+.session-checkpoint-section-title svg {
+  color: var(--color-brand);
+  flex-shrink: 0;
 }
 
 .session-checkpoint-empty {
@@ -7529,12 +7615,18 @@ h3 {
 .session-checkpoint-match {
   align-items: center;
   background: color-mix(in srgb, var(--color-bg) 65%, var(--color-surface));
-  border: 1px solid var(--color-border);
+  border: 1px solid color-mix(in srgb, var(--color-brand) 18%, var(--color-border));
   border-radius: 12px;
   display: flex;
   gap: 10px;
   justify-content: space-between;
   padding: 10px 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.session-checkpoint-match:hover {
+  border-color: color-mix(in srgb, var(--color-brand) 35%, var(--color-border));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-brand) 12%, transparent);
 }
 
 [data-theme="light"] .session-checkpoint-match,
@@ -7619,7 +7711,24 @@ h3 {
 }
 
 .session-checkpoint-stat--primary {
-  background: color-mix(in srgb, var(--color-brand) 12%, var(--color-surface));
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-brand) 22%, var(--color-surface)),
+    color-mix(in srgb, #fbbf24 12%, var(--color-surface))
+  );
+  border: 1px solid color-mix(in srgb, var(--color-brand) 28%, transparent);
+}
+
+.session-checkpoint-stat:nth-child(2) {
+  background: color-mix(in srgb, #22c55e 12%, var(--color-surface));
+}
+
+.session-checkpoint-stat:nth-child(3) {
+  background: color-mix(in srgb, #38bdf8 10%, var(--color-surface));
+}
+
+.session-checkpoint-stat:nth-child(4) {
+  background: color-mix(in srgb, #fbbf24 10%, var(--color-surface));
 }
 
 .session-checkpoint-stat-value {
@@ -7627,10 +7736,6 @@ h3 {
   font-size: 1.35rem;
   font-weight: 800;
   line-height: 1.1;
-}
-
-.session-checkpoint-dialog .timeline-modal-header h2 {
-  color: var(--color-text-primary);
 }
 
 .session-checkpoint-stat-label {
@@ -7678,17 +7783,23 @@ h3 {
 }
 
 .session-checkpoint-recent-points {
-  color: var(--color-brand);
+  color: color-mix(in srgb, var(--color-brand) 85%, #16a34a);
   font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
 }
 
 .session-checkpoint-footer {
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid color-mix(in srgb, var(--color-brand) 18%, var(--color-border));
   display: grid;
   gap: 8px;
-  padding-top: 12px;
+  padding: 14px 18px 18px;
+}
+
+.session-checkpoint-cta {
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-brand) 32%, transparent);
+  font-weight: 800;
+  min-height: 46px;
 }
 
 .session-checkpoint-footnote {
