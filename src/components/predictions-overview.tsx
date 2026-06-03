@@ -11,6 +11,7 @@ import { PREDICTION_BLOCKS, PREDICTION_BLOCK_SHORT } from "@/lib/fixture-predict
 import { PredictionShareButtons } from "@/components/prediction-share-buttons";
 import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
 import type { PredictionSharePayload } from "@/lib/predictions/share";
+import { dismissSessionCheckpoint } from "@/lib/session-checkpoint/storage";
 
 type CategoryStats = {
   won: number;
@@ -322,6 +323,7 @@ export function PredictionsOverview({
                   onEdit={
                     onEditPick
                       ? () => {
+                          dismissSessionCheckpoint();
                           onEditPick(pick.fixtureKey);
                         }
                       : undefined

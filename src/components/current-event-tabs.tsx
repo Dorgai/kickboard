@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { FloatingFanChat } from "@/components/floating-fan-chat";
+import { NAVIGATE_PREDICTIONS_EVENT } from "@/lib/session-checkpoint/navigate";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { PredictionsPanel } from "@/components/predictions-panel";
@@ -203,6 +204,16 @@ export function CurrentEventTabs({
     window.addEventListener("hashchange", applyHash);
     return () => window.removeEventListener("hashchange", applyHash);
   }, [applyHash]);
+
+  useEffect(() => {
+    function onNavigatePredictions() {
+      setActiveTab("predictions");
+      setChatOpen(false);
+    }
+
+    window.addEventListener(NAVIGATE_PREDICTIONS_EVENT, onNavigatePredictions);
+    return () => window.removeEventListener(NAVIGATE_PREDICTIONS_EVENT, onNavigatePredictions);
+  }, []);
 
   useEffect(() => {
     if (groups.length && !groups.some((group) => group.group === activeGroupLetter)) {

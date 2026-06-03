@@ -1,4 +1,5 @@
 export const SESSION_CHECKPOINT_DISMISSED_AT_KEY = "kickboard-session-checkpoint-dismissed-at";
+export const SESSION_CHECKPOINT_CLOSE_EVENT = "kickboard:session-checkpoint-close";
 export const SESSION_CHECKPOINT_INTERVAL_MS = 2 * 60 * 60 * 1000;
 
 export function getCheckpointDismissedAt(): number {
@@ -19,6 +20,13 @@ export function markCheckpointDismissed() {
   } catch {
     /* ignore */
   }
+}
+
+/** Dismiss the check-in dialog without a full page reload (e.g. when editing a pick). */
+export function dismissSessionCheckpoint() {
+  markCheckpointDismissed();
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(SESSION_CHECKPOINT_CLOSE_EVENT));
 }
 
 export function isCheckpointIntervalElapsed(now = Date.now()) {

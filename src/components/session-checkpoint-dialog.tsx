@@ -5,7 +5,8 @@ import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
   isCheckpointIntervalElapsed,
-  markCheckpointDismissed
+  markCheckpointDismissed,
+  SESSION_CHECKPOINT_CLOSE_EVENT
 } from "@/lib/session-checkpoint/storage";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 import { hasSeenWelcome } from "@/lib/welcome";
@@ -73,7 +74,7 @@ export function SessionCheckpointDialog() {
   }, [data]);
 
   useEffect(() => {
-    if (prevStatusRef.current !== "authenticated" && status === "authenticated") {
+    if (prevStatusRef.current === "unauthenticated" && status === "authenticated") {
       loginPulseRef.current = true;
     }
     prevStatusRef.current = status;
@@ -123,6 +124,15 @@ export function SessionCheckpointDialog() {
       setOpen(false);
     }
   }, [status]);
+
+  useEffect(() => {
+    function onForceClose() {
+      setOpen(false);
+    }
+
+    window.addEventListener(SESSION_CHECKPOINT_CLOSE_EVENT, onForceClose);
+    return () => window.removeEventListener(SESSION_CHECKPOINT_CLOSE_EVENT, onForceClose);
+  }, []);
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.user?.onboardingComplete) return;

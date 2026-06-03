@@ -15,6 +15,10 @@ import {
   scrollToPredictionOutcomeOnMobile,
   scrollToPredictionsEditor
 } from "@/lib/scroll-to-prediction-outcome";
+import {
+  NAVIGATE_PREDICTIONS_EVENT,
+  type NavigatePredictionsDetail
+} from "@/lib/session-checkpoint/navigate";
 
 type PredictionsPanelProps = {
   groups?: WorldCupGroupInput[];
@@ -76,6 +80,18 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     const frame = window.requestAnimationFrame(() => scrollToPredictionOutcomeOnMobile());
     return () => window.cancelAnimationFrame(frame);
   }, [selectedKey]);
+
+  useEffect(() => {
+    function onNavigatePredictions(event: Event) {
+      const detail = (event as CustomEvent<NavigatePredictionsDetail>).detail;
+      const key = detail?.fixtureKey?.trim();
+      if (!key) return;
+      handleEditPick(key);
+    }
+
+    window.addEventListener(NAVIGATE_PREDICTIONS_EVENT, onNavigatePredictions);
+    return () => window.removeEventListener(NAVIGATE_PREDICTIONS_EVENT, onNavigatePredictions);
+  }, [handleEditPick]);
 
   const viewerDisplayName = session?.user?.name ?? null;
 
