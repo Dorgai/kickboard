@@ -159,6 +159,102 @@ button:disabled {
   width: 40px;
 }
 
+.brand-logo {
+  border-radius: 12px;
+  flex-shrink: 0;
+  height: 40px;
+  width: 40px;
+}
+
+.pwa-install-banner {
+  inset-inline: var(--page-gutter);
+  margin-block: 0 12px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.pwa-install-banner-inner {
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-surface);
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.pwa-install-banner-icon img {
+  display: block;
+}
+
+.pwa-install-banner-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-install-banner-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.pwa-install-banner-lead {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pwa-install-inline-icon {
+  display: inline;
+  vertical-align: -2px;
+}
+
+.pwa-install-banner-status {
+  color: var(--color-brand);
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+
+.pwa-install-banner-actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.pwa-install-banner-badge {
+  align-items: center;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  font-size: 12px;
+  gap: 4px;
+}
+
+.pwa-install-banner-close {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0;
+}
+
+@media (min-width: 1025px) {
+  .pwa-install-banner {
+    display: none;
+  }
+}
+
 .tournament-switcher,
 .nav-actions button:not(.theme-selector button) {
   background: var(--color-surface);

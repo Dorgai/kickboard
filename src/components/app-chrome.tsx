@@ -35,9 +35,7 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
     <header className="app-header">
       <div className="nav-shell" aria-label="Primary navigation">
         <Link className="brand" href="/" aria-label="Kickboard home">
-          <span className="brand-mark" aria-hidden="true">
-            KB
-          </span>
+          <img alt="" className="brand-logo" height={40} src="/logo.svg" width={40} />
           <span>KICKBOARD</span>
         </Link>
 
