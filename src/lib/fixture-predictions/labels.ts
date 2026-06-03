@@ -22,5 +22,7 @@ export const PREDICTION_HINTS = {
   outcomeEmpty: "Choose home, away, or draw",
   scoreOptional: "Optional — skip if not guessing score",
   scorersLead: "Tap players — up to 8 goals total",
+  scorersShowList: "Tap here to show the player list",
+  scorersHideList: "Tap to hide the player list",
   saveButton: "Save picks"
 } as const;

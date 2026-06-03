@@ -390,11 +390,23 @@ export function FixturePredictionsForm({
           <button
             aria-controls="fixture-scorers-picker"
             aria-expanded={scorersExpanded}
-            className="fixture-prediction-scorers-toggle"
+            aria-label={
+              scorersExpanded
+                ? `${PREDICTION_BLOCKS.scorers} — ${PREDICTION_HINTS.scorersHideList}`
+                : `${PREDICTION_BLOCKS.scorers} — ${PREDICTION_HINTS.scorersShowList}`
+            }
+            className={`fixture-prediction-scorers-toggle${
+              scorersExpanded ? "" : " fixture-prediction-scorers-toggle--collapsed"
+            }`}
             type="button"
             onClick={() => setScorersExpanded((open) => !open)}
           >
-            <span>{PREDICTION_BLOCKS.scorers}</span>
+            <span className="fixture-prediction-scorers-toggle-copy">
+              <span className="fixture-prediction-scorers-toggle-title">{PREDICTION_BLOCKS.scorers}</span>
+              <span className="fixture-prediction-scorers-toggle-hint">
+                {scorersExpanded ? PREDICTION_HINTS.scorersHideList : PREDICTION_HINTS.scorersShowList}
+              </span>
+            </span>
             <span aria-hidden className="fixture-prediction-scorers-chevron" />
           </button>
           {groupedScorerPicks.length > 0 ? (
