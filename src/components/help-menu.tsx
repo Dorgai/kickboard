@@ -1,7 +1,14 @@
 "use client";
 
-import { CircleHelp, ChevronDown, MessageCircleQuestion, Sparkles } from "lucide-react";
+import {
+  CircleHelp,
+  ChevronDown,
+  Menu,
+  MessageCircleQuestion,
+  Sparkles
+} from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { ThemeSelector } from "@/components/theme-selector";
 import { OPEN_HELP_CENTER_EVENT, requestHelpCenter, requestWelcomeDialog } from "@/lib/help/events";
 
 export function HelpMenu() {
@@ -27,22 +34,25 @@ export function HelpMenu() {
   }, []);
 
   return (
-    <div className="help-menu" ref={rootRef}>
+    <div className="help-menu app-menu" ref={rootRef}>
       <button
         aria-controls={menuId}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="help-menu-trigger"
+        className="help-menu-trigger app-menu-trigger"
         type="button"
         onClick={() => setOpen((value) => !value)}
       >
-        <CircleHelp size={18} aria-hidden />
-        <span>Help</span>
+        <Menu size={18} aria-hidden />
+        <span className="app-menu-trigger-label">Menu</span>
         <ChevronDown aria-hidden size={14} />
       </button>
 
       {open ? (
-        <div className="help-menu-dropdown" id={menuId} role="menu">
+        <div className="help-menu-dropdown app-menu-dropdown" id={menuId} role="menu">
+          <ThemeSelector variant="menu" />
+          <div className="app-menu-divider" role="separator" />
+          <p className="app-menu-section-label">Help</p>
           <button
             className="help-menu-item"
             role="menuitem"

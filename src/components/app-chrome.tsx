@@ -7,7 +7,6 @@ import { GlobalOverlays } from "@/components/global-overlays";
 import { HelpMenu } from "@/components/help-menu";
 import { HeaderUserMenu } from "@/components/header-user-menu";
 import { NotificationsCenter } from "@/components/notifications-center";
-import { ThemeSelector } from "@/components/theme-selector";
 import { navigation } from "@/lib/kickboard-data";
 
 type AppChromeProps = {
@@ -67,7 +66,6 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
 
         <div className="nav-actions">
           <HelpMenu />
-          <ThemeSelector />
           <NotificationsCenter />
           <HeaderUserMenu />
         </div>
