@@ -3742,6 +3742,52 @@ h3 {
   padding: 0;
 }
 
+.fixture-prediction-scorers-toggle {
+  align-items: center;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 8px;
+  justify-content: space-between;
+  letter-spacing: 0.03em;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.fixture-prediction-scorers-toggle:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.fixture-prediction-scorers-chevron {
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  flex-shrink: 0;
+  height: 7px;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  width: 7px;
+}
+
+.fixture-prediction-scorers-toggle[aria-expanded="true"] .fixture-prediction-scorers-chevron {
+  margin-top: 4px;
+  transform: rotate(-135deg);
+}
+
+.fixture-prediction-scorers-panel {
+  display: grid;
+  gap: 10px;
+}
+
 .fixture-scorer-pool-list,
 .fixture-scorer-selected {
   display: flex;

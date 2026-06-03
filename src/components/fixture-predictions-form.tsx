@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/components/toast-provider";
 import { PredictionShareButtons } from "@/components/prediction-share-buttons";
@@ -61,6 +61,8 @@ export function FixturePredictionsForm({
   const [scorerPicks, setScorerPicks] = useState<ScorerPick[]>([]);
   const [players, setPlayers] = useState<SquadPoolPlayer[]>([]);
   const [scorerSearch, setScorerSearch] = useState("");
+  const [scorersExpanded, setScorersExpanded] = useState(false);
+  const scorerSearchRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [poolLoading, setPoolLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -97,6 +99,12 @@ export function FixturePredictionsForm({
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (scorersExpanded) {
+      scorerSearchRef.current?.focus();
+    }
+  }, [scorersExpanded]);
 
   useEffect(() => {
     let cancelled = false;
@@ -378,8 +386,17 @@ export function FixturePredictionsForm({
 
       {!coachBoard ? (
         <fieldset className="fixture-prediction-field fixture-prediction-field--scorers">
-          <legend className="fixture-prediction-field-label">{PREDICTION_BLOCKS.scorers}</legend>
-          <p className="fixture-prediction-field-hint">{PREDICTION_HINTS.scorersLead}</p>
+          <legend className="sr-only">{PREDICTION_BLOCKS.scorers}</legend>
+          <button
+            aria-controls="fixture-scorers-picker"
+            aria-expanded={scorersExpanded}
+            className="fixture-prediction-scorers-toggle"
+            type="button"
+            onClick={() => setScorersExpanded((open) => !open)}
+          >
+            <span>{PREDICTION_BLOCKS.scorers}</span>
+            <span aria-hidden className="fixture-prediction-scorers-chevron" />
+          </button>
           {groupedScorerPicks.length > 0 ? (
             <ul className="fixture-scorer-selected">
               {groupedScorerPicks.map(({ pick, goals }) => (
@@ -419,37 +436,43 @@ export function FixturePredictionsForm({
               ))}
             </ul>
           ) : null}
-          <input
-            aria-label="Search scorers"
-            className="feed-control-input"
-            placeholder="Search players"
-            value={scorerSearch}
-            onChange={(event) => setScorerSearch(event.target.value)}
-          />
-          {poolLoading ? <p className="inline-status">Loading players…</p> : null}
-          <ul className="fixture-scorer-pool-list">
-            {filteredPlayers.slice(0, 40).map((player) => {
-              const goals = scorerCount(player.playerId);
-              return (
-                <li key={player.playerId}>
-                  <button
-                    className={`fixture-scorer-chip${goals > 0 ? " fixture-scorer-chip--selected" : ""}`}
-                    disabled={scorerPicks.length >= MAX_SCORER_PICKS}
-                    type="button"
-                    onClick={() => addScorerGoal(player)}
-                  >
-                    <span className="fixture-scorer-chip-name">
-                      {player.name}
-                      {goals > 0 ? (
-                        <span className="fixture-scorer-chip-count"> ×{goals}</span>
-                      ) : null}
-                    </span>
-                    <span className="fixture-scorer-chip-side">{player.teamName}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          {scorersExpanded ? (
+            <div className="fixture-prediction-scorers-panel" id="fixture-scorers-picker">
+              <p className="fixture-prediction-field-hint">{PREDICTION_HINTS.scorersLead}</p>
+              <input
+                ref={scorerSearchRef}
+                aria-label="Search scorers"
+                className="feed-control-input"
+                placeholder="Search players"
+                value={scorerSearch}
+                onChange={(event) => setScorerSearch(event.target.value)}
+              />
+              {poolLoading ? <p className="inline-status">Loading players…</p> : null}
+              <ul className="fixture-scorer-pool-list">
+                {filteredPlayers.slice(0, 40).map((player) => {
+                  const goals = scorerCount(player.playerId);
+                  return (
+                    <li key={player.playerId}>
+                      <button
+                        className={`fixture-scorer-chip${goals > 0 ? " fixture-scorer-chip--selected" : ""}`}
+                        disabled={scorerPicks.length >= MAX_SCORER_PICKS}
+                        type="button"
+                        onClick={() => addScorerGoal(player)}
+                      >
+                        <span className="fixture-scorer-chip-name">
+                          {player.name}
+                          {goals > 0 ? (
+                            <span className="fixture-scorer-chip-count"> ×{goals}</span>
+                          ) : null}
+                        </span>
+                        <span className="fixture-scorer-chip-side">{player.teamName}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
         </fieldset>
       ) : null}
 
