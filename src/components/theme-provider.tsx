@@ -9,6 +9,7 @@ import {
   useState
 } from "react";
 import {
+  MOBILE_THEME_MEDIA,
   resolveTheme,
   THEME_STORAGE_KEY,
   type ThemeMode
@@ -55,14 +56,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (mode !== "system") return;
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const colorScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const viewport = window.matchMedia(MOBILE_THEME_MEDIA);
     function onChange() {
       const next = resolveTheme("system");
       setResolved(next);
       applyResolvedTheme(next);
     }
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
+    colorScheme.addEventListener("change", onChange);
+    viewport.addEventListener("change", onChange);
+    return () => {
+      colorScheme.removeEventListener("change", onChange);
+      viewport.removeEventListener("change", onChange);
+    };
   }, [mode]);
 
   const setMode = useCallback((next: ThemeMode) => {
