@@ -1,9 +1,10 @@
 "use client";
 
+import { Copy, Loader2, Share2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useToastOptional } from "@/components/toast-provider";
 import {
   buildFacebookShareUrl,
-  buildPredictionAppDeepLink,
   buildPredictionShareCaption,
   type PredictionSharePayload
 } from "@/lib/predictions/share";
@@ -19,13 +20,34 @@ type ShareLinkState =
   | { status: "ready"; url: string; mode: "short" | "embedded" }
   | { status: "error"; message: string };
 
+function IconFacebook({ size = 12 }: { size?: number }) {
+  return (
+    <svg aria-hidden height={size} viewBox="0 0 24 24" width={size}>
+      <path
+        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function IconInstagram({ size = 12 }: { size?: number }) {
+  return (
+    <svg aria-hidden height={size} viewBox="0 0 24 24" width={size}>
+      <path
+        d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.974.974 1.246 2.241 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.974.974-2.241 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.974-.974-1.246-2.241-1.308-3.608C2.175 15.747 2.163 15.367 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.974-.974 2.241-1.246 3.608-1.308C8.416 2.175 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.332.013 7.052.072 5.775.132 4.602.333 3.678 1.257 2.753 2.182 2.553 3.354 2.493 4.631 2.433 5.911 2.42 6.32 2.42 12c0 5.741.013 6.15.072 7.43.06 1.277.26 2.45 1.185 3.374.924.924 2.097 1.124 3.374 1.185 1.28.059 1.689.072 7.43.072s6.15-.013 7.43-.072c1.277-.06 2.45-.26 3.374-1.185.924-.924 1.124-2.097 1.185-3.374.059-1.28.072-1.689.072-7.43s-.013-6.15-.072-7.43c-.06-1.277-.26-2.45-1.185-3.374-.924-.924-2.097-1.124-3.374-1.185C18.15.013 17.741 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export function PredictionShareButtons({
   payload,
   disabled = false,
   className = ""
 }: PredictionShareButtonsProps) {
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const toast = useToastOptional();
   const [canNativeShare, setCanNativeShare] = useState(false);
   const [shareLink, setShareLink] = useState<ShareLinkState>({ status: "loading" });
 
@@ -69,17 +91,12 @@ export function PredictionShareButtons({
             url: body.url,
             mode: "embedded"
           });
-          setError(
-            "Using a long link — Instagram and Facebook may break it. Prefer a short /share/p/… link after database setup."
-          );
           return;
         }
 
         setShareLink({
           status: "error",
-          message:
-            body.error ??
-            "Could not create a short share link. Wait a moment and try again, or use Copy after “Short link ready” appears."
+          message: body.error ?? "Could not create share link."
         });
       } catch (requestError) {
         if (cancelled || (requestError instanceof Error && requestError.name === "AbortError")) {
@@ -87,7 +104,7 @@ export function PredictionShareButtons({
         }
         setShareLink({
           status: "error",
-          message: "Could not reach the server to create a share link. Check your connection and try again."
+          message: "Could not reach the server."
         });
       }
     }
@@ -108,47 +125,43 @@ export function PredictionShareButtons({
 
   const sharePageUrl = shareLink.status === "ready" ? shareLink.url : "";
   const caption = useMemo(() => buildPredictionShareCaption(payload), [payload]);
-  const appLink = useMemo(
-    () => buildPredictionAppDeepLink(payload.fixtureKey),
-    [payload.fixtureKey]
-  );
 
   const shareText = useMemo(
     () => (sharePageUrl ? `${caption}\n\n${sharePageUrl}` : caption),
     [caption, sharePageUrl]
   );
 
-  const clearFeedback = useCallback(() => {
-    setNotice(null);
-    setError(null);
-  }, []);
-
   const linkNotReady =
     shareLink.status !== "ready" || !sharePageUrl || shareLink.mode === "embedded";
 
+  const groupTitle =
+    shareLink.status === "loading"
+      ? "Preparing share link…"
+      : shareLink.status === "error"
+        ? shareLink.message
+        : "Share your pick";
+
+  const notify = useCallback(
+    (message: string, variant: "success" | "warning" = "success") => {
+      toast?.showToast({ message, variant });
+    },
+    [toast]
+  );
+
   async function copyCaption() {
-    clearFeedback();
-    if (linkNotReady) {
-      setError("Still preparing your share link…");
-      return;
-    }
+    if (linkNotReady) return;
     try {
       await navigator.clipboard.writeText(shareText);
-      setNotice("Caption and link copied.");
+      notify("Caption and link copied.");
     } catch {
-      setError("Could not copy — select and copy manually.");
+      notify("Could not copy.", "warning");
     }
   }
 
   async function shareNative() {
-    clearFeedback();
-    if (linkNotReady) {
-      setError("Still preparing your share link…");
-      return;
-    }
+    if (linkNotReady) return;
     if (!navigator.share) {
       await copyCaption();
-      setNotice("Caption copied. Paste into Instagram, Stories, or a post.");
       return;
     }
     try {
@@ -157,91 +170,86 @@ export function PredictionShareButtons({
         text: caption,
         url: sharePageUrl
       });
-      setNotice("Shared.");
+      notify("Shared.");
     } catch (shareError) {
       if (shareError instanceof Error && shareError.name === "AbortError") return;
       await copyCaption();
-      setNotice("Caption copied. Paste into your social app.");
     }
   }
 
   function shareFacebook() {
-    clearFeedback();
-    if (linkNotReady) {
-      setError("Still preparing your share link…");
-      return;
-    }
+    if (linkNotReady) return;
     const url = buildFacebookShareUrl(sharePageUrl);
     window.open(url, "_blank", "noopener,noreferrer,width=600,height=720");
-    setNotice("Opened Facebook share window.");
-  }
-
-  async function shareInstagram() {
-    clearFeedback();
-    await shareNative();
-    if (!navigator.share) {
-      setNotice("Caption copied. Open Instagram and paste into a story, post, or DM.");
-    }
   }
 
   if (!canShare) return null;
 
+  const buttonsDisabled = disabled || linkNotReady;
+
   return (
-    <div className={`prediction-share${className ? ` ${className}` : ""}`}>
-      <p className="prediction-share-label">Share your pick</p>
-      {shareLink.status === "loading" ? (
-        <p className="inline-status">Preparing short share link…</p>
-      ) : null}
-      {shareLink.status === "error" ? (
-        <p className="inline-status">{shareLink.message}</p>
-      ) : null}
-      {shareLink.status === "ready" && shareLink.mode === "short" ? (
-        <p className="prediction-share-hint">
-          Short link ready — safe to paste in texts and social apps.
-        </p>
-      ) : null}
-      <div className="prediction-share-actions">
+    <div
+      className={`prediction-share${className ? ` ${className}` : ""}`}
+      title={groupTitle}
+    >
+      <div
+        aria-label={groupTitle}
+        className="prediction-share-actions"
+        role="group"
+        title={groupTitle}
+      >
+        {shareLink.status === "loading" ? (
+          <span
+            aria-hidden
+            className="prediction-share-icon-btn prediction-share-icon-btn--loading"
+            title="Preparing share link…"
+          >
+            <Loader2 className="prediction-share-icon-spin" size={12} />
+          </span>
+        ) : null}
         <button
-          className="button secondary prediction-share-btn prediction-share-btn--facebook"
-          disabled={disabled || linkNotReady}
+          aria-label="Share on Facebook"
+          className="prediction-share-icon-btn prediction-share-icon-btn--facebook"
+          disabled={buttonsDisabled}
+          title="Share on Facebook"
           type="button"
           onClick={shareFacebook}
         >
-          Facebook
+          <IconFacebook />
         </button>
         <button
-          className="button secondary prediction-share-btn prediction-share-btn--instagram"
-          disabled={disabled || linkNotReady}
+          aria-label="Share on Instagram"
+          className="prediction-share-icon-btn prediction-share-icon-btn--instagram"
+          disabled={buttonsDisabled}
+          title="Share on Instagram"
           type="button"
-          onClick={() => void shareInstagram()}
+          onClick={() => void shareNative()}
         >
-          Instagram
+          <IconInstagram />
         </button>
         {canNativeShare ? (
           <button
-            className="button secondary prediction-share-btn"
-            disabled={disabled || linkNotReady}
+            aria-label="More share options"
+            className="prediction-share-icon-btn"
+            disabled={buttonsDisabled}
+            title="More share options"
             type="button"
             onClick={() => void shareNative()}
           >
-            More…
+            <Share2 size={12} />
           </button>
         ) : null}
         <button
-          className="button secondary prediction-share-btn"
-          disabled={disabled || linkNotReady}
+          aria-label="Copy caption and link"
+          className="prediction-share-icon-btn"
+          disabled={buttonsDisabled}
+          title="Copy caption and link"
           type="button"
           onClick={() => void copyCaption()}
         >
-          Copy
+          <Copy size={12} />
         </button>
       </div>
-      <p className="prediction-share-hint">
-        Friends should open the Kickboard link (not only the caption). You can also send them{" "}
-        <a href={appLink}>this match on Kickboard</a>.
-      </p>
-      {notice ? <p className="inline-status community-notice">{notice}</p> : null}
-      {error ? <p className="inline-status">{error}</p> : null}
     </div>
   );
 }
