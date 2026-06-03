@@ -2,6 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { ActivityTracker } from "@/components/activity-tracker";
+import { PredictionCelebrationListener } from "@/components/prediction-celebration-listener";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/components/toast-provider";
 
@@ -11,6 +12,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider>
         <ToastProvider>
           <ActivityTracker />
+          <PredictionCelebrationListener />
           {children}
         </ToastProvider>
       </ThemeProvider>
