@@ -2200,7 +2200,24 @@ h3 {
   }
 
   .match-coach-board-panel .squad-team-bench-groups {
-    max-height: min(12rem, 24vh);
+    max-height: none;
+    overflow: visible;
+  }
+
+  .match-coach-board-panel .squad-team-bench-row {
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .match-coach-board-panel .squad-team-bench-row > li {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
   }
 
   .match-coach-board-panel .squad-builder-toolbar-title .squad-builder-progress {
@@ -3923,6 +3940,8 @@ h3 {
   box-shadow: var(--shadow-surface);
   display: grid;
   gap: 18px;
+  max-width: 100%;
+  min-width: 0;
   padding: 16px 18px;
 }
 
@@ -3936,7 +3955,9 @@ h3 {
   display: grid;
   gap: 10px;
   margin: 0;
+  max-width: 100%;
   min-width: 0;
+  overflow: hidden;
   padding: 0;
 }
 
@@ -3983,10 +4004,13 @@ h3 {
   flex-direction: row;
   flex-wrap: nowrap;
   -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
+  width: 100%;
 }
 
 [data-theme="dark"] .fixture-prediction-outcome-list {
@@ -4013,6 +4037,10 @@ h3 {
 @media (max-width: 1023px) {
   .fixture-prediction-outcome-list {
     overscroll-behavior-x: contain;
+  }
+
+  .fixture-prediction-outcome-option {
+    min-width: min(40vw, 10.5rem);
   }
 }
 
@@ -9816,13 +9844,58 @@ code {
     width: fit-content;
   }
 
+  .squad-team-bench-groups {
+    max-height: none;
+    overflow: visible;
+  }
+
   .squad-team-bench-row {
-    justify-content: center;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+    margin-inline: -2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    padding: 2px 2px 6px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .squad-team-bench-row > li {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
   }
 
   .squad-player-chip--bench {
     justify-content: center;
+    max-width: min(72vw, 14rem);
     text-align: center;
+  }
+
+  .fixture-predictions-form {
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .fixture-prediction-outcome-option {
+    min-width: min(76vw, 10rem);
+  }
+
+  .fixture-prediction-outcome-body {
+    min-width: 0;
+    padding: 10px 8px;
+  }
+
+  .fixture-prediction-outcome-body .team-label,
+  .fixture-prediction-outcome-body .team-label-stacked {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .fixture-prediction-outcome-text {
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .current-event-overview-heading {
