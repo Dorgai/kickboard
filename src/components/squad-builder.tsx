@@ -63,7 +63,6 @@ export function SquadBuilder({
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [homePlayers, setHomePlayers] = useState<SquadPoolPlayer[]>([]);
   const [awayPlayers, setAwayPlayers] = useState<SquadPoolPlayer[]>([]);
-  const [poolLabel, setPoolLabel] = useState<string | null>(null);
   const [poolLoading, setPoolLoading] = useState(true);
   const [poolError, setPoolError] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
@@ -202,12 +201,6 @@ export function SquadBuilder({
             );
             setHomePlayers(mergedHome);
             setAwayPlayers(mergedAway);
-            const sourceHint = poolPayload.source?.includes("wikipedia")
-              ? " · Wikipedia squads"
-              : poolPayload.source?.includes("api-football")
-                ? " · API-Football squads"
-                : "";
-            setPoolLabel(`${poolPayload.seasonName} · ${poolPayload.matchLabel}${sourceHint}`);
             setPoolError(null);
           } else {
             const poolFail = (await poolRes.json()) as { error?: string };
@@ -382,21 +375,10 @@ export function SquadBuilder({
 
   return (
     <form className="squad-builder" onSubmit={saveSquad}>
-      <header className="squad-builder-toolbar">
-        <div className="squad-builder-toolbar-title">
-          <p className="squad-builder-progress">
-            {homeTeam} {homeFilled}/{SLOTS_PER_TEAM} ({formations.home}) · {awayTeam} {awayFilled}/
-            {SLOTS_PER_TEAM} ({formations.away})
-            {squadId ? " · saved board" : " · new board"}
-          </p>
-        </div>
-      </header>
-
       {loadState === "loading" ? <p className="inline-status">Loading your squad…</p> : null}
 
       <div className="squad-builder-layout squad-builder-layout--stacked">
         <div className="squad-builder-pitch-stack">
-          {poolLabel ? <p className="squad-team-benches-source">{poolLabel}</p> : null}
           {pitchHeader}
           <div className="squad-builder-pitch-stage">
             <SquadPitch
