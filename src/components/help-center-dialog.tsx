@@ -6,6 +6,7 @@ import {
   OPEN_HELP_CENTER_EVENT,
   type HelpCenterOpenDetail
 } from "@/lib/help/events";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 
 type HelpChannel = "ai" | "admin";
@@ -34,7 +35,6 @@ export function HelpCenterDialog() {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [aiConfigured, setAiConfigured] = useState<boolean | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
@@ -56,14 +56,6 @@ export function HelpCenterDialog() {
     if (!dialog) return;
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    void fetch("/api/help/status", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((payload: { aiConfigured?: boolean }) => setAiConfigured(payload.aiConfigured ?? false))
-      .catch(() => setAiConfigured(false));
   }, [open]);
 
   useEffect(() => {
@@ -141,7 +133,14 @@ export function HelpCenterDialog() {
         <header className="help-center-header">
           <div>
             <p className="help-center-eyebrow">Help</p>
-            <h2 id={titleId}>Questions & support</h2>
+            <h2 className="panel-help-row help-center-title" id={titleId}>
+              Questions & support
+              <HelpTooltip label="How help works" size="sm">
+                <strong>Kickboard AI</strong> answers from our in-app help guides.{" "}
+                <strong>Ask admin</strong> sends your message to the Kickboard team (account issues,
+                bugs, policy).
+              </HelpTooltip>
+            </h2>
           </div>
           <button className="button secondary help-center-close" type="button" onClick={close}>
             Close
@@ -173,13 +172,6 @@ export function HelpCenterDialog() {
           </button>
         </div>
 
-        {channel === "ai" && aiConfigured === false ? (
-          <p className="help-center-note inline-status">
-            AI uses our built-in guides. Set <code>OPENAI_API_KEY</code> on the server for richer
-            answers.
-          </p>
-        ) : null}
-
         {sessionStatus === "loading" ? (
           <p className="inline-status">Checking sign-in…</p>
         ) : !signedIn ? (
@@ -191,9 +183,7 @@ export function HelpCenterDialog() {
             <div className="help-center-thread" ref={threadRef}>
               {!conversation ? (
                 <p className="help-center-placeholder">
-                  {channel === "ai"
-                    ? "Ask how Predictions, Coach Board, Community, or sign-in work."
-                    : "Describe your issue — admins see every message in Admin → Help."}
+                  {channel === "ai" ? "Ask a question below." : "Describe your issue below."}
                 </p>
               ) : (
                 <ul className="help-center-messages">
