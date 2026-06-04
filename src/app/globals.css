@@ -24,8 +24,8 @@
   --page-gutter: 24px;
   --page-padding-y: 64px;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
-  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-text-primary) 92%, var(--color-bg));
-  --kickboard-tab-active-fg: var(--color-bg);
+  --kickboard-tab-active-bg: #4b5563;
+  --kickboard-tab-active-fg: #f9fafb;
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
 }
 
@@ -3684,6 +3684,14 @@ h3 {
   margin: 0;
 }
 
+.fixture-predictions-form .feed-control-input,
+.tournament-predictions-form .feed-control-input,
+.tournament-player-pick-field .feed-control-input {
+  background: var(--color-surface);
+  box-shadow: none;
+  font-weight: 600;
+}
+
 .tournament-team-pick-grid {
   display: grid;
   gap: 8px;
@@ -4430,9 +4438,10 @@ h3 {
   align-items: center;
   -webkit-appearance: none;
   appearance: none;
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
+  box-shadow: none;
   color: var(--color-text-primary);
   cursor: pointer;
   display: flex;
@@ -4449,19 +4458,13 @@ h3 {
   width: 100%;
 }
 
-[data-theme="light"] .fixture-prediction-scorers-toggle,
-:root:not([data-theme]) .fixture-prediction-scorers-toggle {
-  background: color-mix(in srgb, var(--color-accent) 6%, #ffffff);
-  border-color: color-mix(in srgb, var(--color-accent) 40%, #d1d5db);
-}
-
-.fixture-prediction-scorers-toggle--collapsed {
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent);
-}
-
 .fixture-prediction-scorers-toggle--collapsed:hover {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  background: var(--kickboard-tab-hover-bg);
+  border-color: var(--color-border);
+}
+
+.fixture-prediction-scorers-toggle[aria-expanded="true"] {
+  box-shadow: var(--shadow-surface);
 }
 
 .fixture-prediction-scorers-toggle-copy {
@@ -4545,7 +4548,7 @@ h3 {
 }
 
 [data-theme="dark"] .fixture-scorer-chip {
-  background: var(--color-bg);
+  background: var(--color-surface);
   border-color: var(--color-border);
 }
 
@@ -4608,7 +4611,7 @@ h3 {
 }
 
 [data-theme="dark"] .fixture-scorer-step {
-  background: var(--color-bg);
+  background: var(--color-surface);
 }
 
 .fixture-scorer-step:disabled {
@@ -9175,8 +9178,10 @@ code {
 
 @media (max-width: 860px) {
   :root {
-    --kickboard-event-tabs-dock: 56px;
+    --kickboard-event-tabs-dock: 52px;
     --kickboard-site-nav-dock: 48px;
+    --kickboard-mobile-dock-bottom: 4px;
+    --kickboard-mobile-dock-inset: max(10px, var(--page-gutter));
   }
 
   .nav-shell {
@@ -9185,19 +9190,23 @@ code {
   }
 
   .nav-tabs {
-    background: var(--color-surface);
-    border-top: 1px solid var(--color-border);
-    bottom: calc(var(--kickboard-event-tabs-dock) + env(safe-area-inset-bottom, 0px));
+    background: var(--kickboard-tab-rail-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    bottom: calc(
+      var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) + 6px +
+        env(safe-area-inset-bottom, 0px)
+    );
     box-shadow: var(--shadow-elevation-2);
     display: flex;
     flex-wrap: nowrap;
     gap: 4px;
     justify-content: center;
-    left: 0;
+    left: var(--kickboard-mobile-dock-inset);
     overflow-x: auto;
-    padding: 8px 8px;
+    padding: 6px;
     position: fixed;
-    right: 0;
+    right: var(--kickboard-mobile-dock-inset);
     z-index: 30;
   }
 
@@ -9212,10 +9221,6 @@ code {
     padding: 0 10px;
     text-align: center;
     white-space: nowrap;
-  }
-
-  .nav-tabs {
-    background: var(--kickboard-tab-rail-bg);
   }
 
   .nav-tabs a.active {
@@ -9353,44 +9358,48 @@ code {
   main,
   .feed-browser {
     padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 24px +
-        env(safe-area-inset-bottom, 0px)
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
+        28px + env(safe-area-inset-bottom, 0px)
     );
   }
 
   .current-event-tabs-layout {
     padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 20px +
-        env(safe-area-inset-bottom, 0px)
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
+        24px + env(safe-area-inset-bottom, 0px)
     );
   }
 
   .current-event-tabs-layout:has(.current-event-predictions-tab) {
     padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 20px +
-        env(safe-area-inset-bottom, 0px)
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
+        24px + env(safe-area-inset-bottom, 0px)
     );
   }
 
   .kickboard-mobile-dock-event {
-    background: var(--kickboard-tab-rail-bg);
-    border-top: 1px solid var(--color-border);
-    bottom: 0;
-    box-shadow: var(--shadow-elevation-2);
+    background: transparent;
+    border: none;
+    bottom: calc(var(--kickboard-mobile-dock-bottom) + env(safe-area-inset-bottom, 0px));
+    box-shadow: none;
     justify-content: center;
-    left: 0;
+    left: var(--kickboard-mobile-dock-inset);
     margin: 0;
-    padding: 6px max(var(--page-gutter), env(safe-area-inset-left, 0px))
-      calc(6px + env(safe-area-inset-bottom, 0px)) max(var(--page-gutter), env(safe-area-inset-right, 0px));
+    padding: 0;
     position: fixed;
-    right: 0;
+    right: var(--kickboard-mobile-dock-inset);
     z-index: 31;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar {
+    background: var(--kickboard-tab-rail-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-elevation-2);
     margin: 0 auto;
     max-width: 36rem;
     overflow-x: auto;
+    padding: 4px;
     scrollbar-width: none;
     width: 100%;
   }
@@ -9426,8 +9435,8 @@ code {
 
   .current-event-tabs-layout .fan-chat-float-root {
     bottom: calc(
-      var(--kickboard-event-tabs-dock) + var(--kickboard-site-nav-dock) + 14px +
-        env(safe-area-inset-bottom, 0px)
+      var(--kickboard-event-tabs-dock) + var(--kickboard-site-nav-dock) + var(--kickboard-mobile-dock-bottom) +
+        18px + env(safe-area-inset-bottom, 0px)
     );
   }
 
