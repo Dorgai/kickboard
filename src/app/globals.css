@@ -3559,7 +3559,10 @@ h3 {
 
 .predictions-sub-tabs.feed-tab-bar {
   gap: 4px;
-  margin: 0 0 14px;
+  justify-content: center;
+  margin: 0 auto 14px;
+  max-width: 100%;
+  width: fit-content;
 }
 
 .predictions-sub-tabs.feed-tab-bar button {
@@ -9044,9 +9047,9 @@ code {
 
 @media (max-width: 860px) {
   :root {
-    --kickboard-site-nav-dock: 52px;
-    --kickboard-event-tabs-dock: 46px;
-    --kickboard-predictions-subtabs-dock: 34px;
+    --kickboard-event-tabs-dock: 58px;
+    --kickboard-predictions-subtabs-dock: 50px;
+    --kickboard-site-nav-dock: 50px;
   }
 
   .nav-shell {
@@ -9181,7 +9184,6 @@ code {
   }
 
   .feed-browser > .event-tab-bar,
-  .current-event-section-tabs.event-tab-bar,
   .feed-browser.admin-dashboard .admin-dashboard-tabs.event-tab-bar {
     justify-content: center;
     width: 100%;
@@ -9253,14 +9255,16 @@ code {
         env(safe-area-inset-bottom, 0px)
     );
     box-shadow: var(--shadow-surface);
-    left: max(var(--page-gutter), env(safe-area-inset-left, 0px));
-    margin: 0;
-    max-width: none;
+    justify-content: center;
+    left: 0;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: calc(100% - 2 * max(var(--page-gutter), env(safe-area-inset-left, 0px)));
     padding: 3px;
     position: fixed;
-    right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+    right: 0;
     top: auto;
-    width: auto;
+    width: fit-content;
     z-index: 28;
   }
 
