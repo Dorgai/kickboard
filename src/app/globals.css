@@ -3622,6 +3622,27 @@ h3 {
   white-space: nowrap;
 }
 
+@media (min-width: 861px) {
+  .kickboard-mobile-dock-event {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 4px 0 18px;
+    padding: 0;
+    position: static;
+  }
+
+  .predictions-sub-tabs-rail .kickboard-tab-bar {
+    margin-inline: auto;
+    width: fit-content;
+  }
+
+  .predictions-sub-tabs-rail .kickboard-tab-bar button {
+    flex: 0 0 auto;
+    min-width: auto;
+  }
+}
+
 .predictions-sub-panel {
   display: grid;
   gap: 20px;
