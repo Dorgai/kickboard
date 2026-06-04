@@ -3558,11 +3558,22 @@ h3 {
 }
 
 .predictions-sub-tabs.feed-tab-bar {
+  flex-wrap: nowrap;
   gap: 4px;
   justify-content: center;
   margin: 0 auto 14px;
   max-width: 100%;
   width: fit-content;
+}
+
+@media (min-width: 861px) {
+  .current-event-section-tabs.event-tab-bar,
+  .predictions-panel .predictions-sub-tabs.feed-tab-bar {
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+  }
 }
 
 .predictions-sub-tabs.feed-tab-bar button {
