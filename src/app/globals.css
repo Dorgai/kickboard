@@ -23,9 +23,11 @@
   --max-page: 1280px;
   --page-gutter: 24px;
   --page-padding-y: 64px;
+  --color-button-fill: #4b5563;
+  --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
-  --kickboard-tab-active-bg: #4b5563;
-  --kickboard-tab-active-fg: #f9fafb;
+  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-surface) 94%, var(--kickboard-tab-rail-bg));
+  --kickboard-tab-active-fg: var(--color-text-primary);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
   --kickboard-tab-item-radius: 9999px;
@@ -59,8 +61,10 @@
   --shadow-elevation-3: 0 8px 20px rgba(0, 0, 0, 0.35), 0 20px 48px rgba(0, 0, 0, 0.45);
   --page-gutter: 24px;
   --page-padding-y: 64px;
+  --color-button-fill: #6b7280;
+  --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
-  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-brand) 38%, var(--color-surface));
+  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-surface) 90%, var(--kickboard-tab-rail-bg));
   --kickboard-tab-active-fg: var(--color-text-primary);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-brand) 16%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
@@ -1341,8 +1345,8 @@ h3 {
   margin: 0 auto;
 }
 
-.current-event-section-tabs.event-tab-bar button {
-  font-size: 13px;
+.current-event-section-tabs.event-tab-bar.kickboard-tab-bar button {
+  font-size: var(--kickboard-tab-item-font-size);
 }
 
 .current-event-tab-panel {
@@ -3664,7 +3668,6 @@ h3 {
 }
 
 .predictions-sub-tabs.feed-tab-bar button {
-  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -5292,8 +5295,8 @@ h3 {
 }
 
 .event-tab-bar button.active {
-  background: var(--color-text-primary);
-  color: var(--color-bg);
+  background: var(--color-button-fill);
+  color: var(--color-button-fill-fg);
 }
 
 .feed-tab-bar {
@@ -5319,9 +5322,9 @@ h3 {
 }
 
 .feed-tab-bar button.active {
-  background: var(--color-text-primary);
+  background: var(--color-button-fill);
   box-shadow: var(--shadow-surface-hover);
-  color: var(--color-bg);
+  color: var(--color-button-fill-fg);
 }
 
 .bracket-stage-tabs,
@@ -8387,9 +8390,9 @@ h3 {
 }
 
 .help-center-channel-tabs button.active {
-  background: var(--color-text-primary);
-  border-color: var(--color-text-primary);
-  color: var(--color-bg);
+  background: var(--color-button-fill);
+  border-color: var(--color-button-fill);
+  color: var(--color-button-fill-fg);
 }
 
 [data-theme="light"] .help-center-channel-tabs button,
@@ -9206,16 +9209,16 @@ code {
   [data-theme="light"],
   [data-theme="dark"] {
     --kickboard-tab-rail-shadow: var(--shadow-elevation-2);
-    --kickboard-tab-item-min-height: 40px;
-    --kickboard-tab-item-font-size: 12px;
-    --kickboard-tab-item-padding-x: 12px;
-    --kickboard-tab-rail-padding: 4px;
+    --kickboard-tab-item-min-height: 34px;
+    --kickboard-tab-item-font-size: 10px;
+    --kickboard-tab-item-padding-x: 9px;
+    --kickboard-tab-rail-padding: 3px;
   }
 
   :root {
-    --kickboard-event-tabs-dock: 52px;
-    --kickboard-site-nav-dock: 48px;
-    --kickboard-mobile-dock-bottom: 4px;
+    --kickboard-event-tabs-dock: 44px;
+    --kickboard-site-nav-dock: 42px;
+    --kickboard-mobile-dock-bottom: 0px;
     --kickboard-mobile-dock-inset: max(10px, var(--page-gutter));
   }
 
@@ -9229,7 +9232,7 @@ code {
     border: 1px solid var(--color-border);
     border-radius: var(--kickboard-tab-rail-radius);
     bottom: calc(
-      var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) + 6px +
+      var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
         env(safe-area-inset-bottom, 0px)
     );
     box-shadow: var(--kickboard-tab-rail-shadow);
