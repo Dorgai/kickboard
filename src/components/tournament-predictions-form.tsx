@@ -112,32 +112,46 @@ function SinglePlayerPickField({
           {help}
         </HelpTooltip>
       </legend>
-      {selected ? (
-        <div className="fixture-prediction-field-actions">
-          <p className="fixture-prediction-field-summary">
-            <strong>{selected.playerName}</strong>
-            {selected.teamName ? ` · ${selected.teamName}` : null}
-          </p>
-          <button className="text-button fixture-prediction-clear" type="button" onClick={onClear}>
+      <div className="tournament-player-pick-control">
+        <button
+          aria-expanded={expanded}
+          aria-label={
+            selected
+              ? `${blockLabel}: ${selected.playerName}${
+                  selected.teamName ? `, ${selected.teamName}` : ""
+                }. ${expanded ? "Close player list" : "Change player"}`
+              : `${blockLabel}: choose player`
+          }
+          className={`fixture-prediction-scorers-toggle tournament-player-pick-trigger${
+            expanded ? "" : " fixture-prediction-scorers-toggle--collapsed"
+          }`}
+          type="button"
+          onClick={onToggleExpanded}
+        >
+          <span className="fixture-prediction-scorers-toggle-copy">
+            {selected ? (
+              <span className="tournament-player-pick-value">
+                <span className="tournament-player-pick-name">{selected.playerName}</span>
+                {selected.teamName ? (
+                  <span className="tournament-player-pick-meta">{selected.teamName}</span>
+                ) : null}
+              </span>
+            ) : (
+              <span className="tournament-player-pick-placeholder">Choose player</span>
+            )}
+          </span>
+          <span aria-hidden className="fixture-prediction-scorers-chevron" />
+        </button>
+        {selected ? (
+          <button
+            className="text-button fixture-prediction-clear tournament-player-pick-clear"
+            type="button"
+            onClick={onClear}
+          >
             Clear
           </button>
-        </div>
-      ) : null}
-      <button
-        aria-expanded={expanded}
-        className={`fixture-prediction-scorers-toggle${
-          expanded ? "" : " fixture-prediction-scorers-toggle--collapsed"
-        }`}
-        type="button"
-        onClick={onToggleExpanded}
-      >
-        <span className="fixture-prediction-scorers-toggle-copy">
-          <span className="fixture-prediction-scorers-toggle-title">
-            {selected ? "Change player" : "Choose player"}
-          </span>
-        </span>
-        <span aria-hidden className="fixture-prediction-scorers-chevron" />
-      </button>
+        ) : null}
+      </div>
       {expanded ? (
         <div className="fixture-prediction-scorers-panel">
           <input

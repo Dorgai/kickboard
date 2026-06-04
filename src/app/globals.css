@@ -3801,6 +3801,58 @@ h3 {
   font-weight: 600;
 }
 
+.tournament-player-pick-control {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  width: 100%;
+}
+
+.tournament-player-pick-control .tournament-player-pick-trigger {
+  flex: 1 1 12rem;
+  min-width: min(100%, 12rem);
+}
+
+.tournament-player-pick-clear {
+  flex: 0 0 auto;
+  min-height: 44px;
+}
+
+.tournament-player-pick-value {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.tournament-player-pick-name {
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tournament-player-pick-meta {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tournament-player-pick-placeholder {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
 .tournament-team-pick-grid {
   display: grid;
   gap: 8px;
