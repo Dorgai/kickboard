@@ -5,8 +5,10 @@ import {
   ChevronDown,
   Menu,
   MessageCircleQuestion,
-  Sparkles
+  Sparkles,
+  Users
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { ThemeSelector } from "@/components/theme-selector";
 import { OPEN_HELP_CENTER_EVENT, requestHelpCenter, requestWelcomeDialog } from "@/lib/help/events";
@@ -51,6 +53,17 @@ export function HelpMenu() {
       {open ? (
         <div className="help-menu-dropdown app-menu-dropdown" id={menuId} role="menu">
           <ThemeSelector variant="menu" />
+          <div className="app-menu-divider" role="separator" />
+          <p className="app-menu-section-label">Navigate</p>
+          <Link
+            className="help-menu-item"
+            href="/#community"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <Users size={16} aria-hidden />
+            Community
+          </Link>
           <div className="app-menu-divider" role="separator" />
           <p className="app-menu-section-label">Help</p>
           <button

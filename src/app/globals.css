@@ -5904,10 +5904,29 @@ h3 {
   color: var(--color-text-primary);
 }
 
-.current-event-overview h2 {
+.current-event-title-trigger {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
   font-size: 1.05rem;
+  font-weight: 800;
   line-height: 1.25;
   margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.current-event-title-trigger:hover {
+  color: var(--color-brand);
+}
+
+.current-event-title-trigger:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .bracket-tree-card.compact-tree {
@@ -8265,7 +8284,7 @@ h3 {
 .app-menu-theme-option {
   -webkit-appearance: none;
   appearance: none;
-  background: var(--color-bg);
+  background: transparent;
   border: 1px solid var(--color-border);
   border-radius: 8px;
   color: var(--color-text-primary);
@@ -8279,8 +8298,8 @@ h3 {
 
 [data-theme="light"] .app-menu-theme-option,
 :root:not([data-theme]) .app-menu-theme-option {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: transparent;
+  border-color: var(--color-border);
   color: #111827;
 }
 
@@ -9278,6 +9297,10 @@ code {
     padding: 4px var(--kickboard-tab-item-padding-x);
     text-align: center;
     white-space: normal;
+  }
+
+  .nav-tabs a[href="/#community"] {
+    display: none;
   }
 
   .tier-badge {

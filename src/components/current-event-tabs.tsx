@@ -1,6 +1,5 @@
 "use client";
 
-import { HelpTooltip } from "@/components/help-tooltip";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
@@ -25,6 +24,9 @@ const CURRENT_EVENT_TABS = [
   { id: "predictions" as const, label: "Predictions" },
   { id: "community" as const, label: "Community" }
 ] as const;
+
+/** Shown in the section tab dock — Community lives in the header menu. */
+const CURRENT_EVENT_DOCK_TABS = CURRENT_EVENT_TABS.filter((tab) => tab.id !== "community");
 
 const CURRENT_KNOCKOUT_STAGES = [
   "Round of 32",
@@ -136,11 +138,12 @@ function TournamentSummaryDialog({
   return (
     <>
       <button
-        className="button secondary current-event-summary-trigger"
+        aria-haspopup="dialog"
+        className="current-event-title-trigger"
         type="button"
         onClick={() => setOpen(true)}
       >
-        Tournament details
+        {title}
       </button>
 
       <dialog
@@ -247,23 +250,10 @@ export function CurrentEventTabs({
     <section className={`current-world-cup-card current-event-tabs-layout${chatOpen ? " fan-chat-dock-open" : ""}`}>
       <div className="current-event-overview">
         <div className="current-event-overview-heading">
-          <h2>{currentWorldCup?.title ?? "2026 FIFA World Cup"}</h2>
-          <div className="current-event-overview-actions">
-            <TournamentSummaryDialog
-              summary={summary}
-              title={currentWorldCup?.title ?? "2026 FIFA World Cup"}
-            />
-            <HelpTooltip label="About tournament squads and data sources" size="md">
-              {currentWorldCup?.note ? (
-                <>
-                  {currentWorldCup.note}
-                  {" "}
-                </>
-              ) : null}
-              Tournament summary and groups come from public pages. Live scores appear when API-Football
-              and the worker are configured.
-            </HelpTooltip>
-          </div>
+          <TournamentSummaryDialog
+            summary={summary}
+            title={currentWorldCup?.title ?? "2026 FIFA World Cup"}
+          />
         </div>
       </div>
 
@@ -272,7 +262,7 @@ export function CurrentEventTabs({
           className="event-tab-bar current-event-section-tabs kickboard-tab-bar"
           aria-label="Current event sections"
         >
-          {CURRENT_EVENT_TABS.map((tab) => (
+          {CURRENT_EVENT_DOCK_TABS.map((tab) => (
             <button
               key={tab.id}
               className={activeTab === tab.id ? "active" : ""}
