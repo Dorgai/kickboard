@@ -9421,14 +9421,17 @@ code {
   [data-theme="dark"] {
     --kickboard-tab-rail-bg: var(--kickboard-mobile-dock-bg);
     /* Match header Menu / nav action pill shadow */
-  --kickboard-tab-rail-shadow: var(--shadow-surface);
-  --kickboard-tab-chrome-border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+    --kickboard-tab-rail-shadow: var(--shadow-surface);
+    --kickboard-tab-chrome-border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
     --kickboard-tab-item-min-height: 44px;
-    --kickboard-tab-item-font-size: 11px;
-    --kickboard-tab-item-padding-x: 6px;
-    --kickboard-tab-item-line-height: 1.2;
-    --kickboard-tab-rail-padding: 4px;
-    --kickboard-tab-rail-radius: 16px;
+    --kickboard-tab-item-font-size: 12px;
+    --kickboard-tab-item-font-weight: 500;
+    --kickboard-tab-item-padding-x: 7px;
+    --kickboard-tab-item-line-height: 1.15;
+    --kickboard-tab-item-radius: 9999px;
+    --kickboard-tab-rail-padding: 5px;
+    --kickboard-tab-rail-radius: 9999px;
+    --kickboard-tab-rail-gap: 4px;
   }
 
   :root {
@@ -9465,13 +9468,14 @@ code {
     padding: var(--kickboard-tab-rail-padding);
     position: fixed;
     transform: translateX(-50%);
-    width: min(100%, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
+    width: max-content;
     z-index: 30;
   }
 
   .nav-tabs a {
     align-items: center;
     background: transparent;
+    border-radius: var(--kickboard-tab-item-radius);
     display: inline-flex;
     flex: 1 1 0;
     justify-content: center;
@@ -9601,13 +9605,14 @@ code {
     backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
     border: var(--kickboard-tab-chrome-border);
-    border-radius: var(--kickboard-tab-rail-radius);
+    border-radius: 9999px;
     box-shadow: var(--shadow-surface);
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
     margin: 0 auto 24px;
-    max-width: min(24rem, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
+    max-width: min(24rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
+    min-width: min(16rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
     overflow: hidden;
     padding: var(--kickboard-tab-rail-padding);
     width: fit-content;
@@ -9697,7 +9702,7 @@ code {
     padding: 0;
     position: fixed;
     transform: translateX(-50%);
-    width: max-content;
+    width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
     z-index: 31;
   }
 
@@ -9706,17 +9711,17 @@ code {
     backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
     border: var(--kickboard-tab-chrome-border);
-    border-radius: var(--kickboard-tab-rail-radius);
+    border-radius: 9999px;
     box-shadow: var(--shadow-surface);
     box-sizing: border-box;
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
     margin: 0;
-    max-width: min(100%, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
+    max-width: 100%;
     overflow: hidden;
-    padding: 5px;
-    width: fit-content;
+    padding: var(--kickboard-tab-rail-padding);
+    width: 100%;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
@@ -9731,27 +9736,32 @@ code {
     flex: 1 1 0;
     font-size: var(--kickboard-tab-item-font-size);
     font-weight: var(--kickboard-tab-item-font-weight);
-    hyphens: auto;
     justify-content: center;
     line-height: var(--kickboard-tab-item-line-height);
-    max-width: 100%;
+    max-width: none;
     min-height: var(--kickboard-tab-item-min-height);
     min-width: 0;
     overflow: hidden;
     overflow-wrap: anywhere;
-    padding: 4px 5px;
+    padding: 4px 6px;
     text-align: center;
     white-space: normal;
-    word-break: break-word;
+  }
+
+  .feed-tab-bar.kickboard-tab-bar button,
+  .event-tab-bar.kickboard-tab-bar button {
+    border-radius: var(--kickboard-tab-item-radius);
+    padding: 4px var(--kickboard-tab-item-padding-x);
   }
 
   .nav-tabs {
     box-sizing: border-box;
-    padding: 5px;
+    padding: var(--kickboard-tab-rail-padding);
   }
 
   .nav-tabs a {
     align-items: center;
+    border-radius: var(--kickboard-tab-item-radius);
     box-sizing: border-box;
     display: inline-flex;
     justify-content: center;
