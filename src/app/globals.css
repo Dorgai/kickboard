@@ -3647,6 +3647,35 @@ h3 {
   max-height: min(11rem, 28vh);
 }
 
+@media (max-width: 860px) {
+  .tournament-team-pick-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    grid-template-columns: unset;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    padding: 2px 2px 8px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    width: 100%;
+  }
+
+  .tournament-team-pick-option {
+    flex: 0 0 auto;
+    min-width: 5.75rem;
+    scroll-snap-align: start;
+    width: auto;
+  }
+
+  .tournament-finalists-field .tournament-team-pick-grid {
+    max-height: none;
+  }
+}
+
 .predictions-overview {
   display: grid;
   gap: 0;
