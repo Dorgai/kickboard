@@ -154,13 +154,15 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   return (
     <AuthGate featureLabel="Predictions">
       <div className="predictions-panel">
-        <FeedTabBar
-          ariaLabel="Prediction type"
-          className="predictions-sub-tabs"
-          tabs={subTabButtons}
-          value={subTab}
-          onChange={(id) => selectSubTab(id as PredictionSubTabId)}
-        />
+        <div className="kickboard-tab-rail predictions-sub-tabs-rail">
+          <FeedTabBar
+            ariaLabel="Prediction type"
+            className="predictions-sub-tabs kickboard-tab-bar"
+            tabs={subTabButtons}
+            value={subTab}
+            onChange={(id) => selectSubTab(id as PredictionSubTabId)}
+          />
+        </div>
 
         {subTab === "tournament" ? (
           <div className="predictions-sub-panel" id="predictions-tournament" role="tabpanel">

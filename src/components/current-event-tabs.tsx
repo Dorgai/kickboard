@@ -267,18 +267,23 @@ export function CurrentEventTabs({
         </div>
       </div>
 
-      <nav className="event-tab-bar current-event-section-tabs" aria-label="Current event sections">
-        {CURRENT_EVENT_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            className={activeTab === tab.id ? "active" : ""}
-            type="button"
-            onClick={() => selectTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+      <div className="kickboard-mobile-dock-event">
+        <nav
+          className="event-tab-bar current-event-section-tabs kickboard-tab-bar"
+          aria-label="Current event sections"
+        >
+          {CURRENT_EVENT_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              className={activeTab === tab.id ? "active" : ""}
+              type="button"
+              onClick={() => selectTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
 
       <div className="current-event-tab-panel" role="tabpanel">
         {activeTab === "tournament" ? (

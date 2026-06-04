@@ -23,6 +23,10 @@
   --max-page: 1280px;
   --page-gutter: 24px;
   --page-padding-y: 64px;
+  --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
+  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-text-primary) 92%, var(--color-bg));
+  --kickboard-tab-active-fg: var(--color-bg);
+  --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
 }
 
 [data-theme="dark"] {
@@ -46,6 +50,10 @@
   --shadow-elevation-3: 0 8px 20px rgba(0, 0, 0, 0.35), 0 20px 48px rgba(0, 0, 0, 0.45);
   --page-gutter: 24px;
   --page-padding-y: 64px;
+  --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
+  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-brand) 38%, var(--color-surface));
+  --kickboard-tab-active-fg: var(--color-text-primary);
+  --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-brand) 16%, var(--color-surface));
 }
 
 * {
@@ -1300,21 +1308,19 @@ h3 {
   position: relative;
 }
 
-.current-event-section-tabs.event-tab-bar {
+.kickboard-mobile-dock-event {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 4px;
   justify-content: center;
-  margin: 4px auto 18px;
-  max-width: 100%;
-  padding: 4px;
-  width: fit-content;
+  margin: 4px 0 18px;
+  width: 100%;
+}
+
+.current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
+  margin: 0 auto;
 }
 
 .current-event-section-tabs.event-tab-bar button {
   font-size: 13px;
-  min-height: 38px;
-  padding: 0 14px;
 }
 
 .current-event-tab-panel {
@@ -3555,31 +3561,65 @@ h3 {
 .predictions-panel {
   display: grid;
   gap: 20px;
+  justify-items: stretch;
 }
 
-.predictions-sub-tabs.feed-tab-bar {
+.kickboard-tab-rail {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.predictions-sub-tabs-rail {
+  margin-bottom: 4px;
+}
+
+.feed-tab-bar.kickboard-tab-bar,
+.event-tab-bar.kickboard-tab-bar {
+  background: var(--kickboard-tab-rail-bg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-surface);
   flex-wrap: nowrap;
   gap: 4px;
   justify-content: center;
-  margin: 0 auto 14px;
+  margin: 0;
   max-width: 100%;
+  padding: 4px;
   width: fit-content;
 }
 
-@media (min-width: 861px) {
-  .current-event-section-tabs.event-tab-bar,
-  .predictions-panel .predictions-sub-tabs.feed-tab-bar {
-    justify-content: center;
-    margin-left: auto;
-    margin-right: auto;
-    width: fit-content;
-  }
+.feed-tab-bar.kickboard-tab-bar {
+  position: static;
+  top: auto;
+}
+
+.feed-tab-bar.kickboard-tab-bar button,
+.event-tab-bar.kickboard-tab-bar button {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  min-height: 36px;
+  padding: 0 14px;
+}
+
+.feed-tab-bar.kickboard-tab-bar button:hover,
+.event-tab-bar.kickboard-tab-bar button:hover {
+  background: var(--kickboard-tab-hover-bg);
+  color: var(--color-text-primary);
+}
+
+.feed-tab-bar.kickboard-tab-bar button.active,
+.event-tab-bar.kickboard-tab-bar button.active {
+  background: var(--kickboard-tab-active-bg);
+  box-shadow: none;
+  color: var(--kickboard-tab-active-fg);
 }
 
 .predictions-sub-tabs.feed-tab-bar button {
-  font-size: 12px;
-  min-height: 32px;
-  padding: 0 12px;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .predictions-sub-panel {
@@ -9087,9 +9127,8 @@ code {
 
 @media (max-width: 860px) {
   :root {
-    --kickboard-event-tabs-dock: 58px;
-    --kickboard-predictions-subtabs-dock: 50px;
-    --kickboard-site-nav-dock: 50px;
+    --kickboard-event-tabs-dock: 56px;
+    --kickboard-site-nav-dock: 48px;
   }
 
   .nav-shell {
@@ -9127,14 +9166,18 @@ code {
     white-space: nowrap;
   }
 
+  .nav-tabs {
+    background: var(--kickboard-tab-rail-bg);
+  }
+
   .nav-tabs a.active {
-    background: color-mix(in srgb, var(--color-text-primary) 16%, var(--color-surface));
-    color: var(--color-text-primary);
+    background: var(--kickboard-tab-active-bg);
+    color: var(--kickboard-tab-active-fg);
     font-weight: 500;
   }
 
   .nav-tabs a:hover {
-    background: color-mix(in srgb, var(--color-text-primary) 10%, var(--color-surface));
+    background: var(--kickboard-tab-hover-bg);
     color: var(--color-text-primary);
   }
 
@@ -9276,102 +9319,65 @@ code {
 
   .current-event-tabs-layout:has(.current-event-predictions-tab) {
     padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) +
-        var(--kickboard-predictions-subtabs-dock) + 24px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 20px +
+        env(safe-area-inset-bottom, 0px)
     );
   }
 
-  .current-event-section-tabs.event-tab-bar {
+  .kickboard-mobile-dock-event {
+    background: var(--kickboard-tab-rail-bg);
+    border-top: 1px solid var(--color-border);
     bottom: 0;
-    flex-wrap: nowrap;
-    gap: 4px;
+    box-shadow: var(--shadow-elevation-2);
     justify-content: center;
     left: 0;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: calc(100% - 2 * max(var(--page-gutter), env(safe-area-inset-left, 0px)));
-    overflow-x: auto;
-    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    margin: 0;
+    padding: 6px max(var(--page-gutter), env(safe-area-inset-left, 0px))
+      calc(6px + env(safe-area-inset-bottom, 0px)) max(var(--page-gutter), env(safe-area-inset-right, 0px));
     position: fixed;
     right: 0;
-    scrollbar-width: none;
-    top: auto;
-    width: fit-content;
     z-index: 31;
   }
 
-  .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .current-event-section-tabs.event-tab-bar button {
-    flex: 0 0 auto;
-    font-size: 12px;
-    font-weight: 500;
-    min-height: 42px;
-    padding: 0 12px;
-    white-space: nowrap;
-  }
-
-  .current-event-section-tabs.event-tab-bar button.active {
-    background: color-mix(in srgb, var(--color-text-primary) 88%, var(--color-surface));
-    box-shadow: none;
-    color: var(--color-bg);
-  }
-
-  .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar {
-    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
-    bottom: calc(var(--kickboard-event-tabs-dock) + env(safe-area-inset-bottom, 0px));
-    box-shadow: var(--shadow-surface);
-    flex-wrap: nowrap;
-    gap: 4px;
-    justify-content: center;
-    left: 0;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: calc(100% - 2 * max(var(--page-gutter), env(safe-area-inset-left, 0px)));
+  .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar {
+    margin: 0 auto;
+    max-width: 36rem;
     overflow-x: auto;
-    padding: 6px;
-    position: fixed;
-    right: 0;
     scrollbar-width: none;
-    top: auto;
-    width: fit-content;
-    z-index: 30;
+    width: 100%;
   }
 
-  .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar::-webkit-scrollbar {
+  .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
     display: none;
   }
 
-  .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar button {
-    background: transparent;
-    box-shadow: none;
-    flex: 0 0 auto;
-    font-size: 12px;
-    font-weight: 500;
-    min-height: 38px;
-    padding: 0 11px;
-    white-space: nowrap;
+  .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar button {
+    flex: 1 1 auto;
+    font-size: 11px;
+    min-height: 40px;
+    min-width: 0;
+    padding: 0 8px;
   }
 
-  .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar button.active {
-    background: color-mix(in srgb, var(--color-text-primary) 88%, var(--color-surface));
-    box-shadow: none;
-    color: var(--color-bg);
+  .predictions-sub-tabs-rail {
+    margin-bottom: 12px;
+    padding-inline: 2px;
+  }
+
+  .predictions-sub-tabs-rail .kickboard-tab-bar {
+    width: 100%;
+  }
+
+  .predictions-sub-tabs-rail .kickboard-tab-bar button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 10px;
   }
 
   .current-event-tabs-layout .fan-chat-float-root {
     bottom: calc(
       var(--kickboard-event-tabs-dock) + var(--kickboard-site-nav-dock) + 14px +
         env(safe-area-inset-bottom, 0px)
-    );
-  }
-
-  .current-event-tabs-layout:has(.current-event-predictions-tab) .fan-chat-float-root {
-    bottom: calc(
-      var(--kickboard-event-tabs-dock) + var(--kickboard-predictions-subtabs-dock) +
-        var(--kickboard-site-nav-dock) + 16px + env(safe-area-inset-bottom, 0px)
     );
   }
 
