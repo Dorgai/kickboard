@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { FloatingFanChat } from "@/components/floating-fan-chat";
@@ -27,6 +28,19 @@ const CURRENT_EVENT_TABS = [
 
 /** Shown in the section tab dock — Community lives in the header menu. */
 const CURRENT_EVENT_DOCK_TABS = CURRENT_EVENT_TABS.filter((tab) => tab.id !== "community");
+
+function dockTabLabel(tab: (typeof CURRENT_EVENT_DOCK_TABS)[number], mobile: boolean) {
+  if (mobile && tab.id === "coach-board") {
+    return (
+      <>
+        Coach
+        <br />
+        Board
+      </>
+    );
+  }
+  return tab.label;
+}
 
 const CURRENT_KNOCKOUT_STAGES = [
   "Round of 32",
@@ -197,6 +211,7 @@ export function CurrentEventTabs({
   const [chatOpen, setChatOpen] = useState(false);
   const [activeGroupLetter, setActiveGroupLetter] = useState(groups[0]?.group ?? "A");
   const [activeKnockoutStage, setActiveKnockoutStage] = useState<string>(CURRENT_KNOCKOUT_STAGES[0]);
+  const mobileDock = useNarrowViewport(861);
 
   const applyHash = useCallback(() => {
     const { tab, chatOpen: openChat } = parseHash(hashTarget());
@@ -269,7 +284,7 @@ export function CurrentEventTabs({
               type="button"
               onClick={() => selectTab(tab.id)}
             >
-              {tab.label}
+              {dockTabLabel(tab, mobileDock)}
             </button>
           ))}
         </nav>
