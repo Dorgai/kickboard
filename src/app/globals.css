@@ -9236,8 +9236,8 @@ code {
     --kickboard-tab-rail-bg: var(--kickboard-mobile-dock-bg);
     --kickboard-tab-rail-shadow: var(--shadow-elevation-2);
     --kickboard-tab-item-min-height: 44px;
-    --kickboard-tab-item-font-size: 11px;
-    --kickboard-tab-item-padding-x: 6px;
+    --kickboard-tab-item-font-size: 12px;
+    --kickboard-tab-item-padding-x: 7px;
     --kickboard-tab-item-line-height: 1.15;
     --kickboard-tab-rail-padding: 4px;
     --kickboard-tab-rail-radius: 16px;
