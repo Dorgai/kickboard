@@ -1277,6 +1277,8 @@ h3 {
 #tournament,
 #coach-board,
 #predictions,
+#predictions-tournament,
+#predictions-match,
 #squads,
 #players,
 #community,
@@ -1301,10 +1303,18 @@ h3 {
 .current-event-section-tabs.event-tab-bar {
   display: flex;
   flex-wrap: wrap;
+  gap: 4px;
   justify-content: center;
   margin: 4px auto 18px;
   max-width: 100%;
+  padding: 4px;
   width: fit-content;
+}
+
+.current-event-section-tabs.event-tab-bar button {
+  font-size: 13px;
+  min-height: 38px;
+  padding: 0 14px;
 }
 
 .current-event-tab-panel {
@@ -3547,16 +3557,21 @@ h3 {
   gap: 20px;
 }
 
-.predictions-panel-match-divider {
-  background: var(--color-border);
-  height: 1px;
-  width: 100%;
+.predictions-sub-tabs.feed-tab-bar {
+  gap: 4px;
+  margin: 0 0 14px;
 }
 
-.predictions-match-section-title {
-  font-size: 15px;
-  font-weight: 800;
-  margin: 0;
+.predictions-sub-tabs.feed-tab-bar button {
+  font-size: 12px;
+  min-height: 32px;
+  padding: 0 12px;
+}
+
+.predictions-sub-panel {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
 }
 
 .tournament-predictions-section {
@@ -9191,6 +9206,24 @@ code {
 
   .event-tab-bar {
     top: 72px;
+  }
+
+  .current-event-section-tabs.event-tab-bar {
+    gap: 3px;
+    margin-bottom: 14px;
+    padding: 3px;
+  }
+
+  .current-event-section-tabs.event-tab-bar button {
+    font-size: 11px;
+    min-height: 30px;
+    padding: 0 9px;
+  }
+
+  .predictions-sub-tabs.feed-tab-bar button {
+    font-size: 11px;
+    min-height: 28px;
+    padding: 0 9px;
   }
 
   .theme-selector.event-tab-bar button {

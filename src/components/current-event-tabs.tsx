@@ -72,7 +72,12 @@ function parseHash(hash: string): { tab: CurrentEventTabId; chatOpen: boolean } 
   if (hash === "coach-board") {
     return { tab: "coach-board", chatOpen: false };
   }
-  if (hash === "predictions") {
+  if (
+    hash === "predictions" ||
+    hash === "predictions-tournament" ||
+    hash === "predictions-match" ||
+    hash === "tournament-picks"
+  ) {
     return { tab: "predictions", chatOpen: false };
   }
   return { tab: "predictions", chatOpen: false };

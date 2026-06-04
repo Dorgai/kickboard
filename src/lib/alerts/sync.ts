@@ -72,7 +72,7 @@ async function syncConnectionActivityAlerts(userId: string, peerIds: string[]) {
         awayScore: row.away_score,
         predictedOutcome: row.predicted_outcome
       })}`,
-      href: "/#predictions",
+      href: "/?predictionsTab=match#predictions-match",
       actorUserId: row.user_id,
       fixtureKey: row.fixture_key,
       occurredAt: row.updated_at

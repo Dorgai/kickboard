@@ -184,7 +184,7 @@ export function readShortShareIdFromSearchParams(
 export function buildPredictionAppDeepLink(fixtureKey: string) {
   const origin = resolveAppOrigin();
   const params = new URLSearchParams({ predictionsFixture: fixtureKey });
-  return `${origin}/?${params.toString()}#predictions`;
+  return `${origin}/?${params.toString()}&predictionsTab=match#predictions-match`;
 }
 
 export function buildPredictionShareCaption(payload: PredictionSharePayload) {

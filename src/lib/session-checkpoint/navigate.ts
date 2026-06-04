@@ -10,7 +10,8 @@ export function navigateToPredictFixture(fixtureKey: string) {
   const url = new URL(window.location.href);
   url.pathname = url.pathname || "/";
   url.searchParams.set("predictionsFixture", fixtureKey);
-  url.hash = "predictions";
+  url.searchParams.set("predictionsTab", "match");
+  url.hash = "predictions-match";
   const href = `${url.pathname}${url.search}${url.hash}`;
   window.history.replaceState(null, "", href);
   window.dispatchEvent(
