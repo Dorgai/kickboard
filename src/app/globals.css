@@ -26,7 +26,7 @@
   --color-button-fill: #4b5563;
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
-  --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 55%, transparent);
+  --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 42%, transparent);
   --kickboard-tab-active-bg: var(--color-button-fill);
   --kickboard-tab-active-fg: var(--color-button-fill-fg);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
@@ -9244,10 +9244,11 @@ code {
   }
 
   :root {
-    --kickboard-event-tabs-dock: 52px;
-    --kickboard-site-nav-dock: 44px;
-    --kickboard-mobile-dock-bottom: 0px;
-    --kickboard-mobile-dock-inset: max(10px, var(--page-gutter));
+    --kickboard-event-tabs-dock: 58px;
+    --kickboard-site-nav-dock: 46px;
+    --kickboard-mobile-dock-bottom: 6px;
+    --kickboard-mobile-dock-gap: 8px;
+    --kickboard-mobile-dock-inset: max(14px, calc(var(--page-gutter) + 6px));
   }
 
   .nav-shell {
@@ -9260,10 +9261,9 @@ code {
     backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
     border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-    border-bottom: none;
-    border-radius: var(--kickboard-tab-rail-radius) var(--kickboard-tab-rail-radius) 0 0;
+    border-radius: 9999px;
     bottom: calc(
-      var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
+      var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) + var(--kickboard-mobile-dock-bottom) +
         env(safe-area-inset-bottom, 0px)
     );
     box-shadow: var(--kickboard-tab-rail-shadow);
@@ -9271,18 +9271,14 @@ code {
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
-    left: var(--kickboard-mobile-dock-inset);
+    left: 50%;
     max-width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
     overflow: visible;
     padding: var(--kickboard-tab-rail-padding);
     position: fixed;
-    right: var(--kickboard-mobile-dock-inset);
+    transform: translateX(-50%);
+    width: max-content;
     z-index: 30;
-  }
-
-  body:not(:has(.kickboard-mobile-dock-event)) .nav-tabs {
-    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-    border-radius: var(--kickboard-tab-rail-radius);
   }
 
   .nav-tabs a {
@@ -9472,22 +9468,22 @@ code {
   main,
   .feed-browser {
     padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
-        28px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) +
+        var(--kickboard-mobile-dock-bottom) + 28px + env(safe-area-inset-bottom, 0px)
     );
   }
 
   .current-event-tabs-layout {
     padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
-        24px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) +
+        var(--kickboard-mobile-dock-bottom) + 24px + env(safe-area-inset-bottom, 0px)
     );
   }
 
   .current-event-tabs-layout:has(.current-event-predictions-tab) {
     padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
-        24px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) +
+        var(--kickboard-mobile-dock-bottom) + 24px + env(safe-area-inset-bottom, 0px)
     );
   }
 
@@ -9496,12 +9492,15 @@ code {
     border: none;
     bottom: calc(var(--kickboard-mobile-dock-bottom) + env(safe-area-inset-bottom, 0px));
     box-shadow: none;
+    display: flex;
     justify-content: center;
-    left: var(--kickboard-mobile-dock-inset);
+    left: 50%;
     margin: 0;
+    max-width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
     padding: 0;
     position: fixed;
-    right: var(--kickboard-mobile-dock-inset);
+    transform: translateX(-50%);
+    width: max-content;
     z-index: 31;
   }
 
@@ -9510,19 +9509,18 @@ code {
     backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
     border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-    border-radius: 0 0 var(--kickboard-tab-rail-radius) var(--kickboard-tab-rail-radius);
-    border-top: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent);
+    border-radius: 9999px;
     box-shadow: var(--kickboard-tab-rail-shadow);
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
-    margin: 0 auto;
-    max-width: 36rem;
+    margin: 0;
+    max-width: min(36rem, calc(100vw - 2 * var(--kickboard-mobile-dock-inset) - 8px));
     overflow-x: auto;
     overflow-y: hidden;
     padding: var(--kickboard-tab-rail-padding);
     scrollbar-width: none;
-    width: 100%;
+    width: max-content;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
@@ -9536,13 +9534,15 @@ code {
     flex: 1 1 0;
     font-size: var(--kickboard-tab-item-font-size);
     font-weight: var(--kickboard-tab-item-font-weight);
+    hyphens: auto;
     justify-content: center;
     line-height: var(--kickboard-tab-item-line-height);
-    max-width: none;
+    max-width: 5.75rem;
     min-height: var(--kickboard-tab-item-min-height);
     min-width: 0;
-    padding: 4px var(--kickboard-tab-item-padding-x);
+    padding: 5px var(--kickboard-tab-item-padding-x);
     text-align: center;
+    text-wrap: balance;
     white-space: normal;
   }
 
@@ -9555,8 +9555,8 @@ code {
 
   .current-event-tabs-layout .fan-chat-float-root {
     bottom: calc(
-      var(--kickboard-event-tabs-dock) + var(--kickboard-site-nav-dock) + var(--kickboard-mobile-dock-bottom) +
-        18px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-event-tabs-dock) + var(--kickboard-site-nav-dock) + var(--kickboard-mobile-dock-gap) +
+        var(--kickboard-mobile-dock-bottom) + 18px + env(safe-area-inset-bottom, 0px)
     );
   }
 
