@@ -3547,6 +3547,77 @@ h3 {
   gap: 20px;
 }
 
+.predictions-panel-match-divider {
+  background: var(--color-border);
+  height: 1px;
+  width: 100%;
+}
+
+.predictions-match-section-title {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.tournament-predictions-section {
+  display: grid;
+  gap: 12px;
+}
+
+.tournament-predictions-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.tournament-predictions-form {
+  margin: 0;
+}
+
+.tournament-team-pick-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  max-height: min(14rem, 32vh);
+  overflow: auto;
+  padding: 2px;
+  width: 100%;
+}
+
+.tournament-team-pick-option {
+  min-height: 3.25rem;
+}
+
+.tournament-finalists-slots {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 720px) {
+  .tournament-finalists-slots {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.tournament-finalist-slot {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tournament-finalist-slot-label {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.tournament-finalists-field .tournament-team-pick-grid {
+  max-height: min(11rem, 28vh);
+}
+
 .predictions-overview {
   display: grid;
   gap: 0;

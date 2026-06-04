@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { AuthGate } from "@/components/auth-gate";
 import { PanelHelpRow } from "@/components/help-tooltip";
 import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
+import { TournamentPredictionsForm } from "@/components/tournament-predictions-form";
 import { PredictionsOverview } from "@/components/predictions-overview";
 import { UserPickActivityPanel } from "@/components/user-pick-activity-panel";
 import {
@@ -103,6 +104,18 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   return (
     <AuthGate featureLabel="Predictions">
       <div className="predictions-panel">
+        <TournamentPredictionsForm
+          groups={groups}
+          onSaved={() => {
+            setOverviewRefresh((token) => token + 1);
+            setActivityRefresh((token) => token + 1);
+          }}
+        />
+
+        <div className="predictions-panel-match-divider" aria-hidden />
+
+        <h3 className="predictions-match-section-title">Match picks</h3>
+
         {fixtures.length > 0 && selected ? (
           <div className="predictions-match-row">
             <FixtureMatchPicker
