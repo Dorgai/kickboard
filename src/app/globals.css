@@ -5872,15 +5872,15 @@ h3 {
 }
 
 .tournament-summary-modal .timeline-modal-close.button.secondary {
-  background: var(--color-bg);
-  border-color: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+  background: var(--color-surface);
+  border-color: var(--color-border);
   color: var(--color-text-primary);
   font-weight: 700;
 }
 
 .tournament-summary-modal .summary-tile {
-  background: var(--color-bg);
-  border-color: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  background: transparent;
+  border-color: var(--color-border);
   padding: 12px 14px;
 }
 
@@ -7858,7 +7858,7 @@ h3 {
 
 .welcome-dialog-icon {
   align-items: center;
-  background: color-mix(in srgb, var(--color-brand) 12%, var(--color-bg));
+  background: color-mix(in srgb, var(--color-brand) 12%, var(--color-surface));
   border-radius: 14px;
   color: var(--color-brand);
   display: inline-flex;
@@ -8018,7 +8018,7 @@ h3 {
 
 .session-checkpoint-match {
   align-items: center;
-  background: color-mix(in srgb, var(--color-bg) 65%, var(--color-surface));
+  background: transparent;
   border: 1px solid var(--color-border);
   border-radius: 12px;
   display: flex;
@@ -8029,8 +8029,8 @@ h3 {
 
 [data-theme="light"] .session-checkpoint-match,
 :root:not([data-theme]) .session-checkpoint-match {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: transparent;
+  border-color: var(--color-border);
 }
 
 .session-checkpoint-match-copy {
@@ -8387,7 +8387,7 @@ h3 {
 }
 
 .help-center-channel-tabs button {
-  background: color-mix(in srgb, var(--color-bg) 55%, var(--color-surface));
+  background: transparent;
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
 }
@@ -8400,7 +8400,8 @@ h3 {
 
 [data-theme="light"] .help-center-channel-tabs button,
 :root:not([data-theme]) .help-center-channel-tabs button {
-  background: #f3f4f6;
+  background: transparent;
+  border-color: var(--color-border);
 }
 
 [data-theme="light"] .help-center-channel-tabs button.active,
@@ -8431,8 +8432,8 @@ h3 {
 }
 
 .help-center-thread {
-  background: color-mix(in srgb, var(--color-bg) 70%, var(--color-surface));
-  border: 1px solid color-mix(in srgb, var(--color-text-primary) 14%, var(--color-border));
+  background: transparent;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   max-height: min(22rem, 48vh);
   min-height: 9rem;
@@ -8442,8 +8443,8 @@ h3 {
 
 [data-theme="light"] .help-center-thread,
 :root:not([data-theme]) .help-center-thread {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: transparent;
+  border-color: var(--color-border);
 }
 
 .help-center-placeholder {
@@ -8493,7 +8494,8 @@ h3 {
 }
 
 .help-center-message--system {
-  background: color-mix(in srgb, var(--color-bg) 80%, var(--color-surface));
+  background: transparent;
+  border-style: dashed;
   justify-self: center;
   max-width: 100%;
 }
@@ -8530,7 +8532,7 @@ h3 {
 }
 
 .help-center-compose-input {
-  background: var(--color-bg);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 10px;
   box-sizing: border-box;
@@ -9213,15 +9215,16 @@ code {
   [data-theme="dark"] {
     --kickboard-tab-rail-bg: var(--kickboard-mobile-dock-bg);
     --kickboard-tab-rail-shadow: var(--shadow-elevation-2);
-    --kickboard-tab-item-min-height: 32px;
+    --kickboard-tab-item-min-height: 44px;
     --kickboard-tab-item-font-size: 11px;
-    --kickboard-tab-item-padding-x: 10px;
+    --kickboard-tab-item-padding-x: 6px;
+    --kickboard-tab-item-line-height: 1.15;
     --kickboard-tab-rail-padding: 4px;
     --kickboard-tab-rail-radius: 16px;
   }
 
   :root {
-    --kickboard-event-tabs-dock: 76px;
+    --kickboard-event-tabs-dock: 52px;
     --kickboard-site-nav-dock: 44px;
     --kickboard-mobile-dock-bottom: 0px;
     --kickboard-mobile-dock-inset: max(10px, var(--page-gutter));
@@ -9245,7 +9248,7 @@ code {
     );
     box-shadow: var(--kickboard-tab-rail-shadow);
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
     left: var(--kickboard-mobile-dock-inset);
@@ -9266,12 +9269,15 @@ code {
     align-items: center;
     background: transparent;
     display: inline-flex;
-    flex: 1 1 calc(50% - var(--kickboard-tab-rail-gap));
+    flex: 1 1 0;
     justify-content: center;
-    max-width: calc(50% - var(--kickboard-tab-rail-gap) / 2);
-    min-width: calc(50% - var(--kickboard-tab-rail-gap));
+    line-height: var(--kickboard-tab-item-line-height);
+    max-width: none;
+    min-height: var(--kickboard-tab-item-min-height);
+    min-width: 0;
+    padding: 4px var(--kickboard-tab-item-padding-x);
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   .tier-badge {
@@ -9472,13 +9478,15 @@ code {
     border-radius: 0 0 var(--kickboard-tab-rail-radius) var(--kickboard-tab-rail-radius);
     border-top: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent);
     box-shadow: var(--kickboard-tab-rail-shadow);
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
     margin: 0 auto;
     max-width: 36rem;
-    overflow: visible;
+    overflow-x: auto;
+    overflow-y: hidden;
     padding: var(--kickboard-tab-rail-padding);
+    scrollbar-width: none;
     width: 100%;
   }
 
@@ -9487,14 +9495,20 @@ code {
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar button {
+    align-items: center;
     border-radius: var(--kickboard-tab-item-radius);
-    flex: 1 1 calc(50% - var(--kickboard-tab-rail-gap));
+    display: inline-flex;
+    flex: 1 1 0;
     font-size: var(--kickboard-tab-item-font-size);
     font-weight: var(--kickboard-tab-item-font-weight);
-    max-width: calc(50% - var(--kickboard-tab-rail-gap) / 2);
+    justify-content: center;
+    line-height: var(--kickboard-tab-item-line-height);
+    max-width: none;
     min-height: var(--kickboard-tab-item-min-height);
-    min-width: calc(50% - var(--kickboard-tab-rail-gap));
-    padding: 0 var(--kickboard-tab-item-padding-x);
+    min-width: 0;
+    padding: 4px var(--kickboard-tab-item-padding-x);
+    text-align: center;
+    white-space: normal;
   }
 
   .predictions-sub-tabs-rail {
