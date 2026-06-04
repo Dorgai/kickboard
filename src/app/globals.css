@@ -3565,8 +3565,8 @@ h3 {
 }
 
 .kickboard-tab-rail {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  justify-items: center;
   width: 100%;
 }
 
@@ -3615,6 +3615,27 @@ h3 {
   background: var(--kickboard-tab-active-bg);
   box-shadow: none;
   color: var(--kickboard-tab-active-fg);
+}
+
+/* Feed browser defaults use a full-width grid on .feed-control-bar; keep kickboard rails centered pills */
+.feed-browser .feed-tab-bar.kickboard-tab-bar,
+.feed-browser .event-tab-bar.kickboard-tab-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  grid-template-columns: unset;
+  justify-content: center;
+  margin-inline: auto;
+  max-width: 100%;
+  width: fit-content;
+}
+
+.feed-browser .feed-tab-bar.kickboard-tab-bar button,
+.feed-browser .event-tab-bar.kickboard-tab-bar button {
+  flex: 0 0 auto;
+  max-width: none;
+  overflow: visible;
+  text-overflow: unset;
+  width: auto;
 }
 
 .predictions-sub-tabs.feed-tab-bar button {
@@ -3947,12 +3968,21 @@ h3 {
 
 .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
   background: var(--color-surface);
-  box-shadow: var(--shadow-surface);
+  box-shadow: var(--shadow-surface-hover);
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 42%, transparent);
+  outline-offset: -2px;
+}
+
+[data-theme="light"] .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
+:root:not([data-theme]) .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
+  background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface));
+  box-shadow: var(--shadow-surface-hover);
 }
 
 [data-theme="dark"] .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
   background: var(--color-surface);
   box-shadow: var(--shadow-surface-hover);
+  outline-color: color-mix(in srgb, var(--color-brand) 55%, transparent);
 }
 
 .fixture-prediction-outcome-text {
@@ -4677,16 +4707,12 @@ h3 {
 }
 
 .predictions-overview-pick {
-  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
+  background: transparent;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   display: grid;
   gap: 8px;
   padding: 10px 12px;
-}
-
-[data-theme="light"] .predictions-overview-pick,
-:root:not([data-theme]) .predictions-overview-pick {
-  background: #f3f4f6;
 }
 
 .predictions-overview-pick-main {
@@ -9387,13 +9413,15 @@ code {
   }
 
   .predictions-sub-tabs-rail .kickboard-tab-bar {
-    width: 100%;
+    margin-inline: auto;
+    max-width: 100%;
+    width: fit-content;
   }
 
   .predictions-sub-tabs-rail .kickboard-tab-bar button {
-    flex: 1 1 0;
+    flex: 0 0 auto;
     min-width: 0;
-    padding: 0 10px;
+    padding: 0 12px;
   }
 
   .current-event-tabs-layout .fan-chat-float-root {
