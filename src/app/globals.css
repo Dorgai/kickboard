@@ -62,13 +62,14 @@
   --shadow-elevation-3: 0 8px 20px rgba(0, 0, 0, 0.35), 0 20px 48px rgba(0, 0, 0, 0.45);
   --page-gutter: 24px;
   --page-padding-y: 64px;
-  --color-button-fill: #6b7280;
+  /* Active pills must be darker than surface / frosted dock rails */
+  --color-button-fill: color-mix(in srgb, var(--color-bg) 82%, var(--color-text-primary) 10%);
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
   --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 58%, transparent);
   --kickboard-tab-active-bg: var(--color-button-fill);
   --kickboard-tab-active-fg: var(--color-button-fill-fg);
-  --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-brand) 16%, var(--color-surface));
+  --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
   --kickboard-tab-item-radius: 9999px;
   --kickboard-tab-rail-gap: 4px;
@@ -5330,6 +5331,13 @@ h3 {
   color: var(--color-button-fill-fg);
 }
 
+[data-theme="dark"] .feed-tab-bar button.active,
+[data-theme="dark"] .event-tab-bar button.active {
+  background: var(--color-button-fill);
+  box-shadow: none;
+  color: var(--color-button-fill-fg);
+}
+
 .bracket-stage-tabs,
 .group-stage-tabs {
   max-width: 100%;
@@ -8309,6 +8317,12 @@ h3 {
   color: var(--color-text-primary);
 }
 
+[data-theme="dark"] .app-menu-theme-option--active {
+  background: var(--color-button-fill);
+  border-color: var(--color-button-fill);
+  color: var(--color-button-fill-fg);
+}
+
 .app-menu-theme-hint {
   color: var(--color-text-muted);
   font-size: 11px;
@@ -9236,11 +9250,16 @@ code {
     --kickboard-tab-rail-bg: var(--kickboard-mobile-dock-bg);
     --kickboard-tab-rail-shadow: var(--shadow-elevation-2);
     --kickboard-tab-item-min-height: 44px;
-    --kickboard-tab-item-font-size: 12px;
-    --kickboard-tab-item-padding-x: 7px;
-    --kickboard-tab-item-line-height: 1.15;
+    --kickboard-tab-item-font-size: 11px;
+    --kickboard-tab-item-padding-x: 6px;
+    --kickboard-tab-item-line-height: 1.2;
     --kickboard-tab-rail-padding: 4px;
     --kickboard-tab-rail-radius: 16px;
+  }
+
+  [data-theme="dark"] {
+    /* Opaque fill reads darker than semi-transparent dock (inactive stays clear) */
+    --kickboard-mobile-tab-active-bg: color-mix(in srgb, var(--color-bg) 96%, var(--color-text-primary) 4%);
   }
 
   :root {
@@ -9273,11 +9292,11 @@ code {
     justify-content: center;
     left: 50%;
     max-width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
-    overflow: visible;
+    overflow: hidden;
     padding: var(--kickboard-tab-rail-padding);
     position: fixed;
     transform: translateX(-50%);
-    width: max-content;
+    width: min(100%, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
     z-index: 30;
   }
 
@@ -9430,15 +9449,30 @@ code {
     z-index: 16;
   }
 
+  .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar,
+  .predictions-sub-tabs-rail .feed-tab-bar.kickboard-tab-bar {
+    max-width: min(100%, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
+    overflow: hidden;
+    width: min(100%, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
+  }
+
   .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar button,
-  .predictions-sub-tabs-rail .feed-tab-bar.kickboard-tab-bar button {
+  .predictions-sub-tabs-rail .feed-tab-bar.kickboard-tab-bar button,
+  .feed-tab-bar.kickboard-tab-bar button,
+  .event-tab-bar.kickboard-tab-bar button {
     flex: 1 1 0;
     font-size: var(--kickboard-tab-item-font-size);
     font-weight: var(--kickboard-tab-item-font-weight);
-    max-width: none;
+    hyphens: auto;
+    line-height: var(--kickboard-tab-item-line-height);
+    max-width: 100%;
     min-height: var(--kickboard-tab-item-min-height);
     min-width: 0;
-    white-space: nowrap;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
   }
 
   .feed-tab-bar.kickboard-tab-bar button.active,
@@ -9448,6 +9482,13 @@ code {
     box-shadow: none;
     color: var(--color-button-fill-fg);
     outline: none;
+  }
+
+  [data-theme="dark"] .feed-tab-bar.kickboard-tab-bar button.active,
+  [data-theme="dark"] .event-tab-bar.kickboard-tab-bar button.active,
+  [data-theme="dark"] .nav-tabs a.active {
+    background: var(--kickboard-mobile-tab-active-bg);
+    color: var(--color-button-fill-fg);
   }
 
   .site-footer {
@@ -9534,9 +9575,10 @@ code {
     flex: 1 1 0;
     font-size: var(--kickboard-tab-item-font-size);
     font-weight: var(--kickboard-tab-item-font-weight);
+    hyphens: auto;
     justify-content: center;
     line-height: var(--kickboard-tab-item-line-height);
-    max-width: none;
+    max-width: 100%;
     min-height: var(--kickboard-tab-item-min-height);
     min-width: 0;
     overflow: hidden;
@@ -9544,6 +9586,15 @@ code {
     padding: 4px 5px;
     text-align: center;
     white-space: normal;
+    word-break: break-word;
+  }
+
+  [data-theme="dark"]
+    .kickboard-mobile-dock-event
+    .current-event-section-tabs.event-tab-bar.kickboard-tab-bar
+    button.active {
+    background: var(--kickboard-mobile-tab-active-bg);
+    color: var(--color-button-fill-fg);
   }
 
   .nav-tabs {

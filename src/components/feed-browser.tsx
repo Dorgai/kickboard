@@ -9,6 +9,7 @@ import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { CurrentEventTabs } from "@/components/current-event-tabs";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
+import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 
 type WorldCupCompetition = {
   competitionId: number;
@@ -120,6 +121,7 @@ function hashTarget(): string | null {
 }
 
 export function FeedBrowser() {
+  const mobileEventTabs = useNarrowViewport(860);
   const [activeTab, setActiveTab] = useState<EventTab>("current");
   const [currentWorldCup, setCurrentWorldCup] = useState<CurrentWorldCup | null>(null);
   const [competitions, setCompetitions] = useState<WorldCupCompetition[]>([]);
@@ -333,14 +335,30 @@ export function FeedBrowser() {
           type="button"
           onClick={() => setActiveTab("current")}
         >
-          Current event
+          {mobileEventTabs ? (
+            <>
+              Current
+              <br />
+              event
+            </>
+          ) : (
+            "Current event"
+          )}
         </button>
         <button
           className={activeTab === "past" ? "active" : ""}
           type="button"
           onClick={() => setActiveTab("past")}
         >
-          Past events
+          {mobileEventTabs ? (
+            <>
+              Past
+              <br />
+              events
+            </>
+          ) : (
+            "Past events"
+          )}
         </button>
       </nav>
 
