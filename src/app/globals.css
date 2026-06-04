@@ -27,8 +27,8 @@
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
   --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 55%, transparent);
-  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-surface) 94%, var(--kickboard-tab-rail-bg));
-  --kickboard-tab-active-fg: var(--color-text-primary);
+  --kickboard-tab-active-bg: var(--color-button-fill);
+  --kickboard-tab-active-fg: var(--color-button-fill-fg);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
   --kickboard-tab-item-radius: 9999px;
@@ -66,8 +66,8 @@
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
   --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 72%, transparent);
-  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-surface) 90%, var(--kickboard-tab-rail-bg));
-  --kickboard-tab-active-fg: var(--color-text-primary);
+  --kickboard-tab-active-bg: var(--color-button-fill);
+  --kickboard-tab-active-fg: var(--color-button-fill-fg);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-brand) 16%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
   --kickboard-tab-item-radius: 9999px;
@@ -3674,6 +3674,15 @@ h3 {
 }
 
 @media (min-width: 861px) {
+  .feed-tab-bar.kickboard-tab-bar button.active,
+  .event-tab-bar.kickboard-tab-bar button.active,
+  .nav-tabs a.active {
+    background: var(--color-button-fill);
+    box-shadow: none;
+    color: var(--color-button-fill-fg);
+    outline: none;
+  }
+
   .kickboard-mobile-dock-event {
     background: transparent;
     border: none;
