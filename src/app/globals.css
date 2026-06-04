@@ -3670,6 +3670,11 @@ h3 {
   width: auto;
 }
 
+.feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar {
+  margin-bottom: 24px;
+  margin-top: 0;
+}
+
 .predictions-sub-tabs.feed-tab-bar button {
   white-space: nowrap;
 }
