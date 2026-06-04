@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpTooltip } from "@/components/help-tooltip";
 import { signIn, useSession } from "next-auth/react";
 import { FormEvent, useEffect, useState } from "react";
 
@@ -43,11 +44,13 @@ export function AuthGate({
   if (!session?.user) {
     return (
       <div className="auth-gate">
-        <h3>Sign in to use {featureLabel}</h3>
-        <p className="community-panel-lead">
-          Register with Google (OAuth). We use your account for squads, Fan Chat, and predictions — not
-          a separate community password.
-        </p>
+        <h3 className="panel-help-row">
+          Sign in to use {featureLabel}
+          <HelpTooltip label="Why sign in" size="sm">
+            Register with Google (OAuth). We use your account for squads, Fan Chat, and predictions — not a
+            separate community password.
+          </HelpTooltip>
+        </h3>
         {oauthConfigured === false ? (
           <div className="auth-oauth-setup-help">
             <p className="inline-status">
@@ -117,11 +120,13 @@ export function AuthGate({
 
     return (
       <form className="auth-gate" onSubmit={handleOnboarding}>
-        <h3>Confirm your age</h3>
-        <p className="community-panel-lead">
-          Required for child-safety rules. Accounts under 13 stay in Fan Mode and cannot post on the Coach
-          Board.
-        </p>
+        <h3 className="panel-help-row">
+          Confirm your age
+          <HelpTooltip label="Why we ask" size="sm">
+            Required for child-safety rules. Accounts under 13 stay in Fan Mode and cannot post on the
+            Coach Board.
+          </HelpTooltip>
+        </h3>
         <label className="feed-control-field">
           Birth year
           <input

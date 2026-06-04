@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { PREDICTION_ACTIVITY_EVENT } from "@/lib/fixture-predictions/activity-events";
 
 type PredictionEvent = {
@@ -97,10 +98,13 @@ export function ConnectionActivityTimeline({ refreshToken = 0 }: { refreshToken?
   return (
     <section className="connection-activity-timeline data-card surface-muted" aria-label="Connection moves">
       <header className="connection-activity-timeline-header">
-        <h3>Connection moves</h3>
-        <p className="connection-activity-timeline-lead">
-          Pick changes from your connections appear here when they save, update, or remove predictions.
-        </p>
+        <h3 className="panel-help-row">
+          Connection moves
+          <HelpTooltip label="Connection moves feed" size="sm">
+            Pick changes from your connections appear here when they save, update, or remove
+            predictions.
+          </HelpTooltip>
+        </h3>
       </header>
 
       {loading ? <p className="inline-status">Loading timeline…</p> : null}

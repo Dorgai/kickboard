@@ -8,6 +8,7 @@ import {
   type ScorerPick
 } from "@/lib/fixture-predictions/types";
 import { PREDICTION_BLOCKS, PREDICTION_BLOCK_SHORT } from "@/lib/fixture-predictions/labels";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { PredictionShareButtons } from "@/components/prediction-share-buttons";
 import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
 import type { PredictionSharePayload } from "@/lib/predictions/share";
@@ -262,16 +263,18 @@ export function PredictionsOverview({
     <div className="predictions-overview">
       <section className="predictions-results-board data-card">
         <header className="predictions-results-board-header">
-          <h3>Your points</h3>
+          <h3 className="panel-help-row">
+            Your points
+            <HelpTooltip label="Points summary" size="sm">
+              Earned <strong>{wallet.pointsWon}</strong> pts so far · <strong>{wallet.picksPending}</strong>{" "}
+              picks still waiting on results
+            </HelpTooltip>
+          </h3>
           <p className="predictions-wallet-balance">
             <span className="predictions-wallet-balance-value">{wallet.balance}</span>
             <span className="predictions-wallet-balance-label">points total</span>
           </p>
         </header>
-        <p className="predictions-results-board-lead">
-          Earned <strong>{wallet.pointsWon}</strong> pts so far · <strong>{wallet.picksPending}</strong> picks
-          still waiting on results
-        </p>
         <table className="predictions-results-table">
           <thead>
             <tr>

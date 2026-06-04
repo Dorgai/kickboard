@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { SquadPitch } from "@/components/squad-pitch";
 import type { SquadFormation, SquadLineupSlot } from "@/lib/squads/lineup";
 
@@ -106,11 +107,13 @@ export function FriendsMatchActivity({ fixtureKey, homeTeam, awayTeam }: Friends
   return (
     <section className="friends-match-activity" aria-label="Connected fans for this match">
       <div className="friends-match-activity-header">
-        <h3>Connections</h3>
-        <p className="community-panel-lead">
-          Squads and score picks from people you are connected with.{" "}
-          <a href="#community">Manage connections</a>
-        </p>
+        <h3 className="panel-help-row">
+          Connections
+          <HelpTooltip label="Connected fans on this match" size="sm">
+            Squads and score picks from people you are connected with.{" "}
+            <a href="#community">Manage connections</a>
+          </HelpTooltip>
+        </h3>
       </div>
 
       {error ? <p className="inline-status">{error}</p> : null}

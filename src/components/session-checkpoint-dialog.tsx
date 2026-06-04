@@ -11,6 +11,7 @@ import {
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 import { hasSeenWelcome } from "@/lib/welcome";
 import { TeamLabel } from "@/components/team-label";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 import type { SessionCheckpointPayload } from "@/lib/session-checkpoint/data";
 
@@ -318,10 +319,14 @@ export function SessionCheckpointDialog() {
         </div>
 
         <footer className="session-checkpoint-footer">
-          <button className="button primary" type="button" onClick={dismiss}>
-            Continue
-          </button>
-          <p className="session-checkpoint-footnote">Shown after sign-in and every 2 hours while you use Kickboard.</p>
+          <div className="session-checkpoint-footer-actions">
+            <button className="button primary" type="button" onClick={dismiss}>
+              Continue
+            </button>
+            <HelpTooltip label="When this dialog appears" size="sm">
+              Shown after sign-in and every 2 hours while you use Kickboard.
+            </HelpTooltip>
+          </div>
         </footer>
       </div>
     </dialog>

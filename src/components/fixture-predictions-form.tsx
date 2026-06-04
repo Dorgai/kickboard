@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/components/toast-provider";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { PredictionShareButtons } from "@/components/prediction-share-buttons";
 import type { PredictionSharePayload } from "@/lib/predictions/share";
 import { TeamLabel } from "@/components/team-label";
@@ -299,7 +300,12 @@ export function FixturePredictionsForm({
         className="fixture-prediction-field section-anchor"
         id={coachBoard ? undefined : PREDICTION_OUTCOME_SECTION_ID}
       >
-        <legend className="fixture-prediction-field-label">{PREDICTION_BLOCKS.outcome}</legend>
+        <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
+          {PREDICTION_BLOCKS.outcome}
+          <HelpTooltip label="Who wins help" size="sm">
+            {PREDICTION_HINTS.outcomeEmpty}
+          </HelpTooltip>
+        </legend>
         <div className="fixture-prediction-outcome-list" role="radiogroup" aria-label={PREDICTION_BLOCKS.outcome}>
           {OUTCOME_OPTIONS.map((option) => {
             const teamName = option.team === "home" ? homeTeam : option.team === "away" ? awayTeam : null;
@@ -332,9 +338,7 @@ export function FixturePredictionsForm({
             <p className="fixture-prediction-field-summary">
               {outcomeLabel(predictedOutcome, homeTeam, awayTeam)}
             </p>
-          ) : (
-            <p className="fixture-prediction-field-hint">{PREDICTION_HINTS.outcomeEmpty}</p>
-          )}
+          ) : null}
           <button
             className="text-button fixture-prediction-clear"
             disabled={!predictedOutcome}
@@ -347,7 +351,12 @@ export function FixturePredictionsForm({
       </fieldset>
 
       <fieldset className="fixture-prediction-field">
-        <legend className="fixture-prediction-field-label">{PREDICTION_BLOCKS.score}</legend>
+        <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
+          {PREDICTION_BLOCKS.score}
+          <HelpTooltip label="Final score help" size="sm">
+            {PREDICTION_HINTS.scoreOptional}
+          </HelpTooltip>
+        </legend>
         <div className="fixture-prediction-scoreline" role="group" aria-label={PREDICTION_BLOCKS.score}>
           <div className="fixture-prediction-score-team">
             <TeamLabel name={homeTeam} size={compact ? "xs" : "sm"} />
@@ -381,7 +390,6 @@ export function FixturePredictionsForm({
             />
           </div>
         </div>
-        <p className="fixture-prediction-field-hint">{PREDICTION_HINTS.scoreOptional}</p>
       </fieldset>
 
       {!coachBoard ? (
@@ -402,9 +410,17 @@ export function FixturePredictionsForm({
             onClick={() => setScorersExpanded((open) => !open)}
           >
             <span className="fixture-prediction-scorers-toggle-copy">
-              <span className="fixture-prediction-scorers-toggle-title">{PREDICTION_BLOCKS.scorers}</span>
-              <span className="fixture-prediction-scorers-toggle-hint">
-                {scorersExpanded ? PREDICTION_HINTS.scorersHideList : PREDICTION_HINTS.scorersShowList}
+              <span className="fixture-prediction-scorers-toggle-title fixture-prediction-field-label--with-help">
+                {PREDICTION_BLOCKS.scorers}
+                <HelpTooltip
+                  label="Goal scorers help"
+                  size="sm"
+                  onClick={(event) => event.stopPropagation()}
+                  onPointerDown={(event) => event.stopPropagation()}
+                >
+                  {PREDICTION_HINTS.scorersLead}.{" "}
+                  {scorersExpanded ? PREDICTION_HINTS.scorersHideList : PREDICTION_HINTS.scorersShowList}
+                </HelpTooltip>
               </span>
             </span>
             <span aria-hidden className="fixture-prediction-scorers-chevron" />
@@ -450,7 +466,6 @@ export function FixturePredictionsForm({
           ) : null}
           {scorersExpanded ? (
             <div className="fixture-prediction-scorers-panel" id="fixture-scorers-picker">
-              <p className="fixture-prediction-field-hint">{PREDICTION_HINTS.scorersLead}</p>
               <input
                 ref={scorerSearchRef}
                 aria-label="Search scorers"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   buildFacebookShareUrl,
   buildPredictionAppDeepLink,
@@ -188,17 +189,21 @@ export function PredictionShareButtons({
 
   return (
     <div className={`prediction-share${className ? ` ${className}` : ""}`}>
-      <p className="prediction-share-label">Share your pick</p>
+      <div className="prediction-share-label-row">
+        <p className="prediction-share-label">Share your pick</p>
+        <HelpTooltip label="How sharing works" size="sm">
+          {shareLink.status === "ready" && shareLink.mode === "short"
+            ? "Short link ready — safe to paste in texts and social apps. "
+            : null}
+          Friends should open the Kickboard link (not only the caption). You can also send them{" "}
+          <a href={appLink}>this match on Kickboard</a>.
+        </HelpTooltip>
+      </div>
       {shareLink.status === "loading" ? (
         <p className="inline-status">Preparing short share link…</p>
       ) : null}
       {shareLink.status === "error" ? (
         <p className="inline-status">{shareLink.message}</p>
-      ) : null}
-      {shareLink.status === "ready" && shareLink.mode === "short" ? (
-        <p className="prediction-share-hint">
-          Short link ready — safe to paste in texts and social apps.
-        </p>
       ) : null}
       <div className="prediction-share-actions">
         <button
@@ -236,10 +241,6 @@ export function PredictionShareButtons({
           Copy
         </button>
       </div>
-      <p className="prediction-share-hint">
-        Friends should open the Kickboard link (not only the caption). You can also send them{" "}
-        <a href={appLink}>this match on Kickboard</a>.
-      </p>
       {notice ? <p className="inline-status community-notice">{notice}</p> : null}
       {error ? <p className="inline-status">{error}</p> : null}
     </div>

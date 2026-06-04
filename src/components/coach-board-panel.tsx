@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
+import { PanelHelpRow } from "@/components/help-tooltip";
 import { FriendsMatchActivity } from "@/components/friends-match-activity";
 import { SavedSquadsBar } from "@/components/saved-squads-bar";
 import { SquadBuilder } from "@/components/squad-builder";
@@ -114,10 +115,17 @@ export function CoachBoardPanel({
   return (
     <AuthGate featureLabel="Coach Board">
       <div className="coach-board-panel">
-        <p className="community-panel-lead">
-          <strong>{fixtureLabel}</strong> — squads and published lineups here are scoped to this fixture.
-          Fan Chat text posts are still moderated separately.
-        </p>
+        <PanelHelpRow
+          className="panel-help-row--block"
+          help={
+            <>
+              <strong>{fixtureLabel}</strong> — squads and published lineups here are scoped to this
+              fixture. Fan Chat text posts are still moderated separately.
+            </>
+          }
+          helpLabel="About Coach Board for this match"
+          title={fixtureLabel}
+        />
 
         <SavedSquadsBar
           activeSquadId={activeSquadId}

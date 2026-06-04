@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { isFixtureDragEvent, readFixtureDragData } from "@/lib/fixtures/drag-fixture";
+import { HelpTooltip } from "@/components/help-tooltip";
 import type { SquadSummary } from "@/lib/squads/store";
 
 type SavedSquadsBarProps = {
@@ -70,24 +71,27 @@ export function SavedSquadsBar({
       onDrop={onFixtureDrop ? handleDrop : undefined}
     >
       <div className="saved-squads-bar-header">
-        <h3>Your saved boards</h3>
+        <h3 className="saved-squads-bar-title">
+          Your saved boards
+          {onFixtureDrop || (touchLayout && fixtureLabel) ? (
+            <HelpTooltip label="Saved boards help" size="sm">
+              {fixtureLabel ? (
+                <>
+                  Boards for <strong>{fixtureLabel}</strong>.
+                  {onFixtureDrop
+                    ? " Drag a match from the list to switch, or click a match."
+                    : " Tap another match above to switch."}
+                </>
+              ) : (
+                <>Drag a match from the list onto this area to open its boards.</>
+              )}
+            </HelpTooltip>
+          ) : null}
+        </h3>
         <button className="button secondary saved-squads-new" type="button" onClick={onNew}>
           New board
         </button>
       </div>
-
-      {onFixtureDrop || (touchLayout && fixtureLabel) ? (
-        <p className="saved-squads-bar-hint">
-          {fixtureLabel ? (
-            <>
-              Boards for <strong>{fixtureLabel}</strong>.
-              {onFixtureDrop ? " Drag a match from the list to switch, or click a match." : " Tap another match above to switch."}
-            </>
-          ) : onFixtureDrop ? (
-            <>Drag a match from the list onto this area to open its boards.</>
-          ) : null}
-        </p>
-      ) : null}
 
       {loading ? <p className="inline-status">Loading saved boards…</p> : null}
 

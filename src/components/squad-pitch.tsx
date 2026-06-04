@@ -9,6 +9,7 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent
 } from "react";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   clampPitchCoord,
   nearestFormationSlotNumber,
@@ -342,10 +343,12 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
   return (
     <div className={`squad-pitch-wrap${readOnly ? " squad-pitch-wrap--readonly" : ""}`}>
       {!readOnly ? (
-        <p className="squad-pitch-hint squad-pitch-hint--compact">
-          Drag from the bench onto that team&apos;s half. Drag a name on the pitch to swap positions or drop on
-          their bench to remove. Tap Remove on a selected player or tap an on-pitch bench chip.
-        </p>
+        <div className="squad-pitch-help-row">
+          <HelpTooltip label="Pitch controls" size="sm">
+            Drag from the bench onto that team&apos;s half. Drag a name on the pitch to swap positions or
+            drop on their bench to remove. Tap Remove on a selected player or tap an on-pitch bench chip.
+          </HelpTooltip>
+        </div>
       ) : null}
       <div
         aria-label="Football pitch with home and away teams"

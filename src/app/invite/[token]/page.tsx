@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 type InvitePreview = {
   inviterDisplayName: string;
@@ -99,11 +100,13 @@ export default function InviteRegistrationPage() {
 
         {!loading && !error && preview ? (
           <>
-            <h1>Join {preview.inviterDisplayName} on Kickboard</h1>
-            <p className="community-panel-lead">
-              <strong>{preview.inviterDisplayName}</strong> invited you to register on Kickboard — free
-              skill games, Coach Board squads, and predictions for the World Cup.
-            </p>
+            <h1 className="panel-help-row invite-page-title">
+              Join {preview.inviterDisplayName} on Kickboard
+              <HelpTooltip label="About this invite" size="sm">
+                <strong>{preview.inviterDisplayName}</strong> invited you to register on Kickboard — free
+                skill games, Coach Board squads, and predictions for the World Cup.
+              </HelpTooltip>
+            </h1>
             <p className="invite-registration-inviter-handle">
               Invited by @{preview.inviterUsername}
             </p>
@@ -130,10 +133,12 @@ export default function InviteRegistrationPage() {
             >
               Continue with Google
             </button>
-            <p className="invite-registration-footnote">
-              After sign-in you&apos;ll confirm your birth year. You&apos;ll then be connected with{" "}
-              {preview.inviterDisplayName}.
-            </p>
+            <div className="invite-registration-footnote-row">
+              <HelpTooltip label="After you sign in" size="sm">
+                After sign-in you&apos;ll confirm your birth year. You&apos;ll then be connected with{" "}
+                {preview.inviterDisplayName}.
+              </HelpTooltip>
+            </div>
           </>
         ) : null}
       </div>

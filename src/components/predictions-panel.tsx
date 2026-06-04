@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { AuthGate } from "@/components/auth-gate";
+import { PanelHelpRow } from "@/components/help-tooltip";
 import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
 import { PredictionsOverview } from "@/components/predictions-overview";
 import { UserPickActivityPanel } from "@/components/user-pick-activity-panel";
@@ -141,9 +142,17 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
 
         <UserPickActivityPanel refreshToken={activityRefresh} />
 
-        <p className="community-panel-lead predictions-settle-note">
-          Points update after each match finishes. Until then, picks show as <strong>Pending</strong>.
-        </p>
+        <PanelHelpRow
+          className="panel-help-row--block predictions-settle-help"
+          help={
+            <>
+              Points update after each match finishes. Until then, picks show as <strong>Pending</strong>.
+            </>
+          }
+          helpLabel="How points settle"
+          title="Scoring"
+          titleClassName="predictions-settle-help-title"
+        />
       </div>
     </AuthGate>
   );

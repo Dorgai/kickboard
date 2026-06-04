@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { adminFetch, type AdminAuthMode } from "@/lib/admin/fetch";
 
 type AdminHelpListItem = {
@@ -138,10 +139,12 @@ export function AdminHelpSupportPanel({ auth }: { auth: { mode: AdminAuthMode; t
     <section className="admin-help-panel data-card surface-muted" aria-label="Help and support">
       <header className="admin-help-panel-header">
         <div>
-          <h3>Help & support</h3>
-          <p className="admin-help-panel-lead">
-            All Kickboard AI and admin threads are stored here for audit and follow-up.
-          </p>
+          <h3 className="panel-help-row">
+            Help & support
+            <HelpTooltip label="Admin help inbox" size="sm">
+              All Kickboard AI and admin threads are stored here for audit and follow-up.
+            </HelpTooltip>
+          </h3>
         </div>
         <div className="admin-help-filters feed-tab-bar">
           <button

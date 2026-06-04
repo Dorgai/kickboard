@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { FanChatMessageStatus } from "@/components/fan-chat-message-status";
 import type { FanChatBroadcastSummary, FanChatInboxThread, FanChatMessage } from "@/lib/fan-chat/store";
 import { CONNECTIONS_CHANGED_EVENT } from "@/lib/social/events";
@@ -207,11 +208,6 @@ export function FanChatMessenger() {
 
   return (
     <div className="fan-chat-messenger fan-chat-messenger--inbox">
-      <p className="fan-chat-messenger-lead">
-        Message your connections in private threads. Add friends in{" "}
-        <Link href="/#community">Community</Link> and accept requests to unlock chat.
-      </p>
-
       {loading ? <p className="inline-status">Loading conversations…</p> : null}
       {error ? <p className="inline-error">{error}</p> : null}
       {notice ? <p className="inline-status community-notice">{notice}</p> : null}
@@ -219,7 +215,13 @@ export function FanChatMessenger() {
       <div className="fan-chat-inbox-layout">
         <aside aria-label="Conversations" className="fan-chat-inbox-list">
           <p className="fan-chat-inbox-list-heading">
-            Conversations
+            <span className="panel-help-row">
+              <span>Conversations</span>
+              <HelpTooltip label="How Fan Chat works" size="sm">
+                Message your connections in private threads. Add friends in{" "}
+                <Link href="/#community">Community</Link> and accept requests to unlock chat.
+              </HelpTooltip>
+            </span>
             {totalUnread > 0 ? (
               <span className="fan-chat-inbox-unread-total">{totalUnread} unread</span>
             ) : null}

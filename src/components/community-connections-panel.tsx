@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
 import { ConnectionActivityTimeline } from "@/components/connection-activity-timeline";
 import { RegistrationInvitationsPanel } from "@/components/registration-invitations-panel";
+import { PanelHelpRow } from "@/components/help-tooltip";
 import { notifyConnectionsChanged } from "@/lib/social/events";
 
 type PublicUserCard = {
@@ -161,10 +162,19 @@ function ConnectionsPanelInner() {
     <div className="community-connections-panel">
       <RegistrationInvitationsPanel />
 
-      <p className="community-panel-lead">
-        Connect with other registered fans. Once you accept each other, you can see their Coach Board
-        squads and score picks for the same match — free-to-play predictions, not real-money betting.
-      </p>
+      <PanelHelpRow
+        className="panel-help-row--block community-panel-help"
+        help={
+          <>
+            Connect with other registered fans. Once you accept each other, you can see their Coach
+            Board squads and score picks for the same match — free-to-play predictions, not
+            real-money betting.
+          </>
+        }
+        helpLabel="About connections"
+        title="Connections"
+        titleClassName="community-panel-help-title"
+      />
 
       <ConnectionActivityTimeline />
 

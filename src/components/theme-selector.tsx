@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpTooltip } from "@/components/help-tooltip";
 import { useTheme } from "@/components/theme-provider";
 import type { ThemeMode } from "@/lib/theme";
 
@@ -20,8 +21,11 @@ export function ThemeSelector({ variant = "header" }: ThemeSelectorProps) {
   if (variant === "menu") {
     return (
       <div className="app-menu-theme" role="group" aria-label="Color theme">
-        <p className="app-menu-theme-label" id="app-menu-theme-label">
+        <p className="app-menu-theme-label panel-help-row" id="app-menu-theme-label">
           Theme
+          <HelpTooltip label="Auto theme behavior" size="sm">
+            Auto is light on mobile; on desktop it follows your device.
+          </HelpTooltip>
         </p>
         <div aria-labelledby="app-menu-theme-label" className="app-menu-theme-options">
           {OPTIONS.map((option) => (
@@ -36,7 +40,6 @@ export function ThemeSelector({ variant = "header" }: ThemeSelectorProps) {
             </button>
           ))}
         </div>
-        <p className="app-menu-theme-hint">Auto is light on mobile; on desktop it follows your device.</p>
       </div>
     );
   }

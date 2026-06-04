@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { HelpTooltip, PanelHelpRow } from "@/components/help-tooltip";
 
 type CommunityUser = {
   id: string;
@@ -192,9 +193,12 @@ export function CommunityPanel({ embedded = false }: { embedded?: boolean }) {
         <header className="community-panel-header">
           <div>
             <p className="eyebrow">Fan Chat</p>
-            <p className="community-panel-lead">
-              Short moderated posts. Sign in with Google on Current event (OAuth).
-            </p>
+            <h3 className="panel-help-row community-panel-title">
+              Community posts
+              <HelpTooltip label="Community posts" size="sm">
+                Short moderated posts. Sign in with Google on Current event (OAuth).
+              </HelpTooltip>
+            </h3>
           </div>
           {user ? (
             <div className="community-session-chip">
@@ -206,9 +210,12 @@ export function CommunityPanel({ embedded = false }: { embedded?: boolean }) {
           ) : null}
         </header>
       ) : (
-        <p className="community-panel-lead">
-          Text-only posts for match takes. Squad shares belong on the Coach Board above.
-        </p>
+        <PanelHelpRow
+          className="panel-help-row--block"
+          help="Text-only posts for match takes. Squad shares belong on the Coach Board above."
+          helpLabel="Embedded community posts"
+          title="Fan Chat posts"
+        />
       )}
 
       {error ? <p className="inline-error">{error}</p> : null}
@@ -216,11 +223,13 @@ export function CommunityPanel({ embedded = false }: { embedded?: boolean }) {
 
       {!embedded && !user ? (
         <form className="community-join-form" onSubmit={handleJoin}>
-          <h3>Legacy join (dev)</h3>
-          <p className="community-panel-lead">
-            Prefer Google sign-in on Current event. This fallback creates a local-only account when OAuth is
-            not configured.
-          </p>
+          <h3 className="panel-help-row">
+            Legacy join (dev)
+            <HelpTooltip label="Legacy join" size="sm">
+              Prefer Google sign-in on Current event. This fallback creates a local-only account when OAuth
+              is not configured.
+            </HelpTooltip>
+          </h3>
           <label className="feed-control-field">
             Display name
             <input

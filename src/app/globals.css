@@ -5421,6 +5421,40 @@ h3 {
   opacity: 1;
 }
 
+.info-tooltip--sm {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.info-tooltip-bubble a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.panel-help-row {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.panel-help-row--block {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.panel-help-row-title {
+  font-weight: inherit;
+}
+
+.fixture-prediction-field-label--with-help {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
 .feed-hero p,
 .feed-control-card p,
 .data-card p {
@@ -7540,12 +7574,63 @@ h3 {
   width: 100%;
 }
 
-.welcome-dialog-footnote {
-  color: var(--color-text-muted);
-  font-size: 12px;
-  line-height: 1.4;
-  margin: 0;
-  text-align: center;
+.welcome-dialog-title-row {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.welcome-dialog-feature-title {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.welcome-dialog-cta-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.prediction-share-label-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.session-checkpoint-footer-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.saved-squads-bar-title {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.squad-pitch-help-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+.community-panel-help-title {
+  font-size: 1rem;
+  font-weight: 800;
 }
 
 .session-checkpoint-dialog {

@@ -4,6 +4,7 @@ import { LayoutGrid, Target, Trophy, Users } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { OPEN_WELCOME_EVENT } from "@/lib/help/events";
 import { hasSeenWelcome, markWelcomeSeen } from "@/lib/welcome";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 
 const HIGHLIGHTS = [
@@ -87,8 +88,12 @@ export function WelcomeDialog() {
       <div className="welcome-dialog-panel">
         <header className="welcome-dialog-header">
           <p className="welcome-dialog-eyebrow">World Cup 2026</p>
-          <h2 id={titleId}>Welcome to Kickboard</h2>
-          <p className="welcome-dialog-lead">Everything fans need — in four tabs below.</p>
+          <h2 className="welcome-dialog-title-row" id={titleId}>
+            Welcome to Kickboard
+            <HelpTooltip label="What Kickboard includes" size="sm">
+              Everything fans need — in four tabs below.
+            </HelpTooltip>
+          </h2>
         </header>
 
         <ul className="welcome-dialog-highlights">
@@ -98,18 +103,26 @@ export function WelcomeDialog() {
                 <item.icon size={26} strokeWidth={2} />
               </span>
               <span className="welcome-dialog-copy">
-                <strong>{item.title}</strong>
-                <span>{item.line}</span>
+                <strong className="welcome-dialog-feature-title">
+                  {item.title}
+                  <HelpTooltip label={item.title} size="sm">
+                    {item.line}
+                  </HelpTooltip>
+                </strong>
               </span>
             </li>
           ))}
         </ul>
 
         <footer className="welcome-dialog-footer">
-          <button className="button welcome-dialog-cta" type="button" onClick={dismiss}>
-            Start exploring
-          </button>
-          <p className="welcome-dialog-footnote">Sign in anytime for squads, chat, and saved picks.</p>
+          <div className="welcome-dialog-cta-row">
+            <button className="button welcome-dialog-cta" type="button" onClick={dismiss}>
+              Start exploring
+            </button>
+            <HelpTooltip label="Sign in later" size="sm">
+              Sign in anytime for squads, chat, and saved picks.
+            </HelpTooltip>
+          </div>
         </footer>
       </div>
     </dialog>

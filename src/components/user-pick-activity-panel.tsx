@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 type PickEvent = {
   id: string;
@@ -44,11 +45,13 @@ export function UserPickActivityPanel({ refreshToken = 0 }: { refreshToken?: num
   return (
     <section className="user-pick-activity data-card surface-muted" aria-label="Your pick history">
       <header className="user-pick-activity-header">
-        <h3>Your pick history</h3>
-        <p className="user-pick-activity-lead">
-          Every save, change, or removal is logged here. Connections see updates in their timeline and
-          alerts.
-        </p>
+        <h3 className="panel-help-row">
+          Your pick history
+          <HelpTooltip label="Pick history" size="sm">
+            Every save, change, or removal is logged here. Connections see updates in their timeline
+            and alerts.
+          </HelpTooltip>
+        </h3>
       </header>
 
       {loading ? <p className="inline-status">Loading history…</p> : null}

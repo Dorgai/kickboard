@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CoachBoardPanel } from "@/components/coach-board-panel";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   FixtureMatchPicker,
   useFixtureOptions,
@@ -69,12 +70,14 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
       <div className="match-coach-row-header">
         <div>
           <p className="eyebrow">Per match</p>
-          <h2>Coach Board</h2>
-          <p className="match-coach-row-lead">
-            {touchLayout
-              ? "Tap a match below, then build your squad on the pitch."
-              : "Pick an upcoming fixture, then build and share a squad for that game only."}
-          </p>
+          <h2 className="panel-help-row">
+            Coach Board
+            <HelpTooltip label="How Coach Board works" size="sm">
+              {touchLayout
+                ? "Tap a match below, then build your squad on the pitch."
+                : "Pick an upcoming fixture, then build and share a squad for that game only."}
+            </HelpTooltip>
+          </h2>
         </div>
       </div>
 

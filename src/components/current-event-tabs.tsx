@@ -1,6 +1,6 @@
 "use client";
 
-import { Info } from "lucide-react";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
@@ -248,23 +248,16 @@ export function CurrentEventTabs({
               summary={summary}
               title={currentWorldCup?.title ?? "2026 FIFA World Cup"}
             />
-            <button
-              aria-label="About tournament squads and data sources"
-              className="info-tooltip"
-              type="button"
-            >
-              <Info aria-hidden className="info-tooltip-icon" size={18} />
-              <span className="info-tooltip-bubble" role="tooltip">
-                {currentWorldCup?.note ? (
-                  <>
-                    {currentWorldCup.note}
-                    {" "}
-                  </>
-                ) : null}
-                Tournament summary and groups come from public pages. Live scores appear when
-                API-Football and the worker are configured.
-              </span>
-            </button>
+            <HelpTooltip label="About tournament squads and data sources" size="md">
+              {currentWorldCup?.note ? (
+                <>
+                  {currentWorldCup.note}
+                  {" "}
+                </>
+              ) : null}
+              Tournament summary and groups come from public pages. Live scores appear when API-Football
+              and the worker are configured.
+            </HelpTooltip>
           </div>
         </div>
       </div>
