@@ -324,7 +324,10 @@ export function FeedBrowser() {
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
   return (
     <div className="feed-browser">
-      <nav className="event-tab-bar" aria-label="Tournament event selector">
+      <nav
+        className="event-tab-bar kickboard-tab-bar feed-event-selector-tabs"
+        aria-label="Tournament event selector"
+      >
         <button
           className={activeTab === "current" ? "active" : ""}
           type="button"
