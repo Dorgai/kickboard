@@ -6686,16 +6686,69 @@ h3 {
 }
 
 .bracket-cluster-teams {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px 12px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.bracket-cluster-teams::-webkit-scrollbar {
+  height: 6px;
+}
+
+.bracket-cluster-teams::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-text-secondary) 35%, transparent);
+  border-radius: 9999px;
 }
 
 .bracket-team-slot {
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--color-border);
-  border-radius: 0;
-  padding: 5px 0;
+  align-items: center;
+  background: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: none;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-width: min(9.5rem, 42vw);
+  padding: 10px 14px;
+  scroll-snap-align: start;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.bracket-team-slot .team-label {
+  justify-content: center;
+}
+
+.bracket-team-slot:hover {
+  background: var(--kickboard-tab-hover-bg);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  box-shadow: var(--shadow-surface);
+  transform: translateY(-1px);
+}
+
+.bracket-team-slot:focus-visible {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  outline-offset: 2px;
+}
+
+@media (hover: none) {
+  .bracket-team-slot:active {
+    background: var(--kickboard-tab-hover-bg);
+    border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+    transform: scale(0.98);
+  }
 }
 
 .bracket-tbd-slot {
