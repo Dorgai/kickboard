@@ -1302,7 +1302,7 @@ h3 {
 
 .current-event-section-tabs.event-tab-bar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 4px;
   justify-content: center;
   margin: 4px auto 18px;
@@ -9087,13 +9087,26 @@ code {
 
   .nav-tabs a {
     align-items: center;
+    background: transparent;
     display: inline-flex;
     flex: 0 0 auto;
     font-size: 12px;
+    font-weight: 500;
     min-height: 40px;
     padding: 0 10px;
     text-align: center;
     white-space: nowrap;
+  }
+
+  .nav-tabs a.active {
+    background: color-mix(in srgb, var(--color-text-primary) 16%, var(--color-surface));
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  .nav-tabs a:hover {
+    background: color-mix(in srgb, var(--color-text-primary) 10%, var(--color-surface));
+    color: var(--color-text-primary);
   }
 
   .tier-badge {
@@ -9241,48 +9254,82 @@ code {
 
   .current-event-section-tabs.event-tab-bar {
     bottom: 0;
-    gap: 5px;
+    flex-wrap: nowrap;
+    gap: 4px;
     justify-content: center;
     left: 0;
     margin-left: auto;
     margin-right: auto;
     max-width: calc(100% - 2 * max(var(--page-gutter), env(safe-area-inset-left, 0px)));
+    overflow-x: auto;
     padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
     position: fixed;
     right: 0;
+    scrollbar-width: none;
     top: auto;
     width: fit-content;
     z-index: 31;
   }
 
+  .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
+    display: none;
+  }
+
   .current-event-section-tabs.event-tab-bar button {
+    flex: 0 0 auto;
     font-size: 12px;
+    font-weight: 500;
     min-height: 42px;
     padding: 0 12px;
+    white-space: nowrap;
+  }
+
+  .current-event-section-tabs.event-tab-bar button.active {
+    background: color-mix(in srgb, var(--color-text-primary) 88%, var(--color-surface));
+    box-shadow: none;
+    color: var(--color-bg);
   }
 
   .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar {
     background: color-mix(in srgb, var(--color-surface) 96%, transparent);
     bottom: calc(var(--kickboard-event-tabs-dock) + env(safe-area-inset-bottom, 0px));
     box-shadow: var(--shadow-surface);
-    gap: 5px;
+    flex-wrap: nowrap;
+    gap: 4px;
     justify-content: center;
     left: 0;
     margin-left: auto;
     margin-right: auto;
     max-width: calc(100% - 2 * max(var(--page-gutter), env(safe-area-inset-left, 0px)));
+    overflow-x: auto;
     padding: 6px;
     position: fixed;
     right: 0;
+    scrollbar-width: none;
     top: auto;
     width: fit-content;
     z-index: 30;
   }
 
+  .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar::-webkit-scrollbar {
+    display: none;
+  }
+
   .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar button {
+    background: transparent;
+    box-shadow: none;
+    flex: 0 0 auto;
     font-size: 12px;
+    font-weight: 500;
     min-height: 38px;
     padding: 0 11px;
+    white-space: nowrap;
+  }
+
+  .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar button.active {
+    background: color-mix(in srgb, var(--color-text-primary) 88%, var(--color-surface));
+    box-shadow: none;
+    color: var(--color-bg);
   }
 
   .current-event-tabs-layout .fan-chat-float-root {
