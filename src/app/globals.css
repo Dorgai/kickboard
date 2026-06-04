@@ -9405,33 +9405,44 @@ code {
     padding: 12px;
   }
 
-  .feed-browser > .event-tab-bar,
+  .feed-browser > .event-tab-bar:not(.feed-event-selector-tabs),
   .feed-browser.admin-dashboard .admin-dashboard-tabs.event-tab-bar {
     justify-content: center;
     width: 100%;
   }
 
-  .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar {
+  .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar,
+  .predictions-sub-tabs-rail .feed-tab-bar.kickboard-tab-bar {
     -webkit-backdrop-filter: blur(14px) saturate(1.15);
     backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
     border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-    border-radius: var(--kickboard-tab-rail-radius);
+    border-radius: 9999px;
     box-shadow: var(--kickboard-tab-rail-shadow);
-    margin: 0 0 14px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    margin: 0 auto 14px;
+    max-width: min(24rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
     padding: var(--kickboard-tab-rail-padding);
+    width: fit-content;
+  }
+
+  .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar {
     position: sticky;
     top: max(12px, env(safe-area-inset-top, 0px));
     z-index: 16;
   }
 
-  .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar button {
+  .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar button,
+  .predictions-sub-tabs-rail .feed-tab-bar.kickboard-tab-bar button {
     flex: 1 1 0;
     font-size: var(--kickboard-tab-item-font-size);
     font-weight: var(--kickboard-tab-item-font-weight);
     max-width: none;
     min-height: var(--kickboard-tab-item-min-height);
     min-width: 0;
+    white-space: nowrap;
   }
 
   .feed-tab-bar.kickboard-tab-bar button.active,
@@ -9536,20 +9547,10 @@ code {
   }
 
   .predictions-sub-tabs-rail {
+    display: grid;
+    justify-items: center;
     margin-bottom: 12px;
-    padding-inline: 2px;
-  }
-
-  .predictions-sub-tabs-rail .kickboard-tab-bar {
-    margin-inline: auto;
-    max-width: 100%;
-    width: fit-content;
-  }
-
-  .predictions-sub-tabs-rail .kickboard-tab-bar button {
-    flex: 0 0 auto;
-    min-width: 0;
-    padding: 0 12px;
+    width: 100%;
   }
 
   .current-event-tabs-layout .fan-chat-float-root {
@@ -9559,7 +9560,7 @@ code {
     );
   }
 
-  .feed-browser > .event-tab-bar {
+  .feed-browser > .event-tab-bar:not(.feed-event-selector-tabs) {
     top: 72px;
   }
 
