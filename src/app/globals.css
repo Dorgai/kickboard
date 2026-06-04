@@ -26,6 +26,7 @@
   --color-button-fill: #4b5563;
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
+  --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 55%, transparent);
   --kickboard-tab-active-bg: color-mix(in srgb, var(--color-surface) 94%, var(--kickboard-tab-rail-bg));
   --kickboard-tab-active-fg: var(--color-text-primary);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
@@ -64,6 +65,7 @@
   --color-button-fill: #6b7280;
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
+  --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 72%, transparent);
   --kickboard-tab-active-bg: color-mix(in srgb, var(--color-surface) 90%, var(--kickboard-tab-rail-bg));
   --kickboard-tab-active-fg: var(--color-text-primary);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-brand) 16%, var(--color-surface));
@@ -3939,7 +3941,7 @@ h3 {
 }
 
 [data-theme="dark"] .fixture-prediction-outcome-list {
-  background: var(--color-bg);
+  background: transparent;
   border-color: var(--color-border);
 }
 
@@ -4003,22 +4005,14 @@ h3 {
 }
 
 .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
-  background: var(--color-surface);
-  box-shadow: var(--shadow-surface-hover);
-  outline: 2px solid color-mix(in srgb, var(--color-accent) 42%, transparent);
+  background: transparent;
+  box-shadow: none;
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
   outline-offset: -2px;
 }
 
-[data-theme="light"] .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-:root:not([data-theme]) .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
-  background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface));
-  box-shadow: var(--shadow-surface-hover);
-}
-
 [data-theme="dark"] .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
-  background: var(--color-surface);
-  box-shadow: var(--shadow-surface-hover);
-  outline-color: color-mix(in srgb, var(--color-brand) 55%, transparent);
+  outline-color: color-mix(in srgb, var(--color-brand) 55%, var(--color-border));
 }
 
 .fixture-prediction-outcome-text {
@@ -9208,16 +9202,18 @@ code {
   :root,
   [data-theme="light"],
   [data-theme="dark"] {
+    --kickboard-tab-rail-bg: var(--kickboard-mobile-dock-bg);
     --kickboard-tab-rail-shadow: var(--shadow-elevation-2);
-    --kickboard-tab-item-min-height: 34px;
-    --kickboard-tab-item-font-size: 10px;
-    --kickboard-tab-item-padding-x: 9px;
-    --kickboard-tab-rail-padding: 3px;
+    --kickboard-tab-item-min-height: 32px;
+    --kickboard-tab-item-font-size: 11px;
+    --kickboard-tab-item-padding-x: 10px;
+    --kickboard-tab-rail-padding: 4px;
+    --kickboard-tab-rail-radius: 16px;
   }
 
   :root {
-    --kickboard-event-tabs-dock: 44px;
-    --kickboard-site-nav-dock: 42px;
+    --kickboard-event-tabs-dock: 76px;
+    --kickboard-site-nav-dock: 44px;
     --kickboard-mobile-dock-bottom: 0px;
     --kickboard-mobile-dock-inset: max(10px, var(--page-gutter));
   }
@@ -9228,20 +9224,24 @@ code {
   }
 
   .nav-tabs {
-    background: var(--kickboard-tab-rail-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--kickboard-tab-rail-radius);
+    -webkit-backdrop-filter: blur(14px) saturate(1.15);
+    backdrop-filter: blur(14px) saturate(1.15);
+    background: var(--kickboard-mobile-dock-bg);
+    border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+    border-bottom: none;
+    border-radius: var(--kickboard-tab-rail-radius) var(--kickboard-tab-rail-radius) 0 0;
     bottom: calc(
       var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) +
         env(safe-area-inset-bottom, 0px)
     );
     box-shadow: var(--kickboard-tab-rail-shadow);
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
     left: var(--kickboard-mobile-dock-inset);
-    overflow-x: auto;
+    max-width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
+    overflow: visible;
     padding: var(--kickboard-tab-rail-padding);
     position: fixed;
     right: var(--kickboard-mobile-dock-inset);
@@ -9252,7 +9252,10 @@ code {
     align-items: center;
     background: transparent;
     display: inline-flex;
-    flex: 0 0 auto;
+    flex: 1 1 calc(50% - var(--kickboard-tab-rail-gap));
+    justify-content: center;
+    max-width: calc(50% - var(--kickboard-tab-rail-gap) / 2);
+    min-width: calc(50% - var(--kickboard-tab-rail-gap));
     text-align: center;
     white-space: nowrap;
   }
@@ -9415,16 +9418,20 @@ code {
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar {
-    background: var(--kickboard-tab-rail-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--kickboard-tab-rail-radius);
+    -webkit-backdrop-filter: blur(14px) saturate(1.15);
+    backdrop-filter: blur(14px) saturate(1.15);
+    background: var(--kickboard-mobile-dock-bg);
+    border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+    border-radius: 0 0 var(--kickboard-tab-rail-radius) var(--kickboard-tab-rail-radius);
+    border-top: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent);
     box-shadow: var(--kickboard-tab-rail-shadow);
+    flex-wrap: wrap;
     gap: var(--kickboard-tab-rail-gap);
+    justify-content: center;
     margin: 0 auto;
     max-width: 36rem;
-    overflow-x: auto;
+    overflow: visible;
     padding: var(--kickboard-tab-rail-padding);
-    scrollbar-width: none;
     width: 100%;
   }
 
@@ -9434,11 +9441,12 @@ code {
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar button {
     border-radius: var(--kickboard-tab-item-radius);
-    flex: 1 1 auto;
+    flex: 1 1 calc(50% - var(--kickboard-tab-rail-gap));
     font-size: var(--kickboard-tab-item-font-size);
     font-weight: var(--kickboard-tab-item-font-weight);
+    max-width: calc(50% - var(--kickboard-tab-rail-gap) / 2);
     min-height: var(--kickboard-tab-item-min-height);
-    min-width: 0;
+    min-width: calc(50% - var(--kickboard-tab-rail-gap));
     padding: 0 var(--kickboard-tab-item-padding-x);
   }
 
