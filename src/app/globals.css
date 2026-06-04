@@ -34,7 +34,9 @@
   --kickboard-tab-item-radius: 9999px;
   --kickboard-tab-rail-gap: 4px;
   --kickboard-tab-rail-padding: 4px;
+  /* Match header Menu / nav action pill shadow */
   --kickboard-tab-rail-shadow: var(--shadow-surface);
+  --kickboard-tab-chrome-border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
   --kickboard-tab-item-min-height: 36px;
   --kickboard-tab-item-font-size: 12px;
   --kickboard-tab-item-font-weight: 500;
@@ -74,7 +76,9 @@
   --kickboard-tab-item-radius: 9999px;
   --kickboard-tab-rail-gap: 4px;
   --kickboard-tab-rail-padding: 4px;
+  /* Match header Menu / nav action pill shadow */
   --kickboard-tab-rail-shadow: var(--shadow-surface);
+  --kickboard-tab-chrome-border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
   --kickboard-tab-item-min-height: 36px;
   --kickboard-tab-item-font-size: 12px;
   --kickboard-tab-item-font-weight: 500;
@@ -3665,9 +3669,9 @@ h3 {
   -webkit-backdrop-filter: blur(14px) saturate(1.15);
   backdrop-filter: blur(14px) saturate(1.15);
   background: var(--kickboard-tab-rail-bg);
-  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+  border: var(--kickboard-tab-chrome-border);
   border-radius: var(--kickboard-tab-rail-radius);
-  box-shadow: var(--kickboard-tab-rail-shadow);
+  box-shadow: var(--shadow-surface);
   box-sizing: border-box;
   flex-wrap: nowrap;
   gap: var(--kickboard-tab-rail-gap);
@@ -9416,7 +9420,9 @@ code {
   [data-theme="light"],
   [data-theme="dark"] {
     --kickboard-tab-rail-bg: var(--kickboard-mobile-dock-bg);
-    --kickboard-tab-rail-shadow: var(--shadow-elevation-2);
+    /* Match header Menu / nav action pill shadow */
+  --kickboard-tab-rail-shadow: var(--shadow-surface);
+  --kickboard-tab-chrome-border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
     --kickboard-tab-item-min-height: 44px;
     --kickboard-tab-item-font-size: 11px;
     --kickboard-tab-item-padding-x: 6px;
@@ -9442,13 +9448,13 @@ code {
     -webkit-backdrop-filter: blur(14px) saturate(1.15);
     backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
-    border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+    border: var(--kickboard-tab-chrome-border);
     border-radius: 9999px;
     bottom: calc(
       var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) + var(--kickboard-mobile-dock-bottom) +
         env(safe-area-inset-bottom, 0px)
     );
-    box-shadow: var(--kickboard-tab-rail-shadow);
+    box-shadow: var(--shadow-surface);
     display: flex;
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
@@ -9591,7 +9597,12 @@ code {
 
   .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar,
   .predictions-sub-tabs-rail .feed-tab-bar.kickboard-tab-bar {
+    -webkit-backdrop-filter: blur(14px) saturate(1.15);
+    backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
+    border: var(--kickboard-tab-chrome-border);
+    border-radius: var(--kickboard-tab-rail-radius);
+    box-shadow: var(--shadow-surface);
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
@@ -9690,8 +9701,13 @@ code {
     z-index: 31;
   }
 
-  .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar {
+  .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
+    -webkit-backdrop-filter: blur(14px) saturate(1.15);
+    backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
+    border: var(--kickboard-tab-chrome-border);
+    border-radius: var(--kickboard-tab-rail-radius);
+    box-shadow: var(--shadow-surface);
     box-sizing: border-box;
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
