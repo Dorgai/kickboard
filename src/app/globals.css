@@ -5479,10 +5479,10 @@ h3 {
   font-weight: 500;
   left: 50%;
   letter-spacing: normal;
-  line-height: 1.4;
-  max-width: min(18rem, 80vw);
+  line-height: 1.45;
+  max-width: min(32rem, calc(100vw - 24px));
   opacity: 0;
-  padding: 8px 10px;
+  padding: 10px 12px;
   pointer-events: none;
   position: absolute;
   text-align: left;
@@ -6800,10 +6800,10 @@ h3 {
   font-weight: 500;
   left: 0;
   letter-spacing: normal;
-  line-height: 1.35;
-  max-width: 220px;
+  line-height: 1.45;
+  max-width: min(28rem, calc(100vw - 24px));
   opacity: 0;
-  padding: 8px 10px;
+  padding: 10px 12px;
   pointer-events: none;
   position: absolute;
   text-transform: none;
