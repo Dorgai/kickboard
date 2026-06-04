@@ -9,6 +9,7 @@ type FixtureMatchHeaderProps = Pick<
 > & {
   className?: string;
   teamsSize?: "xs" | "sm" | "md";
+  align?: "start" | "center";
 };
 
 function fixtureEyebrow(group: string | null, status: FixtureOption["status"]) {
@@ -45,13 +46,16 @@ export function FixtureMatchHeader({
   homeGoals,
   awayGoals,
   className = "",
-  teamsSize = "sm"
+  teamsSize = "sm",
+  align = "start"
 }: FixtureMatchHeaderProps) {
   const hasScore = homeGoals != null && awayGoals != null;
   const meta = fixtureMatchMeta(date);
 
   return (
-    <header className={`match-focus-scoreline fixture-match-header${className ? ` ${className}` : ""}`}>
+    <header
+      className={`match-focus-scoreline fixture-match-header fixture-match-header--${align}${className ? ` ${className}` : ""}`}
+    >
       <p className="eyebrow">{fixtureEyebrow(group, status)}</p>
       <MatchTeamsLine
         awayScore={hasScore ? awayGoals : undefined}

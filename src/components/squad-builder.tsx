@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { FixturePredictionPick } from "@/components/fixture-prediction-pick";
 import { SquadPitch, type SquadPitchHandle } from "@/components/squad-pitch";
 import { SquadTeamBench } from "@/components/squad-player-pool";
@@ -37,6 +37,8 @@ type SquadBuilderProps = {
   homeTeam: string;
   awayTeam: string;
   activeSquadId: string | null;
+  /** Rendered centered directly above the pitch (Coach Board match header). */
+  pitchHeader?: ReactNode;
   onSaved: (squadId: string) => void | Promise<void>;
 };
 
@@ -50,6 +52,7 @@ export function SquadBuilder({
   homeTeam,
   awayTeam,
   activeSquadId,
+  pitchHeader,
   onSaved
 }: SquadBuilderProps) {
   const [formations, setFormations] = useState<MatchFormations>(defaultMatchFormations);
@@ -394,6 +397,7 @@ export function SquadBuilder({
       <div className="squad-builder-layout squad-builder-layout--stacked">
         <div className="squad-builder-pitch-stack">
           {poolLabel ? <p className="squad-team-benches-source">{poolLabel}</p> : null}
+          {pitchHeader}
           <div className="squad-builder-pitch-stage">
             <SquadPitch
               ref={pitchDropRef}

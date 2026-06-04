@@ -128,31 +128,6 @@ export function CoachBoardPanel({
   return (
     <AuthGate featureLabel="Coach Board">
       <div className="coach-board-panel">
-        <div className="coach-board-fixture-header panel-help-row panel-help-row--block">
-          <FixtureMatchHeader
-            awayGoals={awayGoals}
-            awayTeam={awayTeam}
-            date={date}
-            group={group}
-            homeGoals={homeGoals}
-            homeTeam={homeTeam}
-            status={status}
-          />
-          <HelpTooltip label="About Coach Board for this match" size="sm">
-            {fixtureTeamsLabel ? (
-              <>
-                <strong>{fixtureTeamsLabel}</strong> — squads and published lineups here are scoped to
-                this fixture. Fan Chat text posts are still moderated separately.
-              </>
-            ) : (
-              <>
-                Squads and published lineups here are scoped to this fixture. Fan Chat text posts are
-                still moderated separately.
-              </>
-            )}
-          </HelpTooltip>
-        </div>
-
         <SavedSquadsBar
           activeSquadId={activeSquadId}
           fixtureLabel={fixtureTeamsLabel || fixtureLabel}
@@ -171,6 +146,37 @@ export function CoachBoardPanel({
           fixtureKey={fixtureKey}
           fixtureLabel={fixtureTeamsLabel || fixtureLabel}
           homeTeam={homeTeam}
+          pitchHeader={
+            <div className="coach-board-pitch-match-header">
+              <FixtureMatchHeader
+                align="center"
+                awayGoals={awayGoals}
+                awayTeam={awayTeam}
+                date={date}
+                group={group}
+                homeGoals={homeGoals}
+                homeTeam={homeTeam}
+                status={status}
+              />
+              <HelpTooltip
+                className="coach-board-pitch-match-header-help"
+                label="About Coach Board for this match"
+                size="sm"
+              >
+                {fixtureTeamsLabel ? (
+                  <>
+                    <strong>{fixtureTeamsLabel}</strong> — squads and published lineups here are scoped
+                    to this fixture. Fan Chat text posts are still moderated separately.
+                  </>
+                ) : (
+                  <>
+                    Squads and published lineups here are scoped to this fixture. Fan Chat text posts are
+                    still moderated separately.
+                  </>
+                )}
+              </HelpTooltip>
+            </div>
+          }
           onSaved={handleSquadSaved}
         />
 

@@ -2199,16 +2199,37 @@ h3 {
   gap: 16px;
 }
 
-.coach-board-fixture-header {
-  align-items: flex-start;
-  gap: 10px;
+.fixture-match-header--center {
+  align-items: center;
+  justify-items: center;
+  text-align: center;
 }
 
-.coach-board-fixture-header .fixture-match-header {
+.fixture-match-header--center .match-teams-line {
+  justify-content: center;
+}
+
+.coach-board-pitch-match-header {
+  position: relative;
+  width: 100%;
+}
+
+.coach-board-pitch-match-header .fixture-match-header {
   border-bottom: none;
-  flex: 1;
-  min-width: 0;
-  padding-bottom: 0;
+  margin: 0 auto;
+  max-width: 36rem;
+  padding-bottom: 4px;
+  width: 100%;
+}
+
+.coach-board-pitch-match-header-help {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.squad-builder-pitch-stack .coach-board-pitch-match-header + .squad-builder-pitch-stage {
+  margin-top: 4px;
 }
 
 .saved-squads-bar {
