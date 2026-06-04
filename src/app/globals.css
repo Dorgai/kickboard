@@ -62,13 +62,14 @@
   --shadow-elevation-3: 0 8px 20px rgba(0, 0, 0, 0.35), 0 20px 48px rgba(0, 0, 0, 0.45);
   --page-gutter: 24px;
   --page-padding-y: 64px;
-  --color-button-fill: #6b7280;
+  /* Dark active pills must read darker than rail/surface, not lighter grey */
+  --color-button-fill: color-mix(in srgb, var(--color-bg) 82%, var(--color-text-primary) 10%);
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
   --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 58%, transparent);
   --kickboard-tab-active-bg: var(--color-button-fill);
   --kickboard-tab-active-fg: var(--color-button-fill-fg);
-  --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-brand) 16%, var(--color-surface));
+  --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
   --kickboard-tab-item-radius: 9999px;
   --kickboard-tab-rail-gap: 4px;
@@ -5330,6 +5331,13 @@ h3 {
   color: var(--color-button-fill-fg);
 }
 
+[data-theme="dark"] .feed-tab-bar button.active,
+[data-theme="dark"] .event-tab-bar button.active {
+  background: var(--color-button-fill);
+  box-shadow: none;
+  color: var(--color-button-fill-fg);
+}
+
 .bracket-stage-tabs,
 .group-stage-tabs {
   max-width: 100%;
@@ -8309,6 +8317,12 @@ h3 {
   color: var(--color-text-primary);
 }
 
+[data-theme="dark"] .app-menu-theme-option--active {
+  background: var(--color-button-fill);
+  border-color: var(--color-button-fill);
+  color: var(--color-button-fill-fg);
+}
+
 .app-menu-theme-hint {
   color: var(--color-text-muted);
   font-size: 11px;
@@ -9688,6 +9702,40 @@ code {
     justify-items: center;
     margin-bottom: 12px;
     width: 100%;
+  }
+
+  .current-event-bracket .bracket-tabbed-section {
+    justify-items: center;
+  }
+
+  .current-event-bracket .bracket-stage-tabs.feed-tab-bar,
+  .current-event-bracket .bracket-stage-tabs.feed-control-bar,
+  .feed-browser .bracket-group-tabs.feed-control-bar,
+  .feed-browser .bracket-controls-row .bracket-stage-tabs.feed-control-bar {
+    display: flex;
+    flex-wrap: wrap;
+    grid-template-columns: unset;
+    justify-content: center;
+    margin-inline: auto;
+    max-width: 100%;
+    width: fit-content;
+  }
+
+  .feed-browser .bracket-controls-row {
+    justify-content: center;
+  }
+
+  .feed-browser .bracket-controls-row .bracket-competition-picker {
+    width: 100%;
+  }
+
+  .feed-browser .bracket-controls-row .bracket-stage-tabs.feed-control-bar {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .feed-browser .bracket-group-tabs.feed-control-bar {
+    margin-bottom: 12px;
   }
 
   .current-event-tabs-layout .fan-chat-float-root {
