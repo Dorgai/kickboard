@@ -9043,6 +9043,12 @@ code {
 }
 
 @media (max-width: 860px) {
+  :root {
+    --kickboard-site-nav-dock: 52px;
+    --kickboard-event-tabs-dock: 46px;
+    --kickboard-predictions-subtabs-dock: 34px;
+  }
+
   .nav-shell {
     grid-template-columns: 1fr auto;
     min-height: 64px;
@@ -9059,7 +9065,7 @@ code {
     justify-content: center;
     left: 0;
     overflow-x: auto;
-    padding: 6px 8px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
     position: fixed;
     right: 0;
     z-index: 30;
@@ -9204,14 +9210,32 @@ code {
     padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
   }
 
-  .event-tab-bar {
-    top: 72px;
+  .current-event-tabs-layout {
+    padding-bottom: calc(
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 16px +
+        env(safe-area-inset-bottom, 0px)
+    );
+  }
+
+  .current-event-tabs-layout:has(.current-event-predictions-tab) {
+    padding-bottom: calc(
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) +
+        var(--kickboard-predictions-subtabs-dock) + 20px + env(safe-area-inset-bottom, 0px)
+    );
   }
 
   .current-event-section-tabs.event-tab-bar {
+    bottom: calc(var(--kickboard-site-nav-dock) + env(safe-area-inset-bottom, 0px));
     gap: 3px;
-    margin-bottom: 14px;
+    left: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+    margin: 0;
+    max-width: none;
     padding: 3px;
+    position: fixed;
+    right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+    top: auto;
+    width: auto;
+    z-index: 29;
   }
 
   .current-event-section-tabs.event-tab-bar button {
@@ -9220,10 +9244,46 @@ code {
     padding: 0 9px;
   }
 
-  .predictions-sub-tabs.feed-tab-bar button {
+  .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar {
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+    bottom: calc(
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) +
+        env(safe-area-inset-bottom, 0px)
+    );
+    box-shadow: var(--shadow-surface);
+    left: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+    margin: 0;
+    max-width: none;
+    padding: 3px;
+    position: fixed;
+    right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+    top: auto;
+    width: auto;
+    z-index: 28;
+  }
+
+  .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar button {
     font-size: 11px;
     min-height: 28px;
     padding: 0 9px;
+  }
+
+  .current-event-tabs-layout .fan-chat-float-root {
+    bottom: calc(
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 12px +
+        env(safe-area-inset-bottom, 0px)
+    );
+  }
+
+  .current-event-tabs-layout:has(.current-event-predictions-tab) .fan-chat-float-root {
+    bottom: calc(
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) +
+        var(--kickboard-predictions-subtabs-dock) + 14px + env(safe-area-inset-bottom, 0px)
+    );
+  }
+
+  .feed-browser > .event-tab-bar {
+    top: 72px;
   }
 
   .theme-selector.event-tab-bar button {
