@@ -5338,8 +5338,9 @@ h3 {
 }
 
 .event-tab-bar button.active {
-  background: var(--color-button-fill);
-  color: var(--color-button-fill-fg);
+  background: var(--kickboard-tab-active-bg);
+  box-shadow: none;
+  color: var(--kickboard-tab-active-fg);
 }
 
 .feed-tab-bar {
@@ -5365,9 +5366,9 @@ h3 {
 }
 
 .feed-tab-bar button.active {
-  background: var(--color-button-fill);
-  box-shadow: var(--shadow-surface-hover);
-  color: var(--color-button-fill-fg);
+  background: var(--kickboard-tab-active-bg);
+  box-shadow: none;
+  color: var(--kickboard-tab-active-fg);
 }
 
 [data-theme="dark"] .feed-tab-bar button.active,
