@@ -2946,7 +2946,7 @@ h3 {
 
 .squad-builder-predictions {
   display: grid;
-  gap: 8px;
+  gap: 16px;
   min-width: 0;
   width: 100%;
 }
@@ -2955,7 +2955,7 @@ h3 {
   color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 800;
-  margin: 0;
+  margin: 0 0 4px;
 }
 
 .squad-builder-predictions .fixture-predictions-form--coach-board {
@@ -3588,7 +3588,7 @@ h3 {
 
 .predictions-panel {
   display: grid;
-  gap: 20px;
+  gap: 24px;
   justify-items: stretch;
 }
 
@@ -3705,13 +3705,17 @@ h3 {
 
 .predictions-sub-panel {
   display: grid;
-  gap: 20px;
+  gap: 24px;
   min-width: 0;
 }
 
 .tournament-predictions-section {
   display: grid;
-  gap: 12px;
+  gap: 20px;
+}
+
+.tournament-predictions-heading.panel-help-row--block {
+  margin-bottom: 2px;
 }
 
 .tournament-predictions-title {
@@ -3759,7 +3763,7 @@ h3 {
 
 .tournament-finalist-slot {
   display: grid;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -3882,31 +3886,32 @@ h3 {
   border-radius: 12px;
   box-shadow: var(--shadow-surface);
   display: grid;
-  gap: 18px;
-  padding: 16px 18px;
+  gap: 24px;
+  padding: 18px 20px;
 }
 
 .fixture-predictions-form--compact {
-  gap: 14px;
-  padding: 12px 14px;
+  gap: 20px;
+  padding: 14px 16px;
 }
 
 .fixture-prediction-field {
   border: none;
   display: grid;
-  gap: 10px;
+  gap: 16px;
   margin: 0;
   min-width: 0;
   padding: 0;
 }
 
-.fixture-prediction-field-label {
+.fixture-prediction-field-label,
+.fixture-prediction-field legend.fixture-prediction-field-label {
   color: var(--color-text-primary);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.03em;
   margin: 0;
-  padding: 0;
+  padding: 0 0 6px;
 }
 
 .fixture-prediction-field-hint,
@@ -4051,7 +4056,7 @@ h3 {
   display: flex;
   flex: 0 1 auto;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
   text-align: center;
 }
@@ -4547,7 +4552,7 @@ h3 {
 
 .fixture-prediction-scorers-panel {
   display: grid;
-  gap: 10px;
+  gap: 14px;
 }
 
 .fixture-scorer-pool-list,
@@ -5769,8 +5774,13 @@ h3 {
 
 .panel-help-row--block {
   display: flex;
+  gap: 10px;
   justify-content: space-between;
   width: 100%;
+}
+
+.predictions-settle-help.panel-help-row--block {
+  margin-top: 4px;
 }
 
 .panel-help-row-title {
