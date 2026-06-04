@@ -9060,7 +9060,7 @@ code {
   .nav-tabs {
     background: var(--color-surface);
     border-top: 1px solid var(--color-border);
-    bottom: 0;
+    bottom: calc(var(--kickboard-event-tabs-dock) + env(safe-area-inset-bottom, 0px));
     box-shadow: var(--shadow-elevation-2);
     display: flex;
     flex-wrap: nowrap;
@@ -9068,16 +9068,19 @@ code {
     justify-content: center;
     left: 0;
     overflow-x: auto;
-    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+    padding: 8px 8px;
     position: fixed;
     right: 0;
     z-index: 30;
   }
 
   .nav-tabs a {
+    align-items: center;
+    display: inline-flex;
     flex: 0 0 auto;
-    font-size: 11px;
-    padding: 10px 8px;
+    font-size: 12px;
+    min-height: 40px;
+    padding: 0 10px;
     text-align: center;
     white-space: nowrap;
   }
@@ -9205,16 +9208,15 @@ code {
 
   main,
   .feed-browser {
-    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-  }
-
-  .feed-browser {
-    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 24px +
+        env(safe-area-inset-bottom, 0px)
+    );
   }
 
   .current-event-tabs-layout {
     padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 16px +
+      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 20px +
         env(safe-area-inset-bottom, 0px)
     );
   }
@@ -9222,69 +9224,67 @@ code {
   .current-event-tabs-layout:has(.current-event-predictions-tab) {
     padding-bottom: calc(
       var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) +
-        var(--kickboard-predictions-subtabs-dock) + 20px + env(safe-area-inset-bottom, 0px)
+        var(--kickboard-predictions-subtabs-dock) + 24px + env(safe-area-inset-bottom, 0px)
     );
   }
 
   .current-event-section-tabs.event-tab-bar {
-    bottom: calc(var(--kickboard-site-nav-dock) + env(safe-area-inset-bottom, 0px));
-    gap: 3px;
+    bottom: 0;
+    gap: 5px;
     justify-content: center;
     left: 0;
     margin-left: auto;
     margin-right: auto;
     max-width: calc(100% - 2 * max(var(--page-gutter), env(safe-area-inset-left, 0px)));
-    padding: 3px;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
     position: fixed;
     right: 0;
     top: auto;
     width: fit-content;
-    z-index: 29;
+    z-index: 31;
   }
 
   .current-event-section-tabs.event-tab-bar button {
-    font-size: 11px;
-    min-height: 30px;
-    padding: 0 9px;
+    font-size: 12px;
+    min-height: 42px;
+    padding: 0 12px;
   }
 
   .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar {
     background: color-mix(in srgb, var(--color-surface) 96%, transparent);
-    bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) +
-        env(safe-area-inset-bottom, 0px)
-    );
+    bottom: calc(var(--kickboard-event-tabs-dock) + env(safe-area-inset-bottom, 0px));
     box-shadow: var(--shadow-surface);
+    gap: 5px;
     justify-content: center;
     left: 0;
     margin-left: auto;
     margin-right: auto;
     max-width: calc(100% - 2 * max(var(--page-gutter), env(safe-area-inset-left, 0px)));
-    padding: 3px;
+    padding: 6px;
     position: fixed;
     right: 0;
     top: auto;
     width: fit-content;
-    z-index: 28;
+    z-index: 30;
   }
 
   .current-event-predictions-tab .predictions-sub-tabs.feed-tab-bar button {
-    font-size: 11px;
-    min-height: 28px;
-    padding: 0 9px;
+    font-size: 12px;
+    min-height: 38px;
+    padding: 0 11px;
   }
 
   .current-event-tabs-layout .fan-chat-float-root {
     bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + 12px +
+      var(--kickboard-event-tabs-dock) + var(--kickboard-site-nav-dock) + 14px +
         env(safe-area-inset-bottom, 0px)
     );
   }
 
   .current-event-tabs-layout:has(.current-event-predictions-tab) .fan-chat-float-root {
     bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) +
-        var(--kickboard-predictions-subtabs-dock) + 14px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-event-tabs-dock) + var(--kickboard-predictions-subtabs-dock) +
+        var(--kickboard-site-nav-dock) + 16px + env(safe-area-inset-bottom, 0px)
     );
   }
 
