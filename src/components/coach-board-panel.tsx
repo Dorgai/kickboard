@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
-import { PanelHelpRow } from "@/components/help-tooltip";
+import { HelpTooltip } from "@/components/help-tooltip";
+import { FixtureMatchHeader } from "@/components/fixture-match-header";
+import { formatFixtureTeamsLabel, type FixtureOption } from "@/lib/fixtures/fixture-key";
 import { FriendsMatchActivity } from "@/components/friends-match-activity";
 import { SavedSquadsBar } from "@/components/saved-squads-bar";
 import { SquadBuilder } from "@/components/squad-builder";
@@ -21,6 +23,11 @@ type CoachBoardPanelProps = {
   fixtureLabel: string;
   homeTeam: string;
   awayTeam: string;
+  group?: string | null;
+  date?: string | null;
+  status?: FixtureOption["status"];
+  homeGoals?: number | null;
+  awayGoals?: number | null;
   touchLayout?: boolean;
   onFixtureDrop?: (fixtureKey: string) => void;
 };
@@ -30,9 +37,15 @@ export function CoachBoardPanel({
   fixtureLabel,
   homeTeam,
   awayTeam,
+  group = null,
+  date = null,
+  status = "upcoming",
+  homeGoals,
+  awayGoals,
   touchLayout = false,
   onFixtureDrop
 }: CoachBoardPanelProps) {
+  const fixtureTeamsLabel = formatFixtureTeamsLabel(homeTeam, awayTeam);
   const [posts, setPosts] = useState<BoardPost[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [squads, setSquads] = useState<SquadSummary[]>([]);
@@ -115,21 +128,34 @@ export function CoachBoardPanel({
   return (
     <AuthGate featureLabel="Coach Board">
       <div className="coach-board-panel">
-        <PanelHelpRow
-          className="panel-help-row--block"
-          help={
-            <>
-              <strong>{fixtureLabel}</strong> — squads and published lineups here are scoped to this
-              fixture. Fan Chat text posts are still moderated separately.
-            </>
-          }
-          helpLabel="About Coach Board for this match"
-          title={fixtureLabel}
-        />
+        <div className="coach-board-fixture-header panel-help-row panel-help-row--block">
+          <FixtureMatchHeader
+            awayGoals={awayGoals}
+            awayTeam={awayTeam}
+            date={date}
+            group={group}
+            homeGoals={homeGoals}
+            homeTeam={homeTeam}
+            status={status}
+          />
+          <HelpTooltip label="About Coach Board for this match" size="sm">
+            {fixtureTeamsLabel ? (
+              <>
+                <strong>{fixtureTeamsLabel}</strong> — squads and published lineups here are scoped to
+                this fixture. Fan Chat text posts are still moderated separately.
+              </>
+            ) : (
+              <>
+                Squads and published lineups here are scoped to this fixture. Fan Chat text posts are
+                still moderated separately.
+              </>
+            )}
+          </HelpTooltip>
+        </div>
 
         <SavedSquadsBar
           activeSquadId={activeSquadId}
-          fixtureLabel={fixtureLabel}
+          fixtureLabel={fixtureTeamsLabel || fixtureLabel}
           loading={squadsLoading}
           squads={squads}
           touchLayout={touchLayout}
@@ -143,7 +169,7 @@ export function CoachBoardPanel({
           activeSquadId={activeSquadId}
           awayTeam={awayTeam}
           fixtureKey={fixtureKey}
-          fixtureLabel={fixtureLabel}
+          fixtureLabel={fixtureTeamsLabel || fixtureLabel}
           homeTeam={homeTeam}
           onSaved={handleSquadSaved}
         />

@@ -103,10 +103,15 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
         >
           {selected ? (
             <CoachBoardPanel
+              awayGoals={selected.awayGoals}
               awayTeam={selected.awayTeam}
+              date={selected.date}
               fixtureKey={selected.key}
               fixtureLabel={selected.label}
+              group={selected.group}
+              homeGoals={selected.homeGoals}
               homeTeam={selected.homeTeam}
+              status={selected.status}
               touchLayout={touchLayout}
               onFixtureDrop={touchLayout ? undefined : setSelectedKey}
             />

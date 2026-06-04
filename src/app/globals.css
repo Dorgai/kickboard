@@ -2199,6 +2199,18 @@ h3 {
   gap: 16px;
 }
 
+.coach-board-fixture-header {
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.coach-board-fixture-header .fixture-match-header {
+  border-bottom: none;
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 0;
+}
+
 .saved-squads-bar {
   background: var(--color-surface);
   border: none;
