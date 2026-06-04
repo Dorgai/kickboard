@@ -1204,10 +1204,11 @@ h3 {
 
 .feed-browser select,
 .feed-browser .feed-control-input {
-  background: var(--color-bg);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--feed-control-radius);
   box-sizing: border-box;
+  box-shadow: none;
   color: var(--color-text-primary);
   font: inherit;
   font-weight: 600;
@@ -1216,6 +1217,11 @@ h3 {
   min-width: 0;
   padding: 0 12px;
   width: 100%;
+}
+
+.feed-browser .match-list-search .feed-control-input,
+.feed-browser .match-fixture-picker-search input {
+  background: var(--color-surface);
 }
 
 .feed-browser .feed-control-bar {
@@ -2044,9 +2050,12 @@ h3 {
 }
 
 .match-fixture-picker-search input {
-  background: var(--color-bg);
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
+  box-shadow: none;
   color: var(--color-text-primary);
   font-size: 12px;
   padding: 6px 8px;
@@ -9896,6 +9905,21 @@ code {
   .fixture-prediction-outcome-text {
     overflow-wrap: anywhere;
     word-break: break-word;
+  }
+
+  .match-fixture-picker-search input,
+  .feed-browser .match-list-search .feed-control-input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--color-surface);
+    box-shadow: none;
+  }
+
+  [data-theme="dark"] .match-fixture-picker-search input,
+  [data-theme="dark"] .feed-browser .match-list-search .feed-control-input {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text-primary);
   }
 
   .current-event-overview-heading {
