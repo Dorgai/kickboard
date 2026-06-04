@@ -63,11 +63,11 @@
   --page-gutter: 24px;
   --page-padding-y: 64px;
   /* Active pills must be darker than surface / frosted dock rails */
-  --color-button-fill: color-mix(in srgb, var(--color-bg) 82%, var(--color-text-primary) 10%);
+  --kickboard-tab-active-bg: color-mix(in srgb, var(--color-bg) 96%, var(--color-text-primary) 4%);
+  --color-button-fill: var(--kickboard-tab-active-bg);
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
   --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 58%, transparent);
-  --kickboard-tab-active-bg: var(--color-button-fill);
   --kickboard-tab-active-fg: var(--color-button-fill-fg);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
@@ -240,6 +240,7 @@ button:disabled {
 
 .nav-tabs a.active {
   background: var(--kickboard-tab-active-bg);
+  box-shadow: none;
   color: var(--kickboard-tab-active-fg);
 }
 
@@ -3635,15 +3636,18 @@ h3 {
 
 .feed-tab-bar.kickboard-tab-bar,
 .event-tab-bar.kickboard-tab-bar {
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.15);
   background: var(--kickboard-tab-rail-bg);
-  border: 1px solid var(--color-border);
+  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
   border-radius: var(--kickboard-tab-rail-radius);
   box-shadow: var(--kickboard-tab-rail-shadow);
+  box-sizing: border-box;
   flex-wrap: nowrap;
   gap: var(--kickboard-tab-rail-gap);
   justify-content: center;
-  margin: 0;
-  max-width: 100%;
+  margin-inline: auto;
+  max-width: min(28rem, calc(100% - 2 * var(--page-gutter)));
   padding: var(--kickboard-tab-rail-padding);
   width: fit-content;
 }
@@ -3713,9 +3717,9 @@ h3 {
   .feed-tab-bar.kickboard-tab-bar button.active,
   .event-tab-bar.kickboard-tab-bar button.active,
   .nav-tabs a.active {
-    background: var(--color-button-fill);
+    background: var(--kickboard-tab-active-bg);
     box-shadow: none;
-    color: var(--color-button-fill-fg);
+    color: var(--kickboard-tab-active-fg);
     outline: none;
   }
 
@@ -5367,10 +5371,13 @@ h3 {
 }
 
 [data-theme="dark"] .feed-tab-bar button.active,
-[data-theme="dark"] .event-tab-bar button.active {
-  background: var(--color-button-fill);
+[data-theme="dark"] .event-tab-bar button.active,
+[data-theme="dark"] .feed-tab-bar.kickboard-tab-bar button.active,
+[data-theme="dark"] .event-tab-bar.kickboard-tab-bar button.active,
+[data-theme="dark"] .nav-tabs a.active {
+  background: var(--kickboard-tab-active-bg);
   box-shadow: none;
-  color: var(--color-button-fill-fg);
+  color: var(--kickboard-tab-active-fg);
 }
 
 .bracket-stage-tabs,
@@ -9380,11 +9387,6 @@ code {
     --kickboard-tab-rail-radius: 16px;
   }
 
-  [data-theme="dark"] {
-    /* Opaque fill reads darker than semi-transparent dock (inactive stays clear) */
-    --kickboard-mobile-tab-active-bg: color-mix(in srgb, var(--color-bg) 96%, var(--color-text-primary) 4%);
-  }
-
   :root {
     --kickboard-event-tabs-dock: 58px;
     --kickboard-site-nav-dock: 46px;
@@ -9543,7 +9545,7 @@ code {
     padding: 12px;
   }
 
-  .feed-browser > .event-tab-bar:not(.feed-event-selector-tabs),
+  .feed-browser > .event-tab-bar:not(.feed-event-selector-tabs):not(.kickboard-tab-bar),
   .feed-browser.admin-dashboard .admin-dashboard-tabs.event-tab-bar {
     justify-content: center;
     width: 100%;
@@ -9551,17 +9553,13 @@ code {
 
   .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar,
   .predictions-sub-tabs-rail .feed-tab-bar.kickboard-tab-bar {
-    -webkit-backdrop-filter: blur(14px) saturate(1.15);
-    backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
-    border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-    border-radius: 9999px;
-    box-shadow: var(--kickboard-tab-rail-shadow);
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
     margin: 0 auto 24px;
-    max-width: min(24rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
+    max-width: min(24rem, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
+    overflow: hidden;
     padding: var(--kickboard-tab-rail-padding);
     width: fit-content;
   }
@@ -9570,13 +9568,6 @@ code {
     position: sticky;
     top: max(12px, env(safe-area-inset-top, 0px));
     z-index: 16;
-  }
-
-  .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar,
-  .predictions-sub-tabs-rail .feed-tab-bar.kickboard-tab-bar {
-    max-width: min(100%, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
-    overflow: hidden;
-    width: min(100%, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
   }
 
   .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar button,
@@ -9601,17 +9592,10 @@ code {
   .feed-tab-bar.kickboard-tab-bar button.active,
   .event-tab-bar.kickboard-tab-bar button.active,
   .nav-tabs a.active {
-    background: var(--color-button-fill);
+    background: var(--kickboard-tab-active-bg);
     box-shadow: none;
-    color: var(--color-button-fill-fg);
+    color: var(--kickboard-tab-active-fg);
     outline: none;
-  }
-
-  [data-theme="dark"] .feed-tab-bar.kickboard-tab-bar button.active,
-  [data-theme="dark"] .event-tab-bar.kickboard-tab-bar button.active,
-  [data-theme="dark"] .nav-tabs a.active {
-    background: var(--kickboard-mobile-tab-active-bg);
-    color: var(--color-button-fill-fg);
   }
 
   .site-footer {
@@ -9664,26 +9648,21 @@ code {
     padding: 0;
     position: fixed;
     transform: translateX(-50%);
-    width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
+    width: max-content;
     z-index: 31;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar {
-    -webkit-backdrop-filter: blur(14px) saturate(1.15);
-    backdrop-filter: blur(14px) saturate(1.15);
     background: var(--kickboard-mobile-dock-bg);
-    border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-    border-radius: 9999px;
-    box-shadow: var(--kickboard-tab-rail-shadow);
     box-sizing: border-box;
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
     margin: 0;
-    max-width: 100%;
+    max-width: min(100%, calc(100vw - 2 * var(--kickboard-mobile-dock-inset)));
     overflow: hidden;
     padding: 5px;
-    width: 100%;
+    width: fit-content;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
@@ -9710,14 +9689,6 @@ code {
     text-align: center;
     white-space: normal;
     word-break: break-word;
-  }
-
-  [data-theme="dark"]
-    .kickboard-mobile-dock-event
-    .current-event-section-tabs.event-tab-bar.kickboard-tab-bar
-    button.active {
-    background: var(--kickboard-mobile-tab-active-bg);
-    color: var(--color-button-fill-fg);
   }
 
   .nav-tabs {
