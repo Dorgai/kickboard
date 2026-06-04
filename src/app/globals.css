@@ -4487,8 +4487,8 @@ h3 {
 
 .prediction-share-icon-btn {
   align-items: center;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  background: transparent;
+  border: none;
   border-radius: 5px;
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -4500,13 +4500,7 @@ h3 {
   width: 20px;
 }
 
-[data-theme="light"] .prediction-share-icon-btn,
-:root:not([data-theme]) .prediction-share-icon-btn {
-  background: #f3f4f6;
-}
-
 .prediction-share-icon-btn:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-brand) 35%, var(--color-border));
   color: var(--color-text-primary);
 }
 
