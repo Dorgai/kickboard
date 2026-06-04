@@ -65,7 +65,7 @@
   --color-button-fill: #6b7280;
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
-  --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 72%, transparent);
+  --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 58%, transparent);
   --kickboard-tab-active-bg: var(--color-button-fill);
   --kickboard-tab-active-fg: var(--color-button-fill-fg);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-brand) 16%, var(--color-surface));
