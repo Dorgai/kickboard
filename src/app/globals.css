@@ -3759,7 +3759,20 @@ h3 {
     box-shadow: none;
     margin: 4px 0 18px;
     padding: 0;
+    position: sticky;
+    top: 84px;
+    z-index: 15;
+  }
+
+  .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
     position: static;
+    top: auto;
+  }
+
+  .feed-browser > .event-tab-bar.feed-event-selector-tabs.kickboard-tab-bar {
+    position: static;
+    top: auto;
+    z-index: auto;
   }
 
   .predictions-sub-tabs-rail .kickboard-tab-bar {
