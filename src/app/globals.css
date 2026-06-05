@@ -4188,6 +4188,16 @@ h3 {
     box-shadow 0.12s ease;
 }
 
+.fixture-prediction-outcome-option.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.fixture-prediction-outcome-option.is-disabled .fixture-prediction-outcome-body {
+  background: transparent;
+  box-shadow: none;
+}
+
 .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
   background: transparent;
   box-shadow: none;

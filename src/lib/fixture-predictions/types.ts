@@ -65,6 +65,18 @@ export function outcomeShort(outcome: FixtureOutcome) {
   return "Draw";
 }
 
+/** When both goal fields are valid integers, derive the matching 1X2 outcome. */
+export function outcomeFromScores(homeScore: string, awayScore: string): FixtureOutcome | null {
+  if (homeScore.trim() === "" || awayScore.trim() === "") return null;
+  const home = Number(homeScore);
+  const away = Number(awayScore);
+  if (!Number.isFinite(home) || !Number.isFinite(away)) return null;
+  if (!Number.isInteger(home) || !Number.isInteger(away) || home < 0 || away < 0) return null;
+  if (home > away) return "home";
+  if (away > home) return "away";
+  return "draw";
+}
+
 export function parseScorerPicks(raw: unknown): ScorerPick[] {
   if (!Array.isArray(raw)) return [];
   const picks: ScorerPick[] = [];

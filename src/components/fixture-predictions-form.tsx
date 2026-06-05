@@ -19,6 +19,7 @@ import { PREDICTION_OUTCOME_SECTION_ID } from "@/lib/scroll-to-prediction-outcom
 import {
   groupScorerPicks,
   MAX_SCORER_PICKS,
+  outcomeFromScores,
   outcomeLabel,
   outcomeShort,
   type FixtureOutcome,
@@ -188,6 +189,17 @@ export function FixturePredictionsForm({
 
   const groupedScorerPicks = useMemo(() => groupScorerPicks(scorerPicks), [scorerPicks]);
 
+  const scoreDerivedOutcome = useMemo(
+    () => outcomeFromScores(homeScore, awayScore),
+    [awayScore, homeScore]
+  );
+
+  useEffect(() => {
+    if (scoreDerivedOutcome) {
+      setPredictedOutcome(scoreDerivedOutcome);
+    }
+  }, [scoreDerivedOutcome]);
+
   const sharePayload = useMemo((): PredictionSharePayload | null => {
     const hasScore = homeScore !== "" && awayScore !== "";
     if (!predictedOutcome && !hasScore && scorerPicks.length === 0) return null;
@@ -310,14 +322,19 @@ export function FixturePredictionsForm({
           {OUTCOME_OPTIONS.map((option) => {
             const teamName = option.team === "home" ? homeTeam : option.team === "away" ? awayTeam : null;
             const selected = predictedOutcome === option.value;
+            const disabledByScore =
+              scoreDerivedOutcome !== null && scoreDerivedOutcome !== option.value;
             return (
               <label
                 key={option.value}
-                className={`fixture-prediction-outcome-option${selected ? " is-selected" : ""}`}
+                className={`fixture-prediction-outcome-option${selected ? " is-selected" : ""}${
+                  disabledByScore ? " is-disabled" : ""
+                }`}
               >
                 <input
                   checked={selected}
                   className="fixture-prediction-outcome-input"
+                  disabled={disabledByScore}
                   name={`fixture-outcome-${fixtureKey}`}
                   type="radio"
                   value={option.value}
@@ -341,7 +358,12 @@ export function FixturePredictionsForm({
           ) : null}
           <button
             className="text-button fixture-prediction-clear"
-            disabled={!predictedOutcome}
+            disabled={!predictedOutcome || scoreDerivedOutcome !== null}
+            title={
+              scoreDerivedOutcome !== null
+                ? "Clear the score to change who wins"
+                : undefined
+            }
             type="button"
             onClick={() => setPredictedOutcome(null)}
           >
