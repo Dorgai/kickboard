@@ -3784,6 +3784,16 @@ h3 {
     flex: 0 0 auto;
     min-width: auto;
   }
+
+  /* Predictions: Tournament picks / Match picks stays below stuck section tabs */
+  .current-event-predictions-tab .predictions-sub-tabs-rail {
+    margin-bottom: 0;
+    padding-bottom: 12px;
+    position: sticky;
+    top: calc(84px + 48px);
+    width: 100%;
+    z-index: 14;
+  }
 }
 
 .predictions-sub-panel {
