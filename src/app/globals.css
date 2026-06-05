@@ -3880,6 +3880,35 @@ h3 {
   min-height: 3.25rem;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .tournament-predictions-form .tournament-team-pick-option:hover .fixture-prediction-outcome-body,
+  .tournament-predictions-form .tournament-team-pick-option:focus-within .fixture-prediction-outcome-body {
+    background: var(--kickboard-tab-hover-bg);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .tournament-predictions-form
+    .tournament-team-pick-option.is-selected:hover
+    .fixture-prediction-outcome-body,
+  .tournament-predictions-form
+    .tournament-team-pick-option.is-selected:focus-within
+    .fixture-prediction-outcome-body {
+    outline-color: color-mix(in srgb, var(--color-accent) 58%, var(--color-border));
+  }
+
+  .tournament-predictions-form .fixture-scorer-chip:not(:disabled):hover,
+  .tournament-predictions-form .fixture-scorer-chip:not(:disabled):focus-visible {
+    background: var(--kickboard-tab-hover-bg);
+    border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+    box-shadow: var(--shadow-surface);
+  }
+
+  .tournament-predictions-form .fixture-scorer-chip--selected:not(:disabled):hover,
+  .tournament-predictions-form .fixture-scorer-chip--selected:not(:disabled):focus-visible {
+    border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  }
+}
+
 .tournament-finalists-slots {
   display: grid;
   gap: 14px;
