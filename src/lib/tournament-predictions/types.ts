@@ -62,4 +62,32 @@ export function normalizeTournamentTeam(value: unknown): string | null {
   return trimmed || null;
 }
 
+function teamsEqual(a: string, b: string) {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+/** Other finalist when champion is stored separately. */
+export function finalOpponentFromRecord(record: TournamentPredictionRecord | null): string | null {
+  if (!record) return null;
+  const finalists = record.predictedFinalists;
+  if (!finalists.length) return null;
+  const champion = record.predictedChampion;
+  if (champion) {
+    const other = finalists.find((team) => !teamsEqual(team, champion));
+    return other ?? null;
+  }
+  if (finalists.length >= 2) return finalists[1];
+  return finalists[0];
+}
+
+/** Persist both finalists while champion is the predicted winner. */
+export function predictedFinalistsFromPicks(champion: string | null, opponent: string | null): string[] {
+  if (champion && opponent) {
+    return teamsEqual(champion, opponent) ? [champion] : [champion, opponent];
+  }
+  if (opponent) return [opponent];
+  if (champion) return [champion];
+  return [];
+}
+
 export { normalizeResultStatus };

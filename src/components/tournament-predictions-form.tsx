@@ -9,8 +9,13 @@ import {
   TOURNAMENT_PREDICTION_HINTS
 } from "@/lib/tournament-predictions/labels";
 import { teamsFromWorldCupGroups, type WorldCupGroupInput } from "@/lib/tournament-predictions/teams";
-import { DEFAULT_TOURNAMENT_KEY } from "@/lib/tournament-predictions/types";
+import {
+  DEFAULT_TOURNAMENT_KEY,
+  finalOpponentFromRecord,
+  predictedFinalistsFromPicks
+} from "@/lib/tournament-predictions/types";
 import type { TournamentPlayerPick, TournamentPredictionRecord } from "@/lib/tournament-predictions/types";
+import { teamsMatch } from "@/lib/squads/team-names";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 
 type TournamentPredictionsFormProps = {
@@ -21,8 +26,7 @@ type TournamentPredictionsFormProps = {
 function applyRecordToState(record: TournamentPredictionRecord | null) {
   return {
     champion: record?.predictedChampion ?? null,
-    finalistA: record?.predictedFinalists[0] ?? null,
-    finalistB: record?.predictedFinalists[1] ?? null,
+    opponent: finalOpponentFromRecord(record),
     topScorer: record?.predictedTopScorer ?? null,
     bestPlayer: record?.predictedBestPlayer ?? null,
     hasSaved: Boolean(record)
@@ -189,8 +193,7 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
   const teams = useMemo(() => teamsFromWorldCupGroups(groups), [groups]);
 
   const [champion, setChampion] = useState<string | null>(null);
-  const [finalistA, setFinalistA] = useState<string | null>(null);
-  const [finalistB, setFinalistB] = useState<string | null>(null);
+  const [opponent, setOpponent] = useState<string | null>(null);
   const [topScorer, setTopScorer] = useState<TournamentPlayerPick | null>(null);
   const [bestPlayer, setBestPlayer] = useState<TournamentPlayerPick | null>(null);
   const [hasSavedPick, setHasSavedPick] = useState(false);
@@ -216,8 +219,7 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
         const payload = (await response.json()) as { prediction?: TournamentPredictionRecord | null };
         const next = applyRecordToState(payload.prediction ?? null);
         setChampion(next.champion);
-        setFinalistA(next.finalistA);
-        setFinalistB(next.finalistB);
+        setOpponent(next.opponent);
         setTopScorer(next.topScorer);
         setBestPlayer(next.bestPlayer);
         setHasSavedPick(next.hasSaved);
@@ -255,12 +257,24 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
     };
   }, []);
 
-  const finalists = useMemo(() => {
-    const list: string[] = [];
-    if (finalistA) list.push(finalistA);
-    if (finalistB && finalistB !== finalistA) list.push(finalistB);
-    return list;
-  }, [finalistA, finalistB]);
+  const opponentTeams = useMemo(() => {
+    if (!champion) return teams;
+    return teams.filter((team) => !teamsMatch(team, champion));
+  }, [champion, teams]);
+
+  const finalists = useMemo(
+    () => predictedFinalistsFromPicks(champion, opponent),
+    [champion, opponent]
+  );
+
+  function selectChampion(team: string | null) {
+    setChampion(team);
+    if (!team) {
+      setOpponent(null);
+      return;
+    }
+    setOpponent((current) => (current && teamsMatch(current, team) ? null : current));
+  }
 
   async function savePick(event: FormEvent) {
     event.preventDefault();
@@ -288,8 +302,7 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
       if (payload.prediction) {
         const next = applyRecordToState(payload.prediction);
         setChampion(next.champion);
-        setFinalistA(next.finalistA);
-        setFinalistB(next.finalistB);
+        setOpponent(next.opponent);
         setTopScorer(next.topScorer);
         setBestPlayer(next.bestPlayer);
         setHasSavedPick(next.hasSaved);
@@ -317,8 +330,7 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to remove picks.");
       setChampion(null);
-      setFinalistA(null);
-      setFinalistB(null);
+      setOpponent(null);
       setTopScorer(null);
       setBestPlayer(null);
       setHasSavedPick(false);
@@ -346,8 +358,8 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
         className="panel-help-row--block tournament-predictions-heading"
         help={
           <>
-            Lock in your World Cup winner, finalists, Golden Boot, and best player before the knockout
-            stage. Points settle when the tournament ends.
+            Lock in your World Cup winner, final opponent, Golden Boot, and best player before the
+            knockout stage. Points settle when the tournament ends.
           </>
         }
         helpLabel="About tournament picks"
@@ -356,7 +368,7 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
       />
 
       <form className="fixture-predictions-form tournament-predictions-form" onSubmit={savePick}>
-        <fieldset className="fixture-prediction-field">
+        <fieldset className="fixture-prediction-field tournament-champion-field">
           <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
             {TOURNAMENT_PREDICTION_BLOCKS.champion}
             <HelpTooltip label="Champion help" size="sm">
@@ -367,54 +379,46 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
             name="tournament-champion"
             selected={champion}
             teams={teams}
-            onSelect={setChampion}
+            onSelect={selectChampion}
           />
           {champion ? (
-            <button className="text-button fixture-prediction-clear" type="button" onClick={() => setChampion(null)}>
+            <button className="text-button fixture-prediction-clear" type="button" onClick={() => selectChampion(null)}>
               Clear
             </button>
           ) : null}
         </fieldset>
 
-        <fieldset className="fixture-prediction-field tournament-finalists-field">
+        <fieldset
+          aria-disabled={!champion}
+          className="fixture-prediction-field tournament-opponent-field"
+        >
           <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
-            {TOURNAMENT_PREDICTION_BLOCKS.finalists}
-            <HelpTooltip label="Finalists help" size="sm">
-              {TOURNAMENT_PREDICTION_HINTS.finalists}
+            {TOURNAMENT_PREDICTION_BLOCKS.finalOpponent}
+            <HelpTooltip label="Final opponent help" size="sm">
+              {TOURNAMENT_PREDICTION_HINTS.finalOpponent}
             </HelpTooltip>
           </legend>
-          <div className="tournament-finalists-slots">
-            <div className="tournament-finalist-slot">
-              <p className="tournament-finalist-slot-label">{TOURNAMENT_PREDICTION_HINTS.finalistSlot(0)}</p>
+          {champion ? (
+            <>
               <TeamPickGrid
-                name="tournament-finalist-a"
-                selected={finalistA}
-                teams={teams}
-                onSelect={setFinalistA}
+                name="tournament-final-opponent"
+                selected={opponent}
+                teams={opponentTeams}
+                onSelect={setOpponent}
               />
-            </div>
-            <div className="tournament-finalist-slot">
-              <p className="tournament-finalist-slot-label">{TOURNAMENT_PREDICTION_HINTS.finalistSlot(1)}</p>
-              <TeamPickGrid
-                name="tournament-finalist-b"
-                selected={finalistB}
-                teams={teams}
-                onSelect={setFinalistB}
-              />
-            </div>
-          </div>
-          {finalistA || finalistB ? (
-            <button
-              className="text-button fixture-prediction-clear"
-              type="button"
-              onClick={() => {
-                setFinalistA(null);
-                setFinalistB(null);
-              }}
-            >
-              Clear finalists
-            </button>
-          ) : null}
+              {opponent ? (
+                <button
+                  className="text-button fixture-prediction-clear"
+                  type="button"
+                  onClick={() => setOpponent(null)}
+                >
+                  Clear
+                </button>
+              ) : null}
+            </>
+          ) : (
+            <p className="tournament-opponent-prereq">{TOURNAMENT_PREDICTION_HINTS.finalOpponentPrereq}</p>
+          )}
         </fieldset>
 
         <SinglePlayerPickField

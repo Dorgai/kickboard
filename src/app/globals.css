@@ -3909,34 +3909,30 @@ h3 {
   }
 }
 
-.tournament-finalists-slots {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.tournament-predictions-form .tournament-champion-field {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
+  margin-bottom: 0;
+  padding-bottom: 22px;
 }
 
-@media (max-width: 720px) {
-  .tournament-finalists-slots {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.tournament-predictions-form .tournament-opponent-field {
+  margin-top: 22px;
+  padding-top: 2px;
 }
 
-.tournament-finalist-slot {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
+.tournament-predictions-form .tournament-opponent-field[aria-disabled="true"] {
+  opacity: 0.92;
 }
 
-.tournament-finalist-slot-label {
+.tournament-opponent-prereq {
   color: var(--color-text-secondary);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  margin: 0;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  margin: 4px 0 0;
 }
 
-.tournament-finalists-field .tournament-team-pick-grid {
+.tournament-opponent-field .tournament-team-pick-grid {
   max-height: min(11rem, 28vh);
 }
 
@@ -3964,7 +3960,7 @@ h3 {
     width: auto;
   }
 
-  .tournament-finalists-field .tournament-team-pick-grid {
+  .tournament-opponent-field .tournament-team-pick-grid {
     max-height: none;
   }
 }
