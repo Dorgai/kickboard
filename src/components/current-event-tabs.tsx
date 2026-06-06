@@ -20,16 +20,16 @@ import { TeamLabel } from "@/components/team-label";
 
 export const CURRENT_EVENT_TAB_IDS = [
   "tournament",
-  "coach-board",
   "predictions",
+  "coach-board",
   "community"
 ] as const;
 export type CurrentEventTabId = (typeof CURRENT_EVENT_TAB_IDS)[number];
 
 const CURRENT_EVENT_TABS = [
   { id: "tournament" as const, label: "Tournament" },
-  { id: "coach-board" as const, label: "Coach Board" },
   { id: "predictions" as const, label: "Predictions" },
+  { id: "coach-board" as const, label: "Coach Board" },
   { id: "community" as const, label: "Community" }
 ] as const;
 
