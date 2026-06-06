@@ -1683,10 +1683,13 @@ h3 {
 }
 
 .current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   justify-content: center;
   margin: 0;
+  margin-left: auto;
+  max-width: min(24rem, calc(100% - 2 * var(--page-gutter)));
   min-width: 0;
+  width: fit-content;
 }
 
 .current-event-section-tabs.event-tab-bar.kickboard-tab-bar button {
@@ -11164,16 +11167,16 @@ code {
     border-radius: 9999px;
     box-shadow: var(--shadow-surface);
     box-sizing: border-box;
-    flex: 1 1 0;
+    flex: 0 1 auto;
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
-    margin: 0;
-    max-width: none;
-    min-width: 0;
+    margin: 0 0 0 auto;
+    max-width: min(24rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
+    min-width: min(16rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
     overflow: hidden;
     padding: var(--kickboard-tab-rail-padding);
-    width: auto;
+    width: fit-content;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
@@ -11190,12 +11193,12 @@ code {
     font-weight: var(--kickboard-tab-item-font-weight);
     justify-content: center;
     line-height: var(--kickboard-tab-item-line-height);
-    max-width: none;
+    max-width: 100%;
     min-height: var(--kickboard-tab-item-min-height);
     min-width: 0;
     overflow: hidden;
     overflow-wrap: anywhere;
-    padding: 4px 6px;
+    padding: 4px var(--kickboard-tab-item-padding-x);
     text-align: center;
     white-space: normal;
   }
