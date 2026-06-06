@@ -3896,6 +3896,7 @@ h3 {
 .squad-builder-predictions {
   display: flex;
   justify-content: center;
+  margin-top: 4px;
   min-width: 0;
   width: 100%;
 }
@@ -11180,9 +11181,10 @@ code {
   :root {
     --kickboard-event-tabs-dock: 58px;
     --kickboard-site-nav-dock: 0px;
-    --kickboard-mobile-dock-bottom: 6px;
+    --kickboard-mobile-dock-bottom: 8px;
     --kickboard-mobile-dock-gap: 8px;
-    --kickboard-mobile-dock-inset: max(14px, calc(var(--page-gutter) + 6px));
+    /* Breathing room from screen edges (safe-area aware); inner rail fills this width. */
+    --kickboard-mobile-dock-inset: 12px;
   }
 
   .nav-shell {
@@ -11433,13 +11435,14 @@ code {
     bottom: calc(var(--kickboard-mobile-dock-bottom) + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
     box-shadow: none;
-    left: 50%;
+    left: max(var(--kickboard-mobile-dock-inset), env(safe-area-inset-left, 0px));
     margin: 0;
-    max-width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
+    max-width: none;
     padding: 0;
     position: fixed;
-    transform: translateX(-50%);
-    width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
+    right: max(var(--kickboard-mobile-dock-inset), env(safe-area-inset-right, 0px));
+    transform: none;
+    width: auto;
     z-index: 31;
   }
 
@@ -11454,11 +11457,11 @@ code {
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     margin: 0;
-    max-width: min(24rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
-    min-width: min(16rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
+    max-width: none;
+    min-width: 0;
     overflow: hidden;
     padding: var(--kickboard-tab-rail-padding);
-    width: fit-content;
+    width: 100%;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
