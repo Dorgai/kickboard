@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import {
   formatScorerPicksSummary,
   outcomeShort,
@@ -469,7 +470,8 @@ type FriendTableColumn = {
 
 function buildFriendColumns(
   connectionsPredictions: ConnectionPredictionSummary[],
-  friendsNameFilter: string
+  friendsNameFilter: string,
+  options?: { placeholders?: boolean }
 ): FriendTableColumn[] {
   const peers = new Map<string, FriendTableColumn>();
 
@@ -485,8 +487,11 @@ function buildFriendColumns(
   }
 
   const columns = Array.from(peers.values()).sort((a, b) => a.label.localeCompare(b.label));
-  const targetCount = Math.max(MIN_FRIEND_COLUMNS, columns.length);
+  if (options?.placeholders === false) {
+    return columns;
+  }
 
+  const targetCount = Math.max(MIN_FRIEND_COLUMNS, columns.length);
   while (columns.length < targetCount) {
     const index = columns.length + 1;
     columns.push({
@@ -529,6 +534,7 @@ export function PredictionsPicksSection({
 }) {
   const [friendsNameFilter, setFriendsNameFilter] = useState("");
   const [picksTab, setPicksTab] = useState<PicksTimeTabId>("upcoming");
+  const mobileLayout = useNarrowViewport(720);
 
   useEffect(() => {
     setFriendsNameFilter("");
@@ -580,8 +586,11 @@ export function PredictionsPicksSection({
 
   const visibleGroups = picksTab === "upcoming" ? upcomingGroups : pastGroups;
   const friendColumns = useMemo(
-    () => buildFriendColumns(connectionsPredictions, friendsNameFilter),
-    [connectionsPredictions, friendsNameFilter]
+    () =>
+      buildFriendColumns(connectionsPredictions, friendsNameFilter, {
+        placeholders: !mobileLayout
+      }),
+    [connectionsPredictions, friendsNameFilter, mobileLayout]
   );
   const friendPickCount = visibleGroups.reduce((sum, group) => sum + group.friends.length, 0);
 
@@ -627,6 +636,62 @@ export function PredictionsPicksSection({
             ? "No upcoming picks — switch to Past to see settled matches."
             : "No past picks yet."}
         </p>
+      ) : mobileLayout ? (
+        <div className="predictions-picks-mobile-stack" role="tabpanel">
+          {visibleGroups.map((group) => {
+            const isActive = activeFixtureKey === group.fixtureKey;
+            const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
+            const matchFriends = group.friends.filter((pick) =>
+              peerMatchesNameFilter(pick, friendsNameFilter)
+            );
+
+            return (
+              <article
+                key={group.fixtureKey}
+                className={`predictions-picks-mobile-card${isActive ? " predictions-picks-mobile-card--active" : ""}`}
+              >
+                <header className="predictions-picks-mobile-card-header">
+                  <span className="predictions-picks-match-label">{group.fixtureLabel}</span>
+                  <div className="predictions-picks-mobile-card-actions">
+                    <PredictionShareButtons
+                      className="prediction-share--compact"
+                      payload={sharePayload}
+                    />
+                    {onEditPick ? (
+                      <button
+                        className="text-button predictions-overview-edit"
+                        type="button"
+                        onClick={() => {
+                          dismissSessionCheckpoint();
+                          onEditPick(group.fixtureKey);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    ) : null}
+                  </div>
+                </header>
+                <div className="predictions-picks-mobile-peer predictions-picks-mobile-peer--you">
+                  <div className="predictions-picks-mobile-peer-head">
+                    <span className="predictions-picks-mobile-peer-label">You</span>
+                  </div>
+                  <TablePickCell pick={group.mine} />
+                </div>
+                {matchFriends.map((friend) => (
+                  <div className="predictions-picks-mobile-peer" key={`${group.fixtureKey}-${friend.userId}`}>
+                    <div className="predictions-picks-mobile-peer-head">
+                      <span className="predictions-picks-mobile-peer-label">
+                        {friend.displayName?.trim() || friend.username}
+                      </span>
+                      <span className="predictions-picks-col-meta">@{friend.username}</span>
+                    </div>
+                    <TablePickCell pick={friend} />
+                  </div>
+                ))}
+              </article>
+            );
+          })}
+        </div>
       ) : (
         <div className="predictions-picks-table-wrap" role="tabpanel">
           <table className="predictions-results-table predictions-results-table--compact predictions-picks-table">

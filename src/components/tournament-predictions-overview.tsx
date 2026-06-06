@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { TOURNAMENT_PREDICTION_BLOCKS } from "@/lib/tournament-predictions/labels";
 import type { TournamentPredictionRecord } from "@/lib/tournament-predictions/types";
 import {
@@ -151,6 +152,7 @@ export function TournamentPicksSection({
   onEditPick?: () => void;
 }) {
   const [friendsNameFilter, setFriendsNameFilter] = useState("");
+  const mobileLayout = useNarrowViewport(720);
   const { myPrediction, connectionsPredictions } = data;
 
   const filteredFriends = useMemo(
@@ -229,6 +231,36 @@ export function TournamentPicksSection({
         <p className="predictions-overview-empty">No tournament picks yet — add yours above.</p>
       ) : visibleColumns.length === 0 ? (
         <p className="predictions-overview-empty">No friends match that filter.</p>
+      ) : mobileLayout ? (
+        <div className="predictions-picks-mobile-stack">
+          {personRows.map((person) => (
+            <article
+              key={person.key}
+              className={`predictions-picks-mobile-card${
+                person.isViewer ? " predictions-picks-mobile-card--active" : ""
+              }`}
+            >
+              <header className="predictions-picks-mobile-card-header">
+                <div className="predictions-picks-mobile-peer-head">
+                  <span className="predictions-picks-mobile-peer-label">{person.label}</span>
+                  {person.username ? (
+                    <span className="predictions-picks-col-meta">@{person.username}</span>
+                  ) : null}
+                </div>
+              </header>
+              <dl className="predictions-picks-mobile-categories">
+                {visibleColumns.map((column) => (
+                  <div className="predictions-picks-mobile-category" key={column.key}>
+                    <dt className="predictions-picks-mobile-category-label">{column.label}</dt>
+                    <dd className="predictions-picks-mobile-category-value">
+                      <TournamentPickCell column={column} record={person.record} />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          ))}
+        </div>
       ) : (
         <div className="predictions-picks-table-wrap">
           <table className="predictions-results-table predictions-results-table--compact predictions-picks-table predictions-picks-table--pivoted">
