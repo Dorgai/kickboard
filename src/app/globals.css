@@ -4623,6 +4623,57 @@ h3 {
   line-height: 1.25;
 }
 
+.fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-outcome-body {
+  gap: 8px;
+  min-height: 4.5rem;
+  padding: 12px 14px;
+}
+
+.fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-outcome-text {
+  font-size: 13px;
+}
+
+.fixture-predictions-form:not(.fixture-predictions-form--compact)
+  .fixture-prediction-outcome-body
+  .team-label-stacked
+  .team-label-text {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  max-width: 7rem;
+}
+
+.fixture-predictions-form:not(.fixture-predictions-form--compact)
+  .fixture-prediction-score-team
+  .team-label-stacked
+  .team-label-text {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  max-width: 8rem;
+}
+
+.fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-score-team {
+  gap: 10px;
+  min-width: 5.75rem;
+}
+
+.fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-scoreline {
+  gap: 12px 20px;
+}
+
+.fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-score-dash {
+  font-size: 1.65rem;
+}
+
+.fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-score-field {
+  font-size: 1.85rem;
+  min-height: 2.85rem;
+  min-width: 3.15rem;
+  padding: 6px 8px;
+  width: 3.35rem;
+}
+
 .fixture-prediction-field:has(.fixture-prediction-scoreline) .fixture-prediction-field-hint {
   text-align: center;
 }

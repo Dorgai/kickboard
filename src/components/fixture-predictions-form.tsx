@@ -355,7 +355,9 @@ export function FixturePredictionsForm({
                   onChange={() => setPredictedOutcome(option.value)}
                 />
                 <span className="fixture-prediction-outcome-body">
-                  {teamName ? <TeamLabel layout="stacked" name={teamName} size="xs" /> : null}
+                  {teamName ? (
+                    <TeamLabel layout="stacked" name={teamName} size={compact ? "xs" : "md"} />
+                  ) : null}
                   <span className="fixture-prediction-outcome-text">
                     {teamName ? option.label : outcomeShort(option.value)}
                   </span>
@@ -395,7 +397,11 @@ export function FixturePredictionsForm({
         </legend>
         <div className="fixture-prediction-scoreline" role="group" aria-label={PREDICTION_BLOCKS.score}>
           <div className="fixture-prediction-score-team">
-            <TeamLabel name={homeTeam} size={compact ? "xs" : "sm"} />
+            <TeamLabel
+              layout={compact ? "inline" : "stacked"}
+              name={homeTeam}
+              size={compact ? "xs" : "md"}
+            />
             <input
               aria-label={`${homeTeam} goals`}
               className="fixture-prediction-score-field"
@@ -412,7 +418,11 @@ export function FixturePredictionsForm({
             –
           </span>
           <div className="fixture-prediction-score-team">
-            <TeamLabel name={awayTeam} size={compact ? "xs" : "sm"} />
+            <TeamLabel
+              layout={compact ? "inline" : "stacked"}
+              name={awayTeam}
+              size={compact ? "xs" : "md"}
+            />
             <input
               aria-label={`${awayTeam} goals`}
               className="fixture-prediction-score-field"
