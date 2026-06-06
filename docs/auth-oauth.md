@@ -28,7 +28,7 @@ In Railway → **kickboard** project → **kickboard** service → **Variables**
 |----------|--------|
 | `GOOGLE_CLIENT_ID` | From Google Cloud |
 | `GOOGLE_CLIENT_SECRET` | From Google Cloud |
-| `AUTH_URL` | `https://kickboard-production.up.railway.app` (**important**) |
+| `AUTH_URL` | `https://mypicks.live` or your public host (**important**, exactly one `https://`, no trailing slash) |
 | `AUTH_SECRET` | Optional; if unset, `JWT_SECRET` is used |
 | `JWT_SECRET` | Already set (session signing) |
 | `NEXT_PUBLIC_APP_URL` | `https://kickboard-production.up.railway.app` |

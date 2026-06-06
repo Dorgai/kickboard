@@ -8,6 +8,19 @@ const googleEnabled = Boolean(
   process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim()
 );
 
+/** Strip trailing slash and accidental double schemes (e.g. https://https://mypicks.live). */
+export function normalizePublicSiteUrl(url: string): string {
+  let normalized = url.trim().replace(/\/+$/, "");
+  if (!normalized) return "";
+
+  normalized = normalized.replace(/^(https?:\/\/)+/i, "https://");
+  if (!/^https?:\/\//i.test(normalized)) {
+    normalized = `https://${normalized}`;
+  }
+
+  return normalized;
+}
+
 /**
  * Auth.js only reads AUTH_URL / NEXTAUTH_URL for OAuth redirect_uri — not NEXT_PUBLIC_APP_URL.
  * On Railway, the internal Host is often `0.0.0.0:PORT`, which Google rejects (Error 400).
@@ -15,10 +28,14 @@ const googleEnabled = Boolean(
 export function ensureAuthUrlEnv(): string {
   const existing = process.env.AUTH_URL?.trim() || process.env.NEXTAUTH_URL?.trim();
   if (existing) {
-    return existing.replace(/\/$/, "");
+    const normalized = normalizePublicSiteUrl(existing);
+    if (normalized !== existing.replace(/\/+$/, "")) {
+      process.env.AUTH_URL = normalized;
+    }
+    return normalized;
   }
   const fallback = process.env.NEXT_PUBLIC_APP_URL?.trim() || "";
-  const normalized = fallback.replace(/\/$/, "");
+  const normalized = normalizePublicSiteUrl(fallback);
   if (normalized) {
     process.env.AUTH_URL = normalized;
   }
