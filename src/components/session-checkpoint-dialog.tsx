@@ -189,6 +189,7 @@ export function SessionCheckpointDialog() {
 
   const wallet = data?.wallet;
   const dialogTitle = checkpointDialogTitle(data, loading && !data);
+  const isMatchDayDialog = dialogTitle === "Hey, it's match day!";
 
   return (
     <dialog
@@ -205,7 +206,10 @@ export function SessionCheckpointDialog() {
       <div className="session-checkpoint-panel timeline-modal-panel">
         <header className="timeline-modal-header session-checkpoint-header">
           <div>
-            <h2 className="session-checkpoint-title" id={titleId}>
+            <h2
+              className={`session-checkpoint-title${isMatchDayDialog ? " session-checkpoint-title--match-day" : ""}`}
+              id={titleId}
+            >
               {dialogTitle}
             </h2>
           </div>

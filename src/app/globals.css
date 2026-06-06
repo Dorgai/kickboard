@@ -8894,15 +8894,23 @@ h3 {
   max-width: min(34rem, calc(100vw - 24px));
 }
 
+.session-checkpoint-dialog .session-checkpoint-panel.timeline-modal-panel {
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  box-shadow: var(--shadow-elevation-2);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: visible;
+}
+
 .session-checkpoint-panel {
   display: grid;
   gap: 0;
   max-height: min(90vh, 720px);
-  overflow: hidden;
 }
 
 .session-checkpoint-header {
   align-items: flex-start;
+  border-bottom: none;
+  padding-bottom: 8px;
 }
 
 .session-checkpoint-title {
@@ -8912,6 +8920,20 @@ h3 {
   letter-spacing: -0.02em;
   line-height: 1.15;
   margin: 0;
+}
+
+.session-checkpoint-title--match-day {
+  background: linear-gradient(
+    118deg,
+    var(--color-brand) 0%,
+    color-mix(in srgb, var(--color-brand) 42%, #f59e0b) 52%,
+    color-mix(in srgb, var(--color-brand) 68%, #ef4444) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(1.75rem, 5.8vw, 2.2rem);
+  line-height: 1.08;
 }
 
 .session-checkpoint-body {
@@ -8947,7 +8969,7 @@ h3 {
 
 .session-checkpoint-matches {
   display: grid;
-  gap: 8px;
+  gap: 0;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -8956,18 +8978,24 @@ h3 {
 .session-checkpoint-match {
   align-items: center;
   background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border: none;
+  border-radius: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
+  box-shadow: none;
   display: flex;
   gap: 10px;
   justify-content: space-between;
-  padding: 10px 12px;
+  padding: 12px 0;
+}
+
+.session-checkpoint-matches > .session-checkpoint-match:first-child {
+  border-top: none;
+  padding-top: 2px;
 }
 
 [data-theme="light"] .session-checkpoint-match,
 :root:not([data-theme]) .session-checkpoint-match {
   background: transparent;
-  border-color: var(--color-border);
 }
 
 .session-checkpoint-match-copy {
@@ -9060,6 +9088,10 @@ h3 {
   color: var(--color-text-primary);
 }
 
+.session-checkpoint-dialog .timeline-modal-header h2.session-checkpoint-title--match-day {
+  color: transparent;
+}
+
 .session-checkpoint-stat-label {
   color: var(--color-text-secondary);
   font-size: 11px;
@@ -9112,10 +9144,25 @@ h3 {
 }
 
 .session-checkpoint-footer {
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
   display: grid;
   gap: 8px;
-  padding-top: 12px;
+  padding: 14px 18px 18px;
+}
+
+.session-checkpoint-footer .button.primary {
+  box-shadow: none;
+  filter: none;
+  min-height: 48px;
+  padding-inline: 28px;
+}
+
+.session-checkpoint-footer .button.primary:hover:not(:disabled),
+.session-checkpoint-footer .button.primary:active:not(:disabled),
+.session-checkpoint-footer .button.primary:focus:not(:disabled),
+.session-checkpoint-footer .button.primary:focus-visible:not(:disabled) {
+  box-shadow: none;
+  filter: none;
 }
 
 .session-checkpoint-footnote {
