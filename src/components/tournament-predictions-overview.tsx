@@ -52,61 +52,37 @@ function peerMatchesNameFilter(pick: ConnectionTournamentPredictionSummary, quer
   return displayName.includes(term) || username.includes(term);
 }
 
-function columnValueForRecord(
-  record: TournamentPredictionRecord | null,
-  column: TournamentTableColumn
-) {
-  if (column.key === "topScorer") {
-    return (
-      tournamentCategoryValue(record, "topScorer") ||
-      formatTournamentScorerBoardLabel(record?.predictedTopScorerBoard ?? null)
-    );
-  }
-  return tournamentCategoryValue(record, column.key);
-}
-
-function columnVisibleForAnyone(
-  column: TournamentTableColumn,
-  mine: TournamentPredictionRecord | null,
-  friends: ConnectionTournamentPredictionSummary[]
-) {
-  if (columnValueForRecord(mine, column)) return true;
-  return friends.some((friend) => columnValueForRecord(friend, column));
-}
+const MIN_TOURNAMENT_FRIEND_ROWS = 3;
 
 function TournamentTopScorerCell({ record }: { record: TournamentPredictionRecord | null }) {
   const topScorer = tournamentCategoryValue(record, "topScorer");
   const board = formatTournamentScorerBoardLabel(record?.predictedTopScorerBoard ?? null);
-
-  if (!topScorer && !board) {
-    return <span className="predictions-picks-placeholder">—</span>;
-  }
-
+  const hasTopScorer = Boolean(topScorer);
   const status = tournamentCategoryResultStatus(record, "topScorer");
   const points = tournamentCategoryPoints(record, "topScorer");
   const badge = resultBadge(status);
 
   return (
     <div className="predictions-type-lines predictions-type-lines--unified predictions-type-lines--top-scorer-stack">
-      {topScorer ? (
-        <div className="predictions-type-line">
-          <span className="predictions-type-line-value">{topScorer}</span>
-          {status !== "pending" ? (
-            <span className={`predictions-result-badge ${badge.className}`}>
-              {badge.label}
-              {points > 0 ? ` · +${points}` : ""}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-      {board ? (
-        <div className="tournament-picks-board-inset">
-          <span className="tournament-picks-board-inset-label">
-            {TOURNAMENT_PREDICTION_BLOCKS.topScorerBoard}
+      <div className="predictions-type-line">
+        <span className="predictions-type-line-value">
+          {topScorer ?? <span className="predictions-picks-placeholder">—</span>}
+        </span>
+        {hasTopScorer && status !== "pending" ? (
+          <span className={`predictions-result-badge ${badge.className}`}>
+            {badge.label}
+            {points > 0 ? ` · +${points}` : ""}
           </span>
-          <span className="tournament-picks-board-inset-value">{board}</span>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
+      <div className="tournament-picks-board-inset">
+        <span className="tournament-picks-board-inset-label">
+          {TOURNAMENT_PREDICTION_BLOCKS.topScorerBoard}
+        </span>
+        <span className="tournament-picks-board-inset-value">
+          {board ?? <span className="predictions-picks-placeholder">—</span>}
+        </span>
+      </div>
     </div>
   );
 }
@@ -123,10 +99,7 @@ function TournamentPickCell({
   }
 
   const value = tournamentCategoryValue(record, column.key);
-  if (!value) {
-    return <span className="predictions-picks-placeholder">—</span>;
-  }
-
+  const hasValue = Boolean(value);
   const status = tournamentCategoryResultStatus(record, column.key);
   const points = tournamentCategoryPoints(record, column.key);
   const badge = resultBadge(status);
@@ -134,8 +107,10 @@ function TournamentPickCell({
   return (
     <div className="predictions-type-lines predictions-type-lines--unified">
       <div className="predictions-type-line">
-        <span className="predictions-type-line-value">{value}</span>
-        {status !== "pending" ? (
+        <span className="predictions-type-line-value">
+          {hasValue ? value : <span className="predictions-picks-placeholder">—</span>}
+        </span>
+        {hasValue && status !== "pending" ? (
           <span className={`predictions-result-badge ${badge.className}`}>
             {badge.label}
             {points > 0 ? ` · +${points}` : ""}
@@ -213,13 +188,7 @@ export function TournamentPicksSection({
     [connectionsPredictions, friendsNameFilter]
   );
 
-  const visibleColumns = useMemo(
-    () =>
-      TOURNAMENT_TABLE_COLUMNS.filter((column) =>
-        columnVisibleForAnyone(column, myPrediction, filteredFriends)
-      ),
-    [filteredFriends, myPrediction]
-  );
+  const visibleColumns = TOURNAMENT_TABLE_COLUMNS;
 
   const personRows = useMemo(() => {
     const rows: TournamentPersonRow[] = [
@@ -243,14 +212,29 @@ export function TournamentPicksSection({
       });
     }
 
+    if (!mobileLayout) {
+      const friendCount = rows.length - 1;
+      const targetCount = Math.max(MIN_TOURNAMENT_FRIEND_ROWS, friendCount);
+      for (let index = friendCount + 1; index <= targetCount; index += 1) {
+        rows.push({
+          key: `placeholder-${index}`,
+          label: `Friend ${index}`,
+          record: null
+        });
+      }
+    }
+
     return rows.sort((a, b) => {
       if (a.isViewer) return -1;
       if (b.isViewer) return 1;
+      if (a.key.startsWith("placeholder-")) return 1;
+      if (b.key.startsWith("placeholder-")) return -1;
       return a.label.localeCompare(b.label);
     });
-  }, [filteredFriends, myPrediction]);
+  }, [filteredFriends, mobileLayout, myPrediction]);
 
-  const hasAnyPicks = Boolean(myPrediction) || connectionsPredictions.length > 0;
+  const showingPlaceholderFriends =
+    !mobileLayout && filteredFriends.length === 0 && !friendsNameFilter.trim();
 
   return (
     <section
@@ -280,18 +264,20 @@ export function TournamentPicksSection({
         </div>
       </header>
 
-      {!hasAnyPicks ? (
-        <p className="predictions-overview-empty">No tournament picks yet — add yours above.</p>
-      ) : visibleColumns.length === 0 ? (
-        <p className="predictions-overview-empty">No friends match that filter.</p>
-      ) : mobileLayout ? (
+      {!myPrediction && connectionsPredictions.length === 0 ? (
+        <p className="predictions-overview-hint predictions-overview-empty--inline">
+          No tournament picks yet — add yours above.
+        </p>
+      ) : null}
+
+      {mobileLayout ? (
         <div className="predictions-picks-mobile-stack">
           {personRows.map((person) => (
             <article
               key={person.key}
               className={`predictions-picks-mobile-card${
                 person.isViewer ? " predictions-picks-mobile-card--active" : ""
-              }`}
+              }${person.key.startsWith("placeholder-") ? " predictions-picks-mobile-card--placeholder" : ""}`}
             >
               <header className="predictions-picks-mobile-card-header">
                 <div className="predictions-picks-mobile-peer-head">
@@ -329,12 +315,18 @@ export function TournamentPicksSection({
               {personRows.map((person) => (
                 <tr
                   key={person.key}
-                  className={person.isViewer ? "predictions-picks-row--active" : undefined}
+                  className={`${person.isViewer ? "predictions-picks-row--active" : ""}${
+                    person.key.startsWith("placeholder-") ? " predictions-picks-row--placeholder" : ""
+                  }`.trim()}
                 >
                   <td className="predictions-picks-match-cell">
                     <span className="predictions-picks-col-label">{person.label}</span>
                     {person.username ? (
                       <span className="predictions-picks-col-meta">@{person.username}</span>
+                    ) : person.key.startsWith("placeholder-") ? (
+                      <span className="predictions-picks-col-meta predictions-picks-col-meta--placeholder">
+                        Open slot
+                      </span>
                     ) : null}
                   </td>
                   {visibleColumns.map((column) => (
@@ -349,9 +341,15 @@ export function TournamentPicksSection({
         </div>
       )}
 
-      {hasAnyPicks && filteredFriends.length === 0 && connectionsPredictions.length > 0 ? (
-        <p className="predictions-overview-empty predictions-unified-filter-empty">
+      {filteredFriends.length === 0 && connectionsPredictions.length > 0 && friendsNameFilter.trim() ? (
+        <p className="predictions-overview-hint predictions-unified-filter-empty">
           No friends match that filter.
+        </p>
+      ) : null}
+
+      {showingPlaceholderFriends && connectionsPredictions.length > 0 ? (
+        <p className="predictions-overview-hint predictions-unified-filter-empty">
+          Friend slots fill in when connections submit tournament picks.
         </p>
       ) : null}
     </section>

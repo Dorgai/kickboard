@@ -5797,6 +5797,23 @@ h3 {
   margin-top: 2px;
 }
 
+.predictions-overview-hint {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+
+.predictions-picks-row--placeholder,
+.predictions-picks-mobile-card--placeholder {
+  opacity: 0.92;
+}
+
+.predictions-picks-row--placeholder .predictions-picks-match-label,
+.predictions-picks-mobile-card--placeholder .predictions-picks-match-label {
+  color: var(--color-text-secondary);
+}
+
 .predictions-picks-table-wrap {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;

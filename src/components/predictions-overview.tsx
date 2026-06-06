@@ -132,35 +132,30 @@ function picksForCategoryStatus(
   });
 }
 
-function formatPickSummary(pick: PredictionPickSummary) {
-  const lines: { label: string; value: string; status: string; points: number }[] = [];
+const PICK_CATEGORY_ROWS: { category: PredictionCategory; label: string }[] = [
+  { category: "outcome", label: PREDICTION_BLOCK_SHORT.outcome },
+  { category: "score", label: PREDICTION_BLOCK_SHORT.score },
+  { category: "scorers", label: PREDICTION_BLOCK_SHORT.scorers }
+];
 
-  if (pick.predictedOutcome) {
-    lines.push({
-      label: PREDICTION_BLOCK_SHORT.outcome,
-      value: outcomeShort(pick.predictedOutcome),
-      status: pick.outcomeStatus,
-      points: pick.outcomePointsAwarded
-    });
+function pickCategoryValue(pick: PredictionPickSummary | null, category: PredictionCategory) {
+  if (!pick) return null;
+  if (category === "outcome" && pick.predictedOutcome) {
+    return outcomeShort(pick.predictedOutcome);
   }
-  if (pick.homeScore !== null && pick.awayScore !== null) {
-    lines.push({
-      label: PREDICTION_BLOCK_SHORT.score,
-      value: `${pick.homeScore}–${pick.awayScore}`,
-      status: pick.scoreStatus,
-      points: pick.scorePointsAwarded
-    });
+  if (category === "score" && pick.homeScore !== null && pick.awayScore !== null) {
+    return `${pick.homeScore}–${pick.awayScore}`;
   }
-  if (pick.scorerPicks.length > 0) {
-    lines.push({
-      label: PREDICTION_BLOCK_SHORT.scorers,
-      value: formatScorerPicksSummary(pick.scorerPicks),
-      status: pick.scorersStatus,
-      points: pick.scorersPointsAwarded
-    });
+  if (category === "scorers" && pick.scorerPicks.length > 0) {
+    return formatScorerPicksSummary(pick.scorerPicks);
   }
+  return null;
+}
 
-  return lines;
+function pickCategoryPoints(pick: PredictionPickSummary, category: PredictionCategory) {
+  if (category === "outcome") return pick.outcomePointsAwarded;
+  if (category === "score") return pick.scorePointsAwarded;
+  return pick.scorersPointsAwarded;
 }
 
 function pickToSharePayload(
@@ -182,39 +177,41 @@ function pickToSharePayload(
   };
 }
 
-function StatusLine({
-  label,
-  value,
-  status,
-  points
+function PickCategoryLine({
+  pick,
+  category,
+  label
 }: {
+  pick: PredictionPickSummary | null;
+  category: PredictionCategory;
   label: string;
-  value: string;
-  status: string;
-  points: number;
 }) {
+  const hasData = Boolean(pick && pickHasCategory(pick, category));
+  const value = pickCategoryValue(pick, category);
+  const status = pick ? categoryStatus(pick, category) : "pending";
   const badge = resultBadge(status);
+
   return (
     <div className="predictions-type-line">
       <span className="predictions-type-line-label">{label}</span>
-      <span className="predictions-type-line-value">{value}</span>
-      <span className={`predictions-result-badge ${badge.className}`}>
-        {badge.label}
-        {points > 0 ? ` · +${points}` : ""}
+      <span className="predictions-type-line-value">
+        {hasData && value ? value : <span className="predictions-picks-placeholder">—</span>}
       </span>
+      {hasData ? (
+        <span className={`predictions-result-badge ${badge.className}`}>
+          {badge.label}
+          {pick ? (pickCategoryPoints(pick, category) > 0 ? ` · +${pickCategoryPoints(pick, category)}` : "") : null}
+        </span>
+      ) : null}
     </div>
   );
 }
 
-function CompactPickLines({ pick }: { pick: PredictionPickSummary }) {
-  const lines = formatPickSummary(pick);
-  if (!lines.length) {
-    return <p className="predictions-overview-empty predictions-overview-empty--inline">No picks</p>;
-  }
+function CompactPickLines({ pick }: { pick: PredictionPickSummary | null }) {
   return (
     <div className="predictions-type-lines predictions-type-lines--unified">
-      {lines.map((line) => (
-        <StatusLine key={line.label} {...line} />
+      {PICK_CATEGORY_ROWS.map((row) => (
+        <PickCategoryLine key={row.category} category={row.category} label={row.label} pick={pick} />
       ))}
     </div>
   );
@@ -504,6 +501,25 @@ function buildFriendColumns(
   return columns;
 }
 
+function createEmptyPickSummary(fixtureKey: string, fixtureLabel: string): PredictionPickSummary {
+  return {
+    id: "",
+    fixtureKey,
+    fixtureLabel,
+    predictedOutcome: null,
+    homeScore: null,
+    awayScore: null,
+    scorerPicks: [],
+    outcomeStatus: "pending",
+    scoreStatus: "pending",
+    scorersStatus: "pending",
+    outcomePointsAwarded: 0,
+    scorePointsAwarded: 0,
+    scorersPointsAwarded: 0,
+    updatedAt: ""
+  };
+}
+
 function friendPickForColumn(
   friends: ConnectionPredictionSummary[],
   column: FriendTableColumn
@@ -512,10 +528,7 @@ function friendPickForColumn(
   return friends.find((pick) => pick.userId === column.userId) ?? null;
 }
 
-function TablePickCell({ pick, placeholder = "—" }: { pick: PredictionPickSummary | null; placeholder?: string }) {
-  if (!pick) {
-    return <span className="predictions-picks-placeholder">{placeholder}</span>;
-  }
+function TablePickCell({ pick }: { pick: PredictionPickSummary | null }) {
   return <CompactPickLines pick={pick} />;
 }
 
@@ -585,6 +598,29 @@ export function PredictionsPicksSection({
   );
 
   const visibleGroups = picksTab === "upcoming" ? upcomingGroups : pastGroups;
+  const displayGroups = useMemo((): UnifiedMatchGroup[] => {
+    if (visibleGroups.length > 0) return visibleGroups;
+
+    const activeFixture = activeFixtureKey
+      ? fixtures.find((fixture) => fixture.key === activeFixtureKey)
+      : null;
+    const fixtureKey = activeFixture?.key ?? `empty-${picksTab}`;
+    const fixtureLabel = activeFixture
+      ? `${activeFixture.homeTeam} vs ${activeFixture.awayTeam}`
+      : picksTab === "upcoming"
+        ? "Upcoming matches"
+        : "Past matches";
+
+    return [
+      {
+        fixtureKey,
+        fixtureLabel,
+        mine: createEmptyPickSummary(fixtureKey, fixtureLabel),
+        friends: []
+      }
+    ];
+  }, [activeFixtureKey, fixtures, picksTab, visibleGroups]);
+  const showingPlaceholderRow = visibleGroups.length === 0;
   const friendColumns = useMemo(
     () =>
       buildFriendColumns(connectionsPredictions, friendsNameFilter, {
@@ -629,16 +665,14 @@ export function PredictionsPicksSection({
       </div>
 
       {myPredictions.length === 0 ? (
-        <p className="predictions-overview-empty">No picks yet — choose a match above.</p>
-      ) : visibleGroups.length === 0 ? (
-        <p className="predictions-overview-empty">
-          {picksTab === "upcoming"
-            ? "No upcoming picks — switch to Past to see settled matches."
-            : "No past picks yet."}
+        <p className="predictions-overview-hint predictions-overview-empty--inline">
+          No picks yet — choose a match above.
         </p>
-      ) : mobileLayout ? (
+      ) : null}
+
+      {mobileLayout ? (
         <div className="predictions-picks-mobile-stack" role="tabpanel">
-          {visibleGroups.map((group) => {
+          {displayGroups.map((group) => {
             const isActive = activeFixtureKey === group.fixtureKey;
             const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
             const matchFriends = group.friends.filter((pick) =>
@@ -648,7 +682,9 @@ export function PredictionsPicksSection({
             return (
               <article
                 key={group.fixtureKey}
-                className={`predictions-picks-mobile-card${isActive ? " predictions-picks-mobile-card--active" : ""}`}
+                className={`predictions-picks-mobile-card${isActive ? " predictions-picks-mobile-card--active" : ""}${
+                  showingPlaceholderRow ? " predictions-picks-mobile-card--placeholder" : ""
+                }`}
               >
                 <header className="predictions-picks-mobile-card-header">
                   <span className="predictions-picks-match-label">{group.fixtureLabel}</span>
@@ -715,13 +751,15 @@ export function PredictionsPicksSection({
               </tr>
             </thead>
             <tbody>
-              {visibleGroups.map((group) => {
+              {displayGroups.map((group) => {
                 const isActive = activeFixtureKey === group.fixtureKey;
                 const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
                 return (
                   <tr
                     key={group.fixtureKey}
-                    className={isActive ? "predictions-picks-row--active" : undefined}
+                    className={`${isActive ? "predictions-picks-row--active" : ""}${
+                      showingPlaceholderRow ? " predictions-picks-row--placeholder" : ""
+                    }`.trim()}
                   >
                     <td className="predictions-picks-match-cell">
                       <span className="predictions-picks-match-label">{group.fixtureLabel}</span>
@@ -759,6 +797,14 @@ export function PredictionsPicksSection({
           </table>
         </div>
       )}
+
+      {showingPlaceholderRow && myPredictions.length > 0 ? (
+        <p className="predictions-overview-hint predictions-unified-filter-empty">
+          {picksTab === "upcoming"
+            ? "No upcoming picks on this tab — switch to Past to see settled matches."
+            : "No past picks yet."}
+        </p>
+      ) : null}
 
       {myPredictions.length > 0 && friendPickCount === 0 && connectionsPredictions.length > 0 ? (
         <p className="predictions-overview-empty predictions-unified-filter-empty">
