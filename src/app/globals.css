@@ -5649,21 +5649,21 @@ h3 {
 }
 
 .predictions-unified-picks {
-  gap: 8px;
+  gap: 10px;
   padding: 12px 14px;
   width: 100%;
 }
 
-.predictions-unified-picks-toolbar {
+.predictions-unified-picks-header {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 10px;
+  gap: 8px;
+  justify-content: space-between;
   width: 100%;
 }
 
 .predictions-unified-picks-title {
-  flex: 0 0 auto;
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -5671,144 +5671,117 @@ h3 {
   text-transform: uppercase;
 }
 
-.predictions-unified-picks-tabs.feed-tab-bar {
-  flex: 1 1 12rem;
-  min-width: 0;
-}
-
-.predictions-unified-picks-filter {
-  flex: 0 0 auto;
-  margin-left: auto;
+.predictions-unified-picks-tabs-rail {
+  margin-bottom: 2px;
 }
 
 .predictions-unified-picks-filter-input {
-  max-width: 7.5rem;
-  width: 7.5rem;
+  max-width: 8rem;
+  width: 8rem;
 }
 
-.predictions-unified-list {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
-  list-style: none;
-  margin: 0;
-  max-height: min(28rem, 58vh);
-  overflow: auto;
-  padding: 0;
+.predictions-unified-filter-empty {
+  margin-top: 2px;
 }
 
-.predictions-unified-match {
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-  padding: 8px 10px;
+.predictions-picks-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  width: 100%;
 }
 
-.predictions-unified-match--active {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent);
+.predictions-picks-table {
+  min-width: 100%;
+  table-layout: auto;
 }
 
-.predictions-unified-match-header {
-  align-items: flex-start;
-  display: flex;
-  gap: 6px 8px;
-  justify-content: space-between;
-  min-width: 0;
+.predictions-picks-table thead th {
+  line-height: 1.2;
+  vertical-align: bottom;
 }
 
-.predictions-unified-match-title {
+.predictions-picks-table tbody tr {
+  vertical-align: top;
+}
+
+.predictions-picks-table tbody tr.predictions-picks-row--active {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+}
+
+.predictions-picks-match-cell {
+  font-weight: 700;
+  min-width: 7.5rem;
+  width: 22%;
+}
+
+.predictions-picks-match-link {
   background: transparent;
   border: none;
   color: var(--color-text-primary);
   cursor: pointer;
-  flex: 1 1 auto;
   font: inherit;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   line-height: 1.25;
-  min-width: 0;
   padding: 0;
   text-align: left;
   text-decoration: underline;
 }
 
-.predictions-unified-match-actions {
-  align-items: center;
-  display: inline-flex;
-  flex: 0 0 auto;
-  flex-wrap: wrap;
-  gap: 4px 6px;
-  justify-content: flex-end;
-}
-
-.predictions-unified-match-body {
-  display: grid;
-  gap: 6px 10px;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  min-width: 0;
-}
-
-.predictions-unified-yours,
-.predictions-unified-friend,
-.predictions-unified-peers {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.predictions-unified-yours {
-  border-right: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
-  padding-right: 8px;
-}
-
-.predictions-unified-role {
-  align-items: baseline;
-  color: var(--color-text-secondary);
-  display: inline-flex;
-  flex-wrap: wrap;
-  font-size: 9px;
-  font-weight: 800;
-  gap: 3px 6px;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.predictions-unified-role--peer strong {
+.predictions-picks-col-label {
+  display: block;
   font-size: 10px;
+  font-weight: 800;
+}
+
+.predictions-picks-col-meta {
+  color: var(--color-text-secondary);
+  display: block;
+  font-size: 9px;
+  font-weight: 600;
   letter-spacing: 0;
+  margin-top: 2px;
   text-transform: none;
 }
 
-.predictions-unified-friends {
-  display: grid;
-  gap: 6px;
-  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.predictions-picks-col-meta--placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
 }
 
-.predictions-unified-friend {
-  background: color-mix(in srgb, var(--color-bg) 55%, var(--color-surface));
-  border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
-  border-radius: 8px;
-  min-width: 0;
-  padding: 5px 6px;
+.predictions-picks-table .predictions-results-cell {
+  min-width: 5.5rem;
+  text-align: left;
 }
 
-.predictions-unified-no-friends {
-  color: var(--color-text-secondary);
+.predictions-picks-placeholder {
+  color: var(--color-text-muted);
+  display: block;
   font-size: 10px;
-  line-height: 1.35;
-  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
 }
 
-.predictions-unified-filter-empty {
-  margin-top: 2px;
+.predictions-picks-actions-head {
+  width: 3.5rem;
+}
+
+.predictions-picks-actions-cell {
+  min-width: 3.5rem;
+  text-align: right;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.predictions-picks-actions-cell .prediction-share--compact {
+  justify-content: flex-end;
+}
+
+.predictions-picks-actions-cell .predictions-overview-edit {
+  display: block;
+  margin-top: 4px;
+  margin-left: auto;
 }
 
 .predictions-overview-empty--inline {
@@ -5870,12 +5843,11 @@ h3 {
 }
 
 @media (max-width: 720px) {
-  .predictions-unified-picks-toolbar {
+  .predictions-unified-picks-header {
     align-items: stretch;
   }
 
   .predictions-unified-picks-filter {
-    margin-left: 0;
     width: 100%;
   }
 
@@ -5884,36 +5856,12 @@ h3 {
     width: 100%;
   }
 
-  .predictions-unified-list {
-    grid-template-columns: minmax(0, 1fr);
-    max-height: min(32rem, 65vh);
+  .predictions-picks-match-cell {
+    min-width: 6.5rem;
   }
 
-  .predictions-unified-match-body {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .predictions-unified-yours {
-    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
-    border-right: none;
-    padding-bottom: 6px;
-    padding-right: 0;
-  }
-
-  .predictions-unified-friends {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 6px;
-    -webkit-overflow-scrolling: touch;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    padding-bottom: 2px;
-    scroll-snap-type: x proximity;
-  }
-
-  .predictions-unified-friend {
-    flex: 0 0 min(78vw, 14rem);
-    scroll-snap-align: start;
+  .predictions-picks-table .predictions-results-cell {
+    min-width: 4.75rem;
   }
 }
 
