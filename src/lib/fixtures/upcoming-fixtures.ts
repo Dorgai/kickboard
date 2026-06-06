@@ -5,6 +5,7 @@ import {
   parseFixtureSortKey,
   type FixtureOption
 } from "@/lib/fixtures/fixture-key";
+import { teamsMatch } from "@/lib/squads/team-names";
 
 type WorldCupGroupFixture = {
   homeTeam: string;
@@ -58,24 +59,54 @@ export function buildFixtureOptionsFromWorldCup(groups: WorldCupGroup[], liveFix
   }
 
   for (const live of liveFixtures) {
-    const key = buildApiFootballFixtureKey(live.fixtureId);
     const status = live.status.short === "FT" ? "finished" : "live";
-    byKey.set(key, {
-      key,
-      homeTeam: live.homeTeam,
-      awayTeam: live.awayTeam,
-      date: live.date,
-      group: null,
-      status,
-      homeGoals: live.homeGoals,
-      awayGoals: live.awayGoals,
-      label: formatFixtureLabel({
+    let merged = false;
+
+    for (const [existingKey, existing] of byKey) {
+      if (
+        !teamsMatch(existing.homeTeam, live.homeTeam) ||
+        !teamsMatch(existing.awayTeam, live.awayTeam)
+      ) {
+        continue;
+      }
+
+      byKey.set(existingKey, {
+        ...existing,
+        date: live.date || existing.date,
+        status,
+        homeGoals: live.homeGoals,
+        awayGoals: live.awayGoals,
+        label: formatFixtureLabel({
+          homeTeam: existing.homeTeam,
+          awayTeam: existing.awayTeam,
+          date: live.date || existing.date,
+          group: existing.group
+        }),
+        sortKey: parseFixtureSortKey(live.date || existing.date)
+      });
+      merged = true;
+      break;
+    }
+
+    if (!merged) {
+      const key = buildApiFootballFixtureKey(live.fixtureId);
+      byKey.set(key, {
+        key,
         homeTeam: live.homeTeam,
         awayTeam: live.awayTeam,
-        date: live.date
-      }),
-      sortKey: parseFixtureSortKey(live.date)
-    });
+        date: live.date,
+        group: null,
+        status,
+        homeGoals: live.homeGoals,
+        awayGoals: live.awayGoals,
+        label: formatFixtureLabel({
+          homeTeam: live.homeTeam,
+          awayTeam: live.awayTeam,
+          date: live.date
+        }),
+        sortKey: parseFixtureSortKey(live.date)
+      });
+    }
   }
 
   return Array.from(byKey.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));

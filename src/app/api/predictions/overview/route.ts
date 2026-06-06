@@ -14,10 +14,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Complete onboarding first." }, { status: 403 });
   }
 
-  const fixtureKey = new URL(request.url).searchParams.get("fixtureKey")?.trim() ?? "";
+  const params = new URL(request.url).searchParams;
+  const fixtureKey = params.get("fixtureKey")?.trim() ?? "";
+  const homeTeam = params.get("homeTeam")?.trim() ?? "";
+  const awayTeam = params.get("awayTeam")?.trim() ?? "";
 
   try {
-    const overview = await getPredictionsOverview(user.id, fixtureKey || undefined);
+    const overview = await getPredictionsOverview(user.id, {
+      fixtureKey: fixtureKey || undefined,
+      homeTeam: homeTeam || undefined,
+      awayTeam: awayTeam || undefined
+    });
     return NextResponse.json(overview);
   } catch (error) {
     const mapped = mapDatabaseError(error);

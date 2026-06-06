@@ -18,13 +18,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Fan Mode accounts cannot view friends." }, { status: 403 });
   }
 
-  const fixtureKey = new URL(request.url).searchParams.get("fixtureKey")?.trim() ?? "";
+  const params = new URL(request.url).searchParams;
+  const fixtureKey = params.get("fixtureKey")?.trim() ?? "";
   if (!fixtureKey) {
     return NextResponse.json({ error: "fixtureKey is required." }, { status: 400 });
   }
 
+  const homeTeam = params.get("homeTeam")?.trim() ?? "";
+  const awayTeam = params.get("awayTeam")?.trim() ?? "";
+
   try {
-    const peers = await listPeersMatchActivity(user.id, fixtureKey);
+    const peers = await listPeersMatchActivity(user.id, fixtureKey, {
+      homeTeam: homeTeam || undefined,
+      awayTeam: awayTeam || undefined
+    });
     return NextResponse.json({ fixtureKey, peers });
   } catch (error) {
     const connectionMapped = mapConnectionError(error);

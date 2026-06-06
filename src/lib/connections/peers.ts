@@ -1,5 +1,7 @@
 import { query } from "@/lib/db";
 import { areUsersConnected, listAcceptedPeerIds } from "@/lib/connections/store";
+import { listApiFootballFixtureKeysForTeams } from "@/lib/fixtures/fixture-key-query";
+import { teamNameToFixtureSlug } from "@/lib/fixtures/fixture-key";
 import {
   formatFormationsLabel,
   normalizeLineupSlots,
@@ -87,12 +89,40 @@ function mapSquadSummary(row: {
   };
 }
 
-export async function listPeersMatchActivity(viewerId: string, fixtureKey: string) {
+export async function listPeersMatchActivity(
+  viewerId: string,
+  fixtureKey: string,
+  teams?: { homeTeam?: string; awayTeam?: string }
+) {
   const key = fixtureKey.trim().slice(0, 120);
   if (!key) return [];
 
   const peerIds = await listAcceptedPeerIds(viewerId);
   if (!peerIds.length) return [];
+
+  const homeTeam = teams?.homeTeam?.trim() ?? "";
+  const awayTeam = teams?.awayTeam?.trim() ?? "";
+  const homeSlug = homeTeam ? teamNameToFixtureSlug(homeTeam) : "";
+  const awaySlug = awayTeam ? teamNameToFixtureSlug(awayTeam) : "";
+  const apiKeys =
+    homeTeam && awayTeam ? await listApiFootballFixtureKeysForTeams(homeTeam, awayTeam) : [];
+
+  const fixtureMatchSql =
+    homeSlug && awaySlug
+      ? `(
+           fixture_key = $2
+           OR (
+             split_part(fixture_key, ':', 1) = 'wc26'
+             AND split_part(fixture_key, ':', 3) = $3
+             AND split_part(fixture_key, ':', 4) = $4
+           )
+           OR (cardinality($5::text[]) > 0 AND fixture_key = ANY($5::text[]))
+         )`
+      : `fixture_key = $2`;
+
+  const squadsParams =
+    homeSlug && awaySlug ? [peerIds, key, homeSlug, awaySlug, apiKeys] : [peerIds, key];
+  const predictionsParams = squadsParams;
 
   const squadsResult = await query<{
     user_id: string;
@@ -105,9 +135,9 @@ export async function listPeersMatchActivity(viewerId: string, fixtureKey: strin
     `SELECT user_id, id, name, formation, lineup, updated_at
      FROM squads
      WHERE user_id = ANY($1::uuid[])
-       AND fixture_key = $2
+       AND ${fixtureMatchSql}
      ORDER BY updated_at DESC`,
-    [peerIds, key]
+    squadsParams
   );
 
   const predictionsResult = await query<{
@@ -119,8 +149,8 @@ export async function listPeersMatchActivity(viewerId: string, fixtureKey: strin
     `SELECT user_id, home_score, away_score, updated_at
      FROM fixture_predictions
      WHERE user_id = ANY($1::uuid[])
-       AND fixture_key = $2`,
-    [peerIds, key]
+       AND ${fixtureMatchSql}`,
+    predictionsParams
   );
 
   const usersResult = await query<{
