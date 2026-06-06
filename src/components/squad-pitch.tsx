@@ -10,8 +10,14 @@ import {
   type PointerEvent as ReactPointerEvent
 } from "react";
 import { HelpTooltip } from "@/components/help-tooltip";
+import { usePitchLayout } from "@/lib/use-pitch-layout";
 import {
-  clampPitchCoord,
+  canonicalCoordsFromPointer,
+  displayPositionFromCanonical,
+  sideFromCanonicalCoords,
+  type PitchLayout
+} from "@/lib/squads/pitch-layout";
+import {
   nearestFormationSlotNumber,
   slotSide,
   swapLineupSlots,
@@ -38,6 +44,7 @@ export type { PitchDragPlayer };
 export type SquadPitchHandle = {
   tryDropPlayer: (player: PitchDragPlayer, clientX: number, clientY: number) => boolean;
   getPitchRect: () => DOMRect | null;
+  getPitchLayout: () => PitchLayout;
 };
 
 type SquadPitchProps = {
@@ -49,13 +56,9 @@ type SquadPitchProps = {
   onLineupChange: (lineup: SquadLineupSlot[]) => void;
   onRemovePlayer?: (playerId: number | string) => void;
   readOnly?: boolean;
+  /** Defaults to responsive layout (horizontal from tablet up). */
+  layout?: PitchLayout;
 };
-
-function coordsFromPointer(pitch: DOMRect, clientX: number, clientY: number) {
-  const x = clampPitchCoord(((clientX - pitch.left) / pitch.width) * 100);
-  const y = clampPitchCoord(((clientY - pitch.top) / pitch.height) * 100);
-  return { x, y };
-}
 
 /** First name(s) on line 1, surname on line 2 (shirt-style). */
 function splitPitchPlayerName(fullName: string) {
@@ -119,11 +122,15 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     onSelectSlot,
     onLineupChange,
     onRemovePlayer,
-    readOnly = false
+    readOnly = false,
+    layout: layoutProp
   },
   ref
 ) {
+  const responsiveLayout = usePitchLayout();
+  const layout = layoutProp ?? responsiveLayout;
   const pitchRef = useRef<HTMLDivElement>(null);
+  const layoutRef = useRef(layout);
   const lineupRef = useRef(lineup);
   const onLineupChangeRef = useRef(onLineupChange);
   const onRemovePlayerRef = useRef(onRemovePlayer);
@@ -141,6 +148,10 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
   useEffect(() => {
     onRemovePlayerRef.current = onRemovePlayer;
   }, [onRemovePlayer]);
+
+  useEffect(() => {
+    layoutRef.current = layout;
+  }, [layout]);
 
   const commitLineup = useCallback((next: SquadLineupSlot[]) => {
     lineupRef.current = next;
@@ -195,9 +206,9 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
       );
       if (!moving) return false;
 
-      const coords = coordsFromPointer(pitch, clientX, clientY);
+      const coords = canonicalCoordsFromPointer(pitch, clientX, clientY, layoutRef.current);
       const side = slotSide(moving);
-      const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
+      const dropSide = sideFromCanonicalCoords(coords);
       if (side !== dropSide) return false;
 
       const targetSlot = nearestFormationSlotNumber(currentLineup, side, coords);
@@ -220,8 +231,8 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
       const playerSide = sideForPlayer(player, homeTeam, awayTeam);
       if (!playerSide) return false;
 
-      const coords = coordsFromPointer(pitch, clientX, clientY);
-      const dropSide: SquadLineupSide = coords.y < 50 ? "home" : "away";
+      const coords = canonicalCoordsFromPointer(pitch, clientX, clientY, layoutRef.current);
+      const dropSide = sideFromCanonicalCoords(coords);
       if (playerSide !== dropSide) return false;
 
       const currentLineup = lineupRef.current;
@@ -249,7 +260,8 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
     ref,
     () => ({
       tryDropPlayer,
-      getPitchRect: () => pitchRef.current?.getBoundingClientRect() ?? null
+      getPitchRect: () => pitchRef.current?.getBoundingClientRect() ?? null,
+      getPitchLayout: () => layoutRef.current
     }),
     [tryDropPlayer]
   );
@@ -259,6 +271,7 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
       getLineup: () => lineupRef.current,
       commitLineup,
       getPitchRect: () => pitchRef.current?.getBoundingClientRect() ?? null,
+      getPitchLayout: () => layoutRef.current,
       homeTeam,
       awayTeam,
       tryPlaceBenchPlayer: tryDropPlayer,
@@ -352,7 +365,9 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
       ) : null}
       <div
         aria-label="Football pitch with home and away teams"
-        className={`squad-pitch squad-pitch--dual${draggingPlayerId ? " squad-pitch--token-drag" : ""}`}
+        className={`squad-pitch squad-pitch--dual${
+          layout === "horizontal" ? " squad-pitch--horizontal" : ""
+        }${draggingPlayerId ? " squad-pitch--token-drag" : ""}`}
         onDragOver={readOnly ? undefined : handleDragOver}
         onDrop={readOnly ? undefined : handleDrop}
         ref={pitchRef}
@@ -373,13 +388,14 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
         {!readOnly
           ? lineup.map((slot) => {
               if (slot.label) return null;
+              const ghostPos = displayPositionFromCanonical({ x: slot.x, y: slot.y }, layout);
               return (
                 <button
                   className={`squad-pitch-ghost squad-pitch-ghost--empty${
                     selectedSlot === slot.slot ? " squad-pitch-ghost--selected" : ""
                   }`}
                   key={`ghost-${slot.slot}`}
-                  style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+                  style={{ left: `${ghostPos.left}%`, top: `${ghostPos.top}%` }}
                   type="button"
                   onClick={() => onSelectSlot(slot.slot)}
                   onDragOver={(event) => {
@@ -409,6 +425,7 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
               draggingPlayerId !== null && playerIdsMatch(draggingPlayerId, slot.playerId);
             const offset = isDragging ? dragOffset : null;
             const isSelected = selectedSlot === slot.slot;
+            const tokenPos = displayPositionFromCanonical({ x: slot.x, y: slot.y }, layout);
             return (
               <div
                 aria-label={slot.label}
@@ -418,8 +435,8 @@ export const SquadPitch = forwardRef<SquadPitchHandle, SquadPitchProps>(function
                 key={`player-${slot.playerId}`}
                 role={readOnly ? "presentation" : "button"}
                 style={{
-                  left: `${slot.x}%`,
-                  top: `${slot.y}%`,
+                  left: `${tokenPos.left}%`,
+                  top: `${tokenPos.top}%`,
                   transform: offset
                     ? `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px))`
                     : undefined,
