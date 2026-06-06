@@ -4397,9 +4397,55 @@ h3 {
 }
 
 .tournament-scorer-board-enable input {
-  accent-color: var(--color-accent);
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-surface);
+  border: 1.5px solid color-mix(in srgb, var(--color-text-primary) 24%, var(--color-border));
+  border-radius: 5px;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-grid;
+  flex-shrink: 0;
   height: 18px;
+  margin: 0;
+  place-content: center;
   width: 18px;
+}
+
+.tournament-scorer-board-enable input::after {
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  content: "";
+  display: block;
+  height: 9px;
+  opacity: 0;
+  transform: rotate(45deg) scale(0.85) translate(-1px, -1px);
+  width: 5px;
+}
+
+.tournament-scorer-board-enable input:checked {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+}
+
+.tournament-scorer-board-enable input:checked::after {
+  opacity: 1;
+}
+
+.tournament-scorer-board-enable input:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+[data-theme="light"] .tournament-scorer-board-enable input,
+:root:not([data-theme]) .tournament-scorer-board-enable input {
+  background: #ffffff;
+  border-color: color-mix(in srgb, var(--color-text-primary) 30%, #d1d5db);
+}
+
+[data-theme="dark"] .tournament-scorer-board-enable input {
+  background: color-mix(in srgb, var(--color-surface) 90%, var(--color-bg));
+  border-color: color-mix(in srgb, var(--color-text-primary) 34%, var(--color-border));
 }
 
 .tournament-scorer-board-size {
