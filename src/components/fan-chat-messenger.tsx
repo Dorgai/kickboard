@@ -11,6 +11,15 @@ function peerLabel(thread: Pick<FanChatInboxThread, "peerDisplayName" | "peerUse
   return thread.peerDisplayName?.trim() || thread.peerUsername;
 }
 
+function sortInboxThreads(threads: FanChatInboxThread[]) {
+  return [...threads].sort((a, b) => {
+    const aTime = a.lastMessageAt ?? "";
+    const bTime = b.lastMessageAt ?? "";
+    if (aTime !== bTime) return bTime.localeCompare(aTime);
+    return peerLabel(a).localeCompare(peerLabel(b));
+  });
+}
+
 export function FanChatMessenger() {
   const [threads, setThreads] = useState<FanChatInboxThread[]>([]);
   const [activePeerId, setActivePeerId] = useState<string>("");
@@ -79,9 +88,10 @@ export function FanChatMessenger() {
     setActivePeerId((current) => {
       if (current === "all") return current;
       if (current && nextThreads.some((thread) => thread.peerId === current)) return current;
-      const firstUnread = nextThreads.find((thread) => thread.unreadCount > 0);
+      const ordered = sortInboxThreads(nextThreads);
+      const firstUnread = ordered.find((thread) => thread.unreadCount > 0);
       if (firstUnread) return firstUnread.peerId;
-      return nextThreads[0]?.peerId ?? "";
+      return ordered[0]?.peerId ?? "";
     });
   }, [loadInbox]);
 
@@ -201,6 +211,7 @@ export function FanChatMessenger() {
     }
   }
 
+  const sortedThreads = sortInboxThreads(threads);
   const totalUnread = threads.reduce((sum, thread) => sum + thread.unreadCount, 0);
 
   return (
@@ -235,12 +246,12 @@ export function FanChatMessenger() {
                 <span className="fan-chat-inbox-thread-name">Message to All</span>
               </button>
             </li>
-            {threads.length === 0 && !loading ? (
+            {sortedThreads.length === 0 && !loading ? (
               <li className="fan-chat-inbox-empty">
                 No connections yet. Accept a request in Community to start chatting.
               </li>
             ) : null}
-            {threads.map((thread) => (
+            {sortedThreads.map((thread) => (
               <li key={thread.peerId}>
                 <button
                   className={`fan-chat-inbox-thread${activePeerId === thread.peerId ? " fan-chat-inbox-thread--active" : ""}${thread.unreadCount > 0 ? " fan-chat-inbox-thread--unread" : ""}`}
