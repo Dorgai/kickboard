@@ -122,7 +122,6 @@ export default function InviteRegistrationPage() {
               Link valid until {new Date(preview.expiresAt).toLocaleString()}.
             </p>
             <GoogleSignInButton
-              block
               callbackUrl={typeof window !== "undefined" ? window.location.origin : "/"}
               disabled={!ready}
             />

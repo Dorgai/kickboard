@@ -149,7 +149,6 @@ export function WelcomeDialog() {
               Start exploring
             </button>
             <GoogleSignInButton
-              block
               className="welcome-dialog-google-sign-in"
               onBeforeSignIn={closeWelcome}
             />
