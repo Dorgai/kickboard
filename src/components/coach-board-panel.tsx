@@ -111,25 +111,38 @@ export function CoachBoardPanel({
 
         <FriendsMatchActivity awayTeam={awayTeam} fixtureKey={fixtureKey} homeTeam={homeTeam} />
 
-        <div className="coach-board-feed">
-          <h3>Approved feed</h3>
-          {postsLoading ? <p className="inline-status">Loading feed…</p> : null}
-          {!postsLoading && posts.length === 0 ? (
-            <p className="inline-status">No approved posts yet. Publish a squad or post in Fan Chat.</p>
-          ) : null}
-          <div className="community-feed" role="feed">
-            {posts.map((post) => (
-              <article className="community-post-card" key={post.id}>
-                <header className="community-post-header">
-                  <strong>{post.authorDisplayName}</strong>
-                  <span className="coach-board-post-type">{post.postType.replace("_", " ")}</span>
-                  <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleString()}</time>
-                </header>
-                <p className="community-post-body">{post.body}</p>
-              </article>
-            ))}
+        <details className="coach-board-feed coach-board-feed-disclosure data-card surface-muted">
+          <summary className="coach-board-feed-toggle">
+            <span className="coach-board-feed-header">
+              <span className="coach-board-feed-title">Approved feed</span>
+              {!postsLoading ? (
+                <span className="coach-board-feed-count">{posts.length}</span>
+              ) : null}
+            </span>
+            <span aria-hidden className="coach-board-feed-chevron" />
+          </summary>
+
+          <div className="coach-board-feed-body">
+            {postsLoading ? <p className="inline-status">Loading feed…</p> : null}
+            {!postsLoading && posts.length === 0 ? (
+              <p className="inline-status">No approved posts yet. Publish a squad or post in Fan Chat.</p>
+            ) : null}
+            {!postsLoading && posts.length > 0 ? (
+              <div className="community-feed" role="feed">
+                {posts.map((post) => (
+                  <article className="community-post-card" key={post.id}>
+                    <header className="community-post-header">
+                      <strong>{post.authorDisplayName}</strong>
+                      <span className="coach-board-post-type">{post.postType.replace("_", " ")}</span>
+                      <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleString()}</time>
+                    </header>
+                    <p className="community-post-body">{post.body}</p>
+                  </article>
+                ))}
+              </div>
+            ) : null}
           </div>
-        </div>
+        </details>
       </div>
     </AuthGate>
   );
