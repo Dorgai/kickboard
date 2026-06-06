@@ -62,6 +62,13 @@ const CURRENT_KNOCKOUT_STAGES = [
   "Final"
 ] as const;
 
+const TOURNAMENT_PHASE_TABS = [
+  { id: "group-stage", label: "Group stage" },
+  { id: "knockout", label: "Knockout" }
+] as const;
+
+type TournamentPhaseId = (typeof TOURNAMENT_PHASE_TABS)[number]["id"];
+
 type CurrentWorldCup = {
   title: string;
   note: string;
@@ -114,6 +121,7 @@ export function CurrentEventTabs({
 }) {
   const groups = currentWorldCup?.groups ?? [];
   const [activeTab, setActiveTab] = useState<CurrentEventTabId>("predictions");
+  const [activeTournamentPhase, setActiveTournamentPhase] = useState<TournamentPhaseId>("group-stage");
   const [activeGroupLetter, setActiveGroupLetter] = useState(groups[0]?.group ?? "A");
   const [activeKnockoutStage, setActiveKnockoutStage] = useState<string>(CURRENT_KNOCKOUT_STAGES[0]);
   const mobileDock = useNarrowViewport(861);
@@ -190,45 +198,55 @@ export function CurrentEventTabs({
               <div>
                 <p className="eyebrow">Tournament path</p>
                 <h2>Route to the final</h2>
-                <p>Use tabs to browse groups and knockout stages. Knockout pairings appear when live data connects.</p>
+                <p>Switch between group stage and knockout, then pick a group or round.</p>
               </div>
             </div>
 
-            <div className="bracket-tabbed-section">
-              <h3 className="bracket-tabbed-heading">Group stage</h3>
-              {groups.length ? (
-                <>
-                  <FeedTabBar
-                    ariaLabel="Group stage groups"
-                    className="bracket-stage-tabs"
-                    tabs={groups.map((group) => ({
-                      id: group.group,
-                      label: `Group ${group.group}`
-                    }))}
-                    value={activeGroupLetter}
-                    onChange={setActiveGroupLetter}
-                  />
-                  {activeGroup ? <TournamentGroupSchedule group={activeGroup} /> : null}
-                </>
-              ) : (
-                <button className="bracket-tbd-slot" disabled type="button">
-                  <strong>Groups A–L</strong>
-                  <span>Loading from public feed</span>
-                </button>
-              )}
+            <div className="kickboard-tab-rail tournament-phase-tabs-rail">
+              <FeedTabBar
+                ariaLabel="Tournament stage"
+                className="tournament-phase-tabs kickboard-tab-bar"
+                tabs={TOURNAMENT_PHASE_TABS.map((tab) => ({ id: tab.id, label: tab.label }))}
+                value={activeTournamentPhase}
+                onChange={(id) => setActiveTournamentPhase(id as TournamentPhaseId)}
+              />
             </div>
 
-            <div className="bracket-tabbed-section">
-              <h3 className="bracket-tabbed-heading">Knockout</h3>
-              <FeedTabBar
-                ariaLabel="Knockout stages"
-                className="bracket-stage-tabs"
-                tabs={CURRENT_KNOCKOUT_STAGES.map((stage) => ({ id: stage, label: stage }))}
-                value={activeKnockoutStage}
-                onChange={setActiveKnockoutStage}
-              />
-              <TournamentKnockoutSchedule stage={activeKnockoutStage} />
-            </div>
+            {activeTournamentPhase === "group-stage" ? (
+              <div className="bracket-tabbed-section tournament-phase-panel" id="group-stage" role="tabpanel">
+                {groups.length ? (
+                  <>
+                    <FeedTabBar
+                      ariaLabel="Group stage groups"
+                      className="bracket-stage-tabs"
+                      tabs={groups.map((group) => ({
+                        id: group.group,
+                        label: `Group ${group.group}`
+                      }))}
+                      value={activeGroupLetter}
+                      onChange={setActiveGroupLetter}
+                    />
+                    {activeGroup ? <TournamentGroupSchedule group={activeGroup} /> : null}
+                  </>
+                ) : (
+                  <button className="bracket-tbd-slot" disabled type="button">
+                    <strong>Groups A–L</strong>
+                    <span>Loading from public feed</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="bracket-tabbed-section tournament-phase-panel" id="bracket" role="tabpanel">
+                <FeedTabBar
+                  ariaLabel="Knockout stages"
+                  className="bracket-stage-tabs"
+                  tabs={CURRENT_KNOCKOUT_STAGES.map((stage) => ({ id: stage, label: stage }))}
+                  value={activeKnockoutStage}
+                  onChange={setActiveKnockoutStage}
+                />
+                <TournamentKnockoutSchedule stage={activeKnockoutStage} />
+              </div>
+            )}
           </section>
         ) : null}
 

@@ -7607,10 +7607,22 @@ h3 {
   align-self: flex-start;
 }
 
+.tournament-phase-tabs-rail {
+  margin-top: 4px;
+}
+
+.tournament-phase-panel {
+  margin-top: 12px;
+}
+
 .bracket-tabbed-section {
   display: grid;
   gap: 10px;
   margin-top: 16px;
+}
+
+.current-event-bracket .bracket-tabbed-section.tournament-phase-panel {
+  margin-top: 0;
 }
 
 .bracket-tabbed-heading {
