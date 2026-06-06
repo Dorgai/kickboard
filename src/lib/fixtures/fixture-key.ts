@@ -1,3 +1,5 @@
+import { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
+
 export type FixtureOption = {
   key: string;
   homeTeam: string;
@@ -105,19 +107,50 @@ export function parseFixtureKeyTeams(fixtureKey: string) {
   return { homeTeam: "Home", awayTeam: "Away" };
 }
 
-export function parseFixtureSortKey(date: string | null) {
-  if (!date) return "9999-99-99";
+function kickoffInstant(date: string | null) {
+  if (!date?.trim()) return null;
+  const fromFeed = parseWorldCupFixtureDate(date);
+  if (fromFeed) return fromFeed;
   const parsed = Date.parse(date);
-  if (Number.isNaN(parsed)) return date;
-  return new Date(parsed).toISOString();
+  return Number.isNaN(parsed) ? null : new Date(parsed);
+}
+
+export function parseFixtureSortKey(date: string | null) {
+  const kickoff = kickoffInstant(date);
+  if (!kickoff) return date?.trim() ? `9999-99-98:${date.trim()}` : "9999-99-99";
+  return kickoff.toISOString();
 }
 
 /** Stable day bucket for grouping fixtures in lists (YYYY-MM-DD or fallback). */
 export function fixtureDateGroupKey(date: string | null) {
-  if (!date?.trim()) return "unknown";
-  const parsed = Date.parse(date);
-  if (Number.isNaN(parsed)) return date.trim().toLowerCase();
-  return new Date(parsed).toISOString().slice(0, 10);
+  const kickoff = kickoffInstant(date);
+  if (!kickoff) return date?.trim() ? date.trim().toLowerCase() : "unknown";
+  return kickoff.toISOString().slice(0, 10);
+}
+
+export function compareFixtureOptions(a: FixtureOption, b: FixtureOption) {
+  const byKickoff = a.sortKey.localeCompare(b.sortKey);
+  if (byKickoff !== 0) return byKickoff;
+  return a.key.localeCompare(b.key);
+}
+
+export function sortFixtureOptions(fixtures: FixtureOption[]) {
+  return [...fixtures].sort(compareFixtureOptions);
+}
+
+/** Upcoming and live fixtures first, earliest kickoff on top. Finished matches last. */
+export function sortCoachBoardFixtures(fixtures: FixtureOption[]) {
+  const statusRank: Record<FixtureOption["status"], number> = {
+    live: 0,
+    upcoming: 1,
+    finished: 2
+  };
+
+  return [...fixtures].sort((a, b) => {
+    const byStatus = statusRank[a.status] - statusRank[b.status];
+    if (byStatus !== 0) return byStatus;
+    return compareFixtureOptions(a, b);
+  });
 }
 
 /** Human-readable date heading for fixture picker timelines. */

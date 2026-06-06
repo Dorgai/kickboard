@@ -231,7 +231,7 @@ export function buildKnockoutFixtureOptions(): FixtureOption[] {
     group: null,
     status: "upcoming" as const,
     label: match.label,
-    sortKey: match.date ?? "9999-99-99"
+    sortKey: parseFixtureSortKey(match.date)
   }));
 }
 

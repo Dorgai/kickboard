@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CoachBoardPanel } from "@/components/coach-board-panel";
@@ -13,7 +13,8 @@ import {
 } from "@/components/fixture-match-picker";
 import {
   fixtureKeyToShortLabel,
-  formatFixtureTeamsLabel
+  formatFixtureTeamsLabel,
+  sortCoachBoardFixtures
 } from "@/lib/fixtures/fixture-key";
 import { isFixtureDragEvent, readFixtureDragData } from "@/lib/fixtures/drag-fixture";
 import type { SquadSummary } from "@/lib/squads/store";
@@ -25,7 +26,11 @@ type MatchCoachBoardRowProps = {
 export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
   const touchLayout = useNarrowViewport();
   const { data: session, status: sessionStatus } = useSession();
-  const fixtures = useFixtureOptions(groups);
+  const allFixtures = useFixtureOptions(groups);
+  const fixtures = useMemo(
+    () => sortCoachBoardFixtures(allFixtures.filter((fixture) => fixture.status !== "finished")),
+    [allFixtures]
+  );
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const fixtureDragDepthRef = useRef(0);
   const [panelFixtureDragOver, setPanelFixtureDragOver] = useState(false);

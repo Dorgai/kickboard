@@ -3,6 +3,7 @@ import {
   buildWorldCupFixtureKey,
   formatFixtureLabel,
   parseFixtureSortKey,
+  sortFixtureOptions,
   type FixtureOption
 } from "@/lib/fixtures/fixture-key";
 import { teamsMatch } from "@/lib/squads/team-names";
@@ -109,5 +110,5 @@ export function buildFixtureOptionsFromWorldCup(groups: WorldCupGroup[], liveFix
     }
   }
 
-  return Array.from(byKey.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+  return sortFixtureOptions(Array.from(byKey.values()));
 }
