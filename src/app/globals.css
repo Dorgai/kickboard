@@ -2958,8 +2958,14 @@ h3 {
 
   .match-coach-board-panel .squad-pitch--horizontal,
   .squad-builder-pitch-stage .squad-pitch--horizontal {
+    --pitch-max-height: min(28rem, 56vh);
     --pitch-max-width: min(100%, 92vw);
-    max-height: min(22rem, 38vh);
+    max-height: none;
+    width: min(
+      100%,
+      var(--pitch-max-width),
+      calc(var(--pitch-max-height) * var(--pitch-length) / var(--pitch-width))
+    );
   }
 
   .match-coach-board-panel .squad-pitch-hint {
@@ -4577,8 +4583,13 @@ h3 {
 /* Tablet / desktop: goals left (home) and right (away). */
 .squad-pitch.squad-pitch--horizontal {
   aspect-ratio: var(--pitch-length) / var(--pitch-width);
-  max-height: min(calc(var(--pitch-max-width) * var(--pitch-width) / var(--pitch-length)), 50vh);
-  width: min(100%, var(--pitch-max-width));
+  height: auto;
+  max-height: none;
+  width: min(
+    100%,
+    var(--pitch-max-width),
+    calc(var(--pitch-max-height) * var(--pitch-length) / var(--pitch-width))
+  );
 }
 
 .squad-pitch--horizontal .squad-pitch-midline {
