@@ -12,7 +12,7 @@ import {
   type TournamentCategory,
   type TournamentPredictionsOverview,
   type TournamentWalletSummary
-} from "@/lib/tournament-predictions/overview";
+} from "@/lib/tournament-predictions/overview-shared";
 
 export type TournamentPredictionsOverviewData = TournamentPredictionsOverview;
 
