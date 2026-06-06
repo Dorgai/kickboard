@@ -78,7 +78,7 @@ Use instead:
 
 Applies to **Fan Chat**, **saved Coach Board squads** (`.saved-squad-card.selected`), **match/tournament picks**, and similar toggles. Reserve `outline` for **`:focus-visible`** keyboard focus only. Structural card shells may keep borders; selection state should not add new contour lines.
 
-**Grey fill text:** **Nav/feed tabs** use dark grey (`--kickboard-tab-active-bg`) with light text (`--kickboard-tab-active-fg`). **Saved squad cards** use that dark fill only in dark theme; in light theme selected tiles use accent-tinted `--kickboard-pick-active-bg` / `--kickboard-pick-active-fg`. **Team/player picks** use the same pick-active tokens. See `.nav-tabs a.active` and `.saved-squad-card.selected` in `globals.css`. Light page grey (`--color-bg`) keeps normal dark text.
+**Grey fill text:** **Nav/feed tabs** use dark grey (`--kickboard-tab-active-bg`) with light text (`--kickboard-tab-active-fg`). In **dark theme**, saved squad cards, match/tournament picks, and other selected tiles all use that same dark fill via `--kickboard-pick-active-*` (aliased to tab-active). In **light theme**, selected picks use accent-tinted `--kickboard-pick-active-bg` / `--kickboard-pick-active-fg`. See `globals.css`. Light page grey (`--color-bg`) keeps normal dark text.
 
 ### Feed UI flags and typography
 

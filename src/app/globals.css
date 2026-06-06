@@ -74,9 +74,10 @@
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
   --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 58%, transparent);
   --kickboard-tab-active-fg: var(--color-button-fill-fg);
-  --kickboard-pick-active-bg: color-mix(in srgb, var(--color-accent) 30%, var(--color-surface));
-  --kickboard-pick-active-fg: color-mix(in srgb, var(--color-accent) 22%, #f9fafb);
-  --kickboard-pick-hover-bg: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface));
+  /* Match saved board tiles: dark grey fill + light text (not accent-tinted) */
+  --kickboard-pick-active-bg: var(--kickboard-tab-active-bg);
+  --kickboard-pick-active-fg: var(--kickboard-tab-active-fg);
+  --kickboard-pick-hover-bg: color-mix(in srgb, var(--kickboard-tab-active-bg) 86%, var(--color-text-primary) 14%);
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
   --kickboard-tab-item-radius: 9999px;
@@ -2906,6 +2907,44 @@ h3 {
 [data-theme="dark"] .saved-squad-card.selected .saved-squad-card-meta,
 [data-theme="dark"] .saved-squad-card.selected .saved-squad-card-time {
   color: color-mix(in srgb, var(--kickboard-tab-active-fg) 72%, transparent);
+}
+
+/* Dark theme: all selected tiles share the saved-boards dark fill (no accent outline) */
+[data-theme="dark"]
+  :is(
+    .match-fixture-btn.selected,
+    .group-stage-match-list button.selected,
+    .group-stage-match-grid button.selected,
+    .bracket-round button.selected,
+    .bracket-cluster-matches .match-fixture-btn.selected,
+    .feed-list button.selected,
+    .feed-list .match-fixture-btn.selected,
+    .player-stat-data-row.selected,
+    .lineup-row.selected,
+    .match-lineup-teams--compact .lineup-row--dense.selected,
+    .vote-options button.selected,
+    .squad-player-chip--selected
+  ) {
+  --color-text-primary: var(--kickboard-tab-active-fg);
+  --color-text-secondary: color-mix(in srgb, var(--kickboard-tab-active-fg) 72%, transparent);
+  --color-text-muted: color-mix(in srgb, var(--kickboard-tab-active-fg) 58%, transparent);
+  background: var(--kickboard-tab-active-bg);
+  border-color: transparent;
+  box-shadow: var(--shadow-surface-hover);
+  color: var(--kickboard-tab-active-fg);
+}
+
+[data-theme="dark"]
+  :is(
+    .match-fixture-btn.selected,
+    .group-stage-match-list button.selected,
+    .group-stage-match-grid button.selected,
+    .feed-list button.selected,
+    .feed-list .match-fixture-btn.selected
+  )
+  .team-label-text,
+[data-theme="dark"] .lineup-row.selected .team-label-text {
+  color: inherit;
 }
 
 .saved-squad-card-name {
@@ -5783,12 +5822,6 @@ h3 {
 }
 
 .fixture-scorer-chip--selected {
-  background: var(--kickboard-pick-active-bg);
-  box-shadow: var(--shadow-surface-hover);
-  color: var(--kickboard-pick-active-fg);
-}
-
-[data-theme="dark"] .fixture-scorer-chip--selected {
   background: var(--kickboard-pick-active-bg);
   box-shadow: var(--shadow-surface-hover);
   color: var(--kickboard-pick-active-fg);
