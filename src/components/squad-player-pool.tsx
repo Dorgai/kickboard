@@ -86,6 +86,7 @@ function BenchPlayerChip({
       getLineup: () => [],
       commitLineup: () => {},
       getPitchRect: () => pitchDropRef?.current?.getPitchRect() ?? null,
+      getPitchLayout: () => pitchDropRef?.current?.getPitchLayout() ?? "vertical",
       homeTeam,
       awayTeam,
       tryPlaceBenchPlayer: (payload, clientX, clientY) =>

@@ -1,6 +1,10 @@
-import { hitTestBenchSide, hitTestPitchRect } from "@/lib/squads/pitch-hit-test";
+import { hitTestBenchSide } from "@/lib/squads/pitch-hit-test";
 import {
-  clampPitchCoord,
+  canonicalCoordsFromPointer,
+  hitTestPitchRect,
+  type PitchLayout
+} from "@/lib/squads/pitch-layout";
+import {
   nearestFormationSlotNumber,
   slotSide,
   swapLineupSlots,
@@ -16,6 +20,7 @@ export type PitchPointerSessionCallbacks = {
   getLineup: () => SquadLineupSlot[];
   commitLineup: (next: SquadLineupSlot[]) => void;
   getPitchRect: () => DOMRect | null;
+  getPitchLayout: () => PitchLayout;
   homeTeam: string;
   awayTeam: string;
   tryPlaceBenchPlayer: (player: PitchDragPlayer, clientX: number, clientY: number) => boolean;
@@ -56,13 +61,6 @@ export function startTokenPointerSession(
   return { kind: "token", playerId, startX: x, startY: y, moved: false, lastTargetSlot: null };
 }
 
-function coordsFromPointer(pitch: DOMRect, clientX: number, clientY: number) {
-  return {
-    x: clampPitchCoord(((clientX - pitch.left) / pitch.width) * 100),
-    y: clampPitchCoord(((clientY - pitch.top) / pitch.height) * 100)
-  };
-}
-
 function moveToken(
   session: Extract<PitchPointerSession, { kind: "token" }>,
   callbacks: PitchPointerSessionCallbacks,
@@ -79,9 +77,10 @@ function moveToken(
   );
   if (!moving) return;
 
-  const coords = coordsFromPointer(pitch, clientX, clientY);
+  const layout = callbacks.getPitchLayout();
+  const coords = canonicalCoordsFromPointer(pitch, clientX, clientY, layout);
   const side = slotSide(moving);
-  const { side: dropSide } = hitTestPitchRect(pitch, clientX, clientY);
+  const { side: dropSide } = hitTestPitchRect(pitch, clientX, clientY, layout);
   if (!dropSide || side !== dropSide) return;
 
   const targetSlot = nearestFormationSlotNumber(currentLineup, side, coords);

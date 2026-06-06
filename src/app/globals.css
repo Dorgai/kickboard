@@ -2897,10 +2897,16 @@ h3 {
     line-height: 1.45;
   }
 
-  .match-coach-board-panel .squad-pitch,
-  .squad-builder-pitch-stage .squad-pitch {
+  .match-coach-board-panel .squad-pitch:not(.squad-pitch--horizontal),
+  .squad-builder-pitch-stage .squad-pitch:not(.squad-pitch--horizontal) {
     --pitch-max-height: min(28rem, 56vh);
     width: min(100%, calc(var(--pitch-max-height) * var(--pitch-width) / var(--pitch-length)));
+  }
+
+  .match-coach-board-panel .squad-pitch--horizontal,
+  .squad-builder-pitch-stage .squad-pitch--horizontal {
+    --pitch-max-width: min(100%, 92vw);
+    max-height: min(22rem, 38vh);
   }
 
   .match-coach-board-panel .squad-pitch-hint {
@@ -4487,11 +4493,12 @@ h3 {
   font-weight: 700;
 }
 
-/* FIFA reference pitch: 105m (goal-to-goal) × 68m (touchline). Goals at top/bottom. */
+/* FIFA reference pitch: 105m (goal-to-goal) × 68m (touchline). Goals at top/bottom by default. */
 .squad-pitch {
   --pitch-length: 105;
   --pitch-width: 68;
   --pitch-max-height: min(54rem, 84vh);
+  --pitch-max-width: min(54rem, 92vw);
   --pitch-line: color-mix(in srgb, #fff 22%, transparent);
   aspect-ratio: var(--pitch-width) / var(--pitch-length);
   background: linear-gradient(
@@ -4512,6 +4519,86 @@ h3 {
   position: relative;
   touch-action: none;
   width: min(100%, calc(var(--pitch-max-height) * var(--pitch-width) / var(--pitch-length)));
+}
+
+/* Tablet / desktop: goals left (home) and right (away). */
+.squad-pitch.squad-pitch--horizontal {
+  aspect-ratio: var(--pitch-length) / var(--pitch-width);
+  max-height: min(calc(var(--pitch-max-width) * var(--pitch-width) / var(--pitch-length)), 50vh);
+  width: min(100%, var(--pitch-max-width));
+}
+
+.squad-pitch--horizontal .squad-pitch-midline {
+  border: none;
+  border-left: 1px solid var(--pitch-line);
+  bottom: 0;
+  height: auto;
+  left: 50%;
+  right: auto;
+  top: 0;
+  width: 0;
+}
+
+.squad-pitch--horizontal .squad-pitch-circle {
+  height: calc(18.3 / var(--pitch-width) * 100%);
+  width: calc(18.3 / var(--pitch-length) * 100%);
+}
+
+.squad-pitch--horizontal .squad-pitch-box {
+  height: calc(40.32 / var(--pitch-width) * 100%);
+  left: auto;
+  top: calc((var(--pitch-width) - 40.32) / 2 / var(--pitch-width) * 100%);
+  width: calc(16.5 / var(--pitch-length) * 100%);
+}
+
+.squad-pitch--horizontal .squad-pitch-box--top {
+  left: 0;
+  right: auto;
+}
+
+.squad-pitch--horizontal .squad-pitch-box--bottom {
+  left: auto;
+  right: 0;
+}
+
+.squad-pitch--horizontal .squad-pitch-goal-area {
+  height: calc(18.32 / var(--pitch-width) * 100%);
+  left: auto;
+  top: calc((var(--pitch-width) - 18.32) / 2 / var(--pitch-width) * 100%);
+  width: calc(5.5 / var(--pitch-length) * 100%);
+}
+
+.squad-pitch--horizontal .squad-pitch-goal-area--top {
+  left: 0;
+  right: auto;
+}
+
+.squad-pitch--horizontal .squad-pitch-goal-area--bottom {
+  left: auto;
+  right: 0;
+}
+
+.squad-pitch--horizontal.squad-pitch--dual .squad-pitch-half-line {
+  bottom: 5%;
+  height: auto;
+  left: 50%;
+  right: auto;
+  top: 5%;
+  transform: translateX(-50%);
+  width: 1px;
+}
+
+.squad-pitch--horizontal .squad-pitch-team-banner--home {
+  bottom: auto;
+  left: 8px;
+  top: 8px;
+}
+
+.squad-pitch--horizontal .squad-pitch-team-banner--away {
+  bottom: auto;
+  left: auto;
+  right: 8px;
+  top: 8px;
 }
 
 [data-theme="light"] .squad-pitch,
