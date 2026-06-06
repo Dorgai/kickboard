@@ -1881,6 +1881,10 @@ h3 {
   padding: 2px 4px 4px;
 }
 
+.fan-chat-inbox-list-heading--meta-only {
+  justify-content: flex-end;
+}
+
 .fan-chat-inbox-list-meta {
   align-items: center;
   display: inline-flex;

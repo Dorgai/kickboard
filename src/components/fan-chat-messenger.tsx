@@ -1,9 +1,6 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { handleKickboardCommunityNav } from "@/lib/navigation/location-hash";
-import { HelpTooltip } from "@/components/help-tooltip";
 import { ConnectionOnlineIndicator } from "@/components/connection-online-indicator";
 import { FanChatMessageStatus } from "@/components/fan-chat-message-status";
 import type { FanChatBroadcastSummary, FanChatInboxThread, FanChatMessage } from "@/lib/fan-chat/store";
@@ -219,30 +216,18 @@ export function FanChatMessenger() {
 
       <div className="fan-chat-inbox-layout">
         <aside aria-label="Conversations" className="fan-chat-inbox-list">
-          <p className="fan-chat-inbox-list-heading">
-            <span className="panel-help-row">
-              <span>Conversations</span>
-              <HelpTooltip label="How Fan Chat works" size="sm">
-                Message your connections in private threads. Add friends in{" "}
-                <Link
-                  href="/#community"
-                  scroll={false}
-                  onClick={handleKickboardCommunityNav}
-                >
-                  Community
-                </Link>{" "}
-                and accept requests to unlock chat.
-              </HelpTooltip>
-            </span>
-            <span className="fan-chat-inbox-list-meta">
-              {onlineCount > 0 ? (
-                <span className="fan-chat-inbox-online-total">{onlineCount} online</span>
-              ) : null}
-              {totalUnread > 0 ? (
-                <span className="fan-chat-inbox-unread-total">{totalUnread} unread</span>
-              ) : null}
-            </span>
-          </p>
+          {onlineCount > 0 || totalUnread > 0 ? (
+            <p className="fan-chat-inbox-list-heading fan-chat-inbox-list-heading--meta-only">
+              <span className="fan-chat-inbox-list-meta">
+                {onlineCount > 0 ? (
+                  <span className="fan-chat-inbox-online-total">{onlineCount} online</span>
+                ) : null}
+                {totalUnread > 0 ? (
+                  <span className="fan-chat-inbox-unread-total">{totalUnread} unread</span>
+                ) : null}
+              </span>
+            </p>
+          ) : null}
 
           <ul className="fan-chat-inbox-threads">
             <li>
@@ -252,8 +237,7 @@ export function FanChatMessenger() {
                 type="button"
                 onClick={() => setActivePeerId("all")}
               >
-                <span className="fan-chat-inbox-thread-name">All connections</span>
-                <span className="fan-chat-inbox-thread-preview">Broadcast to everyone you&apos;re connected with</span>
+                <span className="fan-chat-inbox-thread-name">Message to All</span>
               </button>
             </li>
             {threads.length === 0 && !loading ? (
@@ -303,7 +287,7 @@ export function FanChatMessenger() {
               <header className="fan-chat-inbox-pane-header">
                 <h3 className="fan-chat-inbox-pane-title">
                   {viewingBroadcasts
-                    ? "Broadcast"
+                    ? "Message to All"
                     : peerLabel(activeThread ?? { peerDisplayName: null, peerUsername: "Fan" })}
                 </h3>
                 {!viewingBroadcasts && activeThread ? (
@@ -375,7 +359,7 @@ export function FanChatMessenger() {
                   <textarea
                     aria-label={
                       viewingBroadcasts
-                        ? "Message all connections"
+                        ? "Message to All"
                         : `Message ${activeThread ? peerLabel(activeThread) : "your connection"}`
                     }
                     className="feed-control-input fan-chat-compose-input"
@@ -383,7 +367,7 @@ export function FanChatMessenger() {
                     maxLength={500}
                     placeholder={
                       viewingBroadcasts
-                        ? "Message all connections…"
+                        ? "Message to All…"
                         : `Message ${activeThread ? peerLabel(activeThread) : "your connection"}…`
                     }
                     rows={3}
