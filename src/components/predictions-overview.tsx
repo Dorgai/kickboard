@@ -306,9 +306,10 @@ export function PredictionsOverview({
         <header className="predictions-results-board-header">
           <h3 className="panel-help-row">
             Your points
-            <HelpTooltip label="Points summary" size="sm">
-              Earned <strong>{wallet.pointsWon}</strong> pts so far · <strong>{wallet.picksPending}</strong>{" "}
-              picks still waiting on results
+            <HelpTooltip label="How points settle" size="sm">
+              Points update after each match finishes. Until then, picks show as{" "}
+              <strong>Pending</strong>. Earned <strong>{wallet.pointsWon}</strong> pts so far ·{" "}
+              <strong>{wallet.picksPending}</strong> picks still waiting on results.
             </HelpTooltip>
           </h3>
           <p className="predictions-wallet-balance">
