@@ -2576,8 +2576,10 @@ h3 {
     line-height: 1.45;
   }
 
-  .match-coach-board-panel .squad-pitch {
-    --pitch-max-height: min(18.5rem, 40vh);
+  .match-coach-board-panel .squad-pitch,
+  .squad-builder-pitch-stage .squad-pitch {
+    --pitch-max-height: min(20.5rem, 44vh);
+    width: min(100%, calc(var(--pitch-max-height) * var(--pitch-width) / var(--pitch-length) * 1.05));
   }
 
   .match-coach-board-panel .squad-pitch-hint {
@@ -2586,6 +2588,29 @@ h3 {
 
   .match-coach-board-panel .squad-pitch {
     touch-action: pan-y;
+  }
+
+  .squad-pitch-token {
+    height: 2rem;
+    min-width: 2.7rem;
+    padding: 2px 6px 3px;
+  }
+
+  .squad-pitch-token-role {
+    font-size: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  .squad-pitch-token-name {
+    max-width: 4.25rem;
+  }
+
+  .squad-pitch-token-given {
+    font-size: 6px;
+  }
+
+  .squad-pitch-token-family {
+    font-size: 7px;
   }
 
   .match-coach-board-panel .saved-squads-list {
@@ -4060,7 +4085,7 @@ h3 {
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-radius: 10px;
   cursor: pointer;
   height: 10%;
   min-height: 1.4rem;
@@ -4084,7 +4109,7 @@ h3 {
 
 .squad-pitch-token {
   align-items: center;
-  aspect-ratio: 1.45 / 1;
+  aspect-ratio: 1.55 / 1;
   pointer-events: auto;
   background: linear-gradient(
     160deg,
@@ -4092,7 +4117,7 @@ h3 {
     var(--pitch-kit-primary, #3b82f6) 100%
   );
   border: none;
-  border-radius: 50%;
+  border-radius: 10px;
   box-shadow: 0 4px 14px color-mix(in srgb, var(--pitch-kit-primary, #3b82f6) 38%, transparent);
   color: var(--pitch-kit-text, #fff);
   cursor: grab;
