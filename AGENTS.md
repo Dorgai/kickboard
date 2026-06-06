@@ -26,7 +26,7 @@ See `README.md` for full detail. Quick reference:
 - Verify (typecheck + production build): `npm run check`
 - Health: `GET /api/health`
 - Feed status: `GET /api/feeds/status`
-- Wipe all placed predictions (destructive): `CONFIRM_CLEANUP_PREDICTIONS=yes npm run db:cleanup-predictions` — preview counts with `npm run db:cleanup-predictions -- --dry-run`
+- Wipe all placed predictions (destructive): GitHub Actions → **Cleanup predictions (production)** → set `confirm` to `yes`. Locally (public `DATABASE_URL`): `CONFIRM_CLEANUP_PREDICTIONS=yes npm run db:cleanup-predictions` — preview with `npm run db:cleanup-predictions -- --dry-run`
 
 There is no separate ESLint script; `npm run typecheck` is the static analysis check.
 
