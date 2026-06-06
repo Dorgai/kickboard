@@ -137,8 +137,8 @@ export function HelpCenterDialog() {
             <h2 className="help-center-title" id={titleId}>
               <span>Questions & support</span>
               <HelpTooltip label="How help works" size="sm">
-                <strong>Kickboard AI</strong> answers from our in-app help guides.{" "}
-                <strong>Ask admin</strong> sends your message to the Kickboard team (account issues,
+                <strong>MyPicks AI</strong> answers from our in-app help guides.{" "}
+                <strong>Ask admin</strong> sends your message to the MyPicks team (account issues,
                 bugs, policy).
               </HelpTooltip>
             </h2>
@@ -163,7 +163,7 @@ export function HelpCenterDialog() {
               setConversation(null);
             }}
           >
-            Kickboard AI
+            MyPicks AI
           </button>
           <button
             aria-pressed={channel === "admin"}
@@ -203,7 +203,7 @@ export function HelpCenterDialog() {
                           {message.role === "user"
                             ? "You"
                             : message.role === "assistant"
-                              ? "Kickboard AI"
+                              ? "MyPicks AI"
                               : message.role === "admin"
                                 ? "Admin"
                                 : "System"}
@@ -232,7 +232,7 @@ export function HelpCenterDialog() {
                     disabled={busy}
                     placeholder={
                       channel === "ai"
-                        ? "Ask Kickboard AI…"
+                        ? "Ask MyPicks AI…"
                         : "Message for admins (account, bugs, policy)…"
                     }
                     rows={3}

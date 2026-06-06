@@ -142,7 +142,7 @@ export function AdminHelpSupportPanel({ auth }: { auth: { mode: AdminAuthMode; t
           <h3 className="panel-help-row">
             Help & support
             <HelpTooltip label="Admin help inbox" size="sm">
-              All Kickboard AI and admin threads are stored here for audit and follow-up.
+              All MyPicks AI and admin threads are stored here for audit and follow-up.
             </HelpTooltip>
           </h3>
         </div>
@@ -247,7 +247,7 @@ export function AdminHelpSupportPanel({ auth }: { auth: { mode: AdminAuthMode; t
                   </button>
                 </form>
               ) : (
-                <p className="inline-status">AI threads are read-only here; users continue in Help → Kickboard AI.</p>
+                <p className="inline-status">AI threads are read-only here; users continue in Help → MyPicks AI.</p>
               )}
             </>
           ) : null}

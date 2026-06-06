@@ -15,7 +15,7 @@ export function notifyIncomingConnectionRequest(addresseeId: string, requesterId
   void userDisplayLabel(requesterId).then((name) => {
     notifyUserPush(addresseeId, {
       title: "New connection request",
-      body: `${name} wants to connect on Kickboard.`,
+      body: `${name} wants to connect on MyPicks.`,
       url: "/#community",
       tag: `connection:request:${requesterId}`
     });

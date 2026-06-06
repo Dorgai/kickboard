@@ -6,7 +6,7 @@ import { normalizeTeamName, teamsMatch } from "@/lib/squads/team-names";
 /** Avoid colliding with StatsBomb / API-Football player ids in saved lineups. */
 export const WIKIPEDIA_SQUAD_PLAYER_ID_BASE = 2_300_000_000;
 
-const WIKI_USER_AGENT = "KickboardFeedBot/1.0 (public squad reader; contact via kickboard)";
+const WIKI_USER_AGENT = "MyPicksFeedBot/1.0 (https://mypicks.live; public squad reader)";
 const CACHE_MS = 60 * 60 * 1000;
 
 const WIKI_TITLE_OVERRIDES: Record<string, string> = {

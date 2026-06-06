@@ -50,7 +50,7 @@ export function mapInvitationError(error: unknown) {
     EMAIL_FROM_INVALID: {
       status: 503,
       error:
-        "Email sender (EMAIL_FROM) is misconfigured. Use Kickboard <onboarding@resend.dev> for testing, or verify your domain at resend.com/domains. Gmail addresses cannot be used as the sender."
+        "Email sender (EMAIL_FROM) is misconfigured. Use MyPicks <onboarding@resend.dev> for testing, or verify your domain at resend.com/domains. Gmail addresses cannot be used as the sender."
     }
   };
 

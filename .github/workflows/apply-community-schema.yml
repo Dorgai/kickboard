@@ -68,7 +68,7 @@ jobs:
         env:
           PRODUCTION_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
         run: |
-          BASE="${PRODUCTION_URL:-https://kickboard-production.up.railway.app}"
+          BASE="${PRODUCTION_URL:-https://mypicks.live}"
           BASE="${BASE%/}"
           echo "Checking ${BASE}/api/community/status …"
           for attempt in $(seq 1 12); do

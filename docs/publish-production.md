@@ -1,19 +1,19 @@
-# Publish Kickboard for everyone (not just Google test users)
+# Publish MyPicks for everyone (not just Google test users)
 
-When your Google OAuth app is in **Testing** mode, only emails listed under **Test users** can sign in. To let any fan use Kickboard with Google, publish the OAuth consent screen and point Google at your live legal pages.
+When your Google OAuth app is in **Testing** mode, only emails listed under **Test users** can sign in. To let any fan use MyPicks with Google, publish the OAuth consent screen and point Google at your live legal pages.
 
 ## Checklist
 
 ### 1. Production site is live
 
-- URL works: `https://kickboard-production.up.railway.app` (or your custom domain).
+- URL works: `https://mypicks.live` (or your custom domain).
 - Railway **kickboard** service variables:
   - `AUTH_URL` = your public URL (no trailing slash)
   - `NEXT_PUBLIC_APP_URL` = same URL
   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET`
 - Verify:
-  - [`/api/auth/config`](https://kickboard-production.up.railway.app/api/auth/config) → `oauthConfigured: true`, `privacyPolicyUrl` set
-  - [`/api/auth/providers`](https://kickboard-production.up.railway.app/api/auth/providers) → `callbackUrl` uses your public host (not `0.0.0.0`)
+  - [`/api/auth/config`](https://mypicks.live/api/auth/config) → `oauthConfigured: true`, `privacyPolicyUrl` set
+  - [`/api/auth/providers`](https://mypicks.live/api/auth/providers) → `callbackUrl` uses your public host (not `0.0.0.0`)
 
 ### 2. Google OAuth client redirect URIs
 
@@ -33,7 +33,7 @@ If you use a custom domain, add both Railway and custom URLs while migrating.
 | Field | What to enter |
 |--------|----------------|
 | User type | **External** (so anyone with a Google account can sign in) |
-| App name | `Kickboard` |
+| App name | `MyPicks` |
 | User support email | Your email |
 | Developer contact | Your email |
 | Application home page | `https://YOUR-PUBLIC-HOST` |
@@ -41,7 +41,7 @@ If you use a custom domain, add both Railway and custom URLs while migrating.
 | Terms of service (optional) | `https://YOUR-PUBLIC-HOST/terms` |
 | Authorized domains | `railway.app` and/or your custom root domain (e.g. `kickboard.example.com`) |
 
-**Scopes:** Kickboard uses Google’s default sign-in scopes (`openid`, `email`, `profile`). Do not add extra sensitive scopes unless you need them — extra scopes trigger stricter Google verification.
+**Scopes:** MyPicks uses Google’s default sign-in scopes (`openid`, `email`, `profile`). Do not add extra sensitive scopes unless you need them — extra scopes trigger stricter Google verification.
 
 ### 4. Publish the app (leave Testing)
 
@@ -59,7 +59,7 @@ export DATABASE_URL="<public-postgres-url>"
 npm run db:schema
 ```
 
-Confirm [`/api/community/status`](https://kickboard-production.up.railway.app/api/community/status) → `schemaReady: true`.
+Confirm [`/api/community/status`](https://mypicks.live/api/community/status) → `schemaReady: true`.
 
 ### 6. Custom domain (optional)
 

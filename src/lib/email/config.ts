@@ -18,12 +18,12 @@ export function getEmailConfig(): EmailConfig | null {
   if (!apiKey || !from) return null;
   if (!parseFromAddress(from)) {
     throw new EmailFromAddressError(
-      'EMAIL_FROM must look like Kickboard <invites@yourdomain.com> or invites@yourdomain.com'
+      'EMAIL_FROM must look like MyPicks <invites@yourdomain.com> or invites@yourdomain.com'
     );
   }
   if (isBlockedConsumerFromDomain(from)) {
     throw new EmailFromAddressError(
-      "EMAIL_FROM cannot use Gmail, Yahoo, Outlook, or similar addresses. Use Kickboard <onboarding@resend.dev> for testing, or a domain you verified at resend.com/domains."
+      "EMAIL_FROM cannot use Gmail, Yahoo, Outlook, or similar addresses. Use MyPicks <onboarding@resend.dev> for testing, or a domain you verified at resend.com/domains."
     );
   }
   return { apiKey, from };

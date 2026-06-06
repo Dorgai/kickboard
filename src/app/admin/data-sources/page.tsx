@@ -11,7 +11,7 @@ import { buildAdminDataSources } from "@/lib/admin/data-sources";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "Kickboard Admin | Dashboard"
+  title: "MyPicks Admin | Dashboard"
 };
 
 function isPageTokenAuthorized(token: string | null) {

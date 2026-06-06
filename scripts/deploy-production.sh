@@ -18,7 +18,7 @@ else
 fi
 
 if [ "${VERIFY_DEPLOY:-1}" = "1" ]; then
-  BASE="${NEXT_PUBLIC_APP_URL:-https://kickboard-production.up.railway.app}"
+  BASE="${NEXT_PUBLIC_APP_URL:-https://mypicks.live}"
   BASE="${BASE%/}"
   echo "Waiting for ${BASE}/api/health ..."
   for attempt in $(seq 1 36); do

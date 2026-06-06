@@ -18,7 +18,7 @@ export function formatInviterPublicName(input: {
     return username;
   }
 
-  return "A Kickboard fan";
+  return "A MyPicks fan";
 }
 
 function looksLikeInternalUsername(value: string, username: string): boolean {

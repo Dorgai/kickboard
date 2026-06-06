@@ -1,11 +1,11 @@
 # Predictions legal language
 
-These clauses express the product intent for Kickboard. They must be reviewed by a lawyer admitted
+These clauses express the product intent for MyPicks. They must be reviewed by a lawyer admitted
 in Switzerland or the EU before launch.
 
 ## Predictions and points are not gambling
 
-Kickboard predictions are a free-to-play skill-based entertainment feature. No monetary stake is
+MyPicks predictions are a free-to-play skill-based entertainment feature. No monetary stake is
 required to participate. No cash prize is offered or implied. Points awarded are virtual, have no
 monetary value, cannot be redeemed for cash, and cannot be transferred between users.
 

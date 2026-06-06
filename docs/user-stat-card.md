@@ -6,7 +6,7 @@ a share image for social platforms.
 ## Sizes
 
 - Full profile card: 340x440px target.
-- Share image: 1080x1080px square with padding, larger type, tournament watermark, and Kickboard URL.
+- Share image: 1080x1080px square with padding, larger type, tournament watermark, and MyPicks URL.
 
 ## Full layout
 

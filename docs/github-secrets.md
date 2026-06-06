@@ -15,7 +15,7 @@ The Cloud Agent **cannot** add repository secrets (GitHub returns 403 for the in
 
 | Name | Value |
 |------|--------|
-| `NEXT_PUBLIC_APP_URL` | `https://kickboard-production.up.railway.app` |
+| `NEXT_PUBLIC_APP_URL` | `https://mypicks.live` |
 
 ## Option A — script (fastest)
 
@@ -31,7 +31,7 @@ npm run github:secrets
 1. Open https://github.com/Dorgai/kickboard/settings/secrets/actions
 2. **New repository secret** → `DATABASE_URL` = Postgres **Public URL**
 3. (If missing) `RAILWAY_TOKEN` = kickboard project token
-4. **Variables** tab → `NEXT_PUBLIC_APP_URL` = `https://kickboard-production.up.railway.app`
+4. **Variables** tab → `NEXT_PUBLIC_APP_URL` = `https://mypicks.live`
 
 ## After secrets are set
 

@@ -37,7 +37,7 @@ export async function GET() {
         : nextPublicOnly && baseUrl
           ? "NEXT_PUBLIC_APP_URL was copied to AUTH_URL at runtime. Set AUTH_URL on Railway explicitly."
           : !authUrlEnv && !baseUrl
-            ? "Set AUTH_URL to your public site URL (e.g. https://kickboard-production.up.railway.app)."
+            ? "Set AUTH_URL to your public site URL (e.g. https://mypicks.live)."
             : null
   });
 }

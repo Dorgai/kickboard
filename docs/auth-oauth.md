@@ -10,9 +10,9 @@ Until `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set on the **kickboard w
 2. **Create credentials** → **OAuth client ID**.
 3. Application type: **Web application**.
 4. **Authorized JavaScript origins** (production):
-   - `https://kickboard-production.up.railway.app`
+   - `https://mypicks.live`
 5. **Authorized redirect URIs** (must match exactly):
-   - `https://kickboard-production.up.railway.app/api/auth/callback/google`
+   - `https://mypicks.live/api/auth/callback/google`
 6. Copy the **Client ID** and **Client secret**.
 
 For local dev, also add:
@@ -31,17 +31,17 @@ In Railway → **kickboard** project → **kickboard** service → **Variables**
 | `AUTH_URL` | `https://mypicks.live` or your public host (**important**, exactly one `https://`, no trailing slash) |
 | `AUTH_SECRET` | Optional; if unset, `JWT_SECRET` is used |
 | `JWT_SECRET` | Already set (session signing) |
-| `NEXT_PUBLIC_APP_URL` | `https://kickboard-production.up.railway.app` |
+| `NEXT_PUBLIC_APP_URL` | `https://mypicks.live` |
 
 `AUTH_URL` must match the public site URL so Google gets redirect_uri  
-`https://kickboard-production.up.railway.app/api/auth/callback/google` (not `localhost`).
+`https://mypicks.live/api/auth/callback/google` (not `localhost`).
 
 **Redeploy** the service after saving variables (Railway usually redeploys automatically).
 
-Verify: open `https://kickboard-production.up.railway.app/api/auth/config` — expect:
+Verify: open `https://mypicks.live/api/auth/config` — expect:
 
 - `"oauthConfigured": true`
-- `"googleRedirectUri": "https://kickboard-production.up.railway.app/api/auth/callback/google"`
+- `"googleRedirectUri": "https://mypicks.live/api/auth/callback/google"`
 
 ## 3. OAuth consent screen (fixes “Access blocked” / Error 400)
 
@@ -53,7 +53,7 @@ If Google shows **“doesn't comply with OAuth 2.0 policy”** or **Error 400: i
 2. If **Publishing status** is **Testing**, only **Test users** can sign in.
 3. Under **Test users** → **Add users** → add each Gmail you want during testing.
 4. To allow **anyone** to sign in, follow **[Publish for production](publish-production.md)**:
-   - Set privacy policy to `https://<your-host>/privacy` (hosted by Kickboard).
+   - Set privacy policy to `https://<your-host>/privacy` (hosted by MyPicks).
    - Set application home page to `https://<your-host>`.
    - Click **Publish app** on the consent screen (External user type).
 
@@ -61,7 +61,7 @@ If Google shows **“doesn't comply with OAuth 2.0 policy”** or **Error 400: i
 
 In **Credentials** → your OAuth client → **Authorized redirect URIs**, must include **exactly**:
 
-`https://kickboard-production.up.railway.app/api/auth/callback/google`
+`https://mypicks.live/api/auth/callback/google`
 
 Compare with `googleRedirectUri` from `/api/auth/config`.
 
@@ -79,11 +79,11 @@ Auth.js builds Google’s `redirect_uri` from **`AUTH_URL`** or **`NEXTAUTH_URL`
 
 If those are unset, Railway’s internal host (`0.0.0.0:8080`) is used and Google returns **Error 400: invalid_request** even when test users are configured.
 
-1. Railway → kickboard service → **Variables** → set **`AUTH_URL`** = `https://kickboard-production.up.railway.app` (no trailing slash).
+1. Railway → kickboard service → **Variables** → set **`AUTH_URL`** = `https://mypicks.live` (no trailing slash).
 2. Redeploy.
-3. Check `https://kickboard-production.up.railway.app/api/auth/providers` — `callbackUrl` must be your Railway host, **not** `https://0.0.0.0:8080/...`.
+3. Check `https://mypicks.live/api/auth/providers` — `callbackUrl` must be your Railway host, **not** `https://0.0.0.0:8080/...`.
 
-Kickboard also copies `NEXT_PUBLIC_APP_URL` → `AUTH_URL` at server boot when possible; setting `AUTH_URL` explicitly is still recommended.
+MyPicks also copies `NEXT_PUBLIC_APP_URL` → `AUTH_URL` at server boot when possible; setting `AUTH_URL` explicitly is still recommended.
 
 If `/api/auth/config` shows `googleRedirectUri` as `http://localhost:3000/...`, set `AUTH_URL` on Railway to your production URL and redeploy.
 

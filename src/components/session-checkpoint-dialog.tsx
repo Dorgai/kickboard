@@ -328,7 +328,7 @@ export function SessionCheckpointDialog() {
               Continue
             </button>
             <HelpTooltip label="When this dialog appears" size="sm">
-              Shown after sign-in and every 2 hours while you use Kickboard.
+              Shown after sign-in and every 2 hours while you use MyPicks.
             </HelpTooltip>
           </div>
         </footer>

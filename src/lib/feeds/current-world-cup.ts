@@ -112,7 +112,7 @@ export function parseWorldCupFixtureDate(date: string | null | undefined) {
 export async function fetchCurrentWorldCupFeed(): Promise<CurrentWorldCupFeed> {
   const response = await fetch(`${SOURCE_URL}?action=render`, {
     headers: {
-      "User-Agent": "KickboardFeedBot/1.0 (public data reader)"
+      "User-Agent": "MyPicksFeedBot/1.0 (https://mypicks.live)"
     },
     next: {
       revalidate: 3600
@@ -142,7 +142,7 @@ export async function fetchCurrentWorldCupFeed(): Promise<CurrentWorldCupFeed> {
       const groupUrl = `https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_Group_${letter}`;
       const groupResponse = await fetch(`${groupUrl}?action=render`, {
         headers: {
-          "User-Agent": "KickboardFeedBot/1.0 (public data reader)"
+          "User-Agent": "MyPicksFeedBot/1.0 (https://mypicks.live)"
         },
         next: {
           revalidate: 3600

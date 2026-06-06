@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
+import { BRAND } from "@/lib/brand";
 import { THEME_META_LIGHT } from "@/lib/theme";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Kickboard",
-    short_name: "Kickboard",
-    description:
-      "World Cup predictions, Coach Board squads, and fan community on Kickboard.",
+    name: BRAND.name,
+    short_name: BRAND.name,
+    description: BRAND.tagline,
     start_url: "/",
     scope: "/",
     display: "standalone",

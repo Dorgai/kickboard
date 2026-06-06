@@ -70,7 +70,7 @@ export function CommunitySetupPanel({
           <h3>Enable Google sign-in</h3>
           <p>
             Create a Web OAuth client in Google Cloud Console. Set redirect URI to{" "}
-            <code>https://kickboard-production.up.railway.app/api/auth/callback/google</code> (or your custom
+            <code>https://mypicks.live/api/auth/callback/google</code> (or your custom
             domain).
           </p>
           <p className="admin-community-setup-note">

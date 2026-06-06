@@ -55,7 +55,7 @@ CLI deploy (same token): `export RAILWAY_TOKEN=... && npm run railway:deploy`
 ### Production deploy status (verify after any deploy)
 
 ```bash
-BASE=https://kickboard-production.up.railway.app
+BASE=https://mypicks.live
 curl -fsS "$BASE/api/health"
 curl -sS -o /dev/null -w "admin/session: %{http_code}\n" "$BASE/api/admin/session"   # expect not 404 on current main
 curl -sS "$BASE/" | grep -c feed-status-grid || true                                 # expect 0 on current main
@@ -69,7 +69,7 @@ The main feed uses `feed-browser--hero-backdrop` with optimized WebP in `public/
 
 ### Selection surfaces (no contour lines)
 
-Kickboard avoids **contour** selection chrome — no border rings, `outline` boxes, or `box-shadow: 0 0 0 Npx` halos on selected/active interactive items.
+MyPicks avoids **contour** selection chrome — no border rings, `outline` boxes, or `box-shadow: 0 0 0 Npx` halos on selected/active interactive items.
 
 Use instead:
 
@@ -89,7 +89,7 @@ Applies to **Fan Chat**, **saved Coach Board squads** (`.saved-squad-card.select
 - Gap tracker: [`docs/feed-browser-roadmap.md`](docs/feed-browser-roadmap.md).
 - Feed & infrastructure status (`FeedStatusPanel`) lives on `/admin/data-sources`, not the public homepage.
 - **Coach Board** (`#coach-board`) is **per fixture**: match picker (left) + board (right). Squads/posts use `fixture_key`; run `npm run db:schema` (includes `db/auth-extensions.sql`, `db/fixture-scope-extensions.sql`).
-- **Help menu** (header): Welcome tour (`Help → Welcome tour`), **Kickboard AI** / **Ask admin** (`content/help-knowledge/`, optional `OPENAI_API_KEY`). All threads in **Admin → Help** (`db/help-support-extensions.sql`). See `docs/help-support.md`.
+- **Help menu** (header): Welcome tour (`Help → Welcome tour`), **MyPicks AI** / **Ask admin** (`content/help-knowledge/`, optional `OPENAI_API_KEY`). All threads in **Admin → Help** (`db/help-support-extensions.sql`). See `docs/help-support.md`.
 - **Mobile bottom / in-page tab docks** (`@media (max-width: 860px)` in `globals.css`): use **fully rounded** pills (`border-radius: 9999px`), **12px** tab labels, **44px** min touch height, **5px** rail padding, and `box-shadow: var(--shadow-surface)` like the header Menu button. Do not shrink to 11px type or 16px corner radius on floating docks — that regressed readability (see commits around `680ac62` / `b37ffea`).
 - **Coach Board pitch DnD**: bench chips are `<div draggable>` (not `<button>`) with pointer-drag to `SquadPitch` via `pitchDropRef` (`tryDropPlayer`); pitch tokens reposition with pointer capture only (no HTML5 `draggable` on tokens). Tap an on-pitch bench chip to remove.
 - **Google OAuth** needs `GOOGLE_CLIENT_*`, `AUTH_URL` (public site URL, not `0.0.0.0`), and `JWT_SECRET`/`AUTH_SECRET` on Railway. Verify `/api/auth/providers` shows your Railway host in `callbackUrl`. Public sign-in requires publishing the Google consent screen (`docs/publish-production.md`); `/privacy` and `/terms` are hosted for the privacy policy URL.

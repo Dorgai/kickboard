@@ -21,7 +21,7 @@ Turn on API-Football for **Live** / **FT** badges in the Coach Board fixture pic
 4. Verify (replace host if yours differs):
 
 ```bash
-curl -sS "https://kickboard-production.up.railway.app/api/feeds/realtime" | jq .
+curl -sS "https://mypicks.live/api/feeds/realtime" | jq .
 ```
 
 Expect `"connected": true` and a `fixtures` array when games are live. Off-season or between match days, `fixtures` may be empty even when connected.
@@ -29,7 +29,7 @@ Expect `"connected": true` and a `fixtures` array when games are live. Off-seaso
 Also check status summary:
 
 ```bash
-curl -sS "https://kickboard-production.up.railway.app/api/feeds/status" | jq .feeds.realtime
+curl -sS "https://mypicks.live/api/feeds/status" | jq .feeds.realtime
 ```
 
 ## Railway — CLI / script
@@ -77,4 +77,4 @@ This polls every 60s and writes `api-football:live-fixtures` in Redis. The web r
 
 ## Product note
 
-Kickboard does not invent scores when the API is off. Without a key, fans still pick fixtures from the static schedule and use Coach Board normally.
+MyPicks does not invent scores when the API is off. Without a key, fans still pick fixtures from the static schedule and use Coach Board normally.

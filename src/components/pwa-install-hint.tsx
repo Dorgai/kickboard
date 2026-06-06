@@ -38,9 +38,9 @@ export function PwaInstallHint() {
   const ios = isIosSafari();
 
   return (
-    <aside className="pwa-install-hint" aria-label="Install Kickboard">
+    <aside className="pwa-install-hint" aria-label="Install MyPicks">
       <div className="pwa-install-hint-inner">
-        <p className="pwa-install-hint-title">Add Kickboard to your home screen</p>
+        <p className="pwa-install-hint-title">Add MyPicks to your home screen</p>
         {ios ? (
           <p className="pwa-install-hint-copy">
             Tap <Share aria-hidden size={14} className="pwa-install-hint-icon" /> Share, then{" "}
@@ -48,7 +48,7 @@ export function PwaInstallHint() {
           </p>
         ) : (
           <p className="pwa-install-hint-copy">
-            Install Kickboard from your browser menu for quick access and a full-screen view.
+            Install MyPicks from your browser menu for quick access and a full-screen view.
           </p>
         )}
         <div className="pwa-install-hint-actions">

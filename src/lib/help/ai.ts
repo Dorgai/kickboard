@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand";
 import { searchKnowledge, type KnowledgeChunk } from "@/lib/help/knowledge-base";
 
 function formatContext(chunks: KnowledgeChunk[]) {
@@ -25,7 +26,7 @@ async function callOpenAi(question: string, context: string) {
         {
           role: "system",
           content:
-            "You are Kickboard Help, a concise assistant for the Kickboard World Cup fan app. Answer only using the provided knowledge base excerpts. If the answer is not in the excerpts, say you are not sure and suggest the user ask an admin via Help → Ask admin. Keep answers under 120 words. Do not invent features."
+            `You are ${BRAND.helpAi}, a concise assistant for the ${BRAND.name} World Cup fan app at ${BRAND.url}. Answer only using the provided knowledge base excerpts. If the answer is not in the excerpts, say you are not sure and suggest the user ask an admin via Help → Ask admin. Keep answers under 120 words. Do not invent features.`
         },
         {
           role: "user",
@@ -61,7 +62,7 @@ function fallbackFromChunks(question: string, chunks: KnowledgeChunk[]) {
     .join("\n\n");
 
   return {
-    reply: `Here is what the Kickboard guides say:\n\n${summary}\n\nAsk a follow-up or switch to **Ask admin** if you need personal account help.`,
+    reply: `Here is what the ${BRAND.name} guides say:\n\n${summary}\n\nAsk a follow-up or switch to **Ask admin** if you need personal account help.`,
     sources: chunks.map((chunk) => chunk.title)
   };
 }

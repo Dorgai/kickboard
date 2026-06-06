@@ -1,6 +1,6 @@
 # Railway service plan
 
-Kickboard should start on Railway with a small set of services and grow only when code needs the
+MyPicks should start on Railway with a small set of services and grow only when code needs the
 separation. The first deploy can be run with one web service plus managed Postgres and Redis.
 
 ## Create now

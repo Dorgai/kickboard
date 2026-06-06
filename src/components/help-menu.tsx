@@ -93,7 +93,7 @@ export function HelpMenu() {
             }}
           >
             <MessageCircleQuestion size={16} aria-hidden />
-            Ask Kickboard AI
+            Ask MyPicks AI
           </button>
           <button
             className="help-menu-item"

@@ -1,12 +1,12 @@
-# PWA and push (Kickboard)
+# PWA and push (MyPicks)
 
 ## Add to Home Screen (iPhone / iPad)
 
-Kickboard is a **Progressive Web App (PWA)**:
+MyPicks is a **Progressive Web App (PWA)**:
 
-- Open **https://kickboard-production.up.railway.app** in **Safari** (Chrome on iOS cannot install PWAs).
+- Open **https://mypicks.live** in **Safari** (Chrome on iOS cannot install PWAs).
 - Tap **Share** → **Add to Home Screen**.
-- Launch **Kickboard** from the home screen for a full-screen, app-like experience.
+- Launch **MyPicks** from the home screen for a full-screen, app-like experience.
 
 The site also shows a short **install hint** on mobile until you dismiss it or install.
 
@@ -30,7 +30,7 @@ Push covers:
 - Fan Chat messages (direct and broadcast)
 - Friends' prediction updates (add, change, remove)
 - Coach Board posts and published squads from connections
-- Official messages from Kickboard admin
+- Official messages from MyPicks admin
 
 User preferences default to `notification_channels.push: true` in `user_preferences`.
 

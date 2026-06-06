@@ -1,4 +1,4 @@
-/* Kickboard PWA service worker — push notifications and static asset cache. */
+/* MyPicks PWA service worker — push notifications and static asset cache. */
 const CACHE_VERSION = "kickboard-v1";
 
 self.addEventListener("install", (event) => {
@@ -10,7 +10,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  let payload = { title: "Kickboard", body: "", url: "/", tag: "kickboard" };
+  let payload = { title: "MyPicks", body: "", url: "/", tag: "mypicks" };
   try {
     payload = { ...payload, ...event.data?.json() };
   } catch {

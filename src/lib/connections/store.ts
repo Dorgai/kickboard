@@ -85,7 +85,7 @@ export async function areUsersConnected(userId: string, peerId: string) {
   return row?.status === "accepted";
 }
 
-/** Ensures an accepted connection (e.g. official Kickboard moderator account → user). */
+/** Ensures an accepted connection (e.g. official MyPicks moderator account → user). */
 export async function ensureAcceptedConnection(userId: string, peerId: string) {
   if (userId === peerId) return;
   const existing = await getConnectionBetween(userId, peerId);

@@ -1,6 +1,6 @@
 # Data ingestion pipeline
 
-Kickboard uses polling for live match data. API-Football standard paid tiers do not provide true
+MyPicks uses polling for live match data. API-Football standard paid tiers do not provide true
 push webhooks, so one background worker process manages adaptive polling with Redis-backed job
 state.
 
@@ -40,7 +40,7 @@ Every API-Football call must use the same retry envelope:
 
 ## Reconciliation rules
 
-API-Football can return score and event data out of order. Kickboard resolves inconsistencies with
+API-Football can return score and event data out of order. MyPicks resolves inconsistencies with
 these rules:
 
 1. The fixture endpoint scoreline is ground truth. Never derive score from counting goal events.
