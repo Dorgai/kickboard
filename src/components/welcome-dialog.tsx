@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowRight, LayoutGrid, Target, Trophy, Users } from "lucide-react";
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { useEffect, useId, useRef, useState } from "react";
 import { OPEN_WELCOME_EVENT } from "@/lib/help/events";
@@ -11,32 +10,24 @@ import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer
 
 const HIGHLIGHTS = [
   {
-    icon: Target,
     title: "Predictions",
     line: "Pick scores and outcomes. Climb the points board.",
-    hash: "predictions",
-    accent: "predictions"
+    hash: "predictions"
   },
   {
-    icon: LayoutGrid,
     title: "Coach Board",
     line: "Set lineups for any match — drag players onto the pitch.",
-    hash: "coach-board",
-    accent: "coach"
+    hash: "coach-board"
   },
   {
-    icon: Trophy,
     title: "Tournament",
     line: "Groups, fixtures, and the road to the final.",
-    hash: "tournament",
-    accent: "tournament"
+    hash: "tournament"
   },
   {
-    icon: Users,
     title: "Community",
     line: "Add friends, share boards, and compare picks.",
-    hash: "community",
-    accent: "community"
+    hash: "community"
   }
 ] as const;
 
@@ -122,19 +113,15 @@ export function WelcomeDialog() {
             {HIGHLIGHTS.map((item) => (
               <button
                 key={item.title}
-                className={`welcome-dialog-action welcome-dialog-action--${item.accent}`}
+                className="welcome-dialog-action"
                 role="listitem"
                 type="button"
                 onClick={() => goToSection(item.hash)}
               >
-                <span className="welcome-dialog-action-icon" aria-hidden>
-                  <item.icon size={22} strokeWidth={2.25} />
-                </span>
                 <span className="welcome-dialog-action-copy">
                   <strong>{item.title}</strong>
                   <span>{item.line}</span>
                 </span>
-                <ArrowRight aria-hidden className="welcome-dialog-action-arrow" size={18} />
               </button>
             ))}
           </div>

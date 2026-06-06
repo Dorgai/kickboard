@@ -2,6 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { ActivityTracker } from "@/components/activity-tracker";
+import { LoginCelebrationListener } from "@/components/login-celebration-listener";
 import { PredictionCelebrationListener } from "@/components/prediction-celebration-listener";
 import { PredictionSubmitCelebration } from "@/components/prediction-submit-celebration";
 import { PushNotificationBootstrap } from "@/components/push-notification-bootstrap";
@@ -15,6 +16,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider>
         <ToastProvider>
           <ActivityTracker />
+          <LoginCelebrationListener />
           <PredictionCelebrationListener />
           <PredictionSubmitCelebration />
           <PushNotificationBootstrap />
