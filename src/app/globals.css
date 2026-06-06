@@ -3964,6 +3964,13 @@ h3 {
   min-width: 0;
 }
 
+.predictions-tournament-layout {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  width: 100%;
+}
+
 .predictions-match-form-points-row {
   align-items: start;
   display: grid;
@@ -3974,7 +3981,8 @@ h3 {
 }
 
 .predictions-match-form-points-row .fixture-predictions-form,
-.predictions-match-form-points-row .predictions-points-board {
+.predictions-match-form-points-row .predictions-points-board,
+.predictions-match-form-points-row .tournament-predictions-section {
   width: 100%;
 }
 
@@ -5669,6 +5677,13 @@ h3 {
   letter-spacing: 0.02em;
   margin: 0;
   text-transform: uppercase;
+}
+
+.predictions-unified-picks-header-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .predictions-unified-picks-tabs-rail {
