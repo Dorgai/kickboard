@@ -307,10 +307,6 @@ export function SquadBuilder({
 
   async function saveSquad(event: FormEvent) {
     event.preventDefault();
-    if (!readyToSave) {
-      setError(`Place ${SLOTS_PER_TEAM} home and ${SLOTS_PER_TEAM} away players on the pitch before saving.`);
-      return;
-    }
 
     setBusy(true);
     setError(null);
@@ -348,6 +344,10 @@ export function SquadBuilder({
   async function publishSquad() {
     if (!squadId) {
       setError("Save your squad first.");
+      return;
+    }
+    if (!readyToSave) {
+      setError(`Place ${SLOTS_PER_TEAM} home and ${SLOTS_PER_TEAM} away players on the pitch before publishing.`);
       return;
     }
     setBusy(true);
@@ -426,22 +426,33 @@ export function SquadBuilder({
               onTogglePlayerSelect={toggleAwaySelection}
             />
           </div>
-          <div className="squad-builder-predictions">
-            <FixturePredictionPick awayTeam={awayTeam} fixtureKey={fixtureKey} homeTeam={homeTeam} />
-          </div>
         </div>
       </div>
 
       <div className="squad-builder-actions">
-        <button className="button primary" disabled={busy || !readyToSave} type="submit">
+        <button className="button primary" disabled={busy} type="submit">
           {busy ? "Saving…" : squadId ? "Update board" : "Save board"}
         </button>
-        <button className="button secondary" disabled={busy || !squadId} type="button" onClick={publishSquad}>
+        <button
+          className="button secondary"
+          disabled={busy || !squadId || !readyToSave}
+          title={
+            readyToSave
+              ? undefined
+              : `Place ${SLOTS_PER_TEAM} home and ${SLOTS_PER_TEAM} away players to publish`
+          }
+          type="button"
+          onClick={publishSquad}
+        >
           Publish to Coach Board
         </button>
         <button className="button secondary" disabled={busy} type="button" onClick={resetToFormation}>
           Clear pitch
         </button>
+      </div>
+
+      <div className="squad-builder-predictions">
+        <FixturePredictionPick awayTeam={awayTeam} fixtureKey={fixtureKey} homeTeam={homeTeam} />
       </div>
 
       {notice ? <p className="inline-status community-notice">{notice}</p> : null}

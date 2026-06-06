@@ -2,10 +2,15 @@ export const NAVIGATE_PREDICTIONS_EVENT = "kickboard:navigate-predictions";
 
 export type NavigatePredictionsDetail = {
   fixtureKey: string;
+  /** When true, scroll to the top of the Predictions section (Coach Board link). */
+  scrollToTop?: boolean;
 };
 
 /** Open Predictions tab with a fixture pre-selected (no full page reload). */
-export function navigateToPredictFixture(fixtureKey: string) {
+export function navigateToPredictFixture(
+  fixtureKey: string,
+  options?: { scrollToTop?: boolean }
+) {
   if (typeof window === "undefined") return;
   const url = new URL(window.location.href);
   url.pathname = url.pathname || "/";
@@ -16,7 +21,7 @@ export function navigateToPredictFixture(fixtureKey: string) {
   window.history.replaceState(null, "", href);
   window.dispatchEvent(
     new CustomEvent<NavigatePredictionsDetail>(NAVIGATE_PREDICTIONS_EVENT, {
-      detail: { fixtureKey }
+      detail: { fixtureKey, scrollToTop: options?.scrollToTop }
     })
   );
 }

@@ -12,7 +12,11 @@ import {
   subscribeLocationHash,
   writeLocationHash
 } from "@/lib/navigation/location-hash";
-import { NAVIGATE_PREDICTIONS_EVENT } from "@/lib/session-checkpoint/navigate";
+import { scrollToPredictionsTop } from "@/lib/scroll-to-prediction-outcome";
+import {
+  NAVIGATE_PREDICTIONS_EVENT,
+  type NavigatePredictionsDetail
+} from "@/lib/session-checkpoint/navigate";
 import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { PredictionsPanel } from "@/components/predictions-panel";
 import { TeamLabel } from "@/components/team-label";
@@ -133,9 +137,15 @@ export function CurrentEventTabs({
   }, [applyHash]);
 
   useEffect(() => {
-    function onNavigatePredictions() {
+    function onNavigatePredictions(event: Event) {
+      const detail = (event as CustomEvent<NavigatePredictionsDetail>).detail;
       setActiveTab("predictions");
       setChatOpen(false);
+      if (detail?.scrollToTop) {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => scrollToPredictionsTop());
+        });
+      }
     }
 
     window.addEventListener(NAVIGATE_PREDICTIONS_EVENT, onNavigatePredictions);
@@ -257,7 +267,7 @@ export function CurrentEventTabs({
         ) : null}
 
         {activeTab === "predictions" ? (
-          <div className="current-event-predictions-tab" id="predictions">
+          <div className="current-event-predictions-tab section-anchor" id="predictions">
             <PredictionsPanel groups={groups} />
           </div>
         ) : null}
