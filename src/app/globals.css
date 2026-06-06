@@ -2439,6 +2439,7 @@ h3 {
 }
 
 @media (min-width: 1100px) {
+  .feed-browser.fan-chat-dock-open,
   .current-event-tabs-layout.fan-chat-dock-open {
     padding-right: min(22rem, 28vw);
   }

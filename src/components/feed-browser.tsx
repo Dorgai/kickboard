@@ -8,12 +8,14 @@ import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-la
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { CurrentEventTabs } from "@/components/current-event-tabs";
+import { FloatingFanChat } from "@/components/floating-fan-chat";
 import { KickboardHeroLayers } from "@/components/kickboard-hero-layers";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 import {
   readLocationHash,
   scrollToLocationHashTarget,
-  subscribeLocationHash
+  subscribeLocationHash,
+  writeLocationHash
 } from "@/lib/navigation/location-hash";
 import { useLocationHash } from "@/lib/use-location-hash";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
@@ -116,7 +118,6 @@ const CURRENT_EVENT_HASHES = new Set([
   "tournament",
   "bracket",
   "coach-board",
-  "fan-chat",
   "predictions",
   "community"
 ]);
@@ -138,10 +139,17 @@ export function FeedBrowser() {
   const [showMatchesList, setShowMatchesList] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     function syncTabFromHash() {
       const hash = readLocationHash();
+      if (hash === "fan-chat") {
+        setActiveTab("current");
+        setChatOpen(true);
+        writeLocationHash("predictions", { replace: true });
+        return;
+      }
       if (hash && CURRENT_EVENT_HASHES.has(hash)) {
         setActiveTab("current");
         return;
@@ -318,7 +326,9 @@ export function FeedBrowser() {
 
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
   return (
-    <div className="feed-browser feed-browser--hero-backdrop kickboard-hero-backdrop kickboard-hero-backdrop--dual">
+    <div
+      className={`feed-browser feed-browser--hero-backdrop kickboard-hero-backdrop kickboard-hero-backdrop--dual${chatOpen ? " fan-chat-dock-open" : ""}`}
+    >
       <KickboardHeroLayers dual />
       <nav
         className="event-tab-bar kickboard-tab-bar feed-event-selector-tabs"
@@ -387,6 +397,8 @@ export function FeedBrowser() {
           competitionLabel={selectedCompetitionLabel}
         />
       )}
+
+      <FloatingFanChat open={chatOpen} onOpenChange={setChatOpen} />
 
       <p className="kickboard-hero-credit">
         Background portraits:{" "}
