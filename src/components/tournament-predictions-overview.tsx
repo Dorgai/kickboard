@@ -5,6 +5,7 @@ import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { TOURNAMENT_PREDICTION_BLOCKS } from "@/lib/tournament-predictions/labels";
 import type { TournamentPredictionRecord } from "@/lib/tournament-predictions/types";
 import {
+  formatTournamentScorerBoardLabel,
   tournamentCategoryPoints,
   tournamentCategoryResultStatus,
   tournamentCategoryValue,
@@ -16,7 +17,7 @@ import {
 export type TournamentPredictionsOverviewData = TournamentPredictionsOverview;
 
 type TournamentTableColumn = {
-  key: TournamentCategory | "topScorerBoard";
+  key: TournamentCategory;
   label: string;
 };
 
@@ -24,7 +25,6 @@ const TOURNAMENT_TABLE_COLUMNS: TournamentTableColumn[] = [
   { key: "champion", label: TOURNAMENT_PREDICTION_BLOCKS.champion },
   { key: "finalists", label: TOURNAMENT_PREDICTION_BLOCKS.finalOpponent },
   { key: "topScorer", label: TOURNAMENT_PREDICTION_BLOCKS.topScorer },
-  { key: "topScorerBoard", label: TOURNAMENT_PREDICTION_BLOCKS.topScorerBoard },
   { key: "bestPlayer", label: TOURNAMENT_PREDICTION_BLOCKS.bestPlayer }
 ];
 
@@ -52,13 +52,63 @@ function peerMatchesNameFilter(pick: ConnectionTournamentPredictionSummary, quer
   return displayName.includes(term) || username.includes(term);
 }
 
+function columnValueForRecord(
+  record: TournamentPredictionRecord | null,
+  column: TournamentTableColumn
+) {
+  if (column.key === "topScorer") {
+    return (
+      tournamentCategoryValue(record, "topScorer") ||
+      formatTournamentScorerBoardLabel(record?.predictedTopScorerBoard ?? null)
+    );
+  }
+  return tournamentCategoryValue(record, column.key);
+}
+
 function columnVisibleForAnyone(
   column: TournamentTableColumn,
   mine: TournamentPredictionRecord | null,
   friends: ConnectionTournamentPredictionSummary[]
 ) {
-  if (tournamentCategoryValue(mine, column.key)) return true;
-  return friends.some((friend) => tournamentCategoryValue(friend, column.key));
+  if (columnValueForRecord(mine, column)) return true;
+  return friends.some((friend) => columnValueForRecord(friend, column));
+}
+
+function TournamentTopScorerCell({ record }: { record: TournamentPredictionRecord | null }) {
+  const topScorer = tournamentCategoryValue(record, "topScorer");
+  const board = formatTournamentScorerBoardLabel(record?.predictedTopScorerBoard ?? null);
+
+  if (!topScorer && !board) {
+    return <span className="predictions-picks-placeholder">—</span>;
+  }
+
+  const status = tournamentCategoryResultStatus(record, "topScorer");
+  const points = tournamentCategoryPoints(record, "topScorer");
+  const badge = resultBadge(status);
+
+  return (
+    <div className="predictions-type-lines predictions-type-lines--unified predictions-type-lines--top-scorer-stack">
+      {topScorer ? (
+        <div className="predictions-type-line">
+          <span className="predictions-type-line-value">{topScorer}</span>
+          {status !== "pending" ? (
+            <span className={`predictions-result-badge ${badge.className}`}>
+              {badge.label}
+              {points > 0 ? ` · +${points}` : ""}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+      {board ? (
+        <div className="tournament-picks-board-inset">
+          <span className="tournament-picks-board-inset-label">
+            {TOURNAMENT_PREDICTION_BLOCKS.topScorerBoard}
+          </span>
+          <span className="tournament-picks-board-inset-value">{board}</span>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 function TournamentPickCell({
@@ -68,21 +118,24 @@ function TournamentPickCell({
   record: TournamentPredictionRecord | null;
   column: TournamentTableColumn;
 }) {
+  if (column.key === "topScorer") {
+    return <TournamentTopScorerCell record={record} />;
+  }
+
   const value = tournamentCategoryValue(record, column.key);
   if (!value) {
     return <span className="predictions-picks-placeholder">—</span>;
   }
 
   const status = tournamentCategoryResultStatus(record, column.key);
-  const points =
-    column.key === "topScorerBoard" ? 0 : tournamentCategoryPoints(record, column.key as TournamentCategory);
+  const points = tournamentCategoryPoints(record, column.key);
   const badge = resultBadge(status);
 
   return (
     <div className="predictions-type-lines predictions-type-lines--unified">
       <div className="predictions-type-line">
         <span className="predictions-type-line-value">{value}</span>
-        {column.key !== "topScorerBoard" && status !== "pending" ? (
+        {status !== "pending" ? (
           <span className={`predictions-result-badge ${badge.className}`}>
             {badge.label}
             {points > 0 ? ` · +${points}` : ""}
