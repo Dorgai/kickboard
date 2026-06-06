@@ -206,6 +206,17 @@ function overviewCardMinHeight(itemCount: number) {
   return `${Math.min(32, 8 + itemCount * 3.75)}rem`;
 }
 
+function peerMatchesNameFilter(
+  pick: ConnectionPredictionSummary,
+  query: string
+) {
+  const term = query.trim().toLowerCase();
+  if (!term) return true;
+  const displayName = pick.displayName?.trim().toLowerCase() ?? "";
+  const username = pick.username.trim().toLowerCase();
+  return displayName.includes(term) || username.includes(term);
+}
+
 export function PredictionsOverview({
   fixtureKey,
   refreshToken = 0,
@@ -215,6 +226,7 @@ export function PredictionsOverview({
   const [data, setData] = useState<PredictionsOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [friendsNameFilter, setFriendsNameFilter] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -238,6 +250,10 @@ export function PredictionsOverview({
     void load();
   }, [load, refreshToken]);
 
+  useEffect(() => {
+    setFriendsNameFilter("");
+  }, [fixtureKey]);
+
   if (loading) {
     return <p className="inline-status">Loading your predictions summary…</p>;
   }
@@ -252,6 +268,9 @@ export function PredictionsOverview({
   const connectionsForMatch = fixtureKey
     ? connectionsPredictions
     : connectionsPredictions.slice(0, 8);
+  const filteredFriendsPicks = connectionsForMatch.filter((pick) =>
+    peerMatchesNameFilter(pick, friendsNameFilter)
+  );
 
   const categories = [
     { key: "outcome" as const, label: PREDICTION_BLOCKS.outcome },
@@ -339,11 +358,23 @@ export function PredictionsOverview({
 
         <section
           className="predictions-overview-card predictions-overview-card--friends"
-          style={{ minHeight: overviewCardMinHeight(connectionsForMatch.length) }}
+          style={{ minHeight: overviewCardMinHeight(filteredFriendsPicks.length) }}
         >
-          <header className="predictions-overview-card-header">
+          <header className="predictions-overview-card-header predictions-overview-card-header--friends">
             <h3>Friends&apos; picks</h3>
-            <span className="predictions-overview-count">{connectionsForMatch.length}</span>
+            {connectionsForMatch.length > 0 ? (
+              <label className="predictions-overview-name-filter">
+                <span className="sr-only">Filter friends by name</span>
+                <input
+                  className="predictions-overview-name-filter-input"
+                  placeholder="Name"
+                  type="search"
+                  value={friendsNameFilter}
+                  onChange={(event) => setFriendsNameFilter(event.target.value)}
+                />
+              </label>
+            ) : null}
+            <span className="predictions-overview-count">{filteredFriendsPicks.length}</span>
           </header>
           {connectionsForMatch.length === 0 ? (
             <p className="predictions-overview-empty">
@@ -351,9 +382,11 @@ export function PredictionsOverview({
                 ? "No friends have picked this match yet."
                 : "Add friends to see their picks here."}
             </p>
+          ) : filteredFriendsPicks.length === 0 ? (
+            <p className="predictions-overview-empty">No friends match that name.</p>
           ) : (
             <ul className="predictions-overview-list">
-              {connectionsForMatch.map((pick) => (
+              {filteredFriendsPicks.map((pick) => (
                 <PickCard
                   key={`${pick.userId}-${pick.fixtureKey}-${pick.updatedAt}`}
                   pick={pick}

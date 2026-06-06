@@ -5842,6 +5842,41 @@ h3 {
   justify-content: space-between;
 }
 
+.predictions-overview-card-header--friends {
+  flex-wrap: wrap;
+}
+
+.predictions-overview-name-filter {
+  margin: 0;
+}
+
+.predictions-overview-name-filter-input {
+  background: var(--color-bg);
+  border: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
+  border-radius: 6px;
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  max-width: 5.5rem;
+  min-height: 24px;
+  padding: 2px 6px;
+  width: 5.5rem;
+}
+
+.predictions-overview-name-filter-input::placeholder {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.predictions-overview-name-filter-input:focus {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  outline: none;
+}
+
 .predictions-overview-card-header h3 {
   font-size: 13px;
   font-weight: 800;
