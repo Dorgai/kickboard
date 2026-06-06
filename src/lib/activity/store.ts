@@ -103,8 +103,58 @@ export async function recordActivityWithPresence(input: {
   return sessionId;
 }
 
+export function isUserOnline(lastSeenAt: Date | string | null | undefined) {
+  if (!lastSeenAt) return false;
+  const seen = lastSeenAt instanceof Date ? lastSeenAt : new Date(lastSeenAt);
+  if (Number.isNaN(seen.getTime())) return false;
+  return Date.now() - seen.getTime() <= ONLINE_THRESHOLD_MS;
+}
+
 function isOnline(lastSeenAt: Date) {
-  return Date.now() - lastSeenAt.getTime() <= ONLINE_THRESHOLD_MS;
+  return isUserOnline(lastSeenAt);
+}
+
+export type UserPresenceSnapshot = {
+  userId: string;
+  online: boolean;
+  lastSeenAt: string | null;
+};
+
+export async function getPresenceForUserIds(userIds: string[]): Promise<UserPresenceSnapshot[]> {
+  const uniqueIds = [...new Set(userIds.filter(Boolean))];
+  if (!uniqueIds.length) return [];
+
+  const result = await query<{
+    user_id: string;
+    last_seen_at: Date;
+  }>(
+    `SELECT user_id, max(last_seen_at) AS last_seen_at
+     FROM user_presence_sessions
+     WHERE user_id = ANY($1::uuid[])
+       AND ended_at IS NULL
+     GROUP BY user_id`,
+    [uniqueIds]
+  );
+
+  const byUserId = new Map(
+    result.rows.map((row) => [
+      row.user_id,
+      {
+        userId: row.user_id,
+        online: isUserOnline(row.last_seen_at),
+        lastSeenAt: row.last_seen_at.toISOString()
+      }
+    ])
+  );
+
+  return uniqueIds.map(
+    (userId) =>
+      byUserId.get(userId) ?? {
+        userId,
+        online: false,
+        lastSeenAt: null
+      }
+  );
 }
 
 export async function listUsersActivityForAdmin(options: {

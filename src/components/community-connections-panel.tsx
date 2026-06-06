@@ -4,8 +4,10 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
 import { ConnectionActivityTimeline } from "@/components/connection-activity-timeline";
 import { RegistrationInvitationsPanel } from "@/components/registration-invitations-panel";
+import { ConnectionOnlineIndicator } from "@/components/connection-online-indicator";
 import { PanelHelpRow } from "@/components/help-tooltip";
 import { notifyConnectionsChanged } from "@/lib/social/events";
+import { useConnectionsPresence } from "@/lib/social/use-connections-presence";
 
 type PublicUserCard = {
   id: string;
@@ -46,6 +48,7 @@ function ConnectionsPanelInner() {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const { presenceByPeerId, onlineCount } = useConnectionsPresence(!loading);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -265,7 +268,14 @@ function ConnectionsPanelInner() {
 
       {!loading ? (
         <section className="connections-section">
-          <h3>Connected ({data?.accepted.length ?? 0})</h3>
+          <h3 className="connections-section-heading">
+            Connected ({data?.accepted.length ?? 0})
+            {onlineCount > 0 ? (
+              <span className="connections-online-summary">
+                · {onlineCount} online
+              </span>
+            ) : null}
+          </h3>
           {!data?.accepted.length ? (
             <p className="inline-status">No connections yet. Send a request to get started.</p>
           ) : (
@@ -273,7 +283,10 @@ function ConnectionsPanelInner() {
               {data.accepted.map((row) => (
                 <li key={row.id}>
                   <div className="connections-card connections-card--accepted">
-                    <PeerLabel peer={row.peer} />
+                    <PeerLabel
+                      online={presenceByPeerId[row.peer.id]?.online ?? false}
+                      peer={row.peer}
+                    />
                     <span className="connections-points">{row.peer.pointsBalance} pts</span>
                   </div>
                 </li>
@@ -289,10 +302,13 @@ function ConnectionsPanelInner() {
   );
 }
 
-function PeerLabel({ peer }: { peer: PublicUserCard }) {
+function PeerLabel({ peer, online = false }: { peer: PublicUserCard; online?: boolean }) {
   return (
     <span className="connections-peer">
-      <strong>{peer.displayName ?? peer.username}</strong>
+      <span className="connections-peer-name-row">
+        <ConnectionOnlineIndicator online={online} />
+        <strong>{peer.displayName ?? peer.username}</strong>
+      </span>
       <span className="connections-search-username">@{peer.username}</span>
     </span>
   );

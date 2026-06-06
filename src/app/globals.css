@@ -1846,6 +1846,22 @@ h3 {
   padding: 2px 4px 4px;
 }
 
+.fan-chat-inbox-list-meta {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.fan-chat-inbox-online-total {
+  background: color-mix(in srgb, var(--color-live) 16%, var(--color-bg));
+  border-radius: 999px;
+  color: var(--color-live);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+}
+
 .fan-chat-inbox-unread-total {
   background: color-mix(in srgb, var(--color-brand) 18%, var(--color-bg));
   border-radius: 999px;
@@ -1895,10 +1911,20 @@ h3 {
   justify-content: space-between;
 }
 
+.fan-chat-inbox-thread-name-row {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  min-width: 0;
+}
+
 .fan-chat-inbox-thread-name {
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .fan-chat-inbox-unread-badge {
@@ -1938,7 +1964,16 @@ h3 {
   min-width: 0;
 }
 
-.fan-chat-inbox-pane-header h3 {
+.fan-chat-inbox-pane-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.fan-chat-inbox-pane-header h3,
+.fan-chat-inbox-pane-title {
   font-size: 14px;
   font-weight: 800;
   margin: 0;
@@ -2960,6 +2995,57 @@ h3 {
 .connections-peer {
   display: grid;
   gap: 2px;
+}
+
+.connections-peer-name-row {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.connections-section-heading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.connections-online-summary {
+  color: var(--color-live);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.connection-presence {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 5px;
+}
+
+.connection-online-dot {
+  background: var(--color-live);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-live) 24%, transparent);
+  display: inline-block;
+  flex-shrink: 0;
+  height: 8px;
+  width: 8px;
+}
+
+.connection-presence-label {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.connection-presence-label--online {
+  color: var(--color-live);
+}
+
+.connection-presence-label--offline {
+  color: var(--color-text-secondary);
+  font-weight: 600;
 }
 
 .connections-search-username {

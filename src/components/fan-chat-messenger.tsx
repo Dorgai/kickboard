@@ -4,9 +4,11 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { handleKickboardCommunityNav } from "@/lib/navigation/location-hash";
 import { HelpTooltip } from "@/components/help-tooltip";
+import { ConnectionOnlineIndicator } from "@/components/connection-online-indicator";
 import { FanChatMessageStatus } from "@/components/fan-chat-message-status";
 import type { FanChatBroadcastSummary, FanChatInboxThread, FanChatMessage } from "@/lib/fan-chat/store";
 import { CONNECTIONS_CHANGED_EVENT } from "@/lib/social/events";
+import { useConnectionsPresence } from "@/lib/social/use-connections-presence";
 
 function peerLabel(thread: Pick<FanChatInboxThread, "peerDisplayName" | "peerUsername">) {
   return thread.peerDisplayName?.trim() || thread.peerUsername;
@@ -31,6 +33,8 @@ export function FanChatMessenger() {
 
   const viewingBroadcasts = activePeerId === "all";
   const activeThread = threads.find((thread) => thread.peerId === activePeerId);
+  const { presenceByPeerId, onlineCount } = useConnectionsPresence(!loading);
+  const activePeerPresence = activeThread ? presenceByPeerId[activeThread.peerId] : undefined;
 
   const loadInbox = useCallback(async () => {
     const response = await fetch("/api/fan-chat/messages?scope=inbox", { cache: "no-store" });
@@ -230,9 +234,14 @@ export function FanChatMessenger() {
                 and accept requests to unlock chat.
               </HelpTooltip>
             </span>
-            {totalUnread > 0 ? (
-              <span className="fan-chat-inbox-unread-total">{totalUnread} unread</span>
-            ) : null}
+            <span className="fan-chat-inbox-list-meta">
+              {onlineCount > 0 ? (
+                <span className="fan-chat-inbox-online-total">{onlineCount} online</span>
+              ) : null}
+              {totalUnread > 0 ? (
+                <span className="fan-chat-inbox-unread-total">{totalUnread} unread</span>
+              ) : null}
+            </span>
           </p>
 
           <ul className="fan-chat-inbox-threads">
@@ -261,7 +270,10 @@ export function FanChatMessenger() {
                   onClick={() => setActivePeerId(thread.peerId)}
                 >
                   <span className="fan-chat-inbox-thread-row">
-                    <span className="fan-chat-inbox-thread-name">{peerLabel(thread)}</span>
+                    <span className="fan-chat-inbox-thread-name-row">
+                      <ConnectionOnlineIndicator online={presenceByPeerId[thread.peerId]?.online ?? false} />
+                      <span className="fan-chat-inbox-thread-name">{peerLabel(thread)}</span>
+                    </span>
                     {thread.unreadCount > 0 ? (
                       <span className="fan-chat-inbox-unread-badge">{thread.unreadCount}</span>
                     ) : null}
@@ -289,11 +301,18 @@ export function FanChatMessenger() {
           {activePeerId ? (
             <>
               <header className="fan-chat-inbox-pane-header">
-                <h3>
+                <h3 className="fan-chat-inbox-pane-title">
                   {viewingBroadcasts
                     ? "Broadcast"
                     : peerLabel(activeThread ?? { peerDisplayName: null, peerUsername: "Fan" })}
                 </h3>
+                {!viewingBroadcasts && activeThread ? (
+                  <ConnectionOnlineIndicator
+                    lastSeenAt={activePeerPresence?.lastSeenAt}
+                    online={activePeerPresence?.online ?? false}
+                    showLabel
+                  />
+                ) : null}
               </header>
 
               <div className="fan-chat-thread" aria-live="polite">
