@@ -119,7 +119,7 @@ export async function firePredictionConfetti(mode: "live" | "login" = "live") {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   const confetti = (await import("canvas-confetti")).default;
-  const count = mode === "login" ? 180 : 110;
+  const count = mode === "login" ? 220 : 110;
   const defaults = {
     origin: { y: 0.62 },
     zIndex: 10050,
@@ -143,9 +143,15 @@ export async function firePredictionConfetti(mode: "live" | "login" = "live") {
   burst(0.12, { spread: 130, startVelocity: 38, scalar: 1.15 });
 
   if (mode === "login") {
-    window.setTimeout(() => {
-      burst(0.2, { spread: 88, startVelocity: 42 });
-      burst(0.15, { spread: 120, decay: 0.93, scalar: 0.9 });
-    }, 280);
+    const firework = (delayMs: number) => {
+      window.setTimeout(() => {
+        burst(0.22, { spread: 76, startVelocity: 48, origin: { x: 0.32, y: 0.55 } });
+        burst(0.18, { spread: 96, startVelocity: 44, origin: { x: 0.68, y: 0.58 } });
+        burst(0.14, { spread: 118, decay: 0.91, scalar: 1.05, origin: { x: 0.5, y: 0.5 } });
+      }, delayMs);
+    };
+    firework(220);
+    firework(520);
+    firework(820);
   }
 }

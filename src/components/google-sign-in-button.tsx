@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { markPendingLoginCelebration } from "@/lib/auth/login-celebrate-flag";
 
 function GoogleMark() {
   return (
@@ -51,6 +52,7 @@ export function GoogleSignInButton({
       type="button"
       onClick={() => {
         onBeforeSignIn?.();
+        markPendingLoginCelebration();
         void signIn("google", {
           callbackUrl:
             callbackUrl ?? (typeof window !== "undefined" ? window.location.href : "/")
