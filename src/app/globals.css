@@ -1375,7 +1375,6 @@ h3 {
   .community-post-card,
   .predictions-coming-soon,
   .feed-control-card,
-  .current-world-cup-card,
   .bracket-tree-card,
   .fixture-predictions-form,
   .predictions-results-board,
@@ -1409,7 +1408,6 @@ h3 {
     .community-post-card,
     .predictions-coming-soon,
     .feed-control-card,
-    .current-world-cup-card,
     .bracket-tree-card,
     .fixture-predictions-form,
     .predictions-results-board,
@@ -1662,14 +1660,33 @@ h3 {
 }
 
 .kickboard-mobile-dock-event {
+  align-items: center;
   display: flex;
-  justify-content: center;
+  gap: 12px 20px;
+  justify-content: flex-start;
   margin: 4px 0 18px;
   width: 100%;
 }
 
+.current-event-dock-heading {
+  align-items: center;
+  display: flex;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.current-event-dock-heading .current-event-title-trigger {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
-  margin: 0 auto;
+  flex: 1 1 auto;
+  justify-content: center;
+  margin: 0;
+  min-width: 0;
 }
 
 .current-event-section-tabs.event-tab-bar.kickboard-tab-bar button {
@@ -4356,6 +4373,7 @@ h3 {
     background: transparent;
     border: none;
     box-shadow: none;
+    gap: 16px 24px;
     margin: 4px 0 18px;
     padding: 0;
     position: sticky;
@@ -6932,7 +6950,6 @@ h3 {
 
 .feed-hero,
 .feed-control-card,
-.current-world-cup-card,
 .bracket-tree-card,
 .feed-content-grid {
   margin-bottom: 24px;
@@ -7049,7 +7066,6 @@ h3 {
 }
 
 .feed-control-card,
-.current-world-cup-card,
 .bracket-tree-card {
   background: var(--color-surface);
   border: none;
@@ -7061,14 +7077,9 @@ h3 {
   padding: 18px;
 }
 
-.current-world-cup-card,
 .bracket-tree-card {
   display: grid;
   gap: 8px;
-}
-
-.current-world-cup-card {
-  padding: 12px 14px;
 }
 
 .current-event-overview {
@@ -10857,7 +10868,6 @@ code {
       32px max(var(--page-gutter), env(safe-area-inset-right, 0px));
   }
 
-  .current-world-cup-card,
   .bracket-tree-card,
   .feed-control-card,
   .data-card,
@@ -10871,7 +10881,6 @@ code {
     width: 100%;
   }
 
-  .current-world-cup-card,
   .bracket-tree-card {
     padding: 10px 12px;
   }
@@ -10985,7 +10994,8 @@ code {
     box-sizing: border-box;
     box-shadow: none;
     display: flex;
-    justify-content: center;
+    gap: 8px 10px;
+    justify-content: flex-start;
     left: 50%;
     margin: 0;
     max-width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
@@ -10996,6 +11006,15 @@ code {
     z-index: 31;
   }
 
+  .current-event-dock-heading {
+    flex: 0 1 34%;
+    max-width: 34%;
+  }
+
+  .current-event-dock-heading .current-event-title-trigger {
+    font-size: 0.8rem;
+  }
+
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
     -webkit-backdrop-filter: blur(14px) saturate(1.15);
     backdrop-filter: blur(14px) saturate(1.15);
@@ -11004,14 +11023,16 @@ code {
     border-radius: 9999px;
     box-shadow: var(--shadow-surface);
     box-sizing: border-box;
+    flex: 1 1 0;
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
     justify-content: center;
     margin: 0;
-    max-width: 100%;
+    max-width: none;
+    min-width: 0;
     overflow: hidden;
     padding: var(--kickboard-tab-rail-padding);
-    width: 100%;
+    width: auto;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar::-webkit-scrollbar {
@@ -11224,15 +11245,6 @@ code {
     background: var(--color-surface);
     border-color: var(--color-border);
     color: var(--color-text-primary);
-  }
-
-  .current-event-overview-heading {
-    justify-content: center;
-  }
-
-  .current-event-title-trigger {
-    text-align: center;
-    width: 100%;
   }
 
   .predictions-sub-tabs-rail {
