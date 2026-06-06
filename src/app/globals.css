@@ -1304,7 +1304,7 @@ h3 {
 }
 
 [data-theme="dark"] .feed-browser--hero-backdrop::before {
-  opacity: 0.22;
+  opacity: 0.34;
 }
 
 [data-theme="dark"] .feed-browser--hero-backdrop::after {
@@ -1312,21 +1312,21 @@ h3 {
     linear-gradient(
       108deg,
       var(--color-bg) 0%,
-      color-mix(in srgb, var(--color-bg) 97%, transparent) 44%,
-      color-mix(in srgb, var(--color-bg) 72%, transparent) 62%,
-      transparent 80%
+      color-mix(in srgb, var(--color-bg) 94%, transparent) 38%,
+      color-mix(in srgb, var(--color-bg) 55%, transparent) 58%,
+      transparent 76%
     ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-bg) 94%, transparent) 0%,
-      transparent 20%,
-      transparent 68%,
-      color-mix(in srgb, var(--color-bg) 98%, transparent) 100%
+      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+      transparent 18%,
+      transparent 70%,
+      color-mix(in srgb, var(--color-bg) 96%, transparent) 100%
     ),
     radial-gradient(
-      ellipse 65% 50% at 86% 30%,
-      color-mix(in srgb, #e30613 10%, transparent),
-      transparent 70%
+      ellipse 70% 55% at 88% 28%,
+      color-mix(in srgb, #e30613 14%, transparent),
+      transparent 72%
     );
 }
 
@@ -1384,8 +1384,8 @@ h3 {
 }
 
 [data-theme="dark"] .feed-browser--hero-backdrop {
-  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 72%, transparent);
-  --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 64%, transparent);
+  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 62%, transparent);
+  --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 54%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -9185,6 +9185,21 @@ h3 {
   gap: 6px;
   min-height: 40px;
   white-space: nowrap;
+}
+
+.session-checkpoint-match .button.primary,
+.session-checkpoint-match .button.secondary {
+  border: none;
+  box-shadow: none;
+}
+
+.session-checkpoint-match .button.primary:hover:not(:disabled),
+.session-checkpoint-match .button.primary:active:not(:disabled),
+.session-checkpoint-match .button.primary:focus:not(:disabled),
+.session-checkpoint-match .button.secondary:hover:not(:disabled),
+.session-checkpoint-match .button.secondary:active:not(:disabled),
+.session-checkpoint-match .button.secondary:focus:not(:disabled) {
+  box-shadow: none;
 }
 
 .session-checkpoint-stats {
