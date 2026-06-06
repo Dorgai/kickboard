@@ -8,12 +8,28 @@ export type TournamentPlayerPick = {
   teamName: string;
 };
 
+export type TournamentTopScorerBoardSize = 5 | 10;
+
+export type TournamentScorerRankPick = TournamentPlayerPick & {
+  rank: number;
+  predictedGoals: number;
+};
+
+export type TournamentTopScorerBoard = {
+  size: TournamentTopScorerBoardSize;
+  picks: TournamentScorerRankPick[];
+};
+
+export const TOURNAMENT_SCORER_BOARD_SIZES: TournamentTopScorerBoardSize[] = [5, 10];
+export const MAX_TOURNAMENT_SCORER_BOARD_GOALS = 30;
+
 export type TournamentPredictionRecord = {
   id: string;
   tournamentKey: string;
   predictedChampion: string | null;
   predictedFinalists: string[];
   predictedTopScorer: TournamentPlayerPick | null;
+  predictedTopScorerBoard: TournamentTopScorerBoard | null;
   predictedBestPlayer: TournamentPlayerPick | null;
   championStatus: PredictionResultStatus;
   finalistsStatus: PredictionResultStatus;
@@ -39,6 +55,62 @@ export function parseTournamentPlayerPick(raw: unknown): TournamentPlayerPick | 
     playerName: playerName.slice(0, 80),
     teamName: teamName.slice(0, 80)
   };
+}
+
+function parseScorerBoardSize(raw: unknown): TournamentTopScorerBoardSize | null {
+  const size = typeof raw === "number" ? raw : Number(raw);
+  if (size === 5 || size === 10) return size;
+  return null;
+}
+
+function parseScorerRankPick(raw: unknown): TournamentScorerRankPick | null {
+  const player = parseTournamentPlayerPick(raw);
+  if (!player || !raw || typeof raw !== "object") return null;
+  const row = raw as Record<string, unknown>;
+  const rank = typeof row.rank === "number" ? row.rank : Number(row.rank);
+  const predictedGoals =
+    typeof row.predictedGoals === "number" ? row.predictedGoals : Number(row.predictedGoals);
+  if (!Number.isFinite(rank) || rank < 1 || rank > 10) return null;
+  if (!Number.isFinite(predictedGoals) || predictedGoals < 1 || predictedGoals > MAX_TOURNAMENT_SCORER_BOARD_GOALS) {
+    return null;
+  }
+  return {
+    ...player,
+    rank: Math.trunc(rank),
+    predictedGoals: Math.trunc(predictedGoals)
+  };
+}
+
+export function parseTournamentTopScorerBoard(raw: unknown): TournamentTopScorerBoard | null {
+  if (!raw || typeof raw !== "object") return null;
+  const row = raw as Record<string, unknown>;
+  const size = parseScorerBoardSize(row.size);
+  if (!size) return null;
+  if (!Array.isArray(row.picks) || row.picks.length === 0) return null;
+
+  const picks: TournamentScorerRankPick[] = [];
+  const seenPlayers = new Set<number>();
+  const seenRanks = new Set<number>();
+
+  for (const entry of row.picks) {
+    const pick = parseScorerRankPick(entry);
+    if (!pick || pick.rank > size) continue;
+    if (seenPlayers.has(pick.playerId) || seenRanks.has(pick.rank)) continue;
+    seenPlayers.add(pick.playerId);
+    seenRanks.add(pick.rank);
+    picks.push(pick);
+  }
+
+  if (!picks.length) return null;
+  picks.sort((a, b) => a.rank - b.rank);
+  return { size, picks };
+}
+
+export function normalizeTournamentTopScorerBoard(
+  raw: unknown
+): TournamentTopScorerBoard | null {
+  if (raw === null) return null;
+  return parseTournamentTopScorerBoard(raw);
 }
 
 export function parsePredictedFinalists(raw: unknown): string[] {

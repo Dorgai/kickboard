@@ -9,6 +9,7 @@ import {
 import {
   DEFAULT_TOURNAMENT_KEY,
   normalizeTournamentTeam,
+  normalizeTournamentTopScorerBoard,
   parsePredictedFinalists,
   parseTournamentPlayerPick
 } from "@/lib/tournament-predictions/types";
@@ -62,12 +63,14 @@ export async function POST(request: Request) {
       predictedChampion?: string | null;
       predictedFinalists?: unknown;
       predictedTopScorer?: unknown;
+      predictedTopScorerBoard?: unknown;
       predictedBestPlayer?: unknown;
     };
 
     const championProvided = Object.prototype.hasOwnProperty.call(body, "predictedChampion");
     const finalistsProvided = Object.prototype.hasOwnProperty.call(body, "predictedFinalists");
     const topScorerProvided = Object.prototype.hasOwnProperty.call(body, "predictedTopScorer");
+    const topScorerBoardProvided = Object.prototype.hasOwnProperty.call(body, "predictedTopScorerBoard");
     const bestPlayerProvided = Object.prototype.hasOwnProperty.call(body, "predictedBestPlayer");
 
     const { id, change } = await upsertUserTournamentPrediction({
@@ -81,6 +84,9 @@ export async function POST(request: Request) {
         : undefined,
       predictedTopScorer: topScorerProvided
         ? parseTournamentPlayerPick(body.predictedTopScorer)
+        : undefined,
+      predictedTopScorerBoard: topScorerBoardProvided
+        ? normalizeTournamentTopScorerBoard(body.predictedTopScorerBoard)
         : undefined,
       predictedBestPlayer: bestPlayerProvided
         ? parseTournamentPlayerPick(body.predictedBestPlayer)
@@ -100,7 +106,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Add at least one tournament pick: champion, finalists, top scorer, or best player — or remove all picks."
+            "Add at least one tournament pick: champion, finalists, top scorer, scorer leaderboard, or best player — or remove all picks."
         },
         { status: 400 }
       );
@@ -110,6 +116,27 @@ export async function POST(request: Request) {
     }
     if (error instanceof Error && error.message === "TOO_MANY_FINALISTS") {
       return NextResponse.json({ error: "You can pick at most two finalists." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "INVALID_SCORER_BOARD_SIZE") {
+      return NextResponse.json({ error: "Scorer leaderboard size must be top 5 or top 10." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "TOO_MANY_SCORER_BOARD_PICKS") {
+      return NextResponse.json({ error: "Too many players on the scorer leaderboard." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "DUPLICATE_SCORER_BOARD_PLAYERS") {
+      return NextResponse.json({ error: "Each player can only appear once on the scorer leaderboard." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "DUPLICATE_SCORER_BOARD_RANKS") {
+      return NextResponse.json({ error: "Each rank on the scorer leaderboard must be unique." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "INVALID_SCORER_BOARD_RANK") {
+      return NextResponse.json({ error: "Scorer leaderboard ranks must stay within your top 5 or top 10." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "INVALID_SCORER_BOARD_GOALS") {
+      return NextResponse.json(
+        { error: "Predicted goals must be between 1 and 30 for each scorer." },
+        { status: 400 }
+      );
     }
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });

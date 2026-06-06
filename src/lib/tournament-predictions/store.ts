@@ -1,12 +1,15 @@
 import { query } from "@/lib/db";
 import {
   DEFAULT_TOURNAMENT_KEY,
+  MAX_TOURNAMENT_SCORER_BOARD_GOALS,
   normalizeResultStatus,
   normalizeTournamentTeam,
   parsePredictedFinalists,
   parseTournamentPlayerPick,
+  parseTournamentTopScorerBoard,
   type TournamentPlayerPick,
-  type TournamentPredictionRecord
+  type TournamentPredictionRecord,
+  type TournamentTopScorerBoard
 } from "@/lib/tournament-predictions/types";
 
 type TournamentPredictionRow = {
@@ -15,6 +18,7 @@ type TournamentPredictionRow = {
   predicted_champion: string | null;
   predicted_finalists: unknown;
   predicted_top_scorer: unknown;
+  predicted_top_scorer_board: unknown;
   predicted_best_player: unknown;
   champion_status: string;
   finalists_status: string;
@@ -29,7 +33,7 @@ type TournamentPredictionRow = {
 };
 
 const SELECT_TOURNAMENT_PREDICTION = `SELECT id, tournament_key, predicted_champion, predicted_finalists,
-  predicted_top_scorer, predicted_best_player,
+  predicted_top_scorer, predicted_top_scorer_board, predicted_best_player,
   COALESCE(champion_status, 'pending') AS champion_status,
   COALESCE(finalists_status, 'pending') AS finalists_status,
   COALESCE(top_scorer_status, 'pending') AS top_scorer_status,
@@ -47,6 +51,7 @@ function mapRow(row: TournamentPredictionRow): TournamentPredictionRecord {
     predictedChampion: row.predicted_champion,
     predictedFinalists: parsePredictedFinalists(row.predicted_finalists),
     predictedTopScorer: parseTournamentPlayerPick(row.predicted_top_scorer),
+    predictedTopScorerBoard: parseTournamentTopScorerBoard(row.predicted_top_scorer_board),
     predictedBestPlayer: parseTournamentPlayerPick(row.predicted_best_player),
     championStatus: normalizeResultStatus(row.champion_status),
     finalistsStatus: normalizeResultStatus(row.finalists_status),
@@ -65,12 +70,14 @@ function hasAnyPick(record: {
   predictedChampion: string | null;
   predictedFinalists: string[];
   predictedTopScorer: TournamentPlayerPick | null;
+  predictedTopScorerBoard: TournamentTopScorerBoard | null;
   predictedBestPlayer: TournamentPlayerPick | null;
 }) {
   return Boolean(
     record.predictedChampion ||
       record.predictedFinalists.length > 0 ||
       record.predictedTopScorer ||
+      record.predictedTopScorerBoard ||
       record.predictedBestPlayer
   );
 }
@@ -79,6 +86,26 @@ function validateFinalists(finalists: string[]) {
   if (finalists.length > 2) throw new Error("TOO_MANY_FINALISTS");
   if (finalists.length === 2 && finalists[0].toLowerCase() === finalists[1].toLowerCase()) {
     throw new Error("DUPLICATE_FINALISTS");
+  }
+}
+
+function validateTopScorerBoard(board: TournamentTopScorerBoard | null) {
+  if (!board) return;
+  if (board.size !== 5 && board.size !== 10) throw new Error("INVALID_SCORER_BOARD_SIZE");
+  if (board.picks.length > board.size) throw new Error("TOO_MANY_SCORER_BOARD_PICKS");
+
+  const playerIds = new Set<number>();
+  const ranks = new Set<number>();
+
+  for (const pick of board.picks) {
+    if (pick.rank < 1 || pick.rank > board.size) throw new Error("INVALID_SCORER_BOARD_RANK");
+    if (pick.predictedGoals < 1 || pick.predictedGoals > MAX_TOURNAMENT_SCORER_BOARD_GOALS) {
+      throw new Error("INVALID_SCORER_BOARD_GOALS");
+    }
+    if (playerIds.has(pick.playerId)) throw new Error("DUPLICATE_SCORER_BOARD_PLAYERS");
+    if (ranks.has(pick.rank)) throw new Error("DUPLICATE_SCORER_BOARD_RANKS");
+    playerIds.add(pick.playerId);
+    ranks.add(pick.rank);
   }
 }
 
@@ -102,6 +129,7 @@ export async function upsertUserTournamentPrediction(input: {
   predictedChampion?: string | null;
   predictedFinalists?: string[];
   predictedTopScorer?: TournamentPlayerPick | null;
+  predictedTopScorerBoard?: TournamentTopScorerBoard | null;
   predictedBestPlayer?: TournamentPlayerPick | null;
 }) {
   const tournamentKey = (input.tournamentKey?.trim().slice(0, 20) || DEFAULT_TOURNAMENT_KEY) as string;
@@ -122,17 +150,24 @@ export async function upsertUserTournamentPrediction(input: {
       ? input.predictedTopScorer
       : (existing?.predictedTopScorer ?? null);
 
+  const predictedTopScorerBoard =
+    input.predictedTopScorerBoard !== undefined
+      ? input.predictedTopScorerBoard
+      : (existing?.predictedTopScorerBoard ?? null);
+
   const predictedBestPlayer =
     input.predictedBestPlayer !== undefined
       ? input.predictedBestPlayer
       : (existing?.predictedBestPlayer ?? null);
 
   validateFinalists(predictedFinalists);
+  validateTopScorerBoard(predictedTopScorerBoard);
 
   const next = {
     predictedChampion,
     predictedFinalists,
     predictedTopScorer,
+    predictedTopScorerBoard,
     predictedBestPlayer
   };
 
@@ -149,16 +184,25 @@ export async function upsertUserTournamentPrediction(input: {
 
   const finalistsJson = JSON.stringify(predictedFinalists);
   const topScorerJson = predictedTopScorer ? JSON.stringify(predictedTopScorer) : null;
+  const topScorerBoardJson = predictedTopScorerBoard ? JSON.stringify(predictedTopScorerBoard) : null;
   const bestPlayerJson = predictedBestPlayer ? JSON.stringify(predictedBestPlayer) : null;
 
   if (!existing) {
     const inserted = await query<{ id: string }>(
       `INSERT INTO tournament_predictions (
          user_id, tournament_key, predicted_champion, predicted_finalists,
-         predicted_top_scorer, predicted_best_player
-       ) VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6::jsonb)
+         predicted_top_scorer, predicted_top_scorer_board, predicted_best_player
+       ) VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6::jsonb, $7::jsonb)
        RETURNING id`,
-      [input.userId, tournamentKey, predictedChampion, finalistsJson, topScorerJson, bestPlayerJson]
+      [
+        input.userId,
+        tournamentKey,
+        predictedChampion,
+        finalistsJson,
+        topScorerJson,
+        topScorerBoardJson,
+        bestPlayerJson
+      ]
     );
     return { id: inserted.rows[0]?.id ?? null, change: "created" as const };
   }
@@ -167,6 +211,7 @@ export async function upsertUserTournamentPrediction(input: {
     existing.predictedChampion === predictedChampion &&
     JSON.stringify(existing.predictedFinalists) === finalistsJson &&
     JSON.stringify(existing.predictedTopScorer) === topScorerJson &&
+    JSON.stringify(existing.predictedTopScorerBoard) === topScorerBoardJson &&
     JSON.stringify(existing.predictedBestPlayer) === bestPlayerJson;
 
   if (unchanged) {
@@ -178,10 +223,19 @@ export async function upsertUserTournamentPrediction(input: {
      SET predicted_champion = $3,
          predicted_finalists = $4::jsonb,
          predicted_top_scorer = $5::jsonb,
-         predicted_best_player = $6::jsonb,
+         predicted_top_scorer_board = $6::jsonb,
+         predicted_best_player = $7::jsonb,
          updated_at = now()
      WHERE user_id = $1 AND tournament_key = $2`,
-    [input.userId, tournamentKey, predictedChampion, finalistsJson, topScorerJson, bestPlayerJson]
+    [
+      input.userId,
+      tournamentKey,
+      predictedChampion,
+      finalistsJson,
+      topScorerJson,
+      topScorerBoardJson,
+      bestPlayerJson
+    ]
   );
 
   return { id: existing.id, change: "updated" as const };

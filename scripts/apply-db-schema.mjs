@@ -42,7 +42,8 @@ const files = [
   "db/help-support-extensions.sql",
   "db/fixture-prediction-events-extensions.sql",
   "db/prediction-share-links-extensions.sql",
-  "db/tournament-predictions-extensions.sql"
+  "db/tournament-predictions-extensions.sql",
+  "db/tournament-predictions-top-scorer-board.sql"
 ];
 
 async function applyFile(client, relativePath) {

@@ -4132,6 +4132,99 @@ h3 {
   margin: 4px 0 0;
 }
 
+.tournament-scorer-board-field {
+  display: grid;
+  gap: 12px;
+}
+
+.tournament-scorer-board-enable {
+  align-items: center;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 10px;
+  line-height: 1.35;
+}
+
+.tournament-scorer-board-enable input {
+  accent-color: var(--color-accent);
+  height: 18px;
+  width: 18px;
+}
+
+.tournament-scorer-board-size {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tournament-scorer-board-size-option {
+  flex: 0 0 auto;
+  min-width: 5.5rem;
+}
+
+.tournament-scorer-board-ranks {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tournament-scorer-board-rank {
+  align-items: flex-start;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+}
+
+.tournament-scorer-board-rank-label {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 44px;
+  text-align: center;
+}
+
+.tournament-scorer-board-rank-body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tournament-scorer-board-rank-trigger {
+  width: 100%;
+}
+
+.tournament-scorer-board-goals {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.tournament-scorer-board-goals-label {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.tournament-scorer-board-goals-value {
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 800;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.tournament-scorer-board-panel {
+  margin-top: 2px;
+}
+
 .tournament-opponent-field .tournament-team-pick-grid {
   max-height: min(11rem, 28vh);
 }
