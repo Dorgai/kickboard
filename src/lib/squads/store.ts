@@ -224,6 +224,7 @@ export type SquadSummary = {
   id: string;
   name: string;
   formation: string;
+  fixtureKey: string | null;
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -234,6 +235,7 @@ function mapSquadSummary(row: {
   id: string;
   name: string;
   formation: string;
+  fixture_key: string | null;
   published_to_board_at: Date | null;
   created_at: Date;
   updated_at: Date;
@@ -245,6 +247,7 @@ function mapSquadSummary(row: {
     id: row.id,
     name: row.name,
     formation: formatFormationsLabel(formations),
+    fixtureKey: row.fixture_key,
     publishedAt: row.published_to_board_at?.toISOString() ?? null,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString(),
@@ -290,16 +293,17 @@ export async function listUserSquadsForFixture(userId: string, fixtureKey: strin
     id: string;
     name: string;
     formation: string;
+    fixture_key: string | null;
     published_to_board_at: Date | null;
     created_at: Date;
     updated_at: Date;
     lineup: unknown;
   }>(
-    `SELECT id, name, formation, lineup, published_to_board_at, created_at, updated_at
+    `SELECT DISTINCT ON (fixture_key)
+            id, name, formation, lineup, fixture_key, published_to_board_at, created_at, updated_at
      FROM squads
      WHERE user_id = $1 AND fixture_key = $2
-     ORDER BY updated_at DESC
-     LIMIT 30`,
+     ORDER BY fixture_key, updated_at DESC`,
     [userId, key]
   );
 
@@ -311,18 +315,25 @@ export async function listUserSquads(userId: string) {
     id: string;
     name: string;
     formation: string;
+    fixture_key: string | null;
     published_to_board_at: Date | null;
     created_at: Date;
     updated_at: Date;
     lineup: unknown;
   }>(
-    `SELECT id, name, formation, lineup, published_to_board_at, created_at, updated_at
+    `SELECT DISTINCT ON (COALESCE(fixture_key, id::text))
+            id, name, formation, lineup, fixture_key, published_to_board_at, created_at, updated_at
      FROM squads
      WHERE user_id = $1
-     ORDER BY updated_at DESC
-     LIMIT 20`,
+     ORDER BY COALESCE(fixture_key, id::text), updated_at DESC
+     LIMIT 50`,
     [userId]
   );
 
   return result.rows.map((row) => mapSquadSummary(row));
+}
+
+export async function getUserSquadIdForFixture(userId: string, fixtureKey: string) {
+  const squad = await getLatestUserSquad(userId, fixtureKey);
+  return squad?.id ?? null;
 }

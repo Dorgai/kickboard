@@ -77,6 +77,7 @@ export async function POST(request: Request) {
 
     const existingId = typeof body.squadId === "string" ? body.squadId.trim() : "";
     let squadId: string | null = null;
+    let updatedExisting = Boolean(existingId);
 
     if (existingId) {
       squadId = await updateUserSquad({
@@ -91,28 +92,44 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Squad not found." }, { status: 404 });
       }
     } else {
-      squadId = await createUserSquad({
-        userId: user.id,
-        name: body.name ?? "My XI",
-        formations,
-        lineup,
-        fixtureKey
-      });
-      if (!squadId) {
-        return NextResponse.json({ error: "Unable to save squad." }, { status: 500 });
+      const existingForFixture = await getLatestUserSquad(user.id, fixtureKey);
+      if (existingForFixture) {
+        updatedExisting = true;
+        squadId = await updateUserSquad({
+          squadId: existingForFixture.id,
+          userId: user.id,
+          name: body.name ?? "My XI",
+          formations,
+          lineup,
+          fixtureKey
+        });
+        if (!squadId) {
+          return NextResponse.json({ error: "Squad not found." }, { status: 404 });
+        }
+      } else {
+        squadId = await createUserSquad({
+          userId: user.id,
+          name: body.name ?? "My XI",
+          formations,
+          lineup,
+          fixtureKey
+        });
+        if (!squadId) {
+          return NextResponse.json({ error: "Unable to save squad." }, { status: 500 });
+        }
       }
     }
 
     void recordActivityEvent({
       userId: user.id,
       eventType: "squad_saved",
-      summary: existingId ? "Updated Coach Board squad" : "Saved new Coach Board squad",
+      summary: updatedExisting ? "Updated Coach Board squad" : "Saved new Coach Board squad",
       metadata: { squadId, fixtureKey }
     }).catch(() => undefined);
 
     return NextResponse.json({
       squadId,
-      message: existingId
+      message: updatedExisting
         ? "Squad updated. Publish when ready."
         : "Squad saved. Publish it to the Coach Board when ready."
     });

@@ -6,9 +6,7 @@ import { HelpTooltip } from "@/components/help-tooltip";
 import { FixtureMatchHeader } from "@/components/fixture-match-header";
 import { formatFixtureTeamsLabel, type FixtureOption } from "@/lib/fixtures/fixture-key";
 import { FriendsMatchActivity } from "@/components/friends-match-activity";
-import { SavedSquadsBar } from "@/components/saved-squads-bar";
 import { SquadBuilder } from "@/components/squad-builder";
-import type { SquadSummary } from "@/lib/squads/store";
 
 type BoardPost = {
   id: string;
@@ -28,8 +26,9 @@ type CoachBoardPanelProps = {
   status?: FixtureOption["status"];
   homeGoals?: number | null;
   awayGoals?: number | null;
-  touchLayout?: boolean;
-  onFixtureDrop?: (fixtureKey: string) => void;
+  activeSquadId: string | null;
+  newBoardNonce: number;
+  onSquadSaved: (savedId: string) => void | Promise<void>;
 };
 
 export function CoachBoardPanel({
@@ -42,16 +41,13 @@ export function CoachBoardPanel({
   status = "upcoming",
   homeGoals,
   awayGoals,
-  touchLayout = false,
-  onFixtureDrop
+  activeSquadId,
+  newBoardNonce,
+  onSquadSaved
 }: CoachBoardPanelProps) {
   const fixtureTeamsLabel = formatFixtureTeamsLabel(homeTeam, awayTeam);
   const [posts, setPosts] = useState<BoardPost[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
-  const [squads, setSquads] = useState<SquadSummary[]>([]);
-  const [squadsLoading, setSquadsLoading] = useState(true);
-  const [activeSquadId, setActiveSquadId] = useState<string | null>(null);
-  const [newBoardNonce, setNewBoardNonce] = useState(0);
 
   const refreshPosts = useCallback(async () => {
     setPostsLoading(true);
@@ -65,80 +61,13 @@ export function CoachBoardPanel({
     }
   }, [fixtureKey]);
 
-  const refreshSquads = useCallback(async () => {
-    setSquadsLoading(true);
-    try {
-      const params = new URLSearchParams({ fixtureKey });
-      const response = await fetch(`/api/squads?${params}`, { cache: "no-store" });
-      if (!response.ok) {
-        setSquads([]);
-        return [];
-      }
-      const payload = (await response.json()) as { squads?: SquadSummary[] };
-      const list = payload.squads ?? [];
-      setSquads(list);
-      return list;
-    } catch {
-      setSquads([]);
-      return [];
-    } finally {
-      setSquadsLoading(false);
-    }
-  }, [fixtureKey]);
-
   useEffect(() => {
     void refreshPosts();
   }, [refreshPosts]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadSquadsForFixture() {
-      setActiveSquadId(null);
-      setNewBoardNonce(0);
-      const list = await refreshSquads();
-      if (cancelled) return;
-      setActiveSquadId(list[0]?.id ?? null);
-    }
-
-    void loadSquadsForFixture();
-    return () => {
-      cancelled = true;
-    };
-  }, [fixtureKey, refreshSquads]);
-
-  const handleSelectSquad = useCallback((squadId: string) => {
-    setNewBoardNonce(0);
-    setActiveSquadId(squadId);
-  }, []);
-
-  const handleNewBoard = useCallback(() => {
-    setActiveSquadId(null);
-    setNewBoardNonce((value) => value + 1);
-  }, []);
-
-  const handleSquadSaved = useCallback(
-    async (savedId: string) => {
-      const list = await refreshSquads();
-      setActiveSquadId(savedId || list[0]?.id || null);
-    },
-    [refreshSquads]
-  );
-
   return (
     <AuthGate featureLabel="Coach Board">
       <div className="coach-board-panel">
-        <SavedSquadsBar
-          activeSquadId={activeSquadId}
-          fixtureLabel={fixtureTeamsLabel || fixtureLabel}
-          loading={squadsLoading}
-          squads={squads}
-          touchLayout={touchLayout}
-          onFixtureDrop={onFixtureDrop}
-          onNew={handleNewBoard}
-          onSelect={handleSelectSquad}
-        />
-
         <SquadBuilder
           key={`${fixtureKey}:${activeSquadId ?? "new"}:${newBoardNonce}`}
           activeSquadId={activeSquadId}
@@ -177,7 +106,7 @@ export function CoachBoardPanel({
               </HelpTooltip>
             </div>
           }
-          onSaved={handleSquadSaved}
+          onSaved={onSquadSaved}
         />
 
         <FriendsMatchActivity awayTeam={awayTeam} fixtureKey={fixtureKey} homeTeam={homeTeam} />
