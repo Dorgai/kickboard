@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { isDatabaseConfigured } from "@/lib/db";
-import { payloadFromStored, savePredictionShareLink } from "@/lib/predictions/share-store";
+import { saveShareLink, sharePayloadFromStored } from "@/lib/predictions/share-store";
 import {
   buildPredictionSharePageUrl,
-  buildPredictionSharePageUrlEmbedded,
-  type PredictionSharePayload
+  buildSharePageUrlEmbedded,
+  canSharePayload,
+  type SharePayload
 } from "@/lib/predictions/share";
 
 function isMissingRelationError(error: unknown) {
@@ -14,13 +15,13 @@ function isMissingRelationError(error: unknown) {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as PredictionSharePayload;
-    const payload = payloadFromStored(body);
-    if (!payload) {
+    const body = (await request.json()) as SharePayload;
+    const payload = sharePayloadFromStored(body);
+    if (!payload || !canSharePayload(payload)) {
       return NextResponse.json({ error: "Invalid share payload." }, { status: 400 });
     }
 
-    const shareId = await savePredictionShareLink(payload);
+    const shareId = await saveShareLink(payload);
     if (shareId) {
       return NextResponse.json({
         shareId,
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       shareId: null,
-      url: buildPredictionSharePageUrlEmbedded(payload),
+      url: buildSharePageUrlEmbedded(payload),
       mode: "embedded" as const
     });
   } catch (error) {

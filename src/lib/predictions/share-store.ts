@@ -1,8 +1,18 @@
 import { randomBytes } from "node:crypto";
 import { query, isDatabaseConfigured } from "@/lib/db";
-import type { PredictionSharePayload } from "@/lib/predictions/share";
+import {
+  tournamentLabelFromKey,
+  type PredictionSharePayload,
+  type SharePayload,
+  type TournamentSharePayload
+} from "@/lib/predictions/share";
 import { parseScorerPicks, type FixtureOutcome } from "@/lib/fixture-predictions/types";
 import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
+import {
+  DEFAULT_TOURNAMENT_KEY,
+  parseTournamentPlayerPick,
+  parseTournamentTopScorerBoard
+} from "@/lib/tournament-predictions/types";
 
 function createShareId() {
   return randomBytes(9).toString("base64url");
@@ -45,9 +55,10 @@ export function isShortShareId(value: string) {
   return id.length >= 8 && id.length <= 24 && /^[A-Za-z0-9_-]+$/.test(id);
 }
 
-export function payloadFromStored(raw: unknown): PredictionSharePayload | null {
+function fixturePayloadFromStored(raw: unknown): PredictionSharePayload | null {
   if (!raw || typeof raw !== "object") return null;
   const parsed = raw as Partial<PredictionSharePayload>;
+  if ("kind" in parsed && parsed.kind === "tournament") return null;
   const fixtureKey = typeof parsed.fixtureKey === "string" ? parsed.fixtureKey.trim() : "";
   if (!fixtureKey) return null;
   if (parsed.v !== undefined && parsed.v !== 1) return null;
@@ -82,9 +93,65 @@ export function payloadFromStored(raw: unknown): PredictionSharePayload | null {
   };
 }
 
-export async function savePredictionShareLink(
-  payload: PredictionSharePayload
-): Promise<string | null> {
+function tournamentPayloadFromStored(raw: unknown): TournamentSharePayload | null {
+  if (!raw || typeof raw !== "object") return null;
+  const parsed = raw as Partial<TournamentSharePayload>;
+  if (parsed.kind !== "tournament") return null;
+  if (parsed.v !== undefined && parsed.v !== 1) return null;
+
+  const tournamentKey =
+    typeof parsed.tournamentKey === "string" && parsed.tournamentKey.trim()
+      ? parsed.tournamentKey.trim()
+      : DEFAULT_TOURNAMENT_KEY;
+
+  const predictedChampion =
+    typeof parsed.predictedChampion === "string" && parsed.predictedChampion.trim()
+      ? parsed.predictedChampion.trim().slice(0, 80)
+      : null;
+  const predictedFinalOpponent =
+    typeof parsed.predictedFinalOpponent === "string" && parsed.predictedFinalOpponent.trim()
+      ? parsed.predictedFinalOpponent.trim().slice(0, 80)
+      : null;
+  const predictedTopScorer = parseTournamentPlayerPick(parsed.predictedTopScorer);
+  const predictedTopScorerBoard = parseTournamentTopScorerBoard(parsed.predictedTopScorerBoard);
+  const predictedBestPlayer = parseTournamentPlayerPick(parsed.predictedBestPlayer);
+
+  const hasPick = Boolean(
+    predictedChampion ||
+      predictedFinalOpponent ||
+      predictedTopScorer ||
+      predictedTopScorerBoard ||
+      predictedBestPlayer
+  );
+  if (!hasPick) return null;
+
+  return {
+    kind: "tournament",
+    v: 1,
+    tournamentKey: tournamentKey.slice(0, 40),
+    tournamentLabel: String(parsed.tournamentLabel ?? tournamentLabelFromKey(tournamentKey)).slice(
+      0,
+      120
+    ),
+    predictedChampion,
+    predictedFinalOpponent,
+    predictedTopScorer,
+    predictedTopScorerBoard,
+    predictedBestPlayer,
+    displayName: parsed.displayName ? String(parsed.displayName).slice(0, 80) : null
+  };
+}
+
+export function sharePayloadFromStored(raw: unknown): SharePayload | null {
+  return tournamentPayloadFromStored(raw) ?? fixturePayloadFromStored(raw);
+}
+
+/** @deprecated Use sharePayloadFromStored — kept for fixture-only callers. */
+export function payloadFromStored(raw: unknown): PredictionSharePayload | null {
+  return fixturePayloadFromStored(raw);
+}
+
+export async function saveShareLink(payload: SharePayload): Promise<string | null> {
   if (!isDatabaseConfigured()) return null;
   if (!(await ensurePredictionShareLinksTable())) return null;
 
@@ -108,12 +175,18 @@ export async function savePredictionShareLink(
   return null;
 }
 
+export async function savePredictionShareLink(
+  payload: PredictionSharePayload
+): Promise<string | null> {
+  return saveShareLink(payload);
+}
+
 function isMissingRelationError(error: unknown) {
   if (!error || typeof error !== "object") return false;
   return "code" in error && String(error.code) === "42P01";
 }
 
-export async function loadPredictionShareLink(id: string): Promise<PredictionSharePayload | null> {
+export async function loadShareLink(id: string): Promise<SharePayload | null> {
   if (!isDatabaseConfigured() || !isShortShareId(id)) return null;
   if (!(await ensurePredictionShareLinksTable())) return null;
 
@@ -124,9 +197,13 @@ export async function loadPredictionShareLink(id: string): Promise<PredictionSha
     );
 
     if (!result.rows[0]) return null;
-    return payloadFromStored(result.rows[0].payload);
+    return sharePayloadFromStored(result.rows[0].payload);
   } catch (error) {
     if (isMissingRelationError(error)) return null;
     throw error;
   }
+}
+
+export async function loadPredictionShareLink(id: string): Promise<SharePayload | null> {
+  return loadShareLink(id);
 }

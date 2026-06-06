@@ -6,12 +6,14 @@ import { HelpTooltip } from "@/components/help-tooltip";
 import { useToastOptional } from "@/components/toast-provider";
 import {
   buildFacebookShareUrl,
-  buildPredictionShareCaption,
-  type PredictionSharePayload
+  buildShareCaption,
+  canSharePayload,
+  sharePayloadTitle,
+  type SharePayload
 } from "@/lib/predictions/share";
 
 type PredictionShareButtonsProps = {
-  payload: PredictionSharePayload;
+  payload: SharePayload;
   disabled?: boolean;
   className?: string;
 };
@@ -109,14 +111,10 @@ export function PredictionShareButtons({
     };
   }, [payload]);
 
-  const canShare = Boolean(
-    payload.predictedOutcome ||
-      (payload.homeScore !== null && payload.awayScore !== null) ||
-      payload.scorerPicks.length > 0
-  );
+  const canShare = canSharePayload(payload);
 
   const sharePageUrl = shareLink.status === "ready" ? shareLink.url : "";
-  const caption = useMemo(() => buildPredictionShareCaption(payload), [payload]);
+  const caption = useMemo(() => buildShareCaption(payload), [payload]);
 
   const shareText = useMemo(
     () => (sharePageUrl ? `${caption}\n\n${sharePageUrl}` : caption),
@@ -160,7 +158,7 @@ export function PredictionShareButtons({
     }
     try {
       await navigator.share({
-        title: `MyPicks — ${payload.fixtureLabel}`,
+        title: sharePayloadTitle(payload),
         text: caption,
         url: sharePageUrl
       });

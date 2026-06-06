@@ -7,6 +7,13 @@ import {
   type FixtureOutcome,
   type ScorerPick
 } from "@/lib/fixture-predictions/types";
+import {
+  DEFAULT_TOURNAMENT_KEY,
+  parseTournamentPlayerPick,
+  parseTournamentTopScorerBoard,
+  type TournamentPlayerPick,
+  type TournamentTopScorerBoard
+} from "@/lib/tournament-predictions/types";
 
 export type PredictionSharePayload = {
   v: 1;
@@ -20,6 +27,38 @@ export type PredictionSharePayload = {
   scorerPicks: ScorerPick[];
   displayName?: string | null;
 };
+
+export type TournamentSharePayload = {
+  kind: "tournament";
+  v: 1;
+  tournamentKey: string;
+  tournamentLabel: string;
+  predictedChampion: string | null;
+  predictedFinalOpponent: string | null;
+  predictedTopScorer: TournamentPlayerPick | null;
+  predictedTopScorerBoard: TournamentTopScorerBoard | null;
+  predictedBestPlayer: TournamentPlayerPick | null;
+  displayName?: string | null;
+};
+
+export type SharePayload = PredictionSharePayload | TournamentSharePayload;
+
+export function isTournamentSharePayload(payload: SharePayload): payload is TournamentSharePayload {
+  return "kind" in payload && payload.kind === "tournament";
+}
+
+export function isFixtureSharePayload(payload: SharePayload): payload is PredictionSharePayload {
+  return !isTournamentSharePayload(payload);
+}
+
+const TOURNAMENT_LABEL_BY_KEY: Record<string, string> = {
+  WC26: "World Cup 2026"
+};
+
+export function tournamentLabelFromKey(tournamentKey: string) {
+  const key = tournamentKey.trim();
+  return TOURNAMENT_LABEL_BY_KEY[key] ?? key;
+}
 
 function base64UrlEncode(value: string) {
   if (typeof Buffer !== "undefined") {
@@ -49,6 +88,10 @@ function base64UrlDecode(token: string) {
 }
 
 export function encodePredictionShare(payload: PredictionSharePayload): string {
+  return base64UrlEncode(JSON.stringify(payload));
+}
+
+export function encodeSharePayload(payload: SharePayload): string {
   return base64UrlEncode(JSON.stringify(payload));
 }
 
@@ -99,12 +142,78 @@ export function normalizePredictionShareToken(raw: string | null | undefined): s
   return token;
 }
 
+function normalizeTournamentSharePayload(
+  parsed: Partial<TournamentSharePayload>
+): TournamentSharePayload | null {
+  if (parsed.kind !== "tournament") return null;
+  if (parsed.v !== undefined && parsed.v !== 1) return null;
+
+  const tournamentKey =
+    typeof parsed.tournamentKey === "string" && parsed.tournamentKey.trim()
+      ? parsed.tournamentKey.trim()
+      : DEFAULT_TOURNAMENT_KEY;
+
+  const predictedChampion =
+    typeof parsed.predictedChampion === "string" && parsed.predictedChampion.trim()
+      ? parsed.predictedChampion.trim().slice(0, 80)
+      : null;
+  const predictedFinalOpponent =
+    typeof parsed.predictedFinalOpponent === "string" && parsed.predictedFinalOpponent.trim()
+      ? parsed.predictedFinalOpponent.trim().slice(0, 80)
+      : null;
+  const predictedTopScorer = parseTournamentPlayerPick(parsed.predictedTopScorer);
+  const predictedTopScorerBoard = parseTournamentTopScorerBoard(parsed.predictedTopScorerBoard);
+  const predictedBestPlayer = parseTournamentPlayerPick(parsed.predictedBestPlayer);
+
+  const hasPick = Boolean(
+    predictedChampion ||
+      predictedFinalOpponent ||
+      predictedTopScorer ||
+      predictedTopScorerBoard ||
+      predictedBestPlayer
+  );
+  if (!hasPick) return null;
+
+  return {
+    kind: "tournament",
+    v: 1,
+    tournamentKey: tournamentKey.slice(0, 40),
+    tournamentLabel: String(parsed.tournamentLabel ?? tournamentLabelFromKey(tournamentKey)).slice(
+      0,
+      120
+    ),
+    predictedChampion,
+    predictedFinalOpponent,
+    predictedTopScorer,
+    predictedTopScorerBoard,
+    predictedBestPlayer,
+    displayName: parsed.displayName ? String(parsed.displayName).slice(0, 80) : null
+  };
+}
+
+export function decodeSharePayload(rawToken: string): SharePayload | null {
+  const token = normalizePredictionShareToken(rawToken);
+  if (!token) return null;
+
+  try {
+    const parsed = JSON.parse(base64UrlDecode(token)) as Partial<TournamentSharePayload>;
+    if (parsed.kind === "tournament") {
+      return normalizeTournamentSharePayload(parsed);
+    }
+  } catch {
+    /* fall through to fixture decode */
+  }
+
+  return decodePredictionShare(rawToken);
+}
+
 export function decodePredictionShare(rawToken: string): PredictionSharePayload | null {
   const token = normalizePredictionShareToken(rawToken);
   if (!token) return null;
 
   try {
     const parsed = JSON.parse(base64UrlDecode(token)) as Partial<PredictionSharePayload>;
+    if ("kind" in parsed && parsed.kind === "tournament") return null;
     const fixtureKey = typeof parsed.fixtureKey === "string" ? parsed.fixtureKey.trim() : "";
     if (!fixtureKey) return null;
     if (parsed.v !== undefined && parsed.v !== 1) return null;
@@ -174,6 +283,12 @@ export function buildPredictionSharePageUrlEmbedded(payload: PredictionSharePayl
   return `${origin}/share/prediction/${token}`;
 }
 
+export function buildSharePageUrlEmbedded(payload: SharePayload) {
+  const origin = resolveAppOrigin();
+  const token = encodeSharePayload(payload);
+  return `${origin}/share/prediction/${token}`;
+}
+
 export function readShortShareIdFromSearchParams(
   searchParams: Record<string, string | string[] | undefined>
 ) {
@@ -186,6 +301,83 @@ export function buildPredictionAppDeepLink(fixtureKey: string) {
   const origin = resolveAppOrigin();
   const params = new URLSearchParams({ predictionsFixture: fixtureKey });
   return `${origin}/?${params.toString()}&predictionsTab=match#predictions-match`;
+}
+
+export function buildTournamentAppDeepLink(tournamentKey: string = DEFAULT_TOURNAMENT_KEY) {
+  const origin = resolveAppOrigin();
+  const params = new URLSearchParams({ tournamentKey });
+  return `${origin}/?${params.toString()}&predictionsTab=tournament#predictions-tournament`;
+}
+
+function formatTournamentScorerBoardSummary(board: TournamentTopScorerBoard) {
+  return board.picks
+    .map((pick) => `#${pick.rank} ${pick.playerName} (${pick.predictedGoals}g)`)
+    .join(", ");
+}
+
+export function buildTournamentShareCaption(payload: TournamentSharePayload) {
+  const parts: string[] = [];
+  const who = payload.displayName?.trim();
+  if (who) parts.push(`${who} on MyPicks`);
+
+  parts.push(`${payload.tournamentLabel} tournament picks`);
+
+  if (payload.predictedChampion) {
+    parts.push(`Champion: ${payload.predictedChampion}`);
+  }
+  if (payload.predictedFinalOpponent) {
+    parts.push(`Final opponent: ${payload.predictedFinalOpponent}`);
+  }
+  if (payload.predictedTopScorer) {
+    parts.push(`Top scorer: ${payload.predictedTopScorer.playerName}`);
+  }
+  if (payload.predictedTopScorerBoard) {
+    parts.push(`Scorer board: ${formatTournamentScorerBoardSummary(payload.predictedTopScorerBoard)}`);
+  }
+  if (payload.predictedBestPlayer) {
+    parts.push(`Best player: ${payload.predictedBestPlayer.playerName}`);
+  }
+
+  parts.push("Make your tournament picks on MyPicks for the World Cup.");
+  return parts.join(" · ");
+}
+
+export function buildShareCaption(payload: SharePayload) {
+  if (isTournamentSharePayload(payload)) {
+    return buildTournamentShareCaption(payload);
+  }
+  return buildPredictionShareCaption(payload);
+}
+
+export function sharePayloadTitle(payload: SharePayload) {
+  if (isTournamentSharePayload(payload)) {
+    return `${payload.tournamentLabel} — MyPicks`;
+  }
+  return `${payload.fixtureLabel} — MyPicks`;
+}
+
+export function sharePayloadOpenGraphTitle(payload: SharePayload) {
+  if (isTournamentSharePayload(payload)) {
+    return `${payload.tournamentLabel} — MyPicks tournament picks`;
+  }
+  return `${payload.fixtureLabel} — MyPicks prediction`;
+}
+
+export function canSharePayload(payload: SharePayload) {
+  if (isTournamentSharePayload(payload)) {
+    return Boolean(
+      payload.predictedChampion ||
+        payload.predictedFinalOpponent ||
+        payload.predictedTopScorer ||
+        payload.predictedTopScorerBoard ||
+        payload.predictedBestPlayer
+    );
+  }
+  return Boolean(
+    payload.predictedOutcome ||
+      (payload.homeScore !== null && payload.awayScore !== null) ||
+      payload.scorerPicks.length > 0
+  );
 }
 
 export function buildPredictionShareCaption(payload: PredictionSharePayload) {

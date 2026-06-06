@@ -3,8 +3,8 @@ import {
   SharePredictionUnavailable,
   SharePredictionView
 } from "@/components/share-prediction-view";
-import { buildPredictionShareCaption } from "@/lib/predictions/share";
-import { resolvePredictionSharePayload } from "@/lib/predictions/share-resolve";
+import { buildShareCaption, sharePayloadOpenGraphTitle, sharePayloadTitle } from "@/lib/predictions/share";
+import { resolveSharePayload } from "@/lib/predictions/share-resolve";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const payload = await resolvePredictionSharePayload(id);
+  const payload = await resolveSharePayload(id);
   if (!payload) {
     return {
       title: "MyPicks prediction",
@@ -22,12 +22,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const caption = buildPredictionShareCaption(payload);
+  const caption = buildShareCaption(payload);
+  const title = sharePayloadTitle(payload);
   return {
-    title: `${payload.fixtureLabel} — MyPicks`,
+    title,
     description: caption,
     openGraph: {
-      title: `${payload.fixtureLabel} — MyPicks prediction`,
+      title: sharePayloadOpenGraphTitle(payload),
       description: caption,
       type: "website"
     }
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function SharePredictionShortPage({ params }: PageProps) {
   const { id } = await params;
-  const payload = await resolvePredictionSharePayload(id);
+  const payload = await resolveSharePayload(id);
 
   if (!payload) {
     return <SharePredictionUnavailable />;

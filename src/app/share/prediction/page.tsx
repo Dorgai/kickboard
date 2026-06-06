@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { SharePredictionUnavailable } from "@/components/share-prediction-view";
 import {
-  buildPredictionShareCaption,
+  buildShareCaption,
   readShareTokenFromSearchParams,
-  readShortShareIdFromSearchParams
+  readShortShareIdFromSearchParams,
+  sharePayloadOpenGraphTitle,
+  sharePayloadTitle
 } from "@/lib/predictions/share";
 import { isShortShareId } from "@/lib/predictions/share-store";
-import { resolvePredictionSharePayload } from "@/lib/predictions/share-resolve";
+import { resolveSharePayload } from "@/lib/predictions/share-resolve";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const params = await searchParams;
   const shortId = readShortShareIdFromSearchParams(params);
   const legacyToken = readShareTokenFromSearchParams(params);
-  const payload = await resolvePredictionSharePayload(shortId || legacyToken);
+  const payload = await resolveSharePayload(shortId || legacyToken);
   if (!payload) {
     return {
       title: "MyPicks prediction",
@@ -27,12 +29,12 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     };
   }
 
-  const caption = buildPredictionShareCaption(payload);
+  const caption = buildShareCaption(payload);
   return {
-    title: `${payload.fixtureLabel} — MyPicks`,
+    title: sharePayloadTitle(payload),
     description: caption,
     openGraph: {
-      title: `${payload.fixtureLabel} — MyPicks prediction`,
+      title: sharePayloadOpenGraphTitle(payload),
       description: caption,
       type: "website"
     }
@@ -49,7 +51,7 @@ export default async function SharePredictionLegacyPage({ searchParams }: PagePr
 
   const legacyToken = readShareTokenFromSearchParams(params);
   if (legacyToken) {
-    const payload = await resolvePredictionSharePayload(legacyToken);
+    const payload = await resolveSharePayload(legacyToken);
     if (payload) {
       if (isShortShareId(legacyToken)) {
         redirect(`/share/p/${encodeURIComponent(legacyToken)}`);

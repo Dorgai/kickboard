@@ -6752,6 +6752,21 @@ h3 {
   margin-top: 0;
 }
 
+.prediction-share--inline {
+  margin-top: 0;
+}
+
+.share-prediction-nested-lines {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.share-prediction-nested-lines li {
+  margin: 0;
+  padding: 2px 0;
+}
+
 .prediction-share-actions {
   align-items: center;
   display: inline-flex;

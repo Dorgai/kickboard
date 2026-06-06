@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import { HelpTooltip, PanelHelpRow } from "@/components/help-tooltip";
+import { PredictionShareButtons } from "@/components/prediction-share-buttons";
 import { TeamLabel } from "@/components/team-label";
 import { useToast } from "@/components/toast-provider";
 import {
@@ -25,6 +27,10 @@ import type {
 import { teamsMatch } from "@/lib/squads/team-names";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import { celebratePredictionSubmit } from "@/lib/predictions/submit-celebration";
+import {
+  tournamentLabelFromKey,
+  type TournamentSharePayload
+} from "@/lib/predictions/share";
 
 type TournamentPredictionsFormProps = {
   groups?: WorldCupGroupInput[];
@@ -454,6 +460,7 @@ function TopScorerBoardField({
 }
 
 export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPredictionsFormProps) {
+  const { data: session } = useSession();
   const { showToast } = useToast();
   const teams = useMemo(() => teamsFromWorldCupGroups(groups), [groups]);
 
@@ -542,6 +549,32 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
     [champion, opponent]
   );
 
+  const topScorerBoard = useMemo(
+    () =>
+      topScorerBoardFromForm({
+        enabled: topScorerBoardEnabled,
+        size: topScorerBoardSize,
+        picks: topScorerBoardPicks
+      }),
+    [topScorerBoardEnabled, topScorerBoardPicks, topScorerBoardSize]
+  );
+
+  const sharePayload = useMemo((): TournamentSharePayload | null => {
+    if (!champion && !opponent && !topScorer && !topScorerBoard && !bestPlayer) return null;
+    return {
+      kind: "tournament",
+      v: 1,
+      tournamentKey: DEFAULT_TOURNAMENT_KEY,
+      tournamentLabel: tournamentLabelFromKey(DEFAULT_TOURNAMENT_KEY),
+      predictedChampion: champion,
+      predictedFinalOpponent: opponent,
+      predictedTopScorer: topScorer,
+      predictedTopScorerBoard: topScorerBoard,
+      predictedBestPlayer: bestPlayer,
+      displayName: session?.user?.name ?? null
+    };
+  }, [bestPlayer, champion, opponent, session?.user?.name, topScorer, topScorerBoard]);
+
   function selectChampion(team: string | null) {
     setChampion(team);
     if (!team) {
@@ -622,11 +655,7 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
           predictedChampion: champion,
           predictedFinalists: finalists,
           predictedTopScorer: topScorer,
-          predictedTopScorerBoard: topScorerBoardFromForm({
-            enabled: topScorerBoardEnabled,
-            size: topScorerBoardSize,
-            picks: topScorerBoardPicks
-          }),
+          predictedTopScorerBoard: topScorerBoard,
           predictedBestPlayer: bestPlayer
         })
       });
@@ -748,6 +777,15 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
                 >
                   Clear
                 </button>
+              ) : null}
+              {sharePayload && champion && !loading ? (
+                <div className="fixture-prediction-field-actions">
+                  <PredictionShareButtons
+                    className="prediction-share--inline"
+                    disabled={busy}
+                    payload={sharePayload}
+                  />
+                </div>
               ) : null}
             </fieldset>
           </section>
@@ -888,6 +926,9 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
           </div>
           {notice ? <span className="fixture-prediction-notice">{notice}</span> : null}
           {error ? <span className="fixture-prediction-error">{error}</span> : null}
+          {sharePayload && !champion && !loading ? (
+            <PredictionShareButtons disabled={busy} payload={sharePayload} />
+          ) : null}
         </div>
       </form>
     </section>

@@ -409,6 +409,13 @@ export function FixturePredictionsForm({
               {outcomeLabel(predictedOutcome, homeTeam, awayTeam)}
             </p>
           ) : null}
+          {sharePayload && predictedOutcome && !loading ? (
+            <PredictionShareButtons
+              className="prediction-share--inline"
+              disabled={busy}
+              payload={sharePayload}
+            />
+          ) : null}
           <button
             className="text-button fixture-prediction-clear"
             disabled={!predictedOutcome || scoreDerivedOutcome !== null}
@@ -632,10 +639,6 @@ export function FixturePredictionsForm({
         {notice ? <span className="fixture-prediction-notice">{notice}</span> : null}
         {error ? <span className="fixture-prediction-error">{error}</span> : null}
       </div>
-
-      {sharePayload && !loading ? (
-        <PredictionShareButtons disabled={busy} payload={sharePayload} />
-      ) : null}
     </form>
   );
 }
