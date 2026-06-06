@@ -9133,27 +9133,45 @@ h3 {
   gap: 14px;
 }
 
-.current-event-fixture-list {
+.current-event-fixture-columns {
   display: grid;
   gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+}
+
+@media (min-width: 720px) {
+  .current-event-fixture-columns {
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.current-event-fixture-block {
+  min-width: 0;
+  padding: 4px 14px 10px;
+}
+
+.current-event-fixture-list {
+  display: grid;
+  gap: 0;
   grid-template-columns: minmax(0, 1fr);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-@media (min-width: 720px) {
-  .current-event-fixture-list {
-    gap: 8px 10px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 .current-event-fixture-row {
   align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
   display: grid;
   gap: 10px 12px;
   padding: 12px 0;
+}
+
+.current-event-fixture-block .current-event-fixture-row:last-child {
+  border-bottom: none;
+  padding-bottom: 6px;
 }
 
 .current-event-fixture-row--with-predict,
