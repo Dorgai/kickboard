@@ -2638,11 +2638,11 @@ h3 {
     width: min(42vw, 10.75rem);
   }
 
-  .predictions-match-row .match-fixture-picker-list {
+  .predictions-match-layout .match-fixture-picker-list {
     max-height: none;
   }
 
-  .predictions-match-row .match-fixture-picker,
+  .predictions-match-layout .match-fixture-picker,
   .match-coach-row-body .match-fixture-picker {
     overflow: visible;
   }
@@ -3804,12 +3804,44 @@ h3 {
   cursor: default;
 }
 
-.predictions-match-row {
-  align-items: stretch;
+.predictions-match-layout {
+  align-items: start;
   display: grid;
   gap: 16px;
   grid-template-columns: minmax(10.5rem, 13.5rem) minmax(0, 1fr);
   min-width: 0;
+}
+
+.predictions-match-timeline {
+  align-self: start;
+  min-width: 0;
+}
+
+.predictions-match-content {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.predictions-match-form-points-row {
+  align-items: stretch;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(12.5rem, 17.5rem);
+  min-width: 0;
+}
+
+.predictions-points-board {
+  min-width: 0;
+}
+
+.predictions-points-loading {
+  align-self: center;
+  margin: 0;
+}
+
+.predictions-match-picks-row {
+  width: 100%;
 }
 
 .predictions-match-detail {
@@ -3817,13 +3849,21 @@ h3 {
 }
 
 @media (max-width: 1023px) {
-  .predictions-match-row {
+  .predictions-match-layout {
+    gap: 12px;
+  }
+
+  .predictions-match-form-points-row {
     gap: 12px;
   }
 }
 
 @media (max-width: 900px) {
-  .predictions-match-row {
+  .predictions-match-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .predictions-match-form-points-row {
     grid-template-columns: 1fr;
   }
 }
@@ -5190,23 +5230,10 @@ h3 {
   }
 }
 
-.predictions-overview {
-  display: grid;
-  gap: 0;
-  margin: 0;
-}
-
 .predictions-results-board {
   display: grid;
   gap: 12px;
   padding: 16px 18px;
-}
-
-.predictions-overview-divider {
-  background: var(--color-border);
-  height: 1px;
-  margin: 20px 0;
-  width: 100%;
 }
 
 .predictions-results-board-header {
@@ -5250,14 +5277,16 @@ h3 {
   text-transform: uppercase;
 }
 
-.predictions-overview-grid {
+.predictions-overview-grid,
+.predictions-match-picks-row {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (max-width: 960px) {
-  .predictions-overview-grid {
+  .predictions-overview-grid,
+  .predictions-match-picks-row {
     grid-template-columns: 1fr;
   }
 }

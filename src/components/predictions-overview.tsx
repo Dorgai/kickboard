@@ -44,7 +44,7 @@ type ConnectionPredictionSummary = PredictionPickSummary & {
   displayName: string;
 };
 
-type PredictionsOverviewData = {
+export type PredictionsOverviewData = {
   wallet: {
     balance: number;
     pointsWon: number;
@@ -61,12 +61,11 @@ type PredictionsOverviewData = {
   connectionsPredictions: ConnectionPredictionSummary[];
 };
 
-type PredictionsOverviewProps = {
+type UsePredictionsOverviewOptions = {
   fixtureKey?: string | null;
   homeTeam?: string | null;
   awayTeam?: string | null;
   refreshToken?: number;
-  onEditPick?: (fixtureKey: string) => void;
 };
 
 function resultBadge(status: string) {
@@ -208,10 +207,7 @@ function overviewCardMinHeight(itemCount: number) {
   return `${Math.min(32, 8 + itemCount * 3.75)}rem`;
 }
 
-function peerMatchesNameFilter(
-  pick: ConnectionPredictionSummary,
-  query: string
-) {
+function peerMatchesNameFilter(pick: ConnectionPredictionSummary, query: string) {
   const term = query.trim().toLowerCase();
   if (!term) return true;
   const displayName = pick.displayName?.trim().toLowerCase() ?? "";
@@ -219,18 +215,15 @@ function peerMatchesNameFilter(
   return displayName.includes(term) || username.includes(term);
 }
 
-export function PredictionsOverview({
+export function usePredictionsOverview({
   fixtureKey,
   homeTeam,
   awayTeam,
-  refreshToken = 0,
-  viewerDisplayName = null,
-  onEditPick
-}: PredictionsOverviewProps & { viewerDisplayName?: string | null }) {
+  refreshToken = 0
+}: UsePredictionsOverviewOptions) {
   const [data, setData] = useState<PredictionsOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [friendsNameFilter, setFriendsNameFilter] = useState("");
   const loadGenerationRef = useRef(0);
   const hasLoadedDataRef = useRef(false);
 
@@ -272,28 +265,10 @@ export function PredictionsOverview({
     return () => controller.abort();
   }, [fixtureKey, homeTeam, awayTeam, refreshToken]);
 
-  useEffect(() => {
-    setFriendsNameFilter("");
-  }, [fixtureKey, homeTeam, awayTeam]);
+  return { data, loading, error };
+}
 
-  if (loading) {
-    return <p className="inline-status">Loading your predictions summary…</p>;
-  }
-
-  if (error) {
-    return <p className="inline-status">{error}</p>;
-  }
-
-  if (!data) return null;
-
-  const { wallet, myPredictions, connectionsPredictions } = data;
-  const connectionsForMatch = fixtureKey
-    ? connectionsPredictions
-    : connectionsPredictions.slice(0, 8);
-  const filteredFriendsPicks = connectionsForMatch.filter((pick) =>
-    peerMatchesNameFilter(pick, friendsNameFilter)
-  );
-
+export function PredictionsPointsBoard({ wallet }: { wallet: PredictionsOverviewData["wallet"] }) {
   const categories = [
     { key: "outcome" as const, label: PREDICTION_BLOCKS.outcome },
     { key: "score" as const, label: PREDICTION_BLOCKS.score },
@@ -301,126 +276,150 @@ export function PredictionsOverview({
   ];
 
   return (
-    <div className="predictions-overview">
-      <section className="predictions-results-board data-card">
-        <header className="predictions-results-board-header">
-          <h3 className="panel-help-row">
-            Your points
-            <HelpTooltip label="How points settle" size="sm">
-              Points update after each match finishes. Until then, picks show as{" "}
-              <strong>Pending</strong>. Earned <strong>{wallet.pointsWon}</strong> pts so far ·{" "}
-              <strong>{wallet.picksPending}</strong> picks still waiting on results.
-            </HelpTooltip>
-          </h3>
-          <p className="predictions-wallet-balance">
-            <span className="predictions-wallet-balance-value">{wallet.balance}</span>
-            <span className="predictions-wallet-balance-label">points total</span>
-          </p>
+    <section className="predictions-results-board data-card predictions-points-board">
+      <header className="predictions-results-board-header">
+        <h3 className="panel-help-row">
+          Your points
+          <HelpTooltip label="How points settle" size="sm">
+            Points update after each match finishes. Until then, picks show as <strong>Pending</strong>.
+            Earned <strong>{wallet.pointsWon}</strong> pts so far · <strong>{wallet.picksPending}</strong>{" "}
+            picks still waiting on results.
+          </HelpTooltip>
+        </h3>
+        <p className="predictions-wallet-balance">
+          <span className="predictions-wallet-balance-value">{wallet.balance}</span>
+          <span className="predictions-wallet-balance-label">points total</span>
+        </p>
+      </header>
+      <table className="predictions-results-table">
+        <thead>
+          <tr>
+            <th>Pick</th>
+            <th>Won</th>
+            <th>Lost</th>
+            <th>Pending</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {categories.map(({ key, label }) => {
+            const row = wallet.byCategory[key];
+            return (
+              <tr key={key}>
+                <td>{label}</td>
+                <td>{row.won}</td>
+                <td>{row.lost}</td>
+                <td>{row.pending}</td>
+                <td>{row.points > 0 ? `+${row.points}` : "—"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+export function PredictionsPicksSection({
+  data,
+  fixtureKey,
+  viewerDisplayName = null,
+  onEditPick
+}: {
+  data: PredictionsOverviewData;
+  fixtureKey?: string | null;
+  viewerDisplayName?: string | null;
+  onEditPick?: (fixtureKey: string) => void;
+}) {
+  const [friendsNameFilter, setFriendsNameFilter] = useState("");
+
+  useEffect(() => {
+    setFriendsNameFilter("");
+  }, [fixtureKey]);
+
+  const { myPredictions, connectionsPredictions } = data;
+  const connectionsForMatch = fixtureKey
+    ? connectionsPredictions
+    : connectionsPredictions.slice(0, 8);
+  const filteredFriendsPicks = connectionsForMatch.filter((pick) =>
+    peerMatchesNameFilter(pick, friendsNameFilter)
+  );
+
+  return (
+    <div className="predictions-overview-grid predictions-match-picks-row">
+      <section
+        className="predictions-overview-card predictions-overview-card--yours"
+        style={{ minHeight: overviewCardMinHeight(myPredictions.length) }}
+      >
+        <header className="predictions-overview-card-header">
+          <h3>Your picks</h3>
+          <span className="predictions-overview-count">{myPredictions.length}</span>
         </header>
-        <table className="predictions-results-table">
-          <thead>
-            <tr>
-              <th>Pick</th>
-              <th>Won</th>
-              <th>Lost</th>
-              <th>Pending</th>
-              <th>Points</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map(({ key, label }) => {
-              const row = wallet.byCategory[key];
-              return (
-                <tr key={key}>
-                  <td>{label}</td>
-                  <td>{row.won}</td>
-                  <td>{row.lost}</td>
-                  <td>{row.pending}</td>
-                  <td>{row.points > 0 ? `+${row.points}` : "—"}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        {myPredictions.length === 0 ? (
+          <p className="predictions-overview-empty">No picks yet — choose a match above.</p>
+        ) : (
+          <ul className="predictions-overview-list">
+            {myPredictions.map((pick) => (
+              <PickCard
+                key={pick.id}
+                pick={pick}
+                shareDisplayName={viewerDisplayName}
+                title={pick.fixtureLabel}
+                onEdit={
+                  onEditPick
+                    ? () => {
+                        dismissSessionCheckpoint();
+                        onEditPick(pick.fixtureKey);
+                      }
+                    : undefined
+                }
+              />
+            ))}
+          </ul>
+        )}
       </section>
 
-      <div className="predictions-overview-divider" aria-hidden />
-
-      <div className="predictions-overview-grid">
-        <section
-          className="predictions-overview-card predictions-overview-card--yours"
-          style={{ minHeight: overviewCardMinHeight(myPredictions.length) }}
-        >
-          <header className="predictions-overview-card-header">
-            <h3>Your picks</h3>
-            <span className="predictions-overview-count">{myPredictions.length}</span>
-          </header>
-          {myPredictions.length === 0 ? (
-            <p className="predictions-overview-empty">No picks yet — choose a match above.</p>
-          ) : (
-            <ul className="predictions-overview-list">
-              {myPredictions.map((pick) => (
-                <PickCard
-                  key={pick.id}
-                  pick={pick}
-                  shareDisplayName={viewerDisplayName}
-                  title={pick.fixtureLabel}
-                  onEdit={
-                    onEditPick
-                      ? () => {
-                          dismissSessionCheckpoint();
-                          onEditPick(pick.fixtureKey);
-                        }
-                      : undefined
-                  }
-                />
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section
-          className="predictions-overview-card predictions-overview-card--friends"
-          style={{ minHeight: overviewCardMinHeight(filteredFriendsPicks.length) }}
-        >
-          <header className="predictions-overview-card-header predictions-overview-card-header--friends">
-            <h3>Friends&apos; picks</h3>
-            {connectionsForMatch.length > 0 ? (
-              <label className="predictions-overview-name-filter">
-                <span className="sr-only">Filter friends by name</span>
-                <input
-                  className="predictions-overview-name-filter-input"
-                  placeholder="Name"
-                  type="search"
-                  value={friendsNameFilter}
-                  onChange={(event) => setFriendsNameFilter(event.target.value)}
-                />
-              </label>
-            ) : null}
-            <span className="predictions-overview-count">{filteredFriendsPicks.length}</span>
-          </header>
-          {connectionsForMatch.length === 0 ? (
-            <p className="predictions-overview-empty">
-              {fixtureKey
-                ? "No friends have picked this match yet."
-                : "Add friends to see their picks here."}
-            </p>
-          ) : filteredFriendsPicks.length === 0 ? (
-            <p className="predictions-overview-empty">No friends match that name.</p>
-          ) : (
-            <ul className="predictions-overview-list">
-              {filteredFriendsPicks.map((pick) => (
-                <PickCard
-                  key={`${pick.userId}-${pick.fixtureKey}-${pick.updatedAt}`}
-                  pick={pick}
-                  peer={{ displayName: pick.displayName, username: pick.username }}
-                  title={pick.fixtureLabel}
-                />
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
+      <section
+        className="predictions-overview-card predictions-overview-card--friends"
+        style={{ minHeight: overviewCardMinHeight(filteredFriendsPicks.length) }}
+      >
+        <header className="predictions-overview-card-header predictions-overview-card-header--friends">
+          <h3>Friends&apos; picks</h3>
+          {connectionsForMatch.length > 0 ? (
+            <label className="predictions-overview-name-filter">
+              <span className="sr-only">Filter friends by name</span>
+              <input
+                className="predictions-overview-name-filter-input"
+                placeholder="Name"
+                type="search"
+                value={friendsNameFilter}
+                onChange={(event) => setFriendsNameFilter(event.target.value)}
+              />
+            </label>
+          ) : null}
+          <span className="predictions-overview-count">{filteredFriendsPicks.length}</span>
+        </header>
+        {connectionsForMatch.length === 0 ? (
+          <p className="predictions-overview-empty">
+            {fixtureKey
+              ? "No friends have picked this match yet."
+              : "Add friends to see their picks here."}
+          </p>
+        ) : filteredFriendsPicks.length === 0 ? (
+          <p className="predictions-overview-empty">No friends match that name.</p>
+        ) : (
+          <ul className="predictions-overview-list">
+            {filteredFriendsPicks.map((pick) => (
+              <PickCard
+                key={`${pick.userId}-${pick.fixtureKey}-${pick.updatedAt}`}
+                pick={pick}
+                peer={{ displayName: pick.displayName, username: pick.username }}
+                title={pick.fixtureLabel}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }
