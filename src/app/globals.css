@@ -256,7 +256,6 @@ button:disabled {
 
 /* Dark grey fills (nav / feed tabs): light text on all descendants */
 :is(
-  .saved-squad-card.selected,
   .feed-tab-bar.kickboard-tab-bar button.active,
   .event-tab-bar.kickboard-tab-bar button.active,
   .nav-tabs a.active
@@ -269,7 +268,6 @@ button:disabled {
 
 [data-theme="light"]
   :is(
-    .saved-squad-card.selected,
     .feed-tab-bar.kickboard-tab-bar button.active,
     .event-tab-bar.kickboard-tab-bar button.active,
     .nav-tabs a.active
@@ -277,14 +275,12 @@ button:disabled {
   .team-label-text,
 :root:not([data-theme])
   :is(
-    .saved-squad-card.selected,
     .feed-tab-bar.kickboard-tab-bar button.active,
     .event-tab-bar.kickboard-tab-bar button.active,
     .nav-tabs a.active
   )
   .team-label-text,
 :is(
-  .saved-squad-card.selected,
   .feed-tab-bar.kickboard-tab-bar button.active,
   .event-tab-bar.kickboard-tab-bar button.active,
   .nav-tabs a.active
@@ -2787,7 +2783,7 @@ h3 {
 }
 
 .saved-squad-card {
-  background: var(--color-bg);
+  background: var(--color-surface);
   border: none;
   border-radius: 10px;
   box-shadow: var(--shadow-surface);
@@ -2809,14 +2805,37 @@ h3 {
   box-shadow: var(--shadow-surface-hover);
 }
 
-.saved-squad-card.selected {
+[data-theme="light"] .saved-squad-card.selected,
+:root:not([data-theme]) .saved-squad-card.selected {
+  background: var(--kickboard-pick-active-bg);
+  box-shadow: var(--shadow-surface-hover);
+  color: var(--kickboard-pick-active-fg);
+}
+
+[data-theme="light"] .saved-squad-card.selected .saved-squad-card-name,
+:root:not([data-theme]) .saved-squad-card.selected .saved-squad-card-name {
+  color: var(--kickboard-pick-active-fg);
+}
+
+[data-theme="light"] .saved-squad-card.selected .saved-squad-card-meta,
+[data-theme="light"] .saved-squad-card.selected .saved-squad-card-time,
+:root:not([data-theme]) .saved-squad-card.selected .saved-squad-card-meta,
+:root:not([data-theme]) .saved-squad-card.selected .saved-squad-card-time {
+  color: color-mix(in srgb, var(--kickboard-pick-active-fg) 72%, transparent);
+}
+
+[data-theme="dark"] .saved-squad-card.selected {
   background: var(--kickboard-tab-active-bg);
   box-shadow: var(--shadow-surface-hover);
   color: var(--kickboard-tab-active-fg);
 }
 
-.saved-squad-card.selected .saved-squad-card-meta,
-.saved-squad-card.selected .saved-squad-card-time {
+[data-theme="dark"] .saved-squad-card.selected .saved-squad-card-name {
+  color: var(--kickboard-tab-active-fg);
+}
+
+[data-theme="dark"] .saved-squad-card.selected .saved-squad-card-meta,
+[data-theme="dark"] .saved-squad-card.selected .saved-squad-card-time {
   color: color-mix(in srgb, var(--kickboard-tab-active-fg) 72%, transparent);
 }
 
