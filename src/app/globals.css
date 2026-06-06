@@ -6725,16 +6725,17 @@ h3 {
 
 .info-tooltip-bubble {
   background: var(--color-text-primary);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--color-bg);
   font-size: 12px;
   font-weight: 500;
   left: 50%;
   letter-spacing: normal;
   line-height: 1.45;
-  max-width: min(32rem, calc(100vw - 24px));
+  max-width: min(22rem, calc(100vw - 24px));
+  min-width: min(17rem, calc(100vw - 32px));
   opacity: 0;
-  padding: 10px 12px;
+  padding: 12px 14px;
   pointer-events: none;
   position: absolute;
   text-align: left;
@@ -6742,6 +6743,7 @@ h3 {
   transform: translateX(-50%);
   transition: opacity 0.15s ease;
   white-space: normal;
+  width: max-content;
   z-index: 20;
 }
 
@@ -8118,22 +8120,24 @@ h3 {
 
 .col-tooltip-bubble {
   background: var(--color-text-primary);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--color-bg);
   font-size: 12px;
   font-weight: 500;
   left: 0;
   letter-spacing: normal;
   line-height: 1.45;
-  max-width: min(28rem, calc(100vw - 24px));
+  max-width: min(22rem, calc(100vw - 24px));
+  min-width: min(17rem, calc(100vw - 32px));
   opacity: 0;
-  padding: 10px 12px;
+  padding: 12px 14px;
   pointer-events: none;
   position: absolute;
   text-transform: none;
   top: calc(100% + 6px);
   transition: opacity 0.15s ease;
   white-space: normal;
+  width: max-content;
   z-index: 5;
 }
 
