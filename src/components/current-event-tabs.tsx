@@ -18,7 +18,10 @@ import {
 } from "@/lib/session-checkpoint/navigate";
 import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { PredictionsPanel } from "@/components/predictions-panel";
-import { TeamLabel } from "@/components/team-label";
+import {
+  TournamentGroupSchedule,
+  TournamentKnockoutSchedule
+} from "@/components/tournament-schedule-actions";
 
 export const CURRENT_EVENT_TAB_IDS = [
   "tournament",
@@ -205,17 +208,7 @@ export function CurrentEventTabs({
                     value={activeGroupLetter}
                     onChange={setActiveGroupLetter}
                   />
-                  {activeGroup ? (
-                    <div className="bracket-cluster">
-                      <div className="bracket-cluster-teams">
-                        {activeGroup.teams.map((team) => (
-                          <div className="bracket-team-slot" key={`${activeGroup.group}-${team}`}>
-                            <TeamLabel name={team} size="xs" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
+                  {activeGroup ? <TournamentGroupSchedule group={activeGroup} /> : null}
                 </>
               ) : (
                 <button className="bracket-tbd-slot" disabled type="button">
@@ -234,13 +227,7 @@ export function CurrentEventTabs({
                 value={activeKnockoutStage}
                 onChange={setActiveKnockoutStage}
               />
-              <button className="bracket-tbd-slot" disabled type="button">
-                <strong>Pairings TBD</strong>
-                <span>
-                  {activeKnockoutStage === "Final" ? "July 19, 2026" : "Live feed pending"} ·{" "}
-                  {activeKnockoutStage}
-                </span>
-              </button>
+              <TournamentKnockoutSchedule stage={activeKnockoutStage} />
             </div>
           </section>
         ) : null}

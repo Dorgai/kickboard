@@ -4,10 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import { MatchTeamsLine } from "@/components/team-label";
 import { writeFixtureDragData } from "@/lib/fixtures/drag-fixture";
 import { groupFixturesByDate, type FixtureOption } from "@/lib/fixtures/fixture-key";
+import {
+  buildGroupFixtureOptions,
+  buildKnockoutFixtureOptions
+} from "@/lib/feeds/wc26-tournament-schedule";
 import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
 
 export type WorldCupGroupInput = {
   group: string;
+  teams?: string[];
   fixtures: Array<{
     homeTeam: string;
     awayTeam: string;
@@ -54,10 +59,19 @@ export function useFixtureOptions(groups: WorldCupGroupInput[]) {
     };
   }, []);
 
-  return useMemo(
-    () => buildFixtureOptionsFromWorldCup(groups, liveFixtures),
-    [groups, liveFixtures]
-  );
+  return useMemo(() => {
+    const byKey = new Map<string, FixtureOption>();
+    for (const fixture of buildGroupFixtureOptions(groups)) {
+      byKey.set(fixture.key, fixture);
+    }
+    for (const fixture of buildFixtureOptionsFromWorldCup(groups, liveFixtures)) {
+      byKey.set(fixture.key, fixture);
+    }
+    for (const fixture of buildKnockoutFixtureOptions()) {
+      if (!byKey.has(fixture.key)) byKey.set(fixture.key, fixture);
+    }
+    return Array.from(byKey.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+  }, [groups, liveFixtures]);
 }
 
 function fixtureMatchesSearch(fixture: FixtureOption, query: string) {
