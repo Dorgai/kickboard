@@ -14,6 +14,7 @@ import {
   useFixtureOptions,
   type WorldCupGroupInput
 } from "@/components/fixture-match-picker";
+import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
 import {
   scrollToPredictionOutcomeOnMobile,
   scrollToPredictionsEditor
@@ -145,6 +146,9 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
 
   const viewerDisplayName = session?.user?.name ?? null;
   const selected = fixtures.find((fixture) => fixture.key === selectedKey) ?? null;
+  const teamsFromKey = selectedKey ? parseFixtureKeyTeams(selectedKey) : null;
+  const overviewHomeTeam = selected?.homeTeam ?? teamsFromKey?.homeTeam ?? null;
+  const overviewAwayTeam = selected?.awayTeam ?? teamsFromKey?.awayTeam ?? null;
 
   const subTabButtons = PREDICTION_SUB_TABS.map((tab) => ({
     id: tab.id,
@@ -207,9 +211,9 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
             )}
 
             <PredictionsOverview
-              awayTeam={selected?.awayTeam ?? null}
+              awayTeam={overviewAwayTeam}
               fixtureKey={selectedKey}
-              homeTeam={selected?.homeTeam ?? null}
+              homeTeam={overviewHomeTeam}
               refreshToken={overviewRefresh}
               viewerDisplayName={viewerDisplayName}
               onEditPick={handleEditPick}

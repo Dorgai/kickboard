@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   formatScorerPicksSummary,
   outcomeShort,
@@ -231,30 +231,46 @@ export function PredictionsOverview({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [friendsNameFilter, setFriendsNameFilter] = useState("");
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams();
-      if (fixtureKey) params.set("fixtureKey", fixtureKey);
-      if (homeTeam) params.set("homeTeam", homeTeam);
-      if (awayTeam) params.set("awayTeam", awayTeam);
-      const response = await fetch(`/api/predictions/overview?${params}`, { cache: "no-store" });
-      const payload = (await response.json()) as PredictionsOverviewData & { error?: string };
-      if (!response.ok) throw new Error(payload.error ?? "Unable to load overview.");
-      setData(payload);
-    } catch (loadError) {
-      setData(null);
-      setError(loadError instanceof Error ? loadError.message : "Unable to load overview.");
-    } finally {
-      setLoading(false);
-    }
-  }, [fixtureKey, homeTeam, awayTeam]);
+  const loadGenerationRef = useRef(0);
+  const hasLoadedDataRef = useRef(false);
 
   useEffect(() => {
-    void load();
-  }, [load, refreshToken]);
+    const generation = loadGenerationRef.current + 1;
+    loadGenerationRef.current = generation;
+    const controller = new AbortController();
+    const showInitialSpinner = !hasLoadedDataRef.current;
+
+    setLoading(showInitialSpinner);
+    setError(null);
+
+    async function loadOverview() {
+      try {
+        const params = new URLSearchParams();
+        if (fixtureKey) params.set("fixtureKey", fixtureKey);
+        if (homeTeam) params.set("homeTeam", homeTeam);
+        if (awayTeam) params.set("awayTeam", awayTeam);
+        const response = await fetch(`/api/predictions/overview?${params}`, {
+          cache: "no-store",
+          signal: controller.signal
+        });
+        const payload = (await response.json()) as PredictionsOverviewData & { error?: string };
+        if (loadGenerationRef.current !== generation) return;
+        if (!response.ok) throw new Error(payload.error ?? "Unable to load overview.");
+        hasLoadedDataRef.current = true;
+        setData(payload);
+      } catch (loadError) {
+        if (loadGenerationRef.current !== generation) return;
+        if (loadError instanceof DOMException && loadError.name === "AbortError") return;
+        if (!hasLoadedDataRef.current) setData(null);
+        setError(loadError instanceof Error ? loadError.message : "Unable to load overview.");
+      } finally {
+        if (loadGenerationRef.current === generation) setLoading(false);
+      }
+    }
+
+    void loadOverview();
+    return () => controller.abort();
+  }, [fixtureKey, homeTeam, awayTeam, refreshToken]);
 
   useEffect(() => {
     setFriendsNameFilter("");
