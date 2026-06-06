@@ -63,6 +63,17 @@ curl -sS "$BASE/" | grep -c feed-status-grid || true                            
 
 If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production target**, regenerate the token under **kickboard project → Settings → Tokens** and update the `RAILWAY_TOKEN` repo secret, or add `RAILWAY_PROJECT_ID` + `RAILWAY_SERVICE_ID` secrets. Dashboard **Redeploy** only updates production when the service source is connected to `Dorgai/kickboard` branch **`main`**.
 
+### Selection surfaces (no contour lines)
+
+Kickboard avoids **contour** selection chrome — no border rings, `outline` boxes, or `box-shadow: 0 0 0 Npx` halos on selected/active interactive items.
+
+Use instead:
+
+- Filled surfaces: `--kickboard-tab-active-bg` / `--kickboard-tab-hover-bg`, or light `color-mix` tints
+- Depth: `box-shadow: var(--shadow-surface)` and `var(--shadow-surface-hover)`
+
+Applies to **Fan Chat**, **saved Coach Board squads** (`.saved-squad-card.selected`), **match/tournament picks**, and similar toggles. Reserve `outline` for **`:focus-visible`** keyboard focus only. Structural card shells may keep borders; selection state should not add new contour lines.
+
 ### Feed UI flags and typography
 
 - Country flags load from `flagcdn.com` via native `<img>` in `team-label.tsx` (not `next/image`); use fixed `32x24` / `40x30` / `48x36` CDN paths from `flagImageUrl()` — arbitrary widths like `w32` return **404** and show gray fallbacks.

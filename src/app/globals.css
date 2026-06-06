@@ -2117,9 +2117,9 @@ h3 {
 }
 
 .match-fixture-picker-btn.selected {
-  box-shadow:
-    var(--shadow-surface-hover),
-    0 0 0 1px color-mix(in srgb, var(--color-brand) 40%, transparent);
+  background: var(--kickboard-tab-active-bg);
+  box-shadow: var(--shadow-surface-hover);
+  color: var(--kickboard-tab-active-fg);
 }
 
 .match-fixture-picker-status {
@@ -2386,9 +2386,8 @@ h3 {
 }
 
 .saved-squads-bar--fixture-drag-over {
-  box-shadow:
-    var(--shadow-surface),
-    0 0 0 2px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+  box-shadow: var(--shadow-surface-hover);
 }
 
 .saved-squads-new {
@@ -2413,7 +2412,7 @@ h3 {
 
 .saved-squad-card {
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 10px;
   box-shadow: var(--shadow-surface);
   color: var(--color-text-primary);
@@ -2424,19 +2423,25 @@ h3 {
   padding: 8px 10px;
   text-align: left;
   transition:
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
+    background 0.15s ease,
+    box-shadow 0.15s ease;
   width: 100%;
 }
 
 .saved-squad-card:hover {
+  background: var(--kickboard-tab-hover-bg);
   box-shadow: var(--shadow-surface-hover);
 }
 
 .saved-squad-card.selected {
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  background: var(--kickboard-tab-active-bg);
   box-shadow: var(--shadow-surface-hover);
+  color: var(--kickboard-tab-active-fg);
+}
+
+.saved-squad-card.selected .saved-squad-card-meta,
+.saved-squad-card.selected .saved-squad-card-time {
+  color: color-mix(in srgb, var(--kickboard-tab-active-fg) 72%, transparent);
 }
 
 .saved-squad-card-name {
@@ -3908,26 +3913,23 @@ h3 {
     box-shadow: var(--shadow-surface);
   }
 
-  .tournament-predictions-form
-    .tournament-team-pick-option.is-selected:hover
-    .fixture-prediction-outcome-body,
-  .tournament-predictions-form
-    .tournament-team-pick-option.is-selected:focus-within
-    .fixture-prediction-outcome-body {
-    outline-color: color-mix(in srgb, var(--color-accent) 58%, var(--color-border));
-  }
-
   .tournament-predictions-form .fixture-scorer-chip:not(:disabled):hover,
   .tournament-predictions-form .fixture-scorer-chip:not(:disabled):focus-visible {
     background: var(--kickboard-tab-hover-bg);
-    border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
     box-shadow: var(--shadow-surface);
   }
 
   .tournament-predictions-form .fixture-scorer-chip--selected:not(:disabled):hover,
   .tournament-predictions-form .fixture-scorer-chip--selected:not(:disabled):focus-visible {
-    border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+    box-shadow: var(--shadow-surface-hover);
   }
+}
+
+.tournament-predictions-form .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
+  background: var(--kickboard-tab-active-bg);
+  box-shadow: var(--shadow-surface);
+  color: var(--kickboard-tab-active-fg);
+  outline: none;
 }
 
 .tournament-predictions-form .tournament-champion-field {
@@ -4216,14 +4218,10 @@ h3 {
 }
 
 .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
-  background: transparent;
-  box-shadow: none;
-  outline: 2px solid color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
-  outline-offset: -2px;
-}
-
-[data-theme="dark"] .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
-  outline-color: color-mix(in srgb, var(--color-brand) 55%, var(--color-border));
+  background: var(--kickboard-tab-active-bg);
+  box-shadow: var(--shadow-surface);
+  color: var(--kickboard-tab-active-fg);
+  outline: none;
 }
 
 .fixture-prediction-outcome-text {
@@ -4761,9 +4759,9 @@ h3 {
 .fixture-scorer-chip {
   align-items: center;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 8px;
-  box-shadow: none;
+  box-shadow: var(--shadow-surface);
   color: var(--color-text-primary);
   cursor: pointer;
   display: inline-flex;
@@ -4776,7 +4774,6 @@ h3 {
 
 [data-theme="dark"] .fixture-scorer-chip {
   background: var(--color-surface);
-  border-color: var(--color-border);
 }
 
 .fixture-scorer-chip:disabled {
@@ -4785,14 +4782,15 @@ h3 {
 }
 
 .fixture-scorer-chip--selected {
-  background: var(--color-surface);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
-  box-shadow: var(--shadow-surface);
+  background: var(--kickboard-tab-active-bg);
+  box-shadow: var(--shadow-surface-hover);
+  color: var(--kickboard-tab-active-fg);
 }
 
 [data-theme="dark"] .fixture-scorer-chip--selected {
-  background: var(--color-surface);
+  background: var(--kickboard-tab-active-bg);
   box-shadow: var(--shadow-surface-hover);
+  color: var(--kickboard-tab-active-fg);
 }
 
 .fixture-scorer-chip-name {
