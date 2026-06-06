@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HelpTooltip, PanelHelpRow } from "@/components/help-tooltip";
 import { TeamLabel } from "@/components/team-label";
 import { useToast } from "@/components/toast-provider";
@@ -24,6 +24,7 @@ import type {
 } from "@/lib/tournament-predictions/types";
 import { teamsMatch } from "@/lib/squads/team-names";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
+import { celebratePredictionSubmit } from "@/lib/predictions/submit-celebration";
 
 type TournamentPredictionsFormProps = {
   groups?: WorldCupGroupInput[];
@@ -454,6 +455,7 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
   const [topScorerBoardExpanded, setTopScorerBoardExpanded] = useState(false);
   const [bestPlayerExpanded, setBestPlayerExpanded] = useState(false);
 
+  const submitRef = useRef<HTMLButtonElement>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -610,6 +612,7 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
       const payload = (await response.json()) as {
         error?: string;
         message?: string;
+        change?: string;
         prediction?: TournamentPredictionRecord | null;
       };
       if (!response.ok) throw new Error(payload.error ?? "Unable to save tournament picks.");
@@ -626,8 +629,15 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
       } else {
         setHasSavedPick(false);
       }
+      const change = payload.change ?? "updated";
       setNotice(payload.message ?? "Saved");
-      showToast({ message: payload.message ?? "Tournament picks saved.", variant: "success" });
+      showToast({
+        message: payload.message ?? "Tournament picks saved.",
+        variant: change === "unchanged" ? "info" : "success"
+      });
+      if (change !== "unchanged") {
+        celebratePredictionSubmit(submitRef.current);
+      }
       onSaved?.();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Unable to save tournament picks.");
@@ -816,7 +826,12 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
 
         <div className="fixture-prediction-form-footer">
           <div className="fixture-prediction-form-actions">
-            <button className="button primary fixture-prediction-save" disabled={busy || loading} type="submit">
+            <button
+              ref={submitRef}
+              className="button primary fixture-prediction-save"
+              disabled={busy || loading}
+              type="submit"
+            >
               {busy ? "Saving…" : TOURNAMENT_PREDICTION_HINTS.saveButton}
             </button>
             {hasSavedPick ? (
