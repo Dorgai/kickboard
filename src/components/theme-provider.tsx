@@ -1,11 +1,13 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from "react";
 import {
@@ -26,10 +28,10 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function readStoredMode(): ThemeMode {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
   if (stored === "light" || stored === "dark" || stored === "system") return stored;
-  return "light";
+  return "dark";
 }
 
 function applyResolvedTheme(resolved: "light" | "dark") {
@@ -41,12 +43,16 @@ function applyResolvedTheme(resolved: "light" | "dark") {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>("light");
-  const [resolved, setResolved] = useState<"light" | "dark">("light");
+  const { data: session, status } = useSession();
+  const [mode, setModeState] = useState<ThemeMode>("dark");
+  const [resolved, setResolved] = useState<"light" | "dark">("dark");
+  const syncingFromServerRef = useRef(false);
+  const syncedUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setModeState(readStoredMode());
-    setResolved(resolveTheme(readStoredMode()));
+    const stored = readStoredMode();
+    setModeState(stored);
+    setResolved(resolveTheme(stored));
   }, []);
 
   useEffect(() => {
@@ -54,7 +60,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setResolved(next);
     applyResolvedTheme(next);
     localStorage.setItem(THEME_STORAGE_KEY, mode);
-  }, [mode]);
+
+    if (syncingFromServerRef.current) return;
+    const userId = session?.user?.id;
+    if (status !== "authenticated" || !userId) return;
+
+    void fetch("/api/user/preferences", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ themeMode: mode })
+    }).catch(() => {
+      /* offline or session race */
+    });
+  }, [mode, session?.user?.id, status]);
 
   useEffect(() => {
     if (mode !== "system") return;
@@ -72,6 +90,47 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       viewport.removeEventListener("change", onChange);
     };
   }, [mode]);
+
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (status !== "authenticated" || !userId) {
+      syncedUserIdRef.current = null;
+      return;
+    }
+    const activeUserId = userId;
+    if (syncedUserIdRef.current === activeUserId) return;
+
+    let cancelled = false;
+
+    async function loadServerTheme() {
+      try {
+        const response = await fetch("/api/user/preferences", { cache: "no-store" });
+        if (!response.ok || cancelled) return;
+        const payload = (await response.json()) as { themeMode?: ThemeMode };
+        if (
+          cancelled ||
+          (payload.themeMode !== "light" &&
+            payload.themeMode !== "dark" &&
+            payload.themeMode !== "system")
+        ) {
+          return;
+        }
+        syncingFromServerRef.current = true;
+        syncedUserIdRef.current = activeUserId;
+        setModeState(payload.themeMode);
+        window.requestAnimationFrame(() => {
+          syncingFromServerRef.current = false;
+        });
+      } catch {
+        syncedUserIdRef.current = activeUserId;
+      }
+    }
+
+    void loadServerTheme();
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.user?.id, status]);
 
   const setMode = useCallback((next: ThemeMode) => {
     setModeState(next);

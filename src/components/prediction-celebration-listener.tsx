@@ -43,11 +43,13 @@ export function PredictionCelebrationListener() {
 
       if (wins.length === 0) return;
 
-      const mode = loginCelebrateRef.current ? "login" : "live";
+      const isLogin = loginCelebrateRef.current;
       loginCelebrateRef.current = false;
 
-      await firePredictionConfetti(mode);
-      const lead = mode === "login" ? "Welcome back — you scored! " : "You got it! ";
+      if (!isLogin) {
+        await firePredictionConfetti("live");
+      }
+      const lead = isLogin ? "Welcome back — you scored! " : "You got it! ";
       toast?.showToast({
         message: `${lead}${formatPredictionWinMessage(wins)}`,
         variant: "success",

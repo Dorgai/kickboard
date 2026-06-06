@@ -28,8 +28,8 @@ export function resolveTheme(mode: ThemeMode): "light" | "dark" {
   if (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
     return "dark";
   }
-  return "light";
+  return "dark";
 }
 
 /** Inline script to set `data-theme` before paint (avoids flash). */
-export const themeInitScript = `(function(){try{var k="kickboard-theme";var s=localStorage.getItem(k);var d=document.documentElement;var mobile=window.matchMedia("${MOBILE_THEME_MEDIA}").matches;var dark=s==="dark"||(s==="system"&&!mobile&&window.matchMedia("(prefers-color-scheme: dark)").matches);d.dataset.theme=dark?"dark":"light";}catch(e){}})();`;
+export const themeInitScript = `(function(){try{var k="kickboard-theme";var s=localStorage.getItem(k);var d=document.documentElement;var mobile=window.matchMedia("${MOBILE_THEME_MEDIA}").matches;var dark=s==="light"?false:s==="dark"?true:s==="system"?(!mobile&&window.matchMedia("(prefers-color-scheme: dark)").matches):true;d.dataset.theme=dark?"dark":"light";}catch(e){document.documentElement.dataset.theme="dark";}})();`;

@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS user_preferences (
   widget_layout jsonb NOT NULL DEFAULT '[]'::jsonb,
   toast_events jsonb NOT NULL DEFAULT '{"goals": true, "cards": true}'::jsonb,
   notification_channels jsonb NOT NULL DEFAULT '{"push": true, "email": false}'::jsonb,
-  display_mode varchar(10) NOT NULL DEFAULT 'auto',
+  display_mode varchar(10) NOT NULL DEFAULT 'dark',
   updated_at timestamptz NOT NULL DEFAULT now(),
   CHECK (jsonb_typeof(widget_layout) = 'array'),
   CHECK (display_mode IN ('auto', 'light', 'dark'))

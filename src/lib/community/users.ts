@@ -76,8 +76,8 @@ export async function registerCommunityUser(displayName: string, birthYear: numb
       }
 
       await query(
-        `INSERT INTO user_preferences (user_id)
-         VALUES ($1)
+        `INSERT INTO user_preferences (user_id, display_mode)
+         VALUES ($1, 'dark')
          ON CONFLICT (user_id) DO NOTHING`,
         [user.id]
       );

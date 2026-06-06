@@ -162,7 +162,7 @@ export async function upsertOAuthUser(input: {
       if (!userId) throw new Error("USER_INSERT_FAILED");
 
       await query(
-        `INSERT INTO user_preferences (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING`,
+        `INSERT INTO user_preferences (user_id, display_mode) VALUES ($1, 'dark') ON CONFLICT (user_id) DO NOTHING`,
         [userId]
       );
 
