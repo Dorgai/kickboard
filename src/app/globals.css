@@ -5921,17 +5921,130 @@ h3 {
   padding: 1px 6px;
 }
 
+.predictions-picks-mobile-stack {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.predictions-picks-mobile-card {
+  background: color-mix(in srgb, var(--color-bg) 42%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  border-radius: 12px;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.predictions-picks-mobile-card--active {
+  border-color: color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 24%, transparent);
+}
+
+.predictions-picks-mobile-card-header {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  justify-content: space-between;
+}
+
+.predictions-picks-mobile-card-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.predictions-picks-mobile-peer {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+  display: grid;
+  gap: 6px;
+  padding-top: 10px;
+}
+
+.predictions-picks-mobile-peer--you {
+  border-top: none;
+  padding-top: 0;
+}
+
+.predictions-picks-mobile-peer-head {
+  display: grid;
+  gap: 2px;
+}
+
+.predictions-picks-mobile-peer-label {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.predictions-picks-mobile-categories {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.predictions-picks-mobile-category {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 68%, transparent);
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-top: 8px;
+}
+
+.predictions-picks-mobile-category:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.predictions-picks-mobile-category-label {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.predictions-picks-mobile-category-value {
+  margin: 0;
+}
+
+.predictions-picks-mobile-category-value .predictions-type-lines--unified .predictions-type-line {
+  border-bottom: none;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0;
+}
+
+.predictions-picks-mobile-category-value .predictions-type-lines--unified .predictions-type-line-label {
+  display: none;
+}
+
 @media (max-width: 720px) {
+  .predictions-unified-picks {
+    padding: 10px 12px;
+  }
+
   .predictions-unified-picks-header {
     align-items: stretch;
   }
 
+  .predictions-unified-picks-header-actions {
+    width: 100%;
+  }
+
   .predictions-unified-picks-filter {
+    flex: 1 1 auto;
     width: 100%;
   }
 
   .predictions-unified-picks-filter-input {
     max-width: none;
+    width: 100%;
+  }
+
+  .predictions-unified-picks-tabs-rail .kickboard-tab-bar {
     width: 100%;
   }
 
@@ -5941,6 +6054,30 @@ h3 {
 
   .predictions-picks-table .predictions-results-cell {
     min-width: 4.75rem;
+  }
+
+  .predictions-type-lines--unified .predictions-type-line {
+    font-size: 11px;
+    gap: 6px 8px;
+    grid-template-columns: minmax(2.75rem, auto) minmax(0, 1fr) auto;
+    padding: 6px 0;
+  }
+
+  .predictions-type-lines--unified .predictions-type-line-label {
+    font-size: 10px;
+  }
+
+  .predictions-type-lines--unified .predictions-type-line-value {
+    font-size: 11px;
+  }
+
+  .predictions-type-lines--unified .predictions-result-badge {
+    font-size: 9px;
+  }
+
+  .predictions-picks-match-label {
+    font-size: 12px;
+    line-height: 1.35;
   }
 }
 
