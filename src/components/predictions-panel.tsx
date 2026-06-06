@@ -6,7 +6,11 @@ import { AuthGate } from "@/components/auth-gate";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
 import { TournamentPredictionsForm } from "@/components/tournament-predictions-form";
-import { PredictionsOverview } from "@/components/predictions-overview";
+import {
+  PredictionsPicksSection,
+  PredictionsPointsBoard,
+  usePredictionsOverview
+} from "@/components/predictions-overview";
 import { UserPickActivityPanel } from "@/components/user-pick-activity-panel";
 import {
   FixtureMatchPicker,
@@ -155,6 +159,16 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   const teamsFromKey = selectedKey ? parseFixtureKeyTeams(selectedKey) : null;
   const overviewHomeTeam = selected?.homeTeam ?? teamsFromKey?.homeTeam ?? null;
   const overviewAwayTeam = selected?.awayTeam ?? teamsFromKey?.awayTeam ?? null;
+  const {
+    data: overviewData,
+    loading: overviewLoading,
+    error: overviewError
+  } = usePredictionsOverview({
+    fixtureKey: selectedKey,
+    homeTeam: overviewHomeTeam,
+    awayTeam: overviewAwayTeam,
+    refreshToken: overviewRefresh
+  });
 
   const subTabButtons = PREDICTION_SUB_TABS.map((tab) => ({
     id: tab.id,
@@ -187,26 +201,50 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
         ) : (
           <div className="predictions-sub-panel" id="predictions-match" role="tabpanel">
             {fixtures.length > 0 && selected ? (
-              <div className="predictions-match-row">
-                <FixtureMatchPicker
-                  ariaLabel="Select a match for your prediction"
-                  fixtures={fixtures}
-                  rail={touchLayout}
-                  selectedKey={selectedKey}
-                  timeline={!touchLayout}
-                  onSelect={handleFixtureSelect}
-                />
-
-                <div className="predictions-match-detail">
-                  <FixturePredictionsForm
-                    awayTeam={selected.awayTeam}
-                    fixtureKey={selected.key}
-                    homeTeam={selected.homeTeam}
-                    onSaved={() => {
-                      setOverviewRefresh((token) => token + 1);
-                      setActivityRefresh((token) => token + 1);
-                    }}
+              <div className="predictions-match-layout">
+                <div className="predictions-match-timeline">
+                  <FixtureMatchPicker
+                    ariaLabel="Select a match for your prediction"
+                    fixtures={fixtures}
+                    rail={touchLayout}
+                    selectedKey={selectedKey}
+                    timeline={!touchLayout}
+                    onSelect={handleFixtureSelect}
                   />
+                </div>
+
+                <div className="predictions-match-content">
+                  <div className="predictions-match-form-points-row">
+                    <FixturePredictionsForm
+                      awayTeam={selected.awayTeam}
+                      fixtureKey={selected.key}
+                      homeTeam={selected.homeTeam}
+                      onSaved={() => {
+                        setOverviewRefresh((token) => token + 1);
+                        setActivityRefresh((token) => token + 1);
+                      }}
+                    />
+                    {overviewLoading ? (
+                      <p className="inline-status predictions-points-loading">Loading points…</p>
+                    ) : null}
+                    {overviewError ? (
+                      <p className="inline-status predictions-points-loading">{overviewError}</p>
+                    ) : null}
+                    {!overviewLoading && !overviewError && overviewData ? (
+                      <PredictionsPointsBoard wallet={overviewData.wallet} />
+                    ) : null}
+                  </div>
+
+                  {!overviewLoading && !overviewError && overviewData ? (
+                    <PredictionsPicksSection
+                      data={overviewData}
+                      fixtureKey={selectedKey}
+                      viewerDisplayName={viewerDisplayName}
+                      onEditPick={handleEditPick}
+                    />
+                  ) : null}
+
+                  <UserPickActivityPanel refreshToken={activityRefresh} />
                 </div>
               </div>
             ) : (
@@ -215,17 +253,6 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                 <p>Loading upcoming fixtures from the tournament feed.</p>
               </div>
             )}
-
-            <PredictionsOverview
-              awayTeam={overviewAwayTeam}
-              fixtureKey={selectedKey}
-              homeTeam={overviewHomeTeam}
-              refreshToken={overviewRefresh}
-              viewerDisplayName={viewerDisplayName}
-              onEditPick={handleEditPick}
-            />
-
-            <UserPickActivityPanel refreshToken={activityRefresh} />
           </div>
         )}
       </div>

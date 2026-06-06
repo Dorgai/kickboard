@@ -26,7 +26,8 @@ export function scrollToPredictionsEditor() {
   if (typeof window === "undefined") return;
 
   const target =
-    document.querySelector<HTMLElement>(".predictions-match-detail") ??
+    document.querySelector<HTMLElement>(".predictions-match-form-points-row") ??
+    document.querySelector<HTMLElement>(".predictions-match-content") ??
     document.getElementById(PREDICTION_OUTCOME_SECTION_ID);
   if (!target) return;
 
