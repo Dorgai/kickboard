@@ -5590,6 +5590,15 @@ h3 {
   flex-wrap: wrap;
 }
 
+.predictions-unified-picks-tabs-rail {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.predictions-unified-picks-tabs.feed-tab-bar {
+  width: 100%;
+}
+
 .predictions-unified-list {
   display: grid;
   gap: 10px;

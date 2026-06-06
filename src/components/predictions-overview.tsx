@@ -10,7 +10,8 @@ import {
 import { PREDICTION_BLOCK_SHORT } from "@/lib/fixture-predictions/labels";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { PredictionShareButtons } from "@/components/prediction-share-buttons";
-import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
+import { FeedTabBar } from "@/components/feed-tab-bar";
+import { parseFixtureKeyTeams, type FixtureOption } from "@/lib/fixtures/fixture-key";
 import type { PredictionSharePayload } from "@/lib/predictions/share";
 import { dismissSessionCheckpoint } from "@/lib/session-checkpoint/storage";
 
@@ -397,26 +398,148 @@ type UnifiedMatchGroup = {
   friends: ConnectionPredictionSummary[];
 };
 
+const PICKS_TIME_TABS = [
+  { id: "upcoming", label: "Upcoming" },
+  { id: "past", label: "Past" }
+] as const;
+
+type PicksTimeTabId = (typeof PICKS_TIME_TABS)[number]["id"];
+
+type FixturePickMeta = {
+  sortKey: string;
+  status: FixtureOption["status"];
+};
+
+function pickCategoriesSettled(pick: PredictionPickSummary) {
+  const statuses: string[] = [];
+  if (pick.predictedOutcome) statuses.push(pick.outcomeStatus);
+  if (pick.homeScore !== null && pick.awayScore !== null) statuses.push(pick.scoreStatus);
+  if (pick.scorerPicks.length > 0) statuses.push(pick.scorersStatus);
+  return statuses.some((status) => status !== "pending");
+}
+
+function matchIsPast(pick: PredictionPickSummary, fixtureMeta: Map<string, FixturePickMeta>) {
+  const meta = fixtureMeta.get(pick.fixtureKey);
+  if (meta?.status === "finished") return true;
+  if (meta?.status === "live" || meta?.status === "upcoming") return false;
+  return pickCategoriesSettled(pick);
+}
+
+function matchSortKey(pick: PredictionPickSummary, fixtureMeta: Map<string, FixturePickMeta>) {
+  return fixtureMeta.get(pick.fixtureKey)?.sortKey ?? pick.updatedAt;
+}
+
+function sortMatchGroups(
+  groups: UnifiedMatchGroup[],
+  fixtureMeta: Map<string, FixturePickMeta>,
+  tab: PicksTimeTabId
+) {
+  const direction = tab === "upcoming" ? 1 : -1;
+  return [...groups].sort((a, b) => {
+    const byKickoff = matchSortKey(a.mine, fixtureMeta).localeCompare(matchSortKey(b.mine, fixtureMeta));
+    if (byKickoff !== 0) return direction * byKickoff;
+    return b.mine.updatedAt.localeCompare(a.mine.updatedAt);
+  });
+}
+
+function UnifiedMatchCard({
+  group,
+  activeFixtureKey,
+  viewerDisplayName,
+  onEditPick,
+  onPickNavigate
+}: {
+  group: UnifiedMatchGroup;
+  activeFixtureKey: string | null;
+  viewerDisplayName: string | null;
+  onEditPick?: (fixtureKey: string) => void;
+  onPickNavigate?: (fixtureKey: string) => void;
+}) {
+  const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
+  const isActive = activeFixtureKey === group.fixtureKey;
+
+  return (
+    <li
+      className={`predictions-unified-match${isActive ? " predictions-unified-match--active" : ""}`}
+    >
+      <div className="predictions-unified-match-header">
+        <button
+          className="predictions-unified-match-title"
+          type="button"
+          onClick={() => onPickNavigate?.(group.fixtureKey)}
+        >
+          {group.fixtureLabel}
+        </button>
+        {onEditPick ? (
+          <button
+            className="text-button predictions-overview-edit"
+            type="button"
+            onClick={() => {
+              dismissSessionCheckpoint();
+              onEditPick(group.fixtureKey);
+            }}
+          >
+            Edit yours
+          </button>
+        ) : null}
+      </div>
+
+      <div className="predictions-unified-yours">
+        <span className="predictions-unified-role">You</span>
+        <CompactPickLines pick={group.mine} />
+        <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
+      </div>
+
+      {group.friends.length > 0 ? (
+        <ul className="predictions-unified-friends">
+          {group.friends.map((pick) => (
+            <li className="predictions-unified-friend" key={`${pick.userId}-${pick.updatedAt}`}>
+              <span className="predictions-unified-role">
+                <strong>{pick.displayName}</strong>
+                <span className="connections-search-username">@{pick.username}</span>
+              </span>
+              <CompactPickLines pick={pick} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="predictions-unified-no-friends">No friends have picked this match yet.</p>
+      )}
+    </li>
+  );
+}
+
 export function PredictionsPicksSection({
   data,
+  fixtures = [],
   activeFixtureKey = null,
   viewerDisplayName = null,
   onEditPick,
   onPickNavigate
 }: {
   data: PredictionsOverviewData;
+  fixtures?: FixtureOption[];
   activeFixtureKey?: string | null;
   viewerDisplayName?: string | null;
   onEditPick?: (fixtureKey: string) => void;
   onPickNavigate?: (fixtureKey: string) => void;
 }) {
   const [friendsNameFilter, setFriendsNameFilter] = useState("");
+  const [picksTab, setPicksTab] = useState<PicksTimeTabId>("upcoming");
 
   useEffect(() => {
     setFriendsNameFilter("");
   }, [activeFixtureKey]);
 
   const { myPredictions, connectionsPredictions } = data;
+
+  const fixtureMeta = useMemo(() => {
+    const map = new Map<string, FixturePickMeta>();
+    for (const fixture of fixtures) {
+      map.set(fixture.key, { sortKey: fixture.sortKey, status: fixture.status });
+    }
+    return map;
+  }, [fixtures]);
 
   const matchGroups = useMemo(() => {
     const groups: UnifiedMatchGroup[] = myPredictions.map((mine) => ({
@@ -429,10 +552,31 @@ export function PredictionsPicksSection({
       )
     }));
 
-    return groups.sort((a, b) => b.mine.updatedAt.localeCompare(a.mine.updatedAt));
+    return groups;
   }, [connectionsPredictions, friendsNameFilter, myPredictions]);
 
-  const friendPickCount = matchGroups.reduce((sum, group) => sum + group.friends.length, 0);
+  const upcomingGroups = useMemo(
+    () =>
+      sortMatchGroups(
+        matchGroups.filter((group) => !matchIsPast(group.mine, fixtureMeta)),
+        fixtureMeta,
+        "upcoming"
+      ),
+    [fixtureMeta, matchGroups]
+  );
+
+  const pastGroups = useMemo(
+    () =>
+      sortMatchGroups(
+        matchGroups.filter((group) => matchIsPast(group.mine, fixtureMeta)),
+        fixtureMeta,
+        "past"
+      ),
+    [fixtureMeta, matchGroups]
+  );
+
+  const visibleGroups = picksTab === "upcoming" ? upcomingGroups : pastGroups;
+  const friendPickCount = visibleGroups.reduce((sum, group) => sum + group.friends.length, 0);
 
   return (
     <section
@@ -453,73 +597,48 @@ export function PredictionsPicksSection({
             />
           </label>
         ) : null}
-        <span className="predictions-overview-count">{matchGroups.length}</span>
+        <span className="predictions-overview-count">{visibleGroups.length}</span>
       </header>
 
-      {matchGroups.length === 0 ? (
+      <div className="predictions-unified-picks-tabs-rail">
+        <FeedTabBar
+          ariaLabel="Upcoming or past picks"
+          className="predictions-unified-picks-tabs kickboard-tab-bar"
+          tabs={PICKS_TIME_TABS.map((tab) => ({
+            id: tab.id,
+            label: `${tab.label} (${tab.id === "upcoming" ? upcomingGroups.length : pastGroups.length})`
+          }))}
+          value={picksTab}
+          onChange={(id) => setPicksTab(id as PicksTimeTabId)}
+        />
+      </div>
+
+      {myPredictions.length === 0 ? (
         <p className="predictions-overview-empty">No picks yet — choose a match above.</p>
+      ) : visibleGroups.length === 0 ? (
+        <p className="predictions-overview-empty">
+          {picksTab === "upcoming"
+            ? "No upcoming picks — switch to Past to see settled matches."
+            : "No past picks yet."}
+        </p>
       ) : (
-        <ul className="predictions-unified-list">
-          {matchGroups.map((group) => {
-            const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
-            const isActive = activeFixtureKey === group.fixtureKey;
-            return (
-              <li
-                key={group.fixtureKey}
-                className={`predictions-unified-match${isActive ? " predictions-unified-match--active" : ""}`}
-              >
-                <div className="predictions-unified-match-header">
-                  <button
-                    className="predictions-unified-match-title"
-                    type="button"
-                    onClick={() => onPickNavigate?.(group.fixtureKey)}
-                  >
-                    {group.fixtureLabel}
-                  </button>
-                  {onEditPick ? (
-                    <button
-                      className="text-button predictions-overview-edit"
-                      type="button"
-                      onClick={() => {
-                        dismissSessionCheckpoint();
-                        onEditPick(group.fixtureKey);
-                      }}
-                    >
-                      Edit yours
-                    </button>
-                  ) : null}
-                </div>
-
-                <div className="predictions-unified-yours">
-                  <span className="predictions-unified-role">You</span>
-                  <CompactPickLines pick={group.mine} />
-                  <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
-                </div>
-
-                {group.friends.length > 0 ? (
-                  <ul className="predictions-unified-friends">
-                    {group.friends.map((pick) => (
-                      <li className="predictions-unified-friend" key={`${pick.userId}-${pick.updatedAt}`}>
-                        <span className="predictions-unified-role">
-                          <strong>{pick.displayName}</strong>
-                          <span className="connections-search-username">@{pick.username}</span>
-                        </span>
-                        <CompactPickLines pick={pick} />
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="predictions-unified-no-friends">No friends have picked this match yet.</p>
-                )}
-              </li>
-            );
-          })}
+        <ul className="predictions-unified-list" role="tabpanel">
+          {visibleGroups.map((group) => (
+            <UnifiedMatchCard
+              key={group.fixtureKey}
+              activeFixtureKey={activeFixtureKey}
+              group={group}
+              viewerDisplayName={viewerDisplayName}
+              onEditPick={onEditPick}
+              onPickNavigate={onPickNavigate}
+            />
+          ))}
         </ul>
       )}
 
       {myPredictions.length > 0 && friendPickCount === 0 && connectionsPredictions.length > 0 ? (
         <p className="predictions-overview-empty predictions-unified-filter-empty">
-          No friends match that filter on your matches.
+          No friends match that filter on your {picksTab} matches.
         </p>
       ) : null}
     </section>

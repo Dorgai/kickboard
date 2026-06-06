@@ -291,6 +291,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                     <PredictionsPicksSection
                       activeFixtureKey={selectedKey}
                       data={overviewData}
+                      fixtures={fixtures}
                       viewerDisplayName={viewerDisplayName}
                       onEditPick={handleEditPick}
                       onPickNavigate={handlePickNavigate}
