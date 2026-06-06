@@ -4171,7 +4171,7 @@ h3 {
 .tournament-player-pick-name {
   color: var(--color-text-primary);
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4181,7 +4181,7 @@ h3 {
 .tournament-player-pick-meta {
   color: var(--color-text-secondary);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4191,8 +4191,23 @@ h3 {
 .tournament-player-pick-placeholder {
   color: var(--color-text-secondary);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25;
+}
+
+.tournament-predictions-form .team-label-text,
+.tournament-predictions-form .fixture-scorer-chip-name,
+.tournament-predictions-form .fixture-scorer-chip-side {
+  font-weight: 500;
+}
+
+.tournament-predictions-form .tournament-team-pick-option .team-label-stacked {
+  gap: 6px;
+}
+
+.tournament-predictions-form .tournament-team-pick-option .country-flag-md {
+  height: 22px;
+  width: 30px;
 }
 
 .tournament-team-pick-grid {
