@@ -3896,6 +3896,7 @@ h3 {
 .squad-builder-predictions {
   display: flex;
   justify-content: center;
+  margin-top: 4px;
   min-width: 0;
   width: 100%;
 }

@@ -12,12 +12,12 @@ type FixturePredictionPickProps = {
 export function FixturePredictionPick({ fixtureKey, homeTeam, awayTeam }: FixturePredictionPickProps) {
   return (
     <button
-      aria-label={`Make predictions for ${homeTeam} vs ${awayTeam}`}
+      aria-label={`Make your predictions for ${homeTeam} vs ${awayTeam}`}
       className="button secondary squad-builder-predictions-link"
       type="button"
-      onClick={() => navigateToPredictFixture(fixtureKey)}
+      onClick={() => navigateToPredictFixture(fixtureKey, { scrollToTop: true })}
     >
-      Make your picks
+      Make your predictions
     </button>
   );
 }

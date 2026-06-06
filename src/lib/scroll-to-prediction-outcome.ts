@@ -9,6 +9,18 @@ export function scrollToPredictionOutcomeOnMobile() {
   scrollToPredictionsEditor();
 }
 
+/** Scroll to the top of the Predictions tab (sub-tabs + match picker). */
+export function scrollToPredictionsTop() {
+  if (typeof window === "undefined") return;
+
+  const target =
+    document.getElementById("predictions") ??
+    document.querySelector<HTMLElement>(".predictions-panel");
+  if (!target) return;
+
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 /** Scroll the prediction form into view (match picker + pick fields). */
 export function scrollToPredictionsEditor() {
   if (typeof window === "undefined") return;

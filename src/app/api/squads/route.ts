@@ -69,11 +69,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid formation." }, { status: 400 });
     }
 
-    const lineup =
-      Array.isArray(body.lineup) &&
-      (body.lineup.length === MATCH_LINEUP_SIZE || body.lineup.length === 11)
-        ? body.lineup
-        : defaultLineupForFormations(formations);
+    const lineup = Array.isArray(body.lineup) ? body.lineup : defaultLineupForFormations(formations);
 
     const existingId = typeof body.squadId === "string" ? body.squadId.trim() : "";
     let squadId: string | null = null;

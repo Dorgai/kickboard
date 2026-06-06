@@ -16,7 +16,8 @@ import {
 import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
 import {
   scrollToPredictionOutcomeOnMobile,
-  scrollToPredictionsEditor
+  scrollToPredictionsEditor,
+  scrollToPredictionsTop
 } from "@/lib/scroll-to-prediction-outcome";
 import {
   NAVIGATE_PREDICTIONS_EVENT,
@@ -106,10 +107,10 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   }, []);
 
   const handleEditPick = useCallback(
-    (key: string) => {
+    (key: string, options?: { scrollToTop?: boolean }) => {
       const exists = fixtures.some((fixture) => fixture.key === key);
       if (!exists) return;
-      scrollToOutcomeAfterSelect.current = true;
+      scrollToOutcomeAfterSelect.current = !options?.scrollToTop;
       setSubTab("match");
       setSelectedKey(key);
       if (typeof window !== "undefined") {
@@ -119,7 +120,13 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
         url.hash = "predictions-match";
         window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
       }
-      window.requestAnimationFrame(() => scrollToPredictionsEditor());
+      window.requestAnimationFrame(() => {
+        if (options?.scrollToTop) {
+          scrollToPredictionsTop();
+        } else {
+          scrollToPredictionsEditor();
+        }
+      });
     },
     [fixtures]
   );
@@ -136,7 +143,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
       const detail = (event as CustomEvent<NavigatePredictionsDetail>).detail;
       const key = detail?.fixtureKey?.trim();
       if (!key) return;
-      handleEditPick(key);
+      handleEditPick(key, { scrollToTop: detail?.scrollToTop });
     }
 
     window.addEventListener(NAVIGATE_PREDICTIONS_EVENT, onNavigatePredictions);
