@@ -1,0 +1,85 @@
+name: Cleanup predictions (production)
+
+# Wipe all placed fixture/tournament predictions and reset prediction points.
+# Actions → Run workflow → set confirm to "yes".
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type yes to delete all predictions (irreversible)'
+        required: true
+        default: "no"
+
+concurrency:
+  group: cleanup-predictions-production
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'yes'
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      RAILWAY_ENVIRONMENT: production
+      CONFIRM_CLEANUP_PREDICTIONS: yes
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dry run (counts before)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_POSTGRES_SERVICE_NAME: ${{ vars.RAILWAY_POSTGRES_SERVICE_NAME }}
+        run: |
+          set -euo pipefail
+          if [ -z "${RAILWAY_TOKEN:-}" ] && [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::Add GitHub secret DATABASE_URL (Railway Postgres → Connect → Public URL) and/or RAILWAY_TOKEN."
+            exit 1
+          fi
+          if [ -n "${DATABASE_URL:-}" ]; then
+            if echo "$DATABASE_URL" | grep -q 'railway\.internal'; then
+              echo "::error::DATABASE_URL secret uses postgres.railway.internal. Replace with Railway Postgres → Connect → Public URL."
+              exit 1
+            fi
+          else
+            npm install -g @railway/cli
+            export DATABASE_URL="$(node scripts/resolve-railway-database-url.mjs)"
+            node -e "const u=new URL(process.env.DATABASE_URL); console.log('Postgres host:', u.hostname)"
+          fi
+          npm run db:cleanup-predictions -- --dry-run
+
+      - name: Delete all predictions
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_POSTGRES_SERVICE_NAME: ${{ vars.RAILWAY_POSTGRES_SERVICE_NAME }}
+        run: |
+          set -euo pipefail
+          if [ -z "${RAILWAY_TOKEN:-}" ] && [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::Add GitHub secret DATABASE_URL (Railway Postgres → Connect → Public URL) and/or RAILWAY_TOKEN."
+            exit 1
+          fi
+          if [ -n "${DATABASE_URL:-}" ]; then
+            if echo "$DATABASE_URL" | grep -q 'railway\.internal'; then
+              echo "::error::DATABASE_URL secret uses postgres.railway.internal. Replace with Railway Postgres → Connect → Public URL."
+              exit 1
+            fi
+          else
+            npm install -g @railway/cli
+            export DATABASE_URL="$(node scripts/resolve-railway-database-url.mjs)"
+            node -e "const u=new URL(process.env.DATABASE_URL); console.log('Postgres host:', u.hostname)"
+          fi
+          npm run db:cleanup-predictions
