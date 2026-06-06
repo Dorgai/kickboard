@@ -268,7 +268,13 @@ export function usePredictionsOverview({
   return { data, loading, error };
 }
 
-export function PredictionsPointsBoard({ wallet }: { wallet: PredictionsOverviewData["wallet"] }) {
+export function PredictionsPointsBoard({
+  wallet,
+  narrow = false
+}: {
+  wallet: PredictionsOverviewData["wallet"];
+  narrow?: boolean;
+}) {
   const categories = [
     { key: "outcome" as const, label: PREDICTION_BLOCK_SHORT.outcome },
     { key: "score" as const, label: PREDICTION_BLOCK_SHORT.score },
@@ -276,7 +282,11 @@ export function PredictionsPointsBoard({ wallet }: { wallet: PredictionsOverview
   ];
 
   return (
-    <section className="predictions-results-board data-card predictions-points-board">
+    <section
+      className={`predictions-results-board data-card predictions-points-board${
+        narrow ? " predictions-points-board--narrow" : ""
+      }`}
+    >
       <header className="predictions-results-board-header">
         <h3 className="panel-help-row">
           Your points
@@ -295,10 +305,10 @@ export function PredictionsPointsBoard({ wallet }: { wallet: PredictionsOverview
         <thead>
           <tr>
             <th>Pick</th>
-            <th>Won</th>
-            <th>Lost</th>
-            <th>Pending</th>
-            <th>Points</th>
+            <th>{narrow ? "W" : "Won"}</th>
+            <th>{narrow ? "L" : "Lost"}</th>
+            <th>{narrow ? "Pnd" : "Pending"}</th>
+            <th>{narrow ? "Pts" : "Points"}</th>
           </tr>
         </thead>
         <tbody>

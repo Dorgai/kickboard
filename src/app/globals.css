@@ -3825,10 +3825,11 @@ h3 {
 }
 
 .predictions-match-form-points-row {
-  align-items: stretch;
+  align-items: start;
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(0, min(22.5rem, 100%)) minmax(0, 1fr);
+  grid-template-columns: minmax(0, min(22.5rem, 100%)) minmax(9.5rem, 17rem);
+  justify-content: start;
   min-width: 0;
 }
 
@@ -3836,45 +3837,60 @@ h3 {
   min-width: 0;
 }
 
-.predictions-match-form-points-row .predictions-points-board {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.predictions-points-board--narrow {
+  gap: 10px;
+  padding: 12px 11px;
 }
 
-.predictions-match-form-points-row .predictions-results-board-header {
-  flex-wrap: nowrap;
-  gap: 8px 12px;
+.predictions-points-board--narrow .predictions-results-board-header {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.predictions-match-form-points-row .predictions-results-board-header h3 {
-  flex: 1 1 auto;
-  min-width: 0;
+.predictions-points-board--narrow .predictions-results-board-header h3 {
+  font-size: 14px;
 }
 
-.predictions-match-form-points-row .predictions-wallet-balance {
-  flex: 0 0 auto;
-  white-space: nowrap;
+.predictions-points-board--narrow .predictions-wallet-balance {
+  justify-content: flex-start;
 }
 
-.predictions-match-form-points-row .predictions-results-table {
-  min-width: 13.5rem;
+.predictions-points-board--narrow .predictions-wallet-balance-value {
+  font-size: 1.2rem;
+}
+
+.predictions-points-board--narrow .predictions-results-table {
+  font-size: 11px;
   table-layout: fixed;
+  width: 100%;
 }
 
-.predictions-match-form-points-row .predictions-results-table th,
-.predictions-match-form-points-row .predictions-results-table td {
-  padding: 6px 5px;
+.predictions-points-board--narrow .predictions-results-table th,
+.predictions-points-board--narrow .predictions-results-table td {
+  padding: 5px 3px;
 }
 
-.predictions-match-form-points-row .predictions-results-table th:not(:first-child),
-.predictions-match-form-points-row .predictions-results-table td:not(:first-child) {
+.predictions-points-board--narrow .predictions-results-table th {
+  font-size: 9px;
+  letter-spacing: 0.02em;
+}
+
+.predictions-points-board--narrow .predictions-results-table th:not(:first-child),
+.predictions-points-board--narrow .predictions-results-table td:not(:first-child) {
   text-align: center;
-  width: 2.35rem;
+  width: 1.65rem;
 }
 
-.predictions-match-form-points-row .predictions-results-table th:last-child,
-.predictions-match-form-points-row .predictions-results-table td:last-child {
-  width: 2.75rem;
+.predictions-points-board--narrow .predictions-results-table th:last-child,
+.predictions-points-board--narrow .predictions-results-table td:last-child {
+  width: 2rem;
+}
+
+.predictions-points-board--narrow .predictions-results-table td:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .predictions-match-form-points-row
