@@ -11,11 +11,6 @@ function peerLabel(thread: Pick<FanChatInboxThread, "peerDisplayName" | "peerUse
   return thread.peerDisplayName?.trim() || thread.peerUsername;
 }
 
-function previewText(body: string | null) {
-  if (!body) return "No messages yet";
-  return body.length > 56 ? `${body.slice(0, 53)}…` : body;
-}
-
 export function FanChatMessenger() {
   const [threads, setThreads] = useState<FanChatInboxThread[]>([]);
   const [activePeerId, setActivePeerId] = useState<string>("");
@@ -262,15 +257,6 @@ export function FanChatMessenger() {
                       <span className="fan-chat-inbox-unread-badge">{thread.unreadCount}</span>
                     ) : null}
                   </span>
-                  <span className="fan-chat-inbox-thread-preview">
-                    {thread.lastDirection === "outgoing" ? "You: " : ""}
-                    {previewText(thread.lastMessageBody)}
-                  </span>
-                  {thread.lastMessageAt ? (
-                    <span className="fan-chat-inbox-thread-time">
-                      {new Date(thread.lastMessageAt).toLocaleString()}
-                    </span>
-                  ) : null}
                 </button>
               </li>
             ))}
