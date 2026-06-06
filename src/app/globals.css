@@ -4171,7 +4171,7 @@ h3 {
 .tournament-player-pick-name {
   color: var(--color-text-primary);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4181,7 +4181,7 @@ h3 {
 .tournament-player-pick-meta {
   color: var(--color-text-secondary);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4191,23 +4191,82 @@ h3 {
 .tournament-player-pick-placeholder {
   color: var(--color-text-secondary);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.25;
 }
 
 .tournament-predictions-form .team-label-text,
 .tournament-predictions-form .fixture-scorer-chip-name,
 .tournament-predictions-form .fixture-scorer-chip-side {
-  font-weight: 500;
+  font-weight: 400;
 }
 
-.tournament-predictions-form .tournament-team-pick-option .team-label-stacked {
-  gap: 6px;
+.tournament-predictions-form .tournament-team-pick-option .team-label-text {
+  font-size: 13px;
+  font-weight: 400;
 }
 
-.tournament-predictions-form .tournament-team-pick-option .country-flag-md {
-  height: 22px;
-  width: 30px;
+.tournament-predictions-form .tournament-team-pick-option.is-selected .team-label-text {
+  font-weight: 400;
+}
+
+.tournament-predictions-form .tournament-team-pick-label.team-label-stacked {
+  gap: 5px;
+}
+
+.tournament-predictions-form .tournament-team-pick-label .country-flag {
+  border-radius: 3px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.2),
+    0 5px 12px rgba(15, 23, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  opacity: 0.82;
+  transform: perspective(280px) rotateX(10deg) scale(0.94);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+[data-theme="dark"] .tournament-predictions-form .tournament-team-pick-label .country-flag {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.38),
+    0 8px 16px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.tournament-predictions-form .tournament-team-pick-option:hover .tournament-team-pick-label .country-flag,
+.tournament-predictions-form .tournament-team-pick-option:focus-within .tournament-team-pick-label .country-flag {
+  opacity: 0.96;
+  transform: perspective(280px) rotateX(4deg) scale(0.98);
+}
+
+.tournament-predictions-form .tournament-team-pick-option.is-selected .tournament-team-pick-label .country-flag {
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.18),
+    0 8px 18px rgba(15, 23, 42, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  opacity: 1;
+  transform: perspective(280px) rotateX(0deg) scale(1);
+}
+
+[data-theme="dark"]
+  .tournament-predictions-form
+  .tournament-team-pick-option.is-selected
+  .tournament-team-pick-label
+  .country-flag {
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.42),
+    0 10px 20px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tournament-predictions-form .tournament-team-pick-label .country-flag {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .tournament-team-pick-grid {

@@ -89,7 +89,12 @@ function TeamPickGrid({
               onChange={() => onSelect(team)}
             />
             <span className="fixture-prediction-outcome-body">
-              <TeamLabel layout="stacked" name={team} size="md" />
+              <TeamLabel
+                className="tournament-team-pick-label"
+                layout="stacked"
+                name={team}
+                size="sm"
+              />
             </span>
           </label>
         );
