@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   formatScorerPicksSummary,
   outcomeShort,
@@ -327,6 +327,19 @@ export function PredictionsPointsBoard({
     { key: "scorers" as const, label: PREDICTION_BLOCK_SHORT.scorers }
   ];
 
+  const maxMiniPickLines = useMemo(() => {
+    let max = 0;
+    for (const { key } of categories) {
+      max = Math.max(
+        max,
+        picksForCategoryStatus(myPredictions, key, "won").length,
+        picksForCategoryStatus(myPredictions, key, "lost").length,
+        picksForCategoryStatus(myPredictions, key, "pending").length
+      );
+    }
+    return max;
+  }, [myPredictions]);
+
   return (
     <section className="predictions-results-board data-card predictions-points-board">
       <header className="predictions-results-board-header">
@@ -343,7 +356,10 @@ export function PredictionsPointsBoard({
           <span className="predictions-wallet-balance-label">points total</span>
         </p>
       </header>
-      <table className="predictions-results-table predictions-results-table--compact">
+      <table
+        className="predictions-results-table predictions-results-table--compact"
+        style={{ "--points-mini-lines": maxMiniPickLines } as CSSProperties}
+      >
         <thead>
           <tr>
             <th>Pick</th>
