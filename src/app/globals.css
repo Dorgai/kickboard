@@ -1253,8 +1253,8 @@ h3 {
   width: 100%;
 }
 
-/* Full-bleed Spain hero — assets in /public/images/ (see README there) */
-.feed-browser--hero-backdrop {
+/* Spain hero — assets in /public/images/ (see README there) */
+.kickboard-hero-backdrop {
   --kickboard-hero-image: url("/images/kickboard-hero-spain-mobile.webp");
   --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 62%, transparent);
   --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 54%, transparent);
@@ -1262,15 +1262,13 @@ h3 {
   position: relative;
 }
 
-.feed-browser--hero-backdrop::before,
-.feed-browser--hero-backdrop::after {
+.kickboard-hero-backdrop::before,
+.kickboard-hero-backdrop::after {
   content: "";
   pointer-events: none;
-  position: fixed;
-  z-index: -1;
 }
 
-.feed-browser--hero-backdrop::before {
+.kickboard-hero-backdrop::before {
   background-image: var(--kickboard-hero-image);
   background-position: 72% 8%;
   background-repeat: no-repeat;
@@ -1280,7 +1278,7 @@ h3 {
   opacity: 0.5;
 }
 
-.feed-browser--hero-backdrop::after {
+.kickboard-hero-backdrop::after {
   background:
     linear-gradient(
       108deg,
@@ -1304,12 +1302,12 @@ h3 {
   inset: 0;
 }
 
-[data-theme="dark"] .feed-browser--hero-backdrop::before {
+[data-theme="dark"] .kickboard-hero-backdrop::before {
   filter: saturate(1.1) contrast(1.05);
   opacity: 0.4;
 }
 
-[data-theme="dark"] .feed-browser--hero-backdrop::after {
+[data-theme="dark"] .kickboard-hero-backdrop::after {
   background:
     linear-gradient(
       108deg,
@@ -1333,32 +1331,39 @@ h3 {
 }
 
 @media (min-width: 861px) {
-  .feed-browser--hero-backdrop {
+  .kickboard-hero-backdrop {
     --kickboard-hero-image: url("/images/kickboard-hero-spain.webp");
   }
 
-  .feed-browser--hero-backdrop::before {
+  .kickboard-hero-backdrop::before {
     background-position: 84% 10%;
     opacity: 0.62;
   }
 
-  [data-theme="dark"] .feed-browser--hero-backdrop::before {
+  [data-theme="dark"] .kickboard-hero-backdrop::before {
     opacity: 0.48;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .feed-browser--hero-backdrop::before {
+  .kickboard-hero-backdrop::before {
     filter: none;
     opacity: 0.22;
   }
 }
 
 @media print {
-  .feed-browser--hero-backdrop::before,
-  .feed-browser--hero-backdrop::after {
+  .kickboard-hero-backdrop::before,
+  .kickboard-hero-backdrop::after {
     display: none;
   }
+}
+
+/* Full-bleed feed: fixed viewport layers behind cards */
+.feed-browser--hero-backdrop::before,
+.feed-browser--hero-backdrop::after {
+  position: fixed;
+  z-index: -1;
 }
 
 /* Let the hero photo show through feed cards (one level above the backdrop). */
@@ -1390,7 +1395,7 @@ h3 {
   background: var(--kickboard-hero-surface-muted);
 }
 
-[data-theme="dark"] .feed-browser--hero-backdrop {
+[data-theme="dark"] .kickboard-hero-backdrop {
   --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 62%, transparent);
   --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 54%, transparent);
 }
@@ -9136,6 +9141,49 @@ h3 {
   box-shadow: var(--shadow-elevation-2);
   grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: visible;
+}
+
+.session-checkpoint-panel.kickboard-hero-backdrop {
+  background: transparent;
+  overflow: hidden;
+}
+
+.session-checkpoint-panel.kickboard-hero-backdrop::before,
+.session-checkpoint-panel.kickboard-hero-backdrop::after {
+  border-radius: inherit;
+  position: absolute;
+  z-index: 0;
+}
+
+.session-checkpoint-panel.kickboard-hero-backdrop > * {
+  position: relative;
+  z-index: 1;
+}
+
+.session-checkpoint-panel.kickboard-hero-backdrop .session-checkpoint-header {
+  border-bottom-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+.session-checkpoint-panel.kickboard-hero-backdrop .session-checkpoint-footer {
+  border-top-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+.session-checkpoint-panel.kickboard-hero-backdrop .session-checkpoint-stat {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: var(--kickboard-hero-surface);
+  box-shadow: none;
+}
+
+.session-checkpoint-panel.kickboard-hero-backdrop .session-checkpoint-stat--primary {
+  background: color-mix(in srgb, var(--color-brand) 12%, var(--kickboard-hero-surface));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-checkpoint-panel.kickboard-hero-backdrop .session-checkpoint-stat {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .session-checkpoint-panel {

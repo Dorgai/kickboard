@@ -317,7 +317,7 @@ export function FeedBrowser() {
 
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
   return (
-    <div className="feed-browser feed-browser--hero-backdrop">
+    <div className="feed-browser feed-browser--hero-backdrop kickboard-hero-backdrop">
       <nav
         className="event-tab-bar kickboard-tab-bar feed-event-selector-tabs"
         aria-label="Tournament event selector"

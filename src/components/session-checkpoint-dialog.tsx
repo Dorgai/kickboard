@@ -203,7 +203,7 @@ export function SessionCheckpointDialog() {
       onClick={(event) => closeDialogOnBackdropClick(event, dismiss)}
       onClose={dismiss}
     >
-      <div className="session-checkpoint-panel timeline-modal-panel">
+      <div className="session-checkpoint-panel timeline-modal-panel kickboard-hero-backdrop">
         <header className="timeline-modal-header session-checkpoint-header">
           <div>
             <h2
