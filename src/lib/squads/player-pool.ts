@@ -228,8 +228,23 @@ async function loadWorldCupTeamPlayers(feedTeamName: string) {
   return { players, statsBombTeamName };
 }
 
+function addPlayersFromLineupTeams(byId: Map<number, SquadPoolPlayer>, lineups: Awaited<ReturnType<typeof getLineups>>) {
+  for (const team of lineups) {
+    for (const player of team.lineup) {
+      if (!player.player_id || byId.has(player.player_id)) continue;
+      byId.set(player.player_id, {
+        playerId: player.player_id,
+        name: player.player_nickname?.trim() || player.player_name,
+        teamName: team.team_name,
+        role: mapRole(primaryLineupPosition(player.positions)),
+        jerseyNumber: player.jersey_number ?? null
+      });
+    }
+  }
+}
+
 /**
- * Aggregates unique players from a World Cup final (or latest available match) via StatsBomb open data.
+ * Aggregates unique players from every national team in a World Cup edition via StatsBomb open data.
  */
 export async function getWorldCupSquadPlayerPool(options?: {
   competitionId?: number;
@@ -253,23 +268,32 @@ export async function getWorldCupSquadPlayerPool(options?: {
     throw new Error("NO_MATCHES");
   }
 
-  const finalMatch =
-    matches.find((match) => /final/i.test(match.competition_stage?.name ?? "")) ??
-    matches[matches.length - 1];
+  const teamNames = Array.from(
+    new Set(
+      matches.flatMap((match) => [
+        match.home_team.home_team_name,
+        match.away_team.away_team_name
+      ])
+    )
+  ).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 
-  const lineups = await getLineups(finalMatch.match_id);
   const byId = new Map<number, SquadPoolPlayer>();
 
-  for (const team of lineups) {
-    for (const player of team.lineup) {
-      if (!player.player_id || byId.has(player.player_id)) continue;
-      byId.set(player.player_id, {
-        playerId: player.player_id,
-        name: player.player_nickname?.trim() || player.player_name,
-        teamName: team.team_name,
-        role: mapRole(primaryLineupPosition(player.positions)),
-        jerseyNumber: player.jersey_number ?? null
-      });
+  await Promise.all(
+    teamNames.map(async (teamName) => {
+      const { players } = await loadWorldCupTeamPlayers(teamName);
+      for (const player of players) {
+        if (!byId.has(player.playerId)) {
+          byId.set(player.playerId, player);
+        }
+      }
+    })
+  );
+
+  if (byId.size === 0) {
+    for (const match of matches) {
+      const lineups = await getLineups(match.match_id);
+      addPlayersFromLineupTeams(byId, lineups);
     }
   }
 
@@ -289,8 +313,8 @@ export async function getWorldCupSquadPlayerPool(options?: {
     competitionId: competition.competition_id,
     seasonId: competition.season_id,
     seasonName: competition.season_name,
-    matchId: finalMatch.match_id,
-    matchLabel: `${finalMatch.home_team.home_team_name} vs ${finalMatch.away_team.away_team_name}`,
+    matchId: null,
+    matchLabel: `${competition.season_name} — all teams`,
     players,
     pools: Array.from(poolsByTeam.entries()).map(([teamName, teamPlayers]) => ({
       teamName,
