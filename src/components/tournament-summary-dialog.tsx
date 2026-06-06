@@ -88,8 +88,9 @@ export function TournamentSummaryDialog({
             onClick={(event) => closeDialogOnBackdropClick(event, close)}
             onClose={close}
           >
-            <div className="timeline-modal-panel">
-              <header className="timeline-modal-header">
+            <div className="timeline-modal-panel tournament-summary-modal-panel">
+              <div aria-hidden className="tournament-summary-modal-portrait" />
+              <header className="timeline-modal-header tournament-summary-modal-header">
                 <div>
                   <p className="eyebrow">Overview</p>
                   <h2 id={titleId}>{title}</h2>

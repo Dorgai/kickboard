@@ -98,7 +98,7 @@ export function WelcomeDialog() {
       onClick={(event) => closeDialogOnBackdropClick(event, closeWelcome)}
       onClose={closeWelcome}
     >
-      <div className="welcome-dialog-panel kickboard-hero-backdrop">
+      <div className="welcome-dialog-panel kickboard-hero-backdrop kickboard-hero-backdrop--nico-accent">
         <div className="welcome-dialog-shell">
           <header className="welcome-dialog-header">
             <p className="welcome-dialog-eyebrow">World Cup 2026</p>

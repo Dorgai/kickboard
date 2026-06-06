@@ -8,6 +8,7 @@ import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-la
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { CurrentEventTabs } from "@/components/current-event-tabs";
+import { KickboardHeroLayers } from "@/components/kickboard-hero-layers";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 import {
   readLocationHash,
@@ -317,7 +318,8 @@ export function FeedBrowser() {
 
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
   return (
-    <div className="feed-browser feed-browser--hero-backdrop kickboard-hero-backdrop">
+    <div className="feed-browser feed-browser--hero-backdrop kickboard-hero-backdrop kickboard-hero-backdrop--dual">
+      <KickboardHeroLayers dual />
       <nav
         className="event-tab-bar kickboard-tab-bar feed-event-selector-tabs"
         aria-label="Tournament event selector"
@@ -387,22 +389,43 @@ export function FeedBrowser() {
       )}
 
       <p className="kickboard-hero-credit">
-        Background:{" "}
+        Background portraits:{" "}
         <a
           href="https://commons.wikimedia.org/wiki/File:Lamine_Yamal_in_2025_(cropped2).jpg"
           rel="noopener noreferrer"
           target="_blank"
         >
-          Lamine Yamal (Spain)
+          Lamine Yamal
         </a>{" "}
         by{" "}
         <a href="https://commons.wikimedia.org/wiki/User:Biso" rel="noopener noreferrer" target="_blank">
           Biso
         </a>{" "}
-        /{" "}
+        (
         <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener noreferrer" target="_blank">
           CC BY 4.0
         </a>
+        ) ·{" "}
+        <a
+          href="https://commons.wikimedia.org/wiki/File:Nico_Williams_(cropped).jpg"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Nico Williams
+        </a>{" "}
+        by{" "}
+        <a
+          href="https://commons.wikimedia.org/wiki/User:Maider_Goikoetxea"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Maider Goikoetxea
+        </a>{" "}
+        (
+        <a href="https://creativecommons.org/licenses/by-sa/2.0/" rel="noopener noreferrer" target="_blank">
+          CC BY-SA 2.0
+        </a>
+        )
       </p>
     </div>
   );
