@@ -256,7 +256,6 @@ button:disabled {
 
 /* Dark grey fills (nav / feed tabs): light text on all descendants */
 :is(
-  .saved-squad-card.selected,
   .feed-tab-bar.kickboard-tab-bar button.active,
   .event-tab-bar.kickboard-tab-bar button.active,
   .nav-tabs a.active
@@ -269,7 +268,6 @@ button:disabled {
 
 [data-theme="light"]
   :is(
-    .saved-squad-card.selected,
     .feed-tab-bar.kickboard-tab-bar button.active,
     .event-tab-bar.kickboard-tab-bar button.active,
     .nav-tabs a.active
@@ -277,14 +275,12 @@ button:disabled {
   .team-label-text,
 :root:not([data-theme])
   :is(
-    .saved-squad-card.selected,
     .feed-tab-bar.kickboard-tab-bar button.active,
     .event-tab-bar.kickboard-tab-bar button.active,
     .nav-tabs a.active
   )
   .team-label-text,
 :is(
-  .saved-squad-card.selected,
   .feed-tab-bar.kickboard-tab-bar button.active,
   .event-tab-bar.kickboard-tab-bar button.active,
   .nav-tabs a.active
@@ -1851,14 +1847,14 @@ h3 {
 }
 
 .fan-chat-inbox-list {
-  background: color-mix(in srgb, var(--color-bg) 50%, transparent);
+  background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: 0;
   display: grid;
   gap: 6px;
   min-width: 0;
   overflow: visible;
-  padding: 8px;
+  padding: 0;
   width: 100%;
 }
 
@@ -1932,11 +1928,15 @@ h3 {
 }
 
 .fan-chat-inbox-thread:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-brand) 8%, var(--color-bg));
+  background: transparent;
 }
 
 .fan-chat-inbox-thread--active {
-  background: color-mix(in srgb, var(--color-brand) 14%, var(--color-bg));
+  background: transparent;
+}
+
+.fan-chat-inbox-thread--active .fan-chat-inbox-thread-name {
+  color: var(--color-accent);
 }
 
 .fan-chat-inbox-thread--unread .fan-chat-inbox-thread-name {
@@ -2035,16 +2035,16 @@ h3 {
 }
 
 .fan-chat-thread {
-  background: color-mix(in srgb, var(--color-bg) 55%, transparent);
+  background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: 0;
   box-sizing: border-box;
   display: grid;
   flex: 1 1 auto;
   gap: 8px;
   min-height: 6rem;
   overflow: auto;
-  padding: 10px 12px;
+  padding: 8px 0;
   width: 100%;
 }
 
@@ -2066,31 +2066,31 @@ h3 {
 }
 
 .fan-chat-message {
-  border-radius: 12px;
+  border-radius: 0;
   max-width: 92%;
-  padding: 8px 10px;
+  padding: 6px 0;
 }
 
 .fan-chat-message--incoming {
-  background: var(--color-surface);
+  background: transparent;
   border: none;
-  box-shadow: var(--shadow-surface);
+  box-shadow: none;
   justify-self: start;
 }
 
 .fan-chat-message--outgoing {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  background: transparent;
   border: none;
-  box-shadow: var(--shadow-surface);
+  box-shadow: none;
   justify-self: end;
 }
 
 .fan-chat-broadcast-item {
-  background: var(--color-surface);
+  background: transparent;
   border: none;
-  border-radius: 12px;
-  box-shadow: var(--shadow-surface);
-  padding: 8px 10px;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 6px 0;
 }
 
 .fan-chat-bubble-text {
@@ -2783,7 +2783,7 @@ h3 {
 }
 
 .saved-squad-card {
-  background: var(--color-bg);
+  background: var(--color-surface);
   border: none;
   border-radius: 10px;
   box-shadow: var(--shadow-surface);
@@ -2805,14 +2805,37 @@ h3 {
   box-shadow: var(--shadow-surface-hover);
 }
 
-.saved-squad-card.selected {
+[data-theme="light"] .saved-squad-card.selected,
+:root:not([data-theme]) .saved-squad-card.selected {
+  background: var(--kickboard-pick-active-bg);
+  box-shadow: var(--shadow-surface-hover);
+  color: var(--kickboard-pick-active-fg);
+}
+
+[data-theme="light"] .saved-squad-card.selected .saved-squad-card-name,
+:root:not([data-theme]) .saved-squad-card.selected .saved-squad-card-name {
+  color: var(--kickboard-pick-active-fg);
+}
+
+[data-theme="light"] .saved-squad-card.selected .saved-squad-card-meta,
+[data-theme="light"] .saved-squad-card.selected .saved-squad-card-time,
+:root:not([data-theme]) .saved-squad-card.selected .saved-squad-card-meta,
+:root:not([data-theme]) .saved-squad-card.selected .saved-squad-card-time {
+  color: color-mix(in srgb, var(--kickboard-pick-active-fg) 72%, transparent);
+}
+
+[data-theme="dark"] .saved-squad-card.selected {
   background: var(--kickboard-tab-active-bg);
   box-shadow: var(--shadow-surface-hover);
   color: var(--kickboard-tab-active-fg);
 }
 
-.saved-squad-card.selected .saved-squad-card-meta,
-.saved-squad-card.selected .saved-squad-card-time {
+[data-theme="dark"] .saved-squad-card.selected .saved-squad-card-name {
+  color: var(--kickboard-tab-active-fg);
+}
+
+[data-theme="dark"] .saved-squad-card.selected .saved-squad-card-meta,
+[data-theme="dark"] .saved-squad-card.selected .saved-squad-card-time {
   color: color-mix(in srgb, var(--kickboard-tab-active-fg) 72%, transparent);
 }
 
@@ -10649,40 +10672,38 @@ code {
 
   :root {
     --kickboard-event-tabs-dock: 58px;
-    --kickboard-site-nav-dock: 46px;
+    --kickboard-site-nav-dock: 0px;
     --kickboard-mobile-dock-bottom: 6px;
     --kickboard-mobile-dock-gap: 8px;
     --kickboard-mobile-dock-inset: max(14px, calc(var(--page-gutter) + 6px));
   }
 
   .nav-shell {
-    grid-template-columns: 1fr auto;
+    gap: 8px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     min-height: 64px;
   }
 
   .nav-tabs {
-    -webkit-backdrop-filter: blur(14px) saturate(1.15);
-    backdrop-filter: blur(14px) saturate(1.15);
-    background: var(--kickboard-mobile-dock-bg);
-    border: var(--kickboard-tab-chrome-border);
-    border-radius: 9999px;
-    bottom: calc(
-      var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) + var(--kickboard-mobile-dock-bottom) +
-        env(safe-area-inset-bottom, 0px)
-    );
-    box-shadow: var(--shadow-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-wrap: nowrap;
-    gap: var(--kickboard-tab-rail-gap);
+    gap: 4px;
     justify-content: center;
-    left: 50%;
-    max-width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
-    overflow: hidden;
-    padding: var(--kickboard-tab-rail-padding);
-    position: fixed;
-    transform: translateX(-50%);
-    width: max-content;
-    z-index: 30;
+    max-width: none;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0;
+    position: static;
+    transform: none;
+    width: auto;
+    z-index: auto;
   }
 
   .nav-tabs a {
@@ -10690,15 +10711,15 @@ code {
     background: transparent;
     border-radius: var(--kickboard-tab-item-radius);
     display: inline-flex;
-    flex: 1 1 0;
+    flex: 0 0 auto;
     justify-content: center;
     line-height: var(--kickboard-tab-item-line-height);
     max-width: none;
-    min-height: var(--kickboard-tab-item-min-height);
+    min-height: 36px;
     min-width: 0;
-    padding: 4px var(--kickboard-tab-item-padding-x);
+    padding: 4px 10px;
     text-align: center;
-    white-space: normal;
+    white-space: nowrap;
   }
 
   .nav-tabs a[href="/#community"] {
@@ -10967,22 +10988,10 @@ code {
     padding: 4px var(--kickboard-tab-item-padding-x);
   }
 
-  .nav-tabs {
-    box-sizing: border-box;
-    padding: var(--kickboard-tab-rail-padding);
-  }
-
   .nav-tabs a {
-    align-items: center;
-    border-radius: var(--kickboard-tab-item-radius);
     box-sizing: border-box;
-    display: inline-flex;
-    justify-content: center;
-    line-height: var(--kickboard-tab-item-line-height);
     overflow: hidden;
     overflow-wrap: anywhere;
-    padding: 4px 8px;
-    text-align: center;
   }
 
   /* Predictions, tournament picks, coach bench — centered copy on narrow screens */
