@@ -9,6 +9,8 @@ import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { CurrentEventTabs } from "@/components/current-event-tabs";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
+import { readLocationHash, subscribeLocationHash } from "@/lib/navigation/location-hash";
+import { useLocationHash } from "@/lib/use-location-hash";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 
 type WorldCupCompetition = {
@@ -114,14 +116,9 @@ const CURRENT_EVENT_HASHES = new Set([
   "community"
 ]);
 
-function hashTarget(): string | null {
-  if (typeof window === "undefined") return null;
-  const value = window.location.hash.replace(/^#/, "").trim().toLowerCase();
-  return value || null;
-}
-
 export function FeedBrowser() {
   const mobileEventTabs = useNarrowViewport(860);
+  const locationHash = useLocationHash();
   const [activeTab, setActiveTab] = useState<EventTab>("current");
   const [currentWorldCup, setCurrentWorldCup] = useState<CurrentWorldCup | null>(null);
   const [competitions, setCompetitions] = useState<WorldCupCompetition[]>([]);
@@ -139,7 +136,7 @@ export function FeedBrowser() {
 
   useEffect(() => {
     function syncTabFromHash() {
-      const hash = hashTarget();
+      const hash = readLocationHash();
       if (hash && CURRENT_EVENT_HASHES.has(hash)) {
         setActiveTab("current");
         return;
@@ -150,29 +147,26 @@ export function FeedBrowser() {
     }
 
     syncTabFromHash();
-    window.addEventListener("hashchange", syncTabFromHash);
-    return () => window.removeEventListener("hashchange", syncTabFromHash);
+    return subscribeLocationHash(syncTabFromHash);
   }, []);
 
   useEffect(() => {
     if (activeTab !== "past" || loading) return;
-    const hash = hashTarget();
-    if (!hash || !PAST_EVENT_HASHES.has(hash)) return;
+    if (!locationHash || !PAST_EVENT_HASHES.has(locationHash)) return;
     const frame = window.requestAnimationFrame(() => {
-      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById(locationHash)?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [activeTab, loading, bracketRounds.length, selectedMatchId]);
+  }, [activeTab, loading, locationHash, bracketRounds.length, selectedMatchId]);
 
   useEffect(() => {
     if (activeTab !== "current" || loading) return;
-    const hash = hashTarget();
-    if (!hash || !CURRENT_EVENT_HASHES.has(hash)) return;
+    if (!locationHash || !CURRENT_EVENT_HASHES.has(locationHash)) return;
     const frame = window.requestAnimationFrame(() => {
-      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById(locationHash)?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [activeTab, loading]);
+  }, [activeTab, loading, locationHash]);
 
   useEffect(() => {
     let cancelled = false;
