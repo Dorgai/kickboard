@@ -86,10 +86,11 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
       setSelectedKey(null);
       return;
     }
-    const fromQuery =
-      typeof window !== "undefined"
-        ? new URLSearchParams(window.location.search).get("predictionsFixture")?.trim()
-        : null;
+    const searchParams =
+      typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const fromQuery = searchParams?.get("predictionsFixture")?.trim() ?? null;
+    const fromGroup = searchParams?.get("predictionsGroup")?.trim().toUpperCase() ?? null;
+
     if (fromQuery && fixtures.some((fixture) => fixture.key === fromQuery)) {
       setSelectedKey(fromQuery);
       setSubTab("match");
@@ -100,6 +101,22 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
         }
       }
       return;
+    }
+
+    if (fromGroup) {
+      const groupFixtures = fixtures.filter((fixture) => fixture.group === fromGroup);
+      const firstInGroup = groupFixtures[0]?.key ?? null;
+      if (firstInGroup) {
+        setSelectedKey(firstInGroup);
+        setSubTab("match");
+        if (typeof window !== "undefined") {
+          const hash = window.location.hash.replace(/^#/, "");
+          if (hash !== "predictions-match" && hash !== "predictions") {
+            window.location.hash = "predictions-match";
+          }
+        }
+        return;
+      }
     }
     setSelectedKey((current) =>
       current && fixtures.some((fixture) => fixture.key === current) ? current : fixtures[0].key
@@ -146,13 +163,32 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     function onNavigatePredictions(event: Event) {
       const detail = (event as CustomEvent<NavigatePredictionsDetail>).detail;
       const key = detail?.fixtureKey?.trim();
-      if (!key) return;
-      handleEditPick(key, { scrollToTop: detail?.scrollToTop });
+      if (key) {
+        handleEditPick(key, { scrollToTop: detail?.scrollToTop });
+        return;
+      }
+
+      const group = detail?.group?.trim().toUpperCase();
+      if (!group) return;
+
+      const firstInGroup = fixtures.find((fixture) => fixture.group === group)?.key;
+      if (!firstInGroup) return;
+
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("predictionsGroup", group);
+        url.searchParams.delete("predictionsFixture");
+        url.searchParams.set("predictionsTab", "match");
+        url.hash = "predictions-match";
+        window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+
+      handleEditPick(firstInGroup, { scrollToTop: detail?.scrollToTop });
     }
 
     window.addEventListener(NAVIGATE_PREDICTIONS_EVENT, onNavigatePredictions);
     return () => window.removeEventListener(NAVIGATE_PREDICTIONS_EVENT, onNavigatePredictions);
-  }, [handleEditPick]);
+  }, [fixtures, handleEditPick]);
 
   const viewerDisplayName = session?.user?.name ?? null;
   const selected = fixtures.find((fixture) => fixture.key === selectedKey) ?? null;
