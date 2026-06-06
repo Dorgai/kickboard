@@ -27,6 +27,7 @@ import {
   type FixturePredictionRecord,
   type ScorerPick
 } from "@/lib/fixture-predictions/types";
+import { useClearOnFocusInput } from "@/lib/use-clear-on-focus-input";
 
 type FixturePredictionsFormProps = {
   fixtureKey: string;
@@ -199,6 +200,9 @@ export function FixturePredictionsForm({
   }
 
   const groupedScorerPicks = useMemo(() => groupScorerPicks(scorerPicks), [scorerPicks]);
+
+  const homeScoreInput = useClearOnFocusInput(homeScore, setHomeScore);
+  const awayScoreInput = useClearOnFocusInput(awayScore, setAwayScore);
 
   const scoreDerivedOutcome = useMemo(
     () => outcomeFromScores(homeScore, awayScore),
@@ -411,7 +415,9 @@ export function FixturePredictionsForm({
               placeholder="0"
               type="number"
               value={homeScore}
+              onBlur={homeScoreInput.onBlur}
               onChange={(event) => setHomeScore(event.target.value)}
+              onFocus={homeScoreInput.onFocus}
             />
           </div>
           <span aria-hidden className="fixture-prediction-score-dash">
@@ -432,7 +438,9 @@ export function FixturePredictionsForm({
               placeholder="0"
               type="number"
               value={awayScore}
+              onBlur={awayScoreInput.onBlur}
               onChange={(event) => setAwayScore(event.target.value)}
+              onFocus={awayScoreInput.onFocus}
             />
           </div>
         </div>
