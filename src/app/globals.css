@@ -1276,24 +1276,24 @@ h3 {
   background-repeat: no-repeat;
   background-size: cover;
   inset: 0;
-  opacity: 0.34;
+  opacity: 0.42;
 }
 
 .feed-browser--hero-backdrop::after {
   background:
     linear-gradient(
       108deg,
-      var(--color-bg) 0%,
-      color-mix(in srgb, var(--color-bg) 94%, transparent) 38%,
-      color-mix(in srgb, var(--color-bg) 55%, transparent) 58%,
+      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 82%, transparent) 38%,
+      color-mix(in srgb, var(--color-bg) 42%, transparent) 58%,
       transparent 76%
     ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 84%, transparent) 0%,
       transparent 18%,
       transparent 70%,
-      color-mix(in srgb, var(--color-bg) 96%, transparent) 100%
+      color-mix(in srgb, var(--color-bg) 88%, transparent) 100%
     ),
     radial-gradient(
       ellipse 70% 55% at 88% 28%,
@@ -1304,24 +1304,24 @@ h3 {
 }
 
 [data-theme="dark"] .feed-browser--hero-backdrop::before {
-  opacity: 0.34;
+  opacity: 0.42;
 }
 
 [data-theme="dark"] .feed-browser--hero-backdrop::after {
   background:
     linear-gradient(
       108deg,
-      var(--color-bg) 0%,
-      color-mix(in srgb, var(--color-bg) 94%, transparent) 38%,
-      color-mix(in srgb, var(--color-bg) 55%, transparent) 58%,
+      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 82%, transparent) 38%,
+      color-mix(in srgb, var(--color-bg) 42%, transparent) 58%,
       transparent 76%
     ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 84%, transparent) 0%,
       transparent 18%,
       transparent 70%,
-      color-mix(in srgb, var(--color-bg) 96%, transparent) 100%
+      color-mix(in srgb, var(--color-bg) 88%, transparent) 100%
     ),
     radial-gradient(
       ellipse 70% 55% at 88% 28%,
@@ -1337,13 +1337,13 @@ h3 {
 
   .feed-browser--hero-backdrop::before {
     background-position: 84% 10%;
-    opacity: 0.46;
+    opacity: 0.56;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .feed-browser--hero-backdrop::before {
-    opacity: 0.18;
+    opacity: 0.24;
   }
 }
 
