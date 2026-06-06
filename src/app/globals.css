@@ -5729,18 +5729,12 @@ h3 {
   width: 22%;
 }
 
-.predictions-picks-match-link {
-  background: transparent;
-  border: none;
+.predictions-picks-match-label {
   color: var(--color-text-primary);
-  cursor: pointer;
-  font: inherit;
+  display: block;
   font-size: 11px;
   font-weight: 800;
   line-height: 1.25;
-  padding: 0;
-  text-align: left;
-  text-decoration: underline;
 }
 
 .predictions-picks-col-label {

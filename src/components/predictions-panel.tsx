@@ -294,7 +294,6 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                       fixtures={fixtures}
                       viewerDisplayName={viewerDisplayName}
                       onEditPick={handleEditPick}
-                      onPickNavigate={handlePickNavigate}
                     />
                   ) : null}
 
