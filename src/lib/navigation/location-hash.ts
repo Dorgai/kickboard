@@ -3,6 +3,9 @@ export const HOME_HASH = "predictions";
 
 export const COMMUNITY_HASH = "community";
 
+/** Fired alongside `hashchange` when hash is updated programmatically. */
+export const LOCATION_HASH_EVENT = "kickboard:location-hash";
+
 function normalizeHash(value: string): string {
   return value.replace(/^#/, "").trim().toLowerCase();
 }
@@ -22,6 +25,31 @@ function buildHref(nextHash: string): string {
 export function notifyLocationHashChange() {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new HashChangeEvent("hashchange"));
+  window.dispatchEvent(new Event(LOCATION_HASH_EVENT));
+}
+
+export function isHomePathname(pathname = typeof window !== "undefined" ? window.location.pathname : "") {
+  return pathname === "/" || pathname === "";
+}
+
+/** Same-route hash nav for header/menu links — full page load when not on `/`. */
+export function handleKickboardHashNav(
+  event: { preventDefault(): void },
+  nextHash: string,
+  options?: { replace?: boolean }
+) {
+  if (typeof window === "undefined") return;
+  if (!isHomePathname()) return;
+  event.preventDefault();
+  writeLocationHash(nextHash, options);
+}
+
+export function handleKickboardHomeNav(event: { preventDefault(): void }) {
+  handleKickboardHashNav(event, HOME_HASH);
+}
+
+export function handleKickboardCommunityNav(event: { preventDefault(): void }) {
+  handleKickboardHashNav(event, COMMUNITY_HASH);
 }
 
 /**
@@ -62,8 +90,19 @@ export function subscribeLocationHash(listener: () => void): () => void {
   if (typeof window === "undefined") return () => undefined;
   window.addEventListener("hashchange", listener);
   window.addEventListener("popstate", listener);
+  window.addEventListener(LOCATION_HASH_EVENT, listener);
   return () => {
     window.removeEventListener("hashchange", listener);
     window.removeEventListener("popstate", listener);
+    window.removeEventListener(LOCATION_HASH_EVENT, listener);
   };
+}
+
+export function scrollToLocationHashTarget(hash = readLocationHash()) {
+  if (typeof window === "undefined" || !hash) return;
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
 }

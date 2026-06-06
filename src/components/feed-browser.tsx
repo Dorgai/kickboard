@@ -9,7 +9,11 @@ import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { CurrentEventTabs } from "@/components/current-event-tabs";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
-import { readLocationHash, subscribeLocationHash } from "@/lib/navigation/location-hash";
+import {
+  readLocationHash,
+  scrollToLocationHashTarget,
+  subscribeLocationHash
+} from "@/lib/navigation/location-hash";
 import { useLocationHash } from "@/lib/use-location-hash";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 
@@ -153,19 +157,13 @@ export function FeedBrowser() {
   useEffect(() => {
     if (activeTab !== "past" || loading) return;
     if (!locationHash || !PAST_EVENT_HASHES.has(locationHash)) return;
-    const frame = window.requestAnimationFrame(() => {
-      document.getElementById(locationHash)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-    return () => window.cancelAnimationFrame(frame);
+    scrollToLocationHashTarget(locationHash);
   }, [activeTab, loading, locationHash, bracketRounds.length, selectedMatchId]);
 
   useEffect(() => {
     if (activeTab !== "current" || loading) return;
     if (!locationHash || !CURRENT_EVENT_HASHES.has(locationHash)) return;
-    const frame = window.requestAnimationFrame(() => {
-      document.getElementById(locationHash)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-    return () => window.cancelAnimationFrame(frame);
+    scrollToLocationHashTarget(locationHash);
   }, [activeTab, loading, locationHash]);
 
   useEffect(() => {

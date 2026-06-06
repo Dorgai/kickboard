@@ -9,11 +9,10 @@ import {
   Users
 } from "lucide-react";
 import Link from "next/link";
-import type { MouseEvent } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 import { ThemeSelector } from "@/components/theme-selector";
 import { OPEN_HELP_CENTER_EVENT, requestHelpCenter, requestWelcomeDialog } from "@/lib/help/events";
-import { navigateToCommunity } from "@/lib/navigation/location-hash";
+import { handleKickboardCommunityNav } from "@/lib/navigation/location-hash";
 
 export function HelpMenu() {
   const [open, setOpen] = useState(false);
@@ -61,10 +60,10 @@ export function HelpMenu() {
             className="help-menu-item"
             href="/#community"
             role="menuitem"
-            onClick={(event: MouseEvent<HTMLAnchorElement>) => {
-              event.preventDefault();
+            scroll={false}
+            onClick={(event) => {
+              handleKickboardCommunityNav(event);
               setOpen(false);
-              navigateToCommunity();
             }}
           >
             <Users size={16} aria-hidden />

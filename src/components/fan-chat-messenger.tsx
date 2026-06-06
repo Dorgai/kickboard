@@ -2,8 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { MouseEvent } from "react";
-import { navigateToCommunity } from "@/lib/navigation/location-hash";
+import { handleKickboardCommunityNav } from "@/lib/navigation/location-hash";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { FanChatMessageStatus } from "@/components/fan-chat-message-status";
 import type { FanChatBroadcastSummary, FanChatInboxThread, FanChatMessage } from "@/lib/fan-chat/store";
@@ -223,10 +222,8 @@ export function FanChatMessenger() {
                 Message your connections in private threads. Add friends in{" "}
                 <Link
                   href="/#community"
-                  onClick={(event: MouseEvent<HTMLAnchorElement>) => {
-                    event.preventDefault();
-                    navigateToCommunity();
-                  }}
+                  scroll={false}
+                  onClick={handleKickboardCommunityNav}
                 >
                   Community
                 </Link>{" "}

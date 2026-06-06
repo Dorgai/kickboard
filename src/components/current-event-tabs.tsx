@@ -8,6 +8,7 @@ import { FloatingFanChat } from "@/components/floating-fan-chat";
 import {
   navigateToHome,
   readLocationHash,
+  scrollToLocationHashTarget,
   subscribeLocationHash,
   writeLocationHash
 } from "@/lib/navigation/location-hash";
@@ -212,9 +213,11 @@ export function CurrentEventTabs({
   const mobileDock = useNarrowViewport(861);
 
   const applyHash = useCallback(() => {
-    const { tab, chatOpen: openChat } = parseHash(readLocationHash());
+    const hash = readLocationHash();
+    const { tab, chatOpen: openChat } = parseHash(hash);
     setActiveTab(tab);
     setChatOpen(openChat);
+    scrollToLocationHashTarget(hash);
   }, []);
 
   useEffect(() => {

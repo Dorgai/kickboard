@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { HelpTooltip } from "@/components/help-tooltip";
+import { handleKickboardCommunityNav } from "@/lib/navigation/location-hash";
 import { SquadPitch } from "@/components/squad-pitch";
 import type { SquadFormation, SquadLineupSlot } from "@/lib/squads/lineup";
 
@@ -111,7 +112,9 @@ export function FriendsMatchActivity({ fixtureKey, homeTeam, awayTeam }: Friends
           Connections
           <HelpTooltip label="Connected fans on this match" size="sm">
             Squads and score picks from people you are connected with.{" "}
-            <a href="#community">Manage connections</a>
+            <a href="/#community" onClick={handleKickboardCommunityNav}>
+              Manage connections
+            </a>
           </HelpTooltip>
         </h3>
       </div>
@@ -121,7 +124,10 @@ export function FriendsMatchActivity({ fixtureKey, homeTeam, awayTeam }: Friends
       {!error && peers.length === 0 ? (
         <p className="inline-status">
           No activity from connections for this match yet. Connect with fans in{" "}
-          <a href="#community">Community</a> to compare boards and picks.
+          <a href="/#community" onClick={handleKickboardCommunityNav}>
+            Community
+          </a>{" "}
+          to compare boards and picks.
         </p>
       ) : null}
 

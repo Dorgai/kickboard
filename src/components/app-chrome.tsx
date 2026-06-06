@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import type { MouseEvent } from "react";
 import { GlobalOverlays } from "@/components/global-overlays";
 import { HelpMenu } from "@/components/help-menu";
 import { HeaderUserMenu } from "@/components/header-user-menu";
 import { NotificationsCenter } from "@/components/notifications-center";
 import { navigation } from "@/lib/kickboard-data";
-import { navigateToCommunity, navigateToHome } from "@/lib/navigation/location-hash";
+import {
+  handleKickboardCommunityNav,
+  handleKickboardHomeNav
+} from "@/lib/navigation/location-hash";
 import { useLocationHash } from "@/lib/use-location-hash";
 
 type AppChromeProps = {
@@ -17,16 +19,6 @@ type AppChromeProps = {
 
 function isCommunityHash(hash: string) {
   return hash === "community" || hash === "coach-board" || hash === "fan-chat";
-}
-
-function onHomeNavClick(event: MouseEvent<HTMLAnchorElement>) {
-  event.preventDefault();
-  navigateToHome();
-}
-
-function onCommunityNavClick(event: MouseEvent<HTMLAnchorElement>) {
-  event.preventDefault();
-  navigateToCommunity();
 }
 
 export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
@@ -40,7 +32,8 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
           className="brand"
           href="/#predictions"
           aria-label="Kickboard home"
-          onClick={onHomeNavClick}
+          scroll={false}
+          onClick={handleKickboardHomeNav}
         >
           <span className="brand-mark" aria-hidden="true">
             KB
@@ -60,7 +53,8 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
                 key={item}
                 className={isActive ? "active" : ""}
                 href={item === "Home" ? "/#predictions" : "/#community"}
-                onClick={item === "Home" ? onHomeNavClick : onCommunityNavClick}
+                scroll={false}
+                onClick={item === "Home" ? handleKickboardHomeNav : handleKickboardCommunityNav}
               >
                 {item}
               </Link>
