@@ -15,6 +15,7 @@ import {
   PREDICTION_OUTCOME_OPTION
 } from "@/lib/fixture-predictions/labels";
 import { notifyPredictionActivity } from "@/lib/fixture-predictions/activity-events";
+import { celebratePredictionSubmit } from "@/lib/predictions/submit-celebration";
 import { PREDICTION_OUTCOME_SECTION_ID } from "@/lib/scroll-to-prediction-outcome";
 import {
   groupScorerPicks,
@@ -65,6 +66,7 @@ export function FixturePredictionsForm({
   const [scorerSearch, setScorerSearch] = useState("");
   const [scorersExpanded, setScorersExpanded] = useState(false);
   const scorerSearchRef = useRef<HTMLInputElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
   const [loading, setLoading] = useState(true);
   const [poolLoading, setPoolLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -258,6 +260,9 @@ export function FixturePredictionsForm({
         message: payload.message ?? "Picks saved.",
         variant: change === "unchanged" ? "info" : "success"
       });
+      if (change !== "unchanged") {
+        celebratePredictionSubmit(submitRef.current);
+      }
       onSaved?.(change);
       notifyPredictionActivity();
       await load();
@@ -527,7 +532,12 @@ export function FixturePredictionsForm({
 
       <div className="fixture-prediction-form-footer">
         <div className="fixture-prediction-form-actions">
-          <button className="button primary fixture-prediction-save" disabled={busy || loading} type="submit">
+          <button
+            ref={submitRef}
+            className="button primary fixture-prediction-save"
+            disabled={busy || loading}
+            type="submit"
+          >
             {busy ? "Saving…" : PREDICTION_HINTS.saveButton}
           </button>
           {hasSavedPick ? (
