@@ -3,7 +3,10 @@
 import { MessageCircle, X } from "lucide-react";
 import { useRef } from "react";
 import { FanChatPanel } from "@/components/fan-chat-panel";
-import { useDismissOnOutsidePointerDown } from "@/lib/use-dismiss-on-outside-pointer-down";
+import {
+  useDismissOnEscape,
+  useDismissOnOutsidePointerDown
+} from "@/lib/use-dismiss-on-outside-pointer-down";
 
 type FloatingFanChatProps = {
   open: boolean;
@@ -13,41 +16,43 @@ type FloatingFanChatProps = {
 export function FloatingFanChat({ open, onOpenChange }: FloatingFanChatProps) {
   const panelRef = useRef<HTMLElement>(null);
   const fabRef = useRef<HTMLButtonElement>(null);
+  const close = () => onOpenChange(false);
 
-  useDismissOnOutsidePointerDown(open, () => onOpenChange(false), [panelRef, fabRef]);
+  useDismissOnOutsidePointerDown(open, close, [panelRef, fabRef]);
+  useDismissOnEscape(open, close);
 
   return (
     <div className="fan-chat-float-root" data-open={open ? "true" : "false"}>
       {open ? (
-        <button
-          aria-label="Close Fan Chat"
-          className="fan-chat-float-backdrop"
-          type="button"
-          onClick={() => onOpenChange(false)}
-        />
-      ) : null}
-
-      <aside
-        ref={panelRef}
-        aria-label="Fan Chat"
-        className={`fan-chat-float-panel${open ? " fan-chat-float-panel--open" : ""}`}
-        hidden={!open}
-      >
-        <header className="fan-chat-float-header">
-          <h2>Fan Chat</h2>
+        <>
           <button
-            aria-label="Close"
-            className="fan-chat-float-close"
+            aria-label="Close Fan Chat"
+            className="fan-chat-float-backdrop"
             type="button"
-            onClick={() => onOpenChange(false)}
+            onClick={close}
+          />
+          <aside
+            ref={panelRef}
+            aria-label="Fan Chat"
+            className="fan-chat-float-panel fan-chat-float-panel--open"
           >
-            <X size={18} aria-hidden="true" />
-          </button>
-        </header>
-        <div className="fan-chat-float-body">
-          <FanChatPanel />
-        </div>
-      </aside>
+            <header className="fan-chat-float-header">
+              <h2>Fan Chat</h2>
+              <button
+                aria-label="Close"
+                className="fan-chat-float-close"
+                type="button"
+                onClick={close}
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </header>
+            <div className="fan-chat-float-body">
+              <FanChatPanel />
+            </div>
+          </aside>
+        </>
+      ) : null}
 
       <button
         ref={fabRef}

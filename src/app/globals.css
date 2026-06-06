@@ -998,7 +998,6 @@ h3 {
 .saved-squads-bar,
 .friends-match-activity,
 .fixture-prediction-pick--card,
-.fan-chat-float-panel,
 .community-post-card,
 .predictions-coming-soon {
   background: var(--color-surface);
@@ -1365,7 +1364,6 @@ h3 {
   .saved-squads-bar,
   .friends-match-activity,
   .fixture-prediction-pick--card,
-  .fan-chat-float-panel,
   .community-post-card,
   .predictions-coming-soon,
   .feed-control-card,
@@ -1400,7 +1398,6 @@ h3 {
     .saved-squads-bar,
     .friends-match-activity,
     .fixture-prediction-pick--card,
-    .fan-chat-float-panel,
     .community-post-card,
     .predictions-coming-soon,
     .feed-control-card,
@@ -1738,21 +1735,19 @@ h3 {
   border: none;
   border-radius: 14px 14px 0 0;
   box-shadow: -8px 0 32px color-mix(in srgb, #000 18%, transparent);
+  box-sizing: border-box;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   height: min(85vh, 40rem);
   max-height: calc(100vh - 32px);
+  max-width: 100vw;
+  overflow: hidden;
   position: fixed;
   right: 0;
   bottom: 0;
-  transform: translateX(100%);
-  transition: transform 0.22s ease;
+  transform: translateX(0);
   width: min(22rem, 100vw);
   z-index: 39;
-}
-
-.fan-chat-float-panel--open {
-  transform: translateX(0);
 }
 
 .fan-chat-float-header {
@@ -1788,8 +1783,16 @@ h3 {
 
 .fan-chat-float-body {
   min-height: 0;
+  min-width: 0;
   overflow: auto;
   padding: 12px 14px 16px;
+}
+
+.fan-chat-float-body .inline-error,
+.fan-chat-float-body .inline-status {
+  margin: 0 0 8px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .fan-chat-messenger {
@@ -2094,14 +2097,9 @@ h3 {
     border-radius: 14px 0 0 14px;
     bottom: 16px;
     height: min(80vh, 40rem);
-    max-width: min(28rem, 92vw);
+    max-width: min(28rem, calc(100vw - 32px));
     right: 16px;
-    transform: translateX(calc(100% + 24px));
-    width: min(28rem, 92vw);
-  }
-
-  .fan-chat-float-panel--open {
-    transform: translateX(0);
+    width: min(28rem, calc(100vw - 32px));
   }
 
   .fan-chat-float-backdrop {
