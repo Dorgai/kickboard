@@ -1,34 +1,23 @@
 "use client";
 
-import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
+import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 
 type FixturePredictionPickProps = {
   fixtureKey: string;
   homeTeam: string;
   awayTeam: string;
-  /** @deprecated Use coachBoard */
-  inline?: boolean;
-  coachBoard?: boolean;
-  onSaved?: () => void;
 };
 
-/** Coach Board — outcome + score below the pitch (scorers on Predictions tab). */
-export function FixturePredictionPick({
-  fixtureKey,
-  homeTeam,
-  awayTeam,
-  inline = false,
-  coachBoard = false,
-  onSaved
-}: FixturePredictionPickProps) {
-  const onCoachBoard = coachBoard || inline;
+/** Coach Board — link to the Predictions tab with this fixture pre-selected. */
+export function FixturePredictionPick({ fixtureKey, homeTeam, awayTeam }: FixturePredictionPickProps) {
   return (
-    <FixturePredictionsForm
-      awayTeam={awayTeam}
-      coachBoard={onCoachBoard}
-      fixtureKey={fixtureKey}
-      homeTeam={homeTeam}
-      onSaved={onSaved}
-    />
+    <button
+      aria-label={`Make predictions for ${homeTeam} vs ${awayTeam}`}
+      className="button secondary squad-builder-predictions-link"
+      type="button"
+      onClick={() => navigateToPredictFixture(fixtureKey)}
+    >
+      Make your picks
+    </button>
   );
 }
