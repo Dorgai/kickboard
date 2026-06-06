@@ -78,6 +78,8 @@ Use instead:
 
 Applies to **Fan Chat**, **saved Coach Board squads** (`.saved-squad-card.selected`), **match/tournament picks**, and similar toggles. Reserve `outline` for **`:focus-visible`** keyboard focus only. Structural card shells may keep borders; selection state should not add new contour lines.
 
+**Grey fill text:** Any **dark grey** active/selected surface (`--kickboard-tab-active-bg`, e.g. tabs, saved boards, picker chips) must use **light** foreground (`--kickboard-tab-active-fg`) on the container and all nested labels (`team-label-text`, meta lines, etc.). See the grey-fill `:is(...)` rules near `.nav-tabs a.active` in `globals.css`. Light page grey (`--color-bg`) keeps normal dark text.
+
 ### Feed UI flags and typography
 
 - Country flags load from `flagcdn.com` via native `<img>` in `team-label.tsx` (not `next/image`); use fixed `32x24` / `40x30` / `48x36` CDN paths from `flagImageUrl()` — arbitrary widths like `w32` return **404** and show gray fallbacks.
