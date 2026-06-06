@@ -5126,6 +5126,42 @@ h3 {
   margin: 0;
 }
 
+.tournament-predictions-form--blocks {
+  background: transparent;
+  box-shadow: none;
+  gap: 12px;
+  padding: 0;
+}
+
+.tournament-predictions-blocks {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+.tournament-pick-block {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 16px;
+  width: 100%;
+}
+
+.tournament-predictions-form--blocks .tournament-champion-field,
+.tournament-predictions-form--blocks .tournament-opponent-field {
+  border-bottom: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tournament-predictions-form-footer {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-surface);
+  margin-top: 4px;
+  padding: 14px 16px;
+}
+
 .fixture-predictions-form .feed-control-input,
 .tournament-predictions-form .feed-control-input,
 .tournament-player-pick-field .feed-control-input {

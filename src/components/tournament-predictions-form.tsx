@@ -705,131 +705,148 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
         titleClassName="tournament-predictions-title"
       />
 
-      <form className="fixture-predictions-form tournament-predictions-form" onSubmit={savePick}>
-        <fieldset className="fixture-prediction-field tournament-champion-field">
-          <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
-            {TOURNAMENT_PREDICTION_BLOCKS.champion}
-            <HelpTooltip label="Champion help" size="sm">
-              {TOURNAMENT_PREDICTION_HINTS.champion}
-            </HelpTooltip>
-          </legend>
-          <TeamPickGrid
-            name="tournament-champion"
-            selected={champion}
-            teams={teams}
-            onSelect={selectChampion}
-          />
-          {champion ? (
-            <button className="text-button fixture-prediction-clear" type="button" onClick={() => selectChampion(null)}>
-              Clear
-            </button>
-          ) : null}
-        </fieldset>
-
-        <fieldset
-          aria-disabled={!champion}
-          className="fixture-prediction-field tournament-opponent-field"
-        >
-          <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
-            {TOURNAMENT_PREDICTION_BLOCKS.finalOpponent}
-            <HelpTooltip label="Final opponent help" size="sm">
-              {TOURNAMENT_PREDICTION_HINTS.finalOpponent}
-            </HelpTooltip>
-          </legend>
-          {champion ? (
-            <>
+      <form
+        className="fixture-predictions-form tournament-predictions-form tournament-predictions-form--blocks"
+        onSubmit={savePick}
+      >
+        <div className="tournament-predictions-blocks">
+          <section className="tournament-pick-block data-card" id="tournament-pick-champion">
+            <fieldset className="fixture-prediction-field tournament-champion-field">
+              <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
+                {TOURNAMENT_PREDICTION_BLOCKS.champion}
+                <HelpTooltip label="Champion help" size="sm">
+                  {TOURNAMENT_PREDICTION_HINTS.champion}
+                </HelpTooltip>
+              </legend>
               <TeamPickGrid
-                name="tournament-final-opponent"
-                selected={opponent}
-                teams={opponentTeams}
-                onSelect={setOpponent}
+                name="tournament-champion"
+                selected={champion}
+                teams={teams}
+                onSelect={selectChampion}
               />
-              {opponent ? (
+              {champion ? (
                 <button
                   className="text-button fixture-prediction-clear"
                   type="button"
-                  onClick={() => setOpponent(null)}
+                  onClick={() => selectChampion(null)}
                 >
                   Clear
                 </button>
               ) : null}
-            </>
-          ) : (
-            <p className="tournament-opponent-prereq">{TOURNAMENT_PREDICTION_HINTS.finalOpponentPrereq}</p>
-          )}
-        </fieldset>
+            </fieldset>
+          </section>
 
-        <SinglePlayerPickField
-          blockLabel={TOURNAMENT_PREDICTION_BLOCKS.topScorer}
-          expanded={topScorerExpanded}
-          help={TOURNAMENT_PREDICTION_HINTS.topScorer}
-          players={players}
-          poolLoading={poolLoading}
-          search={topScorerSearch}
-          selected={topScorer}
-          onClear={() => setTopScorer(null)}
-          onSearchChange={setTopScorerSearch}
-          onSelect={(player) => {
-            setTopScorer({
-              playerId: player.playerId,
-              playerName: player.name,
-              teamName: player.teamName
-            });
-            setTopScorerExpanded(false);
-          }}
-          onToggleExpanded={() => {
-            setTopScorerExpanded((open) => !open);
-            setTopScorerBoardExpanded(false);
-            setTopScorerBoardActiveRank(null);
-            setBestPlayerExpanded(false);
-          }}
-        />
+          <section className="tournament-pick-block data-card" id="tournament-pick-opponent">
+            <fieldset
+              aria-disabled={!champion}
+              className="fixture-prediction-field tournament-opponent-field"
+            >
+              <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
+                {TOURNAMENT_PREDICTION_BLOCKS.finalOpponent}
+                <HelpTooltip label="Final opponent help" size="sm">
+                  {TOURNAMENT_PREDICTION_HINTS.finalOpponent}
+                </HelpTooltip>
+              </legend>
+              {champion ? (
+                <>
+                  <TeamPickGrid
+                    name="tournament-final-opponent"
+                    selected={opponent}
+                    teams={opponentTeams}
+                    onSelect={setOpponent}
+                  />
+                  {opponent ? (
+                    <button
+                      className="text-button fixture-prediction-clear"
+                      type="button"
+                      onClick={() => setOpponent(null)}
+                    >
+                      Clear
+                    </button>
+                  ) : null}
+                </>
+              ) : (
+                <p className="tournament-opponent-prereq">{TOURNAMENT_PREDICTION_HINTS.finalOpponentPrereq}</p>
+              )}
+            </fieldset>
+          </section>
 
-        <TopScorerBoardField
-          activeRank={topScorerBoardActiveRank}
-          enabled={topScorerBoardEnabled}
-          expanded={topScorerBoardExpanded}
-          picks={topScorerBoardPicks}
-          players={players}
-          poolLoading={poolLoading}
-          search={topScorerBoardSearch}
-          size={topScorerBoardSize}
-          onClearRank={clearTopScorerBoardRank}
-          onEnabledChange={setTopScorerBoardEnabledState}
-          onGoalsChange={setTopScorerBoardGoals}
-          onSearchChange={setTopScorerBoardSearch}
-          onSelectRank={selectTopScorerBoardPlayer}
-          onSizeChange={setTopScorerBoardSizeState}
-          onToggleExpanded={toggleTopScorerBoardExpanded}
-        />
+          <section className="tournament-pick-block data-card" id="tournament-pick-top-scorer">
+            <SinglePlayerPickField
+              blockLabel={TOURNAMENT_PREDICTION_BLOCKS.topScorer}
+              expanded={topScorerExpanded}
+              help={TOURNAMENT_PREDICTION_HINTS.topScorer}
+              players={players}
+              poolLoading={poolLoading}
+              search={topScorerSearch}
+              selected={topScorer}
+              onClear={() => setTopScorer(null)}
+              onSearchChange={setTopScorerSearch}
+              onSelect={(player) => {
+                setTopScorer({
+                  playerId: player.playerId,
+                  playerName: player.name,
+                  teamName: player.teamName
+                });
+                setTopScorerExpanded(false);
+              }}
+              onToggleExpanded={() => {
+                setTopScorerExpanded((open) => !open);
+                setTopScorerBoardExpanded(false);
+                setTopScorerBoardActiveRank(null);
+                setBestPlayerExpanded(false);
+              }}
+            />
 
-        <SinglePlayerPickField
-          blockLabel={TOURNAMENT_PREDICTION_BLOCKS.bestPlayer}
-          expanded={bestPlayerExpanded}
-          help={TOURNAMENT_PREDICTION_HINTS.bestPlayer}
-          players={players}
-          poolLoading={poolLoading}
-          search={bestPlayerSearch}
-          selected={bestPlayer}
-          onClear={() => setBestPlayer(null)}
-          onSearchChange={setBestPlayerSearch}
-          onSelect={(player) => {
-            setBestPlayer({
-              playerId: player.playerId,
-              playerName: player.name,
-              teamName: player.teamName
-            });
-            setBestPlayerExpanded(false);
-          }}
-          onToggleExpanded={() => {
-            setBestPlayerExpanded((open) => !open);
-            setTopScorerExpanded(false);
-            setTopScorerBoardExpanded(false);
-            setTopScorerBoardActiveRank(null);
-          }}
-        />
+            <TopScorerBoardField
+              activeRank={topScorerBoardActiveRank}
+              enabled={topScorerBoardEnabled}
+              expanded={topScorerBoardExpanded}
+              picks={topScorerBoardPicks}
+              players={players}
+              poolLoading={poolLoading}
+              search={topScorerBoardSearch}
+              size={topScorerBoardSize}
+              onClearRank={clearTopScorerBoardRank}
+              onEnabledChange={setTopScorerBoardEnabledState}
+              onGoalsChange={setTopScorerBoardGoals}
+              onSearchChange={setTopScorerBoardSearch}
+              onSelectRank={selectTopScorerBoardPlayer}
+              onSizeChange={setTopScorerBoardSizeState}
+              onToggleExpanded={toggleTopScorerBoardExpanded}
+            />
+          </section>
 
-        <div className="fixture-prediction-form-footer">
+          <section className="tournament-pick-block data-card" id="tournament-pick-best-player">
+            <SinglePlayerPickField
+              blockLabel={TOURNAMENT_PREDICTION_BLOCKS.bestPlayer}
+              expanded={bestPlayerExpanded}
+              help={TOURNAMENT_PREDICTION_HINTS.bestPlayer}
+              players={players}
+              poolLoading={poolLoading}
+              search={bestPlayerSearch}
+              selected={bestPlayer}
+              onClear={() => setBestPlayer(null)}
+              onSearchChange={setBestPlayerSearch}
+              onSelect={(player) => {
+                setBestPlayer({
+                  playerId: player.playerId,
+                  playerName: player.name,
+                  teamName: player.teamName
+                });
+                setBestPlayerExpanded(false);
+              }}
+              onToggleExpanded={() => {
+                setBestPlayerExpanded((open) => !open);
+                setTopScorerExpanded(false);
+                setTopScorerBoardExpanded(false);
+                setTopScorerBoardActiveRank(null);
+              }}
+            />
+          </section>
+        </div>
+
+        <div className="fixture-prediction-form-footer tournament-predictions-form-footer">
           <div className="fixture-prediction-form-actions">
             <button
               ref={submitRef}
