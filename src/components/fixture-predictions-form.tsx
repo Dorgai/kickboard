@@ -18,11 +18,14 @@ import { notifyPredictionActivity } from "@/lib/fixture-predictions/activity-eve
 import { celebratePredictionSubmit } from "@/lib/predictions/submit-celebration";
 import { PREDICTION_OUTCOME_SECTION_ID } from "@/lib/scroll-to-prediction-outcome";
 import {
+  countScorerPicksBySide,
   groupScorerPicks,
   MAX_SCORER_PICKS,
   outcomeFromScores,
   outcomeLabel,
   outcomeShort,
+  scorerLimitsFromScore,
+  trimScorerPicksToScore,
   type FixtureOutcome,
   type FixturePredictionRecord,
   type ScorerPick
@@ -154,30 +157,63 @@ export function FixturePredictionsForm({
     });
   }, [players, scorerSearch]);
 
+  const parsedHomeScore = homeScore.trim() === "" ? null : Number(homeScore);
+  const parsedAwayScore = awayScore.trim() === "" ? null : Number(awayScore);
+  const scorerLimits = useMemo(() => {
+    if (
+      parsedHomeScore === null ||
+      parsedAwayScore === null ||
+      !Number.isInteger(parsedHomeScore) ||
+      !Number.isInteger(parsedAwayScore) ||
+      parsedHomeScore < 0 ||
+      parsedAwayScore < 0
+    ) {
+      return null;
+    }
+    return scorerLimitsFromScore(parsedHomeScore, parsedAwayScore);
+  }, [parsedAwayScore, parsedHomeScore]);
+
+  const scorerCounts = useMemo(() => countScorerPicksBySide(scorerPicks), [scorerPicks]);
+
+  useEffect(() => {
+    if (!scorerLimits) return;
+    setScorerPicks((current) => {
+      const trimmed = trimScorerPicksToScore(current, scorerLimits);
+      return trimmed.length === current.length ? current : trimmed;
+    });
+  }, [scorerLimits]);
+
+  function canAddScorerGoal(teamSide: ScorerPick["teamSide"]) {
+    if (scorerLimits) {
+      if (scorerLimits.total === 0) return false;
+      if (scorerCounts.total >= scorerLimits.total) return false;
+      if (teamSide === "home" && scorerCounts.home >= scorerLimits.home) return false;
+      if (teamSide === "away" && scorerCounts.away >= scorerLimits.away) return false;
+      return true;
+    }
+    return scorerPicks.length < MAX_SCORER_PICKS;
+  }
+
   function scorerCount(playerId: number) {
     return scorerPicks.filter((pick) => pick.playerId === playerId).length;
   }
 
   function addScorerGoal(player: SquadPoolPlayer) {
     const teamSide = teamsMatch(player.teamName, homeTeam) ? "home" : "away";
-    setScorerPicks((current) => {
-      if (current.length >= MAX_SCORER_PICKS) return current;
-      return [
-        ...current,
-        {
-          playerId: player.playerId,
-          playerName: player.name,
-          teamSide
-        }
-      ];
-    });
+    if (!canAddScorerGoal(teamSide)) return;
+    setScorerPicks((current) => [
+      ...current,
+      {
+        playerId: player.playerId,
+        playerName: player.name,
+        teamSide
+      }
+    ]);
   }
 
   function addScorerGoalFromPick(pick: ScorerPick) {
-    setScorerPicks((current) => {
-      if (current.length >= MAX_SCORER_PICKS) return current;
-      return [...current, pick];
-    });
+    if (!canAddScorerGoal(pick.teamSide)) return;
+    setScorerPicks((current) => [...current, pick]);
   }
 
   function removeOneScorerGoal(playerId: number) {
@@ -472,6 +508,11 @@ export function FixturePredictionsForm({
             <span className="fixture-prediction-scorers-toggle-copy">
               <span className="fixture-prediction-scorers-toggle-title fixture-prediction-field-label--with-help">
                 {PREDICTION_BLOCKS.scorers}
+                {scorerLimits ? (
+                  <span className="fixture-prediction-scorers-progress">
+                    {scorerCounts.total} / {scorerLimits.total} goals
+                  </span>
+                ) : null}
                 <HelpTooltip
                   label="Goal scorers help"
                   size="sm"
@@ -515,7 +556,7 @@ export function FixturePredictionsForm({
                       <button
                         aria-label={`Add one goal for ${pick.playerName}`}
                         className="fixture-scorer-step"
-                        disabled={busy || scorerPicks.length >= MAX_SCORER_PICKS}
+                        disabled={busy || !canAddScorerGoal(pick.teamSide)}
                         type="button"
                         onClick={() => addScorerGoalFromPick(pick)}
                       >
@@ -545,7 +586,9 @@ export function FixturePredictionsForm({
                     <li key={player.playerId}>
                       <button
                         className={`fixture-scorer-chip${goals > 0 ? " fixture-scorer-chip--selected" : ""}`}
-                        disabled={scorerPicks.length >= MAX_SCORER_PICKS}
+                        disabled={
+                          !canAddScorerGoal(teamsMatch(player.teamName, homeTeam) ? "home" : "away")
+                        }
                         type="button"
                         onClick={() => addScorerGoal(player)}
                       >

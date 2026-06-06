@@ -8,6 +8,7 @@ import {
 } from "@/lib/fixture-predictions/snapshot";
 import {
   MAX_SCORER_PICKS,
+  validateScorerPicksForScore,
   normalizeResultStatus,
   parseScorerPicks,
   type FixtureOutcome,
@@ -125,6 +126,9 @@ export async function upsertUserFixturePrediction(input: {
       : (existing?.scorerPicks ?? []);
 
   if (scorerPicks.length > MAX_SCORER_PICKS) throw new Error("TOO_MANY_SCORERS");
+
+  const scorerScoreError = validateScorerPicksForScore(scorerPicks, homeScore, awayScore);
+  if (scorerScoreError) throw new Error(scorerScoreError);
 
   const hasOutcome = Boolean(predictedOutcome);
   const hasScore = homeScore !== null && awayScore !== null;

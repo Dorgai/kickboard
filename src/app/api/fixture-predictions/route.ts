@@ -109,6 +109,27 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    if (error instanceof Error && error.message === "TOO_MANY_SCORERS_FOR_SCORE") {
+      return NextResponse.json(
+        { error: "Who scores must match your final score — one pick per goal." },
+        { status: 400 }
+      );
+    }
+    if (
+      error instanceof Error &&
+      (error.message === "TOO_MANY_HOME_SCORERS" || error.message === "TOO_MANY_AWAY_SCORERS")
+    ) {
+      return NextResponse.json(
+        { error: "Each team can only have as many scorer picks as goals in your scoreline." },
+        { status: 400 }
+      );
+    }
+    if (error instanceof Error && error.message === "SCORERS_WITH_ZERO_SCORE") {
+      return NextResponse.json(
+        { error: "A 0–0 score cannot have goal scorers. Clear scorers or change the score." },
+        { status: 400 }
+      );
+    }
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
     return NextResponse.json({ error: "Unable to save prediction." }, { status: 500 });

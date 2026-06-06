@@ -27,8 +27,68 @@ export type FixturePredictionRecord = {
 
 export type PredictionCategory = "outcome" | "score" | "scorers";
 
-/** Max individual goal picks (same player may appear multiple times). */
+/** Max individual goal picks when no final score is entered (same player may appear multiple times). */
 export const MAX_SCORER_PICKS = 8;
+
+export type ScorerPickLimits = {
+  home: number;
+  away: number;
+  total: number;
+};
+
+export function scorerLimitsFromScore(
+  homeScore: number | null,
+  awayScore: number | null
+): ScorerPickLimits | null {
+  if (homeScore === null || awayScore === null) return null;
+  if (!Number.isInteger(homeScore) || !Number.isInteger(awayScore)) return null;
+  if (homeScore < 0 || awayScore < 0) return null;
+  return { home: homeScore, away: awayScore, total: homeScore + awayScore };
+}
+
+export function countScorerPicksBySide(picks: ScorerPick[]) {
+  let home = 0;
+  let away = 0;
+  for (const pick of picks) {
+    if (pick.teamSide === "home") home += 1;
+    else away += 1;
+  }
+  return { home, away, total: picks.length };
+}
+
+/** Drop excess scorer rows when the predicted score shrinks. */
+export function trimScorerPicksToScore(picks: ScorerPick[], limits: ScorerPickLimits) {
+  const trimmed: ScorerPick[] = [];
+  let home = 0;
+  let away = 0;
+  for (const pick of picks) {
+    if (trimmed.length >= limits.total) break;
+    if (pick.teamSide === "home") {
+      if (home >= limits.home) continue;
+      home += 1;
+    } else {
+      if (away >= limits.away) continue;
+      away += 1;
+    }
+    trimmed.push(pick);
+  }
+  return trimmed;
+}
+
+export function validateScorerPicksForScore(
+  picks: ScorerPick[],
+  homeScore: number | null,
+  awayScore: number | null
+) {
+  const limits = scorerLimitsFromScore(homeScore, awayScore);
+  if (!limits) return null;
+  const counts = countScorerPicksBySide(picks);
+  if (counts.total > limits.total) return "TOO_MANY_SCORERS_FOR_SCORE";
+  if (counts.home > limits.home) return "TOO_MANY_HOME_SCORERS";
+  if (counts.away > limits.away) return "TOO_MANY_AWAY_SCORERS";
+  if (limits.total === 0 && counts.total > 0) return "SCORERS_WITH_ZERO_SCORE";
+  return null;
+}
 
 export function groupScorerPicks(picks: ScorerPick[]) {
   const order: number[] = [];
