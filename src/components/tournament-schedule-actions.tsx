@@ -2,15 +2,13 @@
 
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 import {
+  fixtureKeyForGroupMatch,
   fixturesForGroupDisplay,
   formatTournamentFixtureDate,
   knockoutPlaceholdersForStage,
   type TournamentScheduleFixture
 } from "@/lib/feeds/wc26-tournament-schedule";
-import {
-  navigateToPredictFixture,
-  navigateToPredictGroup
-} from "@/lib/session-checkpoint/navigate";
+import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 
 type TournamentGroupScheduleProps = {
   group: {
@@ -19,6 +17,39 @@ type TournamentGroupScheduleProps = {
     fixtures: TournamentScheduleFixture[];
   };
 };
+
+function TournamentFixtureRow({
+  fixtureKey,
+  fixture,
+  metaLabel
+}: {
+  fixtureKey: string;
+  fixture: TournamentScheduleFixture;
+  metaLabel?: string;
+}) {
+  return (
+    <li className="current-event-fixture-row current-event-fixture-row--with-predict">
+      <div className="current-event-fixture-match">
+        {metaLabel ? <span className="current-event-fixture-stage-label">{metaLabel}</span> : null}
+        <MatchTeamsLine
+          awayTeam={fixture.awayTeam}
+          homeTeam={fixture.homeTeam}
+          layout="stacked"
+          size="xs"
+        />
+        <span className="current-event-fixture-date">{formatTournamentFixtureDate(fixture.date)}</span>
+      </div>
+      <button
+        aria-label={`Predict ${fixture.homeTeam} vs ${fixture.awayTeam}`}
+        className="button secondary current-event-predict-action current-event-predict-action--game"
+        type="button"
+        onClick={() => navigateToPredictFixture(fixtureKey, { scrollToTop: true })}
+      >
+        Predict
+      </button>
+    </li>
+  );
+}
 
 export function TournamentGroupSchedule({ group }: TournamentGroupScheduleProps) {
   const fixtures = fixturesForGroupDisplay(group);
@@ -43,29 +74,13 @@ export function TournamentGroupSchedule({ group }: TournamentGroupScheduleProps)
 
       <ul className="current-event-fixture-list" aria-label={`Group ${group.group} fixtures`}>
         {fixtures.map((fixture, index) => (
-          <li className="current-event-fixture-row" key={`${group.group}-fixture-${index}`}>
-            <div className="current-event-fixture-match">
-              <MatchTeamsLine
-                awayTeam={fixture.awayTeam}
-                homeTeam={fixture.homeTeam}
-                layout="stacked"
-                size="xs"
-              />
-              <span className="current-event-fixture-date">
-                {formatTournamentFixtureDate(fixture.date)}
-              </span>
-            </div>
-          </li>
+          <TournamentFixtureRow
+            key={`${group.group}-fixture-${index}`}
+            fixture={fixture}
+            fixtureKey={fixtureKeyForGroupMatch(group.group, fixture, index)}
+          />
         ))}
       </ul>
-
-      <button
-        className="button secondary current-event-predict-action"
-        type="button"
-        onClick={() => navigateToPredictGroup(group.group, { scrollToTop: true })}
-      >
-        Make your predictions for this group
-      </button>
     </div>
   );
 }
@@ -76,25 +91,12 @@ export function TournamentKnockoutSchedule({ stage }: { stage: string }) {
   return (
     <ul className="current-event-fixture-list" aria-label={`${stage} fixtures`}>
       {matches.map((match) => (
-        <li className="current-event-fixture-row current-event-fixture-row--knockout" key={match.matchId}>
-          <div className="current-event-fixture-match">
-            <span className="current-event-fixture-stage-label">{match.label}</span>
-            <MatchTeamsLine
-              awayTeam={match.awayTeam}
-              homeTeam={match.homeTeam}
-              layout="stacked"
-              size="xs"
-            />
-            <span className="current-event-fixture-date">{formatTournamentFixtureDate(match.date)}</span>
-          </div>
-          <button
-            className="button secondary current-event-predict-action current-event-predict-action--game"
-            type="button"
-            onClick={() => navigateToPredictFixture(match.fixtureKey, { scrollToTop: true })}
-          >
-            Make predictions for this game
-          </button>
-        </li>
+        <TournamentFixtureRow
+          key={match.matchId}
+          fixture={match}
+          fixtureKey={match.fixtureKey}
+          metaLabel={match.label}
+        />
       ))}
     </ul>
   );

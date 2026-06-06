@@ -8793,6 +8793,7 @@ h3 {
   padding: 12px 14px;
 }
 
+.current-event-fixture-row--with-predict,
 .current-event-fixture-row--knockout {
   grid-template-columns: minmax(0, 1fr) auto;
 }
@@ -8834,6 +8835,7 @@ h3 {
 }
 
 @media (max-width: 640px) {
+  .current-event-fixture-row--with-predict,
   .current-event-fixture-row--knockout {
     grid-template-columns: 1fr;
   }
