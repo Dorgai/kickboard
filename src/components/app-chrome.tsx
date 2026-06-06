@@ -6,6 +6,7 @@ import { GlobalOverlays } from "@/components/global-overlays";
 import { HelpMenu } from "@/components/help-menu";
 import { HeaderUserMenu } from "@/components/header-user-menu";
 import { NotificationsCenter } from "@/components/notifications-center";
+import { BRAND } from "@/lib/brand";
 import { navigation } from "@/lib/kickboard-data";
 import {
   handleKickboardCommunityNav,
@@ -31,14 +32,14 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
         <Link
           className="brand"
           href="/#predictions"
-          aria-label="Kickboard home"
+          aria-label={`${BRAND.name} home`}
           scroll={false}
           onClick={handleKickboardHomeNav}
         >
           <span className="brand-mark" aria-hidden="true">
-            KB
+            {BRAND.shortMark}
           </span>
-          <span>KICKBOARD</span>
+          <span>{BRAND.wordmark}</span>
         </Link>
 
         <span className="tournament-switcher tournament-switcher--label">FIFA World Cup 2026</span>

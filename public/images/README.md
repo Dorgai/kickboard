@@ -1,4 +1,4 @@
-# Kickboard hero imagery
+# MyPicks hero imagery
 
 ## `kickboard-hero-spain.webp` / `kickboard-hero-spain-mobile.webp`
 

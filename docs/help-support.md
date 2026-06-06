@@ -3,7 +3,7 @@
 Fans use **Help** in the header:
 
 - **Welcome tour** — reopens the first-visit dialog.
-- **Ask Kickboard AI** — answers from `content/help-knowledge/*.md` (and OpenAI when configured).
+- **Ask MyPicks AI** — answers from `content/help-knowledge/*.md` (and OpenAI when configured).
 - **Ask an admin** — threaded messages stored in Postgres for operator review.
 
 ## Database

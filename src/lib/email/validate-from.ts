@@ -42,7 +42,7 @@ export function formatResendSendErrorDetail(status: number, rawBody: string): st
       if (status === 403 && lower.includes("testing emails")) {
         return (
           "Resend is in test mode: you can only email your own Resend account address until a domain is verified. " +
-          "Add your domain at resend.com/domains, set Railway EMAIL_FROM to something like Kickboard <invites@yourdomain.com>, " +
+          "Add your domain at resend.com/domains, set Railway EMAIL_FROM to something like MyPicks <invites@yourdomain.com>, " +
           "then redeploy. Until then, copy the invite link below."
         );
       }

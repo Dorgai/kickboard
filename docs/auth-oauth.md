@@ -53,7 +53,7 @@ If Google shows **“doesn't comply with OAuth 2.0 policy”** or **Error 400: i
 2. If **Publishing status** is **Testing**, only **Test users** can sign in.
 3. Under **Test users** → **Add users** → add each Gmail you want during testing.
 4. To allow **anyone** to sign in, follow **[Publish for production](publish-production.md)**:
-   - Set privacy policy to `https://<your-host>/privacy` (hosted by Kickboard).
+   - Set privacy policy to `https://<your-host>/privacy` (hosted by MyPicks).
    - Set application home page to `https://<your-host>`.
    - Click **Publish app** on the consent screen (External user type).
 
@@ -83,7 +83,7 @@ If those are unset, Railway’s internal host (`0.0.0.0:8080`) is used and Googl
 2. Redeploy.
 3. Check `https://kickboard-production.up.railway.app/api/auth/providers` — `callbackUrl` must be your Railway host, **not** `https://0.0.0.0:8080/...`.
 
-Kickboard also copies `NEXT_PUBLIC_APP_URL` → `AUTH_URL` at server boot when possible; setting `AUTH_URL` explicitly is still recommended.
+MyPicks also copies `NEXT_PUBLIC_APP_URL` → `AUTH_URL` at server boot when possible; setting `AUTH_URL` explicitly is still recommended.
 
 If `/api/auth/config` shows `googleRedirectUri` as `http://localhost:3000/...`, set `AUTH_URL` on Railway to your production URL and redeploy.
 

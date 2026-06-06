@@ -120,7 +120,7 @@ export function AdminUserManagementPanel({
       }
 
       setDmBody("");
-      setNotice(`Direct message sent to @${selected.username} as Kickboard.`);
+      setNotice(`Direct message sent to @${selected.username} as MyPicks.`);
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : "Unable to send message.");
     } finally {
@@ -260,7 +260,7 @@ export function AdminUserManagementPanel({
               ) : null}
 
               <label className="feed-control-field">
-                <span>Direct message as Kickboard</span>
+                <span>Direct message as MyPicks</span>
                 <textarea
                   className="feed-control-input admin-user-dm-input"
                   rows={3}

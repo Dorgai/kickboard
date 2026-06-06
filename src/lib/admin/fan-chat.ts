@@ -125,7 +125,7 @@ export async function sendAdminDirectMessage(recipientUserId: string, body: stri
     userId: recipientUserId,
     alertKey: `fan-chat:${row.id}`,
     category: "connection_activity",
-    title: "Message from Kickboard",
+    title: "Message from MyPicks",
     body: preview,
     href: "/#fan-chat",
     occurredAt: row.created_at,

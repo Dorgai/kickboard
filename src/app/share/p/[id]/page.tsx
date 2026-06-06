@@ -17,17 +17,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const payload = await resolvePredictionSharePayload(id);
   if (!payload) {
     return {
-      title: "Kickboard prediction",
-      description: "World Cup predictions on Kickboard."
+      title: "MyPicks prediction",
+      description: "World Cup predictions on MyPicks."
     };
   }
 
   const caption = buildPredictionShareCaption(payload);
   return {
-    title: `${payload.fixtureLabel} — Kickboard`,
+    title: `${payload.fixtureLabel} — MyPicks`,
     description: caption,
     openGraph: {
-      title: `${payload.fixtureLabel} — Kickboard prediction`,
+      title: `${payload.fixtureLabel} — MyPicks prediction`,
       description: caption,
       type: "website"
     }

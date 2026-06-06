@@ -15,7 +15,7 @@ export async function GET() {
         workerEnabled,
         requiredRailwayVariables: ["API_FOOTBALL_KEY", "KICKBOARD_WORKER_ENABLED=true"],
         message:
-          "Real-time data is not connected yet. Set API_FOOTBALL_KEY and KICKBOARD_WORKER_ENABLED=true on the kickboard web service (see docs/api-football-live-setup.md). Kickboard will not fabricate live data."
+          "Real-time data is not connected yet. Set API_FOOTBALL_KEY and KICKBOARD_WORKER_ENABLED=true on the MyPicks web service (see docs/api-football-live-setup.md). MyPicks will not fabricate live data."
       },
       { status: 503 }
     );

@@ -1,6 +1,6 @@
 # Portrait generation pipeline
 
-Kickboard player portraits are generated from structured text prompts. No real photographs are used
+MyPicks player portraits are generated from structured text prompts. No real photographs are used
 as input at any stage.
 
 ## Prompt template

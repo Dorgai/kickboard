@@ -77,4 +77,4 @@ This polls every 60s and writes `api-football:live-fixtures` in Redis. The web r
 
 ## Product note
 
-Kickboard does not invent scores when the API is off. Without a key, fans still pick fixtures from the static schedule and use Coach Board normally.
+MyPicks does not invent scores when the API is off. Without a key, fans still pick fixtures from the static schedule and use Coach Board normally.

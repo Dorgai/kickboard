@@ -1,17 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import { Providers } from "@/components/providers";
+import { BRAND } from "@/lib/brand";
 import { themeInitScript, THEME_META_LIGHT } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kickboard | World Cup fan and analytics platform",
-  description:
-    "World Cup predictions, Coach Board squads, and fan community on Kickboard.",
-  applicationName: "Kickboard",
+  title: BRAND.pageTitle,
+  description: BRAND.tagline,
+  applicationName: BRAND.name,
+  metadataBase: new URL(BRAND.url),
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Kickboard"
+    title: BRAND.name
   },
   formatDetection: {
     telephone: false

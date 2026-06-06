@@ -160,7 +160,7 @@ export function PredictionShareButtons({
     }
     try {
       await navigator.share({
-        title: `Kickboard — ${payload.fixtureLabel}`,
+        title: `MyPicks — ${payload.fixtureLabel}`,
         text: caption,
         url: sharePageUrl
       });
@@ -241,7 +241,7 @@ export function PredictionShareButtons({
           {shareLink.status === "ready" && shareLink.mode === "short"
             ? "Short link ready — safe for texts and social apps. "
             : null}
-          Friends should open the Kickboard link, not only the caption.
+          Friends should open the MyPicks link, not only the caption.
         </HelpTooltip>
       </div>
     </div>

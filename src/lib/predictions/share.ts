@@ -190,7 +190,7 @@ export function buildPredictionAppDeepLink(fixtureKey: string) {
 export function buildPredictionShareCaption(payload: PredictionSharePayload) {
   const parts: string[] = [];
   const who = payload.displayName?.trim();
-  if (who) parts.push(`${who} on Kickboard`);
+  if (who) parts.push(`${who} on MyPicks`);
 
   parts.push(payload.fixtureLabel);
 
@@ -206,7 +206,7 @@ export function buildPredictionShareCaption(payload: PredictionSharePayload) {
     parts.push(`Scorers: ${formatScorerPicksSummary(payload.scorerPicks)}`);
   }
 
-  parts.push("Make your picks on Kickboard for the World Cup.");
+  parts.push("Make your picks on MyPicks for the World Cup.");
   return parts.join(" · ");
 }
 

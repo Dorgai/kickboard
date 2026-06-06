@@ -55,8 +55,8 @@ export function AuthGate({
         {oauthConfigured === false ? (
           <div className="auth-oauth-setup-help">
             <p className="inline-status">
-              Google OAuth is not configured on this server. Add variables on the Railway <strong>kickboard</strong>{" "}
-              service, then redeploy.
+              Google OAuth is not configured on this server. Add variables on the Railway <strong>MyPicks</strong>{" "}
+              web service, then redeploy.
             </p>
             <ul className="auth-oauth-setup-list">
               <li>

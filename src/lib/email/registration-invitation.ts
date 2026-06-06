@@ -28,7 +28,7 @@ export function buildRegistrationInvitationEmail(input: {
   personalMessage: string | null;
   expiresAt: string;
 }) {
-  const inviter = escapeHtml(input.inviterDisplayName.trim() || "A Kickboard fan");
+  const inviter = escapeHtml(input.inviterDisplayName.trim() || "A MyPicks fan");
   const inviteUrl = input.inviteUrl.trim();
   const expiryLabel = formatExpiryDate(input.expiresAt);
   const messageBlock = input.personalMessage?.trim()
@@ -37,7 +37,7 @@ export function buildRegistrationInvitationEmail(input: {
       </blockquote>`
   : "";
 
-  const subject = `${input.inviterDisplayName.trim() || "Someone"} invited you to Kickboard`;
+  const subject = `${input.inviterDisplayName.trim() || "Someone"} invited you to MyPicks`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -48,8 +48,8 @@ export function buildRegistrationInvitationEmail(input: {
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:28px 24px;">
             <tr>
               <td>
-                <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#6b7280;">Kickboard invitation</p>
-                <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;">Join ${inviter} on Kickboard</h1>
+                <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#6b7280;">MyPicks invitation</p>
+                <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;">Join ${inviter} on MyPicks</h1>
                 <p style="margin:0 0 16px;font-size:15px;line-height:1.55;color:#374151;">
                   ${inviter} invited you to register with Google, pick World Cup fixtures, and connect on Coach Board.
                 </p>
@@ -76,7 +76,7 @@ export function buildRegistrationInvitationEmail(input: {
 </html>`;
 
   const textLines = [
-    `${input.inviterDisplayName.trim() || "Someone"} invited you to Kickboard.`,
+    `${input.inviterDisplayName.trim() || "Someone"} invited you to MyPicks.`,
     "",
     input.personalMessage?.trim() ? `Message: ${input.personalMessage.trim()}` : null,
     input.personalMessage?.trim() ? "" : null,

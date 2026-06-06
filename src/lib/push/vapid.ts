@@ -14,5 +14,5 @@ export function isWebPushConfigured(): boolean {
 }
 
 export function getVapidSubject(): string {
-  return process.env.VAPID_SUBJECT?.trim() || "mailto:support@kickboard.app";
+  return process.env.VAPID_SUBJECT?.trim() || "mailto:support@mypicks.live";
 }

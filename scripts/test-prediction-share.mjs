@@ -30,10 +30,10 @@ const embeddedUrl = buildPredictionSharePageUrlEmbedded(payload);
 const fromPath = embeddedUrl.split("/share/prediction/")[1];
 assert.ok(decodePredictionShare(fromPath));
 
-const shortPath = "https://kickboard.app/share/p/abc12345XY";
+const shortPath = "https://mypicks.live/share/p/abc12345XY";
 assert.equal(normalizePredictionShareToken(shortPath), "abc12345XY");
 
-const legacy = `https://kickboard.app/share/prediction?d=${encodeURIComponent(token)}`;
+const legacy = `https://mypicks.live/share/prediction?d=${encodeURIComponent(token)}`;
 assert.equal(normalizePredictionShareToken(legacy), token);
 
 const pasted = `  ${legacy}  `;

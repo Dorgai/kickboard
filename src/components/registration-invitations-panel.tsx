@@ -161,7 +161,7 @@ export function RegistrationInvitationsPanel() {
           <textarea
             className="feed-control-input registration-invite-message"
             maxLength={280}
-            placeholder="Join me on Kickboard for WC26 picks and Coach Board…"
+            placeholder="Join me on MyPicks for WC26 picks and Coach Board…"
             rows={2}
             value={personalMessage}
             onChange={(event) => setPersonalMessage(event.target.value)}

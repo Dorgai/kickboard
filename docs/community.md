@@ -16,7 +16,7 @@ Moderated public posting for the **Current event** tab. Historical match data st
 - **Coach Board** text posts publish as `approved` immediately (no pre-approval queue).
 - **Coach Board squad shares** (`post_type = squad_share`) publish as `approved` immediately (structured lineup summary from saved squads).
 - Reporting a post hides it (`withheld`) until an admin restores or removes it.
-- **Admin → Data sources**: search users (suspend, ban, send Kickboard DMs), moderate Fan Chat messages (remove), and hide/remove Coach Board posts.
+- **Admin → Data sources**: search users (suspend, ban, send MyPicks DMs), moderate Fan Chat messages (remove), and hide/remove Coach Board posts.
 - Full user auth, DMs, and child profiles are later phases.
 
 ## Authentication (no user password yet)

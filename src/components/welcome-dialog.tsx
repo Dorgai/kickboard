@@ -111,7 +111,7 @@ export function WelcomeDialog() {
         <div className="welcome-dialog-shell">
           <header className="welcome-dialog-header">
             <p className="welcome-dialog-eyebrow">World Cup 2026</p>
-            <h2 id={titleId}>Welcome to Kickboard</h2>
+            <h2 id={titleId}>Welcome to MyPicks</h2>
             <p className="welcome-dialog-lead">
               Predict matches, build squads, follow the tournament, and connect with fans — all in one
               place.

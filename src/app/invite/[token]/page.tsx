@@ -84,7 +84,7 @@ export default function InviteRegistrationPage() {
   return (
     <main className="invite-registration-page">
       <div className="invite-registration-card data-card">
-        <p className="invite-registration-eyebrow">Kickboard invitation</p>
+        <p className="invite-registration-eyebrow">MyPicks invitation</p>
 
         {loading ? <p className="inline-status">Loading invitation…</p> : null}
 
@@ -93,7 +93,7 @@ export default function InviteRegistrationPage() {
             <h1>Invitation unavailable</h1>
             <p className="inline-status">{error}</p>
             <Link className="button secondary" href="/">
-              Go to Kickboard
+              Go to MyPicks
             </Link>
           </>
         ) : null}
@@ -101,9 +101,9 @@ export default function InviteRegistrationPage() {
         {!loading && !error && preview ? (
           <>
             <h1 className="panel-help-row invite-page-title">
-              Join {preview.inviterDisplayName} on Kickboard
+              Join {preview.inviterDisplayName} on MyPicks
               <HelpTooltip label="About this invite" size="sm">
-                <strong>{preview.inviterDisplayName}</strong> invited you to register on Kickboard — free
+                <strong>{preview.inviterDisplayName}</strong> invited you to register on MyPicks — free
                 skill games, Coach Board squads, and predictions for the World Cup.
               </HelpTooltip>
             </h1>

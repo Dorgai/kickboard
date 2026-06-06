@@ -2,8 +2,8 @@ import Link from "next/link";
 import { AppChrome } from "@/components/app-chrome";
 
 export const metadata = {
-  title: "Terms of Use | Kickboard",
-  description: "Rules for using the Kickboard fan platform."
+  title: "Terms of Use | MyPicks",
+  description: "Rules for using the MyPicks fan platform."
 };
 
 export default function TermsPage() {
@@ -19,12 +19,12 @@ export default function TermsPage() {
           <p className="legal-updated">Last updated: {updated}</p>
 
           <p>
-            By using Kickboard you agree to these terms. If you do not agree, do not use the service.
+            By using MyPicks you agree to these terms. If you do not agree, do not use the service.
           </p>
 
           <h2>The service</h2>
           <p>
-            Kickboard provides tournament information, squad tools, predictions, and social features for fans.
+            MyPicks provides tournament information, squad tools, predictions, and social features for fans.
             Features may change or be unavailable during beta. Match data may come from third-party sources and
             is provided without guarantee of accuracy or timeliness.
           </p>
@@ -64,7 +64,7 @@ export default function TermsPage() {
           <p className="legal-nav">
             <Link href="/privacy">Privacy Policy</Link>
             {" · "}
-            <Link href="/">Back to Kickboard</Link>
+            <Link href="/">Back to MyPicks</Link>
           </p>
         </article>
       </main>

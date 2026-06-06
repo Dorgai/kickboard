@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { query } from "@/lib/db";
 
 const SYSTEM_EMAIL = "moderator@kickboard.local";
-const SYSTEM_DISPLAY = "Kickboard";
+const SYSTEM_DISPLAY = "MyPicks";
 
 export async function getAdminMessagingSenderId() {
   const configured = process.env.ADMIN_FAN_CHAT_SENDER_ID?.trim();

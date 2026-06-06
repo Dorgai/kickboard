@@ -2,8 +2,8 @@ import Link from "next/link";
 import { AppChrome } from "@/components/app-chrome";
 
 export const metadata = {
-  title: "Privacy Policy | Kickboard",
-  description: "How Kickboard collects and uses account and usage data."
+  title: "Privacy Policy | MyPicks",
+  description: "How MyPicks collects and uses account and usage data."
 };
 
 export default function PrivacyPage() {
@@ -19,13 +19,13 @@ export default function PrivacyPage() {
           <p className="legal-updated">Last updated: {updated}</p>
 
           <p>
-            Kickboard (&quot;we&quot;, &quot;the platform&quot;) is a fan and analytics experience for football
+            MyPicks (&quot;we&quot;, &quot;the platform&quot;) is a fan and analytics experience for football
             tournaments. This policy describes what we collect when you use the website and how we use it.
           </p>
 
-          <h2>Who operates Kickboard</h2>
+          <h2>Who operates MyPicks</h2>
           <p>
-            The service is operated by the Kickboard project team. For privacy requests, contact the address
+            The service is operated by the MyPicks project team. For privacy requests, contact the address
             listed on the Google OAuth consent screen as the developer contact email.
           </p>
 
@@ -103,7 +103,7 @@ export default function PrivacyPage() {
           <p className="legal-nav">
             <Link href="/terms">Terms of Use</Link>
             {" · "}
-            <Link href="/">Back to Kickboard</Link>
+            <Link href="/">Back to MyPicks</Link>
           </p>
         </article>
       </main>
