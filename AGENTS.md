@@ -73,12 +73,12 @@ Kickboard avoids **contour** selection chrome — no border rings, `outline` box
 
 Use instead:
 
-- Filled surfaces: `--kickboard-tab-active-bg` / `--kickboard-tab-hover-bg`, or light `color-mix` tints
+- Filled surfaces: `--kickboard-pick-active-bg` for **team/player picks**; `--kickboard-tab-active-bg` for **nav/feed tabs** and saved squad cards; `--kickboard-tab-hover-bg` on hover
 - Depth: `box-shadow: var(--shadow-surface)` and `var(--shadow-surface-hover)`
 
 Applies to **Fan Chat**, **saved Coach Board squads** (`.saved-squad-card.selected`), **match/tournament picks**, and similar toggles. Reserve `outline` for **`:focus-visible`** keyboard focus only. Structural card shells may keep borders; selection state should not add new contour lines.
 
-**Grey fill text:** Any **dark grey** active/selected surface (`--kickboard-tab-active-bg`, e.g. tabs, saved boards, picker chips) must use **light** foreground (`--kickboard-tab-active-fg`) on the container and all nested labels (`team-label-text`, meta lines, etc.). See the grey-fill `:is(...)` rules near `.nav-tabs a.active` in `globals.css`. Light page grey (`--color-bg`) keeps normal dark text.
+**Grey fill text:** **Nav/feed tabs** and **saved squad cards** use dark grey (`--kickboard-tab-active-bg`) with light text (`--kickboard-tab-active-fg`). **Team/player picks** (tournament teams, scorer chips, fixture picker, player pick fields) use accent-tinted `--kickboard-pick-active-bg` / `--kickboard-pick-active-fg`. See the `:is(...)` rules near `.nav-tabs a.active` in `globals.css`. Light page grey (`--color-bg`) keeps normal dark text.
 
 ### Feed UI flags and typography
 

@@ -187,6 +187,15 @@ export function FixturePredictionsForm({
     });
   }
 
+  function clearScores() {
+    const derived = outcomeFromScores(homeScore, awayScore);
+    setHomeScore("");
+    setAwayScore("");
+    if (derived && predictedOutcome === derived) {
+      setPredictedOutcome(null);
+    }
+  }
+
   const groupedScorerPicks = useMemo(() => groupScorerPicks(scorerPicks), [scorerPicks]);
 
   const scoreDerivedOutcome = useMemo(
@@ -412,6 +421,16 @@ export function FixturePredictionsForm({
             />
           </div>
         </div>
+        <div className="fixture-prediction-field-actions">
+          <button
+            className="text-button fixture-prediction-clear"
+            disabled={!homeScore && !awayScore}
+            type="button"
+            onClick={clearScores}
+          >
+            Clear
+          </button>
+        </div>
       </fieldset>
 
       {!coachBoard ? (
@@ -471,6 +490,9 @@ export function FixturePredictionsForm({
                       >
                         −
                       </button>
+                      <span aria-hidden className="fixture-scorer-chip-goals-value">
+                        {goals}
+                      </span>
                       <button
                         aria-label={`Add one goal for ${pick.playerName}`}
                         className="fixture-scorer-step"
