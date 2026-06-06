@@ -3828,12 +3828,99 @@ h3 {
   align-items: stretch;
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(0, 1fr) minmax(12.5rem, 17.5rem);
+  grid-template-columns: minmax(0, min(22.5rem, 100%)) minmax(0, 1fr);
   min-width: 0;
 }
 
 .predictions-points-board {
   min-width: 0;
+}
+
+.predictions-match-form-points-row .predictions-points-board {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.predictions-match-form-points-row .predictions-results-board-header {
+  flex-wrap: nowrap;
+  gap: 8px 12px;
+}
+
+.predictions-match-form-points-row .predictions-results-board-header h3 {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.predictions-match-form-points-row .predictions-wallet-balance {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.predictions-match-form-points-row .predictions-results-table {
+  min-width: 13.5rem;
+  table-layout: fixed;
+}
+
+.predictions-match-form-points-row .predictions-results-table th,
+.predictions-match-form-points-row .predictions-results-table td {
+  padding: 6px 5px;
+}
+
+.predictions-match-form-points-row .predictions-results-table th:not(:first-child),
+.predictions-match-form-points-row .predictions-results-table td:not(:first-child) {
+  text-align: center;
+  width: 2.35rem;
+}
+
+.predictions-match-form-points-row .predictions-results-table th:last-child,
+.predictions-match-form-points-row .predictions-results-table td:last-child {
+  width: 2.75rem;
+}
+
+.predictions-match-form-points-row
+  .fixture-predictions-form:not(.fixture-predictions-form--compact)
+  .fixture-prediction-outcome-body {
+  min-height: 3.75rem;
+  padding: 10px 8px;
+}
+
+.predictions-match-form-points-row
+  .fixture-predictions-form:not(.fixture-predictions-form--compact)
+  .fixture-prediction-outcome-body
+  .team-label-stacked
+  .team-label-text {
+  font-size: 13px;
+  max-width: 5.5rem;
+}
+
+.predictions-match-form-points-row
+  .fixture-predictions-form:not(.fixture-predictions-form--compact)
+  .fixture-prediction-score-team
+  .team-label-stacked
+  .team-label-text {
+  font-size: 14px;
+  max-width: 6.5rem;
+}
+
+.predictions-match-form-points-row
+  .fixture-predictions-form:not(.fixture-predictions-form--compact)
+  .fixture-prediction-score-team {
+  min-width: 5rem;
+}
+
+.predictions-match-form-points-row
+  .fixture-predictions-form:not(.fixture-predictions-form--compact)
+  .fixture-prediction-scoreline {
+  gap: 10px 14px;
+}
+
+.predictions-match-form-points-row
+  .fixture-predictions-form:not(.fixture-predictions-form--compact)
+  .fixture-prediction-score-field {
+  font-size: 1.65rem;
+  min-height: 2.6rem;
+  min-width: 2.85rem;
+  width: 3rem;
 }
 
 .predictions-points-loading {

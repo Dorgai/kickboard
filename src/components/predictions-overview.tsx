@@ -7,7 +7,7 @@ import {
   type FixtureOutcome,
   type ScorerPick
 } from "@/lib/fixture-predictions/types";
-import { PREDICTION_BLOCKS, PREDICTION_BLOCK_SHORT } from "@/lib/fixture-predictions/labels";
+import { PREDICTION_BLOCK_SHORT } from "@/lib/fixture-predictions/labels";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { PredictionShareButtons } from "@/components/prediction-share-buttons";
 import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
@@ -270,9 +270,9 @@ export function usePredictionsOverview({
 
 export function PredictionsPointsBoard({ wallet }: { wallet: PredictionsOverviewData["wallet"] }) {
   const categories = [
-    { key: "outcome" as const, label: PREDICTION_BLOCKS.outcome },
-    { key: "score" as const, label: PREDICTION_BLOCKS.score },
-    { key: "scorers" as const, label: PREDICTION_BLOCKS.scorers }
+    { key: "outcome" as const, label: PREDICTION_BLOCK_SHORT.outcome },
+    { key: "score" as const, label: PREDICTION_BLOCK_SHORT.score },
+    { key: "scorers" as const, label: PREDICTION_BLOCK_SHORT.scorers }
   ];
 
   return (
