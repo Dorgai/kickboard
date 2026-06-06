@@ -33,14 +33,3 @@ export function notifyConnectionAccepted(requesterId: string, addresseeId: strin
   });
 }
 
-export function notifyConnectionActivity(
-  userId: string,
-  input: { title: string; body: string; tag: string; url?: string }
-) {
-  notifyUserPush(userId, {
-    title: input.title,
-    body: input.body,
-    url: input.url ?? "/#community",
-    tag: input.tag
-  });
-}

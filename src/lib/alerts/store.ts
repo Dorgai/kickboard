@@ -41,8 +41,14 @@ export async function upsertUserAlert(input: {
   occurredAt: Date;
   actorUserId?: string | null;
   fixtureKey?: string | null;
-}) {
+}): Promise<boolean> {
   const key = input.alertKey.slice(0, 180);
+
+  const existing = await query<{ alert_key: string }>(
+    `SELECT alert_key FROM user_alerts WHERE user_id = $1 AND alert_key = $2`,
+    [input.userId, key]
+  );
+  const isNew = existing.rows.length === 0;
   const title = input.title.trim().slice(0, 120);
   const body = input.body.trim().slice(0, 400);
   const href = input.href.trim().slice(0, 200) || "/";
@@ -78,6 +84,8 @@ export async function upsertUserAlert(input: {
       input.occurredAt
     ]
   );
+
+  return isNew;
 }
 
 export async function pruneOldAlerts(userId: string, keepDays = 30) {

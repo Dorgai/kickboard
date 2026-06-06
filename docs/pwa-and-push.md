@@ -24,8 +24,13 @@ On **phones and tablets** (viewport ≤ 1024px), signed-in users are prompted on
 Push covers:
 
 - Daily match-day digest (scheduled cron)
+- Full-time match results (scheduled cron every 30 minutes when API-Football is configured)
+- Upcoming matches within 72 hours (first time each fixture is seen)
 - Connection requests and acceptances
-- Friends' prediction updates
+- Fan Chat messages (direct and broadcast)
+- Friends' prediction updates (add, change, remove)
+- Coach Board posts and published squads from connections
+- Official messages from Kickboard admin
 
 User preferences default to `notification_channels.push: true` in `user_preferences`.
 
@@ -36,7 +41,8 @@ Set:
 - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
 - `VAPID_PRIVATE_KEY`
 - `VAPID_SUBJECT` (mailto: or https URL)
-- `CRON_SECRET` for `POST /api/cron/push-daily` and GitHub Actions digest
+- `CRON_SECRET` for `POST /api/cron/push-daily`, `POST /api/cron/push-match-results`, and GitHub Actions
+- `API_FOOTBALL_KEY` (optional but required for live match-result push)
 
 Generate keys: `npx web-push generate-vapid-keys`
 

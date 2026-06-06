@@ -1,6 +1,5 @@
-import { upsertUserAlert } from "@/lib/alerts/store";
+import { deliverUserAlert } from "@/lib/alerts/deliver";
 import { recordActivityEvent } from "@/lib/activity/store";
-import { notifyConnectionActivity } from "@/lib/push/connection-notify";
 import { listAcceptedPeerIds } from "@/lib/connections/store";
 import { query } from "@/lib/db";
 import { fixtureKeyToShortLabel } from "@/lib/fixtures/fixture-key";
@@ -138,25 +137,20 @@ export async function recordFixturePredictionEvent(input: {
       : `${fixtureLabel} — ${describePredictionSnapshot(input.nextSnapshot)}`;
 
   await Promise.all(
-    peerIds.map(async (peerId) => {
-      await upsertUserAlert({
+    peerIds.map((peerId) =>
+      deliverUserAlert({
         userId: peerId,
         alertKey: `connection:prediction-event:${eventId}`,
         category: "connection_activity",
         title,
         body,
-        href: "/#community",
+        href: "/#predictions",
         actorUserId: input.userId,
         fixtureKey: input.fixtureKey,
-        occurredAt: new Date()
-      });
-      notifyConnectionActivity(peerId, {
-        title,
-        body,
-        tag: `connection:prediction-event:${eventId}`,
-        url: "/#predictions"
-      });
-    })
+        occurredAt: new Date(),
+        push: true
+      })
+    )
   );
 
   return eventId;

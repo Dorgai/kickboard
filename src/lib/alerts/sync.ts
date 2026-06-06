@@ -11,6 +11,7 @@ import {
   fixtureKeyToShortLabel,
   formatFixtureLabel
 } from "@/lib/fixtures/fixture-key";
+import { deliverUserAlert } from "@/lib/alerts/deliver";
 import { upsertUserAlert, pruneOldAlerts } from "@/lib/alerts/store";
 import { outcomeShort } from "@/lib/fixture-predictions/types";
 
@@ -209,7 +210,7 @@ async function syncWorldCupScheduleAlerts(userId: string) {
           group: group.group
         });
 
-        await upsertUserAlert({
+        await deliverUserAlert({
           userId,
           alertKey: `match:upcoming:${fixtureKey}`,
           category: "match_upcoming",
@@ -220,7 +221,8 @@ async function syncWorldCupScheduleAlerts(userId: string) {
           })} · Group ${group.group}`,
           href: "/#tournament",
           fixtureKey,
-          occurredAt: kickoff
+          occurredAt: kickoff,
+          push: "ifNew"
         });
       }
     }
@@ -251,7 +253,7 @@ async function syncApiFootballMatchAlerts(userId: string) {
       if (mapped.date.getTime() > upcomingCutoff) continue;
       if (mapped.date.getTime() < now - 1000 * 60 * 30) continue;
 
-      await upsertUserAlert({
+      await deliverUserAlert({
         userId,
         alertKey: `match:upcoming:${mapped.fixtureKey}`,
         category: "match_upcoming",
@@ -262,7 +264,8 @@ async function syncApiFootballMatchAlerts(userId: string) {
         })}`,
         href: "/#tournament",
         fixtureKey: mapped.fixtureKey,
-        occurredAt: mapped.date
+        occurredAt: mapped.date,
+        push: "ifNew"
       });
     }
 
@@ -276,7 +279,7 @@ async function syncApiFootballMatchAlerts(userId: string) {
       if (seenResultKeys.has(mapped.fixtureKey)) continue;
       seenResultKeys.add(mapped.fixtureKey);
 
-      await upsertUserAlert({
+      await deliverUserAlert({
         userId,
         alertKey: `match:result:${mapped.fixtureKey}`,
         category: "match_result",
@@ -284,7 +287,8 @@ async function syncApiFootballMatchAlerts(userId: string) {
         body: `${mapped.homeTeam} ${mapped.homeGoals}–${mapped.awayGoals} ${mapped.awayTeam}`,
         href: "/#tournament",
         fixtureKey: mapped.fixtureKey,
-        occurredAt: new Date(fixture.fixture.date)
+        occurredAt: new Date(fixture.fixture.date),
+        push: "ifNew"
       });
     }
   } catch {

@@ -1,3 +1,4 @@
+import { deliverCoachBoardPostToPeers } from "@/lib/alerts/deliver";
 import { query } from "@/lib/db";
 
 export type CommunityPost = {
@@ -79,7 +80,16 @@ export async function createTextPost(authorId: string, body: string) {
     [authorId, trimmed]
   );
 
-  return result.rows[0];
+  const post = result.rows[0];
+  if (post?.id) {
+    void deliverCoachBoardPostToPeers({
+      authorId,
+      postId: post.id,
+      body: trimmed
+    }).catch(() => undefined);
+  }
+
+  return post;
 }
 
 export async function listPostsForModeration(limit = 50) {

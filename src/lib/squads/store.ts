@@ -1,3 +1,4 @@
+import { deliverSquadPublishedToPeers } from "@/lib/alerts/deliver";
 import { query } from "@/lib/db";
 import { getDefaultTournamentId } from "@/lib/auth/users";
 import {
@@ -135,6 +136,13 @@ export async function publishSquadToBoard(squadId: string, userId: string) {
      RETURNING id`,
     [userId, body, row.id, row.fixture_key]
   );
+
+  void deliverSquadPublishedToPeers({
+    userId,
+    squadId: row.id,
+    squadName: row.name,
+    fixtureKey: row.fixture_key
+  }).catch(() => undefined);
 
   return { squadId: row.id, postId: post.rows[0]?.id ?? null, body };
 }

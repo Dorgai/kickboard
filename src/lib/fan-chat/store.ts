@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { areUsersConnected, listAcceptedPeerIds } from "@/lib/connections/store";
-import { upsertUserAlert } from "@/lib/alerts/store";
+import { deliverUserAlert } from "@/lib/alerts/deliver";
 import { query } from "@/lib/db";
 import { ensureFanChatSchema } from "@/lib/fan-chat/ensure-schema";
 
@@ -92,7 +92,7 @@ async function notifyRecipient(input: {
 }) {
   const preview = input.body.length > 80 ? `${input.body.slice(0, 77)}…` : input.body;
   const title = input.broadcast ? "Message from a connection" : `Message from ${input.senderDisplayName}`;
-  await upsertUserAlert({
+  await deliverUserAlert({
     userId: input.recipientId,
     alertKey: `fan-chat:${input.messageId}`,
     category: "connection_activity",
@@ -100,7 +100,8 @@ async function notifyRecipient(input: {
     body: preview,
     href: "/#fan-chat",
     occurredAt: new Date(),
-    actorUserId: input.senderId
+    actorUserId: input.senderId,
+    push: true
   });
 }
 

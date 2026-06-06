@@ -16,6 +16,7 @@
     "db:schema:psql": "sh -c 'test -n \"$DATABASE_URL\" && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/schema.sql -f db/community-extensions.sql'",
     "check": "npm run typecheck && npm run build",
     "push:daily": "npx tsx scripts/push-daily-digest.ts",
+    "push:match-results": "npx tsx scripts/push-match-results.ts",
     "railway:connect": "bash scripts/railway-connect.sh",
     "railway:deploy": "bash scripts/deploy-production.sh",
     "railway:variables": "bash scripts/configure-railway-variables.sh",

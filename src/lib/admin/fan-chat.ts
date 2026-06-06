@@ -1,7 +1,7 @@
 import { getAdminMessagingSenderId } from "@/lib/admin/system-user";
 import { ensureAcceptedConnection } from "@/lib/connections/store";
 import { normalizeFanChatBody } from "@/lib/fan-chat/store";
-import { upsertUserAlert } from "@/lib/alerts/store";
+import { deliverUserAlert } from "@/lib/alerts/deliver";
 import { query } from "@/lib/db";
 
 export type AdminFanChatMessage = {
@@ -121,7 +121,7 @@ export async function sendAdminDirectMessage(recipientUserId: string, body: stri
   if (!row) throw new Error("SEND_FAILED");
 
   const preview = trimmed.length > 80 ? `${trimmed.slice(0, 77)}…` : trimmed;
-  await upsertUserAlert({
+  await deliverUserAlert({
     userId: recipientUserId,
     alertKey: `fan-chat:${row.id}`,
     category: "connection_activity",
@@ -129,7 +129,8 @@ export async function sendAdminDirectMessage(recipientUserId: string, body: stri
     body: preview,
     href: "/#fan-chat",
     occurredAt: row.created_at,
-    actorUserId: senderId
+    actorUserId: senderId,
+    push: true
   });
 
   return { messageId: row.id, createdAt: row.created_at.toISOString(), senderId };
