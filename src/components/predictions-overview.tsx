@@ -519,15 +519,13 @@ export function PredictionsPicksSection({
   fixtures = [],
   activeFixtureKey = null,
   viewerDisplayName = null,
-  onEditPick,
-  onPickNavigate
+  onEditPick
 }: {
   data: PredictionsOverviewData;
   fixtures?: FixtureOption[];
   activeFixtureKey?: string | null;
   viewerDisplayName?: string | null;
   onEditPick?: (fixtureKey: string) => void;
-  onPickNavigate?: (fixtureKey: string) => void;
 }) {
   const [friendsNameFilter, setFriendsNameFilter] = useState("");
   const [picksTab, setPicksTab] = useState<PicksTimeTabId>("upcoming");
@@ -661,13 +659,7 @@ export function PredictionsPicksSection({
                     className={isActive ? "predictions-picks-row--active" : undefined}
                   >
                     <td className="predictions-picks-match-cell">
-                      <button
-                        className="predictions-picks-match-link"
-                        type="button"
-                        onClick={() => onPickNavigate?.(group.fixtureKey)}
-                      >
-                        {group.fixtureLabel}
-                      </button>
+                      <span className="predictions-picks-match-label">{group.fixtureLabel}</span>
                     </td>
                     <td className="predictions-results-cell">
                       <TablePickCell pick={group.mine} />

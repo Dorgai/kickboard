@@ -5717,7 +5717,12 @@ h3 {
 
 .predictions-picks-table {
   min-width: 100%;
-  table-layout: auto;
+  table-layout: fixed;
+}
+
+.predictions-picks-table th,
+.predictions-picks-table td {
+  padding: 5px 4px;
 }
 
 .predictions-picks-table thead th {
@@ -5739,18 +5744,12 @@ h3 {
   width: 22%;
 }
 
-.predictions-picks-match-link {
-  background: transparent;
-  border: none;
+.predictions-picks-match-label {
   color: var(--color-text-primary);
-  cursor: pointer;
-  font: inherit;
+  display: block;
   font-size: 11px;
   font-weight: 800;
   line-height: 1.25;
-  padding: 0;
-  text-align: left;
-  text-decoration: underline;
 }
 
 .predictions-picks-col-label {
@@ -5815,24 +5814,32 @@ h3 {
 }
 
 .predictions-type-lines--unified {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  display: grid;
+  gap: 0;
+  width: 100%;
 }
 
 .predictions-type-lines--unified .predictions-type-line {
-  align-items: center;
-  background: color-mix(in srgb, var(--color-bg) 70%, var(--color-surface));
-  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
-  border-radius: 6px;
-  display: inline-flex;
-  flex-wrap: wrap;
+  align-items: baseline;
+  background: none;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+  border-radius: 0;
+  display: grid;
   font-size: 10px;
-  gap: 3px 5px;
-  grid-template-columns: unset;
+  gap: 4px 6px;
+  grid-template-columns: minmax(2.4rem, auto) minmax(0, 1fr) auto;
   max-width: 100%;
-  padding: 2px 6px;
+  padding: 4px 0;
+}
+
+.predictions-type-lines--unified .predictions-type-line:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.predictions-type-lines--unified .predictions-type-line:first-child {
+  padding-top: 0;
 }
 
 .predictions-type-lines--unified .predictions-type-line-label {
@@ -5845,7 +5852,8 @@ h3 {
 
 .predictions-type-lines--unified .predictions-type-line-value {
   font-size: 10px;
-  max-width: 8.5rem;
+  max-width: none;
+  overflow-wrap: anywhere;
 }
 
 .predictions-type-lines--unified .predictions-result-badge {
