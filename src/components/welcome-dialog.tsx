@@ -155,9 +155,9 @@ export function WelcomeDialog() {
             >
               Start exploring
             </button>
-            <button className="button welcome-dialog-cta-secondary" type="button" onClick={handleSignIn}>
-              <LogIn aria-hidden size={18} strokeWidth={2.25} />
-              Sign in with Google
+            <button className="button google-sign-in-cta welcome-dialog-cta-secondary" type="button" onClick={handleSignIn}>
+              <LogIn aria-hidden size={15} strokeWidth={2.25} />
+              Continue with Google
             </button>
             <p className="welcome-dialog-footnote">Free to browse. Sign in to save picks, squads, and chat.</p>
           </footer>

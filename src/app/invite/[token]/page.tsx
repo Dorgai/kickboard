@@ -122,7 +122,7 @@ export default function InviteRegistrationPage() {
               Link valid until {new Date(preview.expiresAt).toLocaleString()}.
             </p>
             <button
-              className="button primary"
+              className="button google-sign-in-cta"
               disabled={!ready}
               type="button"
               onClick={() => {

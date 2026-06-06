@@ -84,7 +84,7 @@ export function AuthGate({
           </div>
         ) : (
           <button
-            className="button primary"
+            className="button google-sign-in-cta"
             type="button"
             onClick={() => {
               void signIn("google", { callbackUrl: typeof window !== "undefined" ? window.location.href : "/" });
