@@ -84,7 +84,7 @@ export function AuthGate({
             </p>
           </div>
         ) : (
-          <GoogleSignInButton block />
+          <GoogleSignInButton />
         )}
       </div>
     );
