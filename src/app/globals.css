@@ -9607,7 +9607,13 @@ h3 {
 }
 
 .session-checkpoint-footer .button.primary {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, transparent);
   box-shadow: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
   filter: none;
   min-height: 48px;
   padding-inline: 28px;
@@ -9617,7 +9623,10 @@ h3 {
 .session-checkpoint-footer .button.primary:active:not(:disabled),
 .session-checkpoint-footer .button.primary:focus:not(:disabled),
 .session-checkpoint-footer .button.primary:focus-visible:not(:disabled) {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--color-text-primary) 28%, transparent);
   box-shadow: none;
+  color: var(--color-text-primary);
   filter: none;
 }
 
