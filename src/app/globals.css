@@ -1258,10 +1258,15 @@ h3 {
 /* Spain hero — assets in /public/images/ (see README there) */
 .kickboard-hero-backdrop {
   --kickboard-hero-image: url("/images/kickboard-hero-spain-mobile.webp");
+  --kickboard-hero-image-alt: url("/images/kickboard-hero-nico-mobile.webp");
   --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 62%, transparent);
   --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 54%, transparent);
   isolation: isolate;
   position: relative;
+}
+
+.kickboard-hero-backdrop--dual {
+  --kickboard-hero-crossfade-duration: 24s;
 }
 
 .kickboard-hero-backdrop::before,
@@ -1335,6 +1340,7 @@ h3 {
 @media (min-width: 861px) {
   .kickboard-hero-backdrop {
     --kickboard-hero-image: url("/images/kickboard-hero-spain.webp");
+    --kickboard-hero-image-alt: url("/images/kickboard-hero-nico.webp");
   }
 
   .kickboard-hero-backdrop::before {
@@ -1344,6 +1350,200 @@ h3 {
 
   [data-theme="dark"] .kickboard-hero-backdrop::before {
     opacity: 0.48;
+  }
+}
+
+.kickboard-hero-layers {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.feed-browser--hero-backdrop .kickboard-hero-layers {
+  position: fixed;
+  z-index: -1;
+}
+
+.kickboard-hero-photo--alt {
+  background-image: var(--kickboard-hero-image-alt);
+  background-position: 78% 12%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: saturate(1.12) contrast(1.06);
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+.kickboard-hero-backdrop--dual::before {
+  animation: kickboard-hero-crossfade-primary var(--kickboard-hero-crossfade-duration, 24s) ease-in-out infinite;
+}
+
+.kickboard-hero-layers--dual .kickboard-hero-photo--alt {
+  animation: kickboard-hero-crossfade-alt var(--kickboard-hero-crossfade-duration, 24s) ease-in-out infinite;
+}
+
+@keyframes kickboard-hero-crossfade-primary {
+  0%,
+  40% {
+    opacity: 0.5;
+  }
+
+  48%,
+  88% {
+    opacity: 0;
+  }
+
+  96%,
+  100% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes kickboard-hero-crossfade-alt {
+  0%,
+  40% {
+    opacity: 0;
+  }
+
+  48%,
+  88% {
+    opacity: 0.5;
+  }
+
+  96%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (min-width: 861px) {
+  .kickboard-hero-photo--alt {
+    background-position: 86% 8%;
+  }
+
+  @keyframes kickboard-hero-crossfade-primary {
+    0%,
+    40% {
+      opacity: 0.62;
+    }
+
+    48%,
+    88% {
+      opacity: 0;
+    }
+
+    96%,
+    100% {
+      opacity: 0.62;
+    }
+  }
+
+  @keyframes kickboard-hero-crossfade-alt {
+    0%,
+    40% {
+      opacity: 0;
+    }
+
+    48%,
+    88% {
+      opacity: 0.62;
+    }
+
+    96%,
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
+[data-theme="dark"] .kickboard-hero-backdrop--dual::before {
+  animation-name: kickboard-hero-crossfade-primary-dark;
+}
+
+[data-theme="dark"] .kickboard-hero-layers--dual .kickboard-hero-photo--alt {
+  animation-name: kickboard-hero-crossfade-alt-dark;
+}
+
+@keyframes kickboard-hero-crossfade-primary-dark {
+  0%,
+  40% {
+    opacity: 0.4;
+  }
+
+  48%,
+  88% {
+    opacity: 0;
+  }
+
+  96%,
+  100% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes kickboard-hero-crossfade-alt-dark {
+  0%,
+  40% {
+    opacity: 0;
+  }
+
+  48%,
+  88% {
+    opacity: 0.4;
+  }
+
+  96%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (min-width: 861px) {
+  @keyframes kickboard-hero-crossfade-primary-dark {
+    0%,
+    40% {
+      opacity: 0.48;
+    }
+
+    48%,
+    88% {
+      opacity: 0;
+    }
+
+    96%,
+    100% {
+      opacity: 0.48;
+    }
+  }
+
+  @keyframes kickboard-hero-crossfade-alt-dark {
+    0%,
+    40% {
+      opacity: 0;
+    }
+
+    48%,
+    88% {
+      opacity: 0.48;
+    }
+
+    96%,
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kickboard-hero-backdrop--dual::before,
+  .kickboard-hero-layers--dual .kickboard-hero-photo--alt {
+    animation: none;
+  }
+
+  .kickboard-hero-layers--dual .kickboard-hero-photo--alt {
+    display: none;
   }
 }
 
@@ -1362,6 +1562,16 @@ h3 {
 }
 
 /* Full-bleed feed: fixed viewport layers behind cards */
+.feed-browser--hero-backdrop {
+  position: relative;
+  z-index: 0;
+}
+
+.feed-browser--hero-backdrop > :not(.kickboard-hero-layers) {
+  position: relative;
+  z-index: 1;
+}
+
 .feed-browser--hero-backdrop::before,
 .feed-browser--hero-backdrop::after {
   position: fixed;
@@ -7212,6 +7422,30 @@ h3 {
   }
 }
 
+.tournament-summary-modal-panel {
+  overflow: hidden;
+}
+
+.tournament-summary-modal-portrait {
+  background-image: var(--kickboard-hero-image-alt);
+  background-position: 72% 18%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: saturate(1.08) contrast(1.04);
+  height: 5.25rem;
+  margin: 0;
+  mask-image: linear-gradient(180deg, #000 0%, #000 42%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 42%, transparent 100%);
+  opacity: 0.92;
+  width: 100%;
+}
+
+.tournament-summary-modal-header {
+  margin-top: -1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
 .tournament-summary-modal .timeline-modal-header h2 {
   color: var(--color-text-primary);
 }
@@ -9237,6 +9471,20 @@ h3 {
   box-shadow: none;
   overflow: hidden;
   position: relative;
+}
+
+.kickboard-hero-backdrop--nico-accent {
+  --kickboard-hero-image: url("/images/kickboard-hero-nico-mobile.webp");
+}
+
+@media (min-width: 861px) {
+  .kickboard-hero-backdrop--nico-accent {
+    --kickboard-hero-image: url("/images/kickboard-hero-nico.webp");
+  }
+
+  .kickboard-hero-backdrop--nico-accent::before {
+    background-position: 80% 10%;
+  }
 }
 
 .welcome-dialog-panel.kickboard-hero-backdrop::before,
