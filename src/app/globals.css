@@ -1758,7 +1758,7 @@ h3 {
   right: 0;
   bottom: 0;
   transform: translateX(0);
-  width: min(22rem, 100vw);
+  width: min(24rem, 100vw);
   z-index: 39;
 }
 
@@ -1794,10 +1794,24 @@ h3 {
 }
 
 .fan-chat-float-body {
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   min-width: 0;
   overflow: auto;
   padding: 12px 14px 16px;
+}
+
+.fan-chat-float-body > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.fan-chat-float-body .auth-gate-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .fan-chat-float-body .inline-error,
@@ -1807,9 +1821,15 @@ h3 {
   overflow-wrap: anywhere;
 }
 
+.fan-chat-float-body .fan-chat-messenger {
+  height: 100%;
+  min-height: min(18rem, 42vh);
+}
+
 .fan-chat-messenger {
   display: grid;
   gap: 12px;
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
 }
 
@@ -1822,7 +1842,8 @@ h3 {
 
 @media (min-width: 640px) {
   .fan-chat-inbox-layout {
-    grid-template-columns: minmax(9.5rem, 34%) minmax(0, 1fr);
+    align-items: stretch;
+    grid-template-columns: auto minmax(0, 1fr);
     min-height: min(20rem, 48vh);
   }
 }
@@ -1833,10 +1854,17 @@ h3 {
   border-radius: 12px;
   display: grid;
   gap: 6px;
-  max-height: min(20rem, 48vh);
-  min-height: 8rem;
-  overflow: auto;
+  min-width: 0;
+  overflow: visible;
   padding: 8px;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .fan-chat-inbox-list {
+    min-width: max-content;
+    width: max-content;
+  }
 }
 
 .fan-chat-inbox-list-heading {
@@ -1927,9 +1955,7 @@ h3 {
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .fan-chat-inbox-unread-badge {
@@ -1963,10 +1989,12 @@ h3 {
 }
 
 .fan-chat-inbox-pane {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   min-height: 0;
   min-width: 0;
+  overflow: hidden;
 }
 
 .fan-chat-inbox-pane-header {
@@ -2004,12 +2032,14 @@ h3 {
   background: color-mix(in srgb, var(--color-bg) 55%, transparent);
   border: none;
   border-radius: 12px;
+  box-sizing: border-box;
   display: grid;
+  flex: 1 1 auto;
   gap: 8px;
-  max-height: min(16rem, 42vh);
-  min-height: 8rem;
+  min-height: 6rem;
   overflow: auto;
   padding: 10px 12px;
+  width: 100%;
 }
 
 .fan-chat-thread-empty {
@@ -2118,12 +2148,18 @@ h3 {
 }
 
 .fan-chat-compose {
+  box-sizing: border-box;
   display: grid;
+  flex: 0 0 auto;
   gap: 8px;
+  width: 100%;
 }
 
 .fan-chat-compose-field {
   margin: 0;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
 }
 
 .fan-chat-compose-input,
@@ -2131,8 +2167,17 @@ h3 {
   background: color-mix(in srgb, var(--color-bg) 40%, var(--color-surface));
   border: none;
   box-shadow: none;
+  box-sizing: border-box;
+  display: block;
+  max-width: 100%;
   min-height: 4.5rem;
   resize: vertical;
+  width: 100%;
+}
+
+.fan-chat-compose .button.primary {
+  justify-self: stretch;
+  width: 100%;
 }
 
 @media (min-width: 1100px) {
@@ -2146,7 +2191,7 @@ h3 {
     height: min(80vh, 40rem);
     max-width: min(28rem, calc(100vw - 32px));
     right: 16px;
-    width: min(28rem, calc(100vw - 32px));
+    width: min(34rem, calc(100vw - 32px));
   }
 
   .fan-chat-float-backdrop {
