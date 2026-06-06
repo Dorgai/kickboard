@@ -1155,6 +1155,120 @@ h3 {
   width: 100%;
 }
 
+/* Full-bleed Spain hero — assets in /public/images/ (see README there) */
+.feed-browser--hero-backdrop {
+  --kickboard-hero-image: url("/images/kickboard-hero-spain-mobile.webp");
+  isolation: isolate;
+  position: relative;
+}
+
+.feed-browser--hero-backdrop::before,
+.feed-browser--hero-backdrop::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  z-index: -1;
+}
+
+.feed-browser--hero-backdrop::before {
+  background-image: var(--kickboard-hero-image);
+  background-position: 72% 8%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  inset: 0;
+  opacity: 0.34;
+}
+
+.feed-browser--hero-backdrop::after {
+  background:
+    linear-gradient(
+      108deg,
+      var(--color-bg) 0%,
+      color-mix(in srgb, var(--color-bg) 94%, transparent) 38%,
+      color-mix(in srgb, var(--color-bg) 55%, transparent) 58%,
+      transparent 76%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
+      transparent 18%,
+      transparent 70%,
+      color-mix(in srgb, var(--color-bg) 96%, transparent) 100%
+    ),
+    radial-gradient(
+      ellipse 70% 55% at 88% 28%,
+      color-mix(in srgb, #e30613 14%, transparent),
+      transparent 72%
+    );
+  inset: 0;
+}
+
+[data-theme="dark"] .feed-browser--hero-backdrop::before {
+  opacity: 0.22;
+}
+
+[data-theme="dark"] .feed-browser--hero-backdrop::after {
+  background:
+    linear-gradient(
+      108deg,
+      var(--color-bg) 0%,
+      color-mix(in srgb, var(--color-bg) 97%, transparent) 44%,
+      color-mix(in srgb, var(--color-bg) 72%, transparent) 62%,
+      transparent 80%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-bg) 94%, transparent) 0%,
+      transparent 20%,
+      transparent 68%,
+      color-mix(in srgb, var(--color-bg) 98%, transparent) 100%
+    ),
+    radial-gradient(
+      ellipse 65% 50% at 86% 30%,
+      color-mix(in srgb, #e30613 10%, transparent),
+      transparent 70%
+    );
+}
+
+@media (min-width: 861px) {
+  .feed-browser--hero-backdrop {
+    --kickboard-hero-image: url("/images/kickboard-hero-spain.webp");
+  }
+
+  .feed-browser--hero-backdrop::before {
+    background-position: 84% 10%;
+    opacity: 0.46;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed-browser--hero-backdrop::before {
+    opacity: 0.18;
+  }
+}
+
+@media print {
+  .feed-browser--hero-backdrop::before,
+  .feed-browser--hero-backdrop::after {
+    display: none;
+  }
+}
+
+.kickboard-hero-credit {
+  color: var(--color-text-muted);
+  font-size: 10px;
+  line-height: 1.4;
+  margin: 28px 0 0;
+  max-width: 36rem;
+  text-align: center;
+}
+
+.kickboard-hero-credit a {
+  color: color-mix(in srgb, var(--color-text-secondary) 88%, var(--color-accent));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Feed UI type scale (overrides global marketing-sized h1/h2) */
 .feed-browser h1 {
   font-size: clamp(1.5rem, 2.4vw, 2rem);

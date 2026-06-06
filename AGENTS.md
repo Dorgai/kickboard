@@ -63,6 +63,10 @@ curl -sS "$BASE/" | grep -c feed-status-grid || true                            
 
 If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production target**, regenerate the token under **kickboard project → Settings → Tokens** and update the `RAILWAY_TOKEN` repo secret, or add `RAILWAY_PROJECT_ID` + `RAILWAY_SERVICE_ID` secrets. Dashboard **Redeploy** only updates production when the service source is connected to `Dorgai/kickboard` branch **`main`**.
 
+### Home feed hero background
+
+The main feed uses `feed-browser--hero-backdrop` with optimized WebP in `public/images/` (`kickboard-hero-spain*.webp`). Layers: fixed photo (right-weighted) + left readability gradient + subtle Spain red radial tint. Do not put text directly on the raw photo — cards stay on `--color-surface`. See `public/images/README.md` for replace/optimize steps and photo attribution.
+
 ### Selection surfaces (no contour lines)
 
 Kickboard avoids **contour** selection chrome — no border rings, `outline` boxes, or `box-shadow: 0 0 0 Npx` halos on selected/active interactive items.

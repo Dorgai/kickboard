@@ -325,7 +325,7 @@ export function FeedBrowser() {
 
   const selectedMatch = matches.find((match) => match.matchId === selectedMatchId);
   return (
-    <div className="feed-browser">
+    <div className="feed-browser feed-browser--hero-backdrop">
       <nav
         className="event-tab-bar kickboard-tab-bar feed-event-selector-tabs"
         aria-label="Tournament event selector"
@@ -393,6 +393,25 @@ export function FeedBrowser() {
           competitionLabel={selectedCompetitionLabel}
         />
       )}
+
+      <p className="kickboard-hero-credit">
+        Background:{" "}
+        <a
+          href="https://commons.wikimedia.org/wiki/File:Lamine_Yamal_in_2025_(cropped2).jpg"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Lamine Yamal (Spain)
+        </a>{" "}
+        by{" "}
+        <a href="https://commons.wikimedia.org/wiki/User:Biso" rel="noopener noreferrer" target="_blank">
+          Biso
+        </a>{" "}
+        /{" "}
+        <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener noreferrer" target="_blank">
+          CC BY 4.0
+        </a>
+      </p>
     </div>
   );
 }
