@@ -3,7 +3,28 @@ import { buildApiFootballFixtureKey } from "@/lib/fixtures/fixture-key";
 import { teamsMatch } from "@/lib/squads/team-names";
 
 const API_KEY_CACHE_TTL_MS = 60_000;
+/** Do not block friends-picks queries on a slow upstream fixtures API. */
+const API_KEY_LOOKUP_BUDGET_MS = 2_500;
 const apiKeyCache = new Map<string, { expiresAt: number; keys: string[] }>();
+
+function withLookupBudget<T>(promise: Promise<T>, fallback: T) {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), API_KEY_LOOKUP_BUDGET_MS))
+  ]);
+}
+
+/** Skip API-Football alias resolution when names are placeholders (e.g. api-football keys). */
+export function teamsUsableForApiFootballLookup(homeTeam: string, awayTeam: string) {
+  const home = homeTeam.trim();
+  const away = awayTeam.trim();
+  if (!home || !away) return false;
+  const homeLower = home.toLowerCase();
+  const awayLower = away.toLowerCase();
+  if (homeLower === "home" && awayLower === "away") return false;
+  if (homeLower === "tbd" || awayLower === "tbd") return false;
+  return true;
+}
 
 function worldCupLeagueParams() {
   return {
@@ -69,7 +90,10 @@ export async function listApiFootballFixtureKeysForTeams(
   }
 
   try {
-    const keys = await fetchApiFootballFixtureKeysForTeams(home, away);
+    const keys = await withLookupBudget(
+      fetchApiFootballFixtureKeysForTeams(home, away),
+      cached?.keys ?? []
+    );
     if (keys.length > 0) {
       apiKeyCache.set(cacheKey, { keys, expiresAt: Date.now() + API_KEY_CACHE_TTL_MS });
     } else if (cached) {

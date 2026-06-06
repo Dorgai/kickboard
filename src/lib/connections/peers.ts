@@ -1,6 +1,9 @@
 import { query } from "@/lib/db";
 import { areUsersConnected, listAcceptedPeerIds } from "@/lib/connections/store";
-import { listApiFootballFixtureKeysForTeams } from "@/lib/fixtures/fixture-key-query";
+import {
+  listApiFootballFixtureKeysForTeams,
+  teamsUsableForApiFootballLookup
+} from "@/lib/fixtures/fixture-key-query";
 import {
   fixtureKeyMatchBindParams,
   fixtureKeyMatchSql,
@@ -111,7 +114,7 @@ export async function listPeersMatchActivity(
   const homeTeam = teams?.homeTeam?.trim() ?? "";
   const awayTeam = teams?.awayTeam?.trim() ?? "";
   const apiKeys =
-    match.homeSlug && match.awaySlug && homeTeam && awayTeam
+    match.homeSlug && match.awaySlug && teamsUsableForApiFootballLookup(homeTeam, awayTeam)
       ? await listApiFootballFixtureKeysForTeams(homeTeam, awayTeam)
       : [];
 
