@@ -10935,7 +10935,7 @@ code {
     width: 100%;
   }
 
-  .current-event-tabs-layout .fan-chat-float-root {
+  .fan-chat-float-root {
     bottom: calc(
       var(--kickboard-event-tabs-dock) + var(--kickboard-site-nav-dock) + var(--kickboard-mobile-dock-gap) +
         var(--kickboard-mobile-dock-bottom) + 18px + env(safe-area-inset-bottom, 0px)
