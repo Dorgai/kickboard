@@ -1660,6 +1660,8 @@ h3 {
 }
 
 .current-event-tabs-layout {
+  display: grid;
+  gap: 8px;
   position: relative;
 }
 
@@ -10581,6 +10583,13 @@ code {
 }
 
 @media (max-width: 860px) {
+  /* backdrop-filter on ancestors breaks position:fixed for bottom nav rails */
+  .app-header {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--color-surface);
+  }
+
   :root,
   [data-theme="light"],
   [data-theme="dark"] {

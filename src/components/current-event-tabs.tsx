@@ -262,13 +262,15 @@ export function CurrentEventTabs({
   }
 
   return (
-    <section className={`current-world-cup-card current-event-tabs-layout${chatOpen ? " fan-chat-dock-open" : ""}`}>
-      <div className="current-event-overview">
-        <div className="current-event-overview-heading">
-          <TournamentSummaryDialog
-            summary={summary}
-            title={currentWorldCup?.title ?? "2026 FIFA World Cup"}
-          />
+    <section className={`current-event-tabs-layout${chatOpen ? " fan-chat-dock-open" : ""}`}>
+      <div className="current-world-cup-card">
+        <div className="current-event-overview">
+          <div className="current-event-overview-heading">
+            <TournamentSummaryDialog
+              summary={summary}
+              title={currentWorldCup?.title ?? "2026 FIFA World Cup"}
+            />
+          </div>
         </div>
       </div>
 
