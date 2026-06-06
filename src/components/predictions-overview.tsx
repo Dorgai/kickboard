@@ -458,77 +458,60 @@ function sortMatchGroups(
   });
 }
 
-function UnifiedMatchCard({
-  group,
-  activeFixtureKey,
-  viewerDisplayName,
-  onEditPick,
-  onPickNavigate
-}: {
-  group: UnifiedMatchGroup;
-  activeFixtureKey: string | null;
-  viewerDisplayName: string | null;
-  onEditPick?: (fixtureKey: string) => void;
-  onPickNavigate?: (fixtureKey: string) => void;
-}) {
-  const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
-  const isActive = activeFixtureKey === group.fixtureKey;
+const MIN_FRIEND_COLUMNS = 3;
 
-  return (
-    <li
-      className={`predictions-unified-match${isActive ? " predictions-unified-match--active" : ""}`}
-    >
-      <div className="predictions-unified-match-header">
-        <button
-          className="predictions-unified-match-title"
-          type="button"
-          onClick={() => onPickNavigate?.(group.fixtureKey)}
-        >
-          {group.fixtureLabel}
-        </button>
-        <div className="predictions-unified-match-actions">
-          <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
-          {onEditPick ? (
-            <button
-              className="text-button predictions-overview-edit"
-              type="button"
-              onClick={() => {
-                dismissSessionCheckpoint();
-                onEditPick(group.fixtureKey);
-              }}
-            >
-              Edit
-            </button>
-          ) : null}
-        </div>
-      </div>
+type FriendTableColumn = {
+  key: string;
+  label: string;
+  userId: string | null;
+  username?: string;
+};
 
-      <div className="predictions-unified-match-body">
-        <div className="predictions-unified-yours">
-          <span className="predictions-unified-role">You</span>
-          <CompactPickLines pick={group.mine} />
-        </div>
+function buildFriendColumns(
+  connectionsPredictions: ConnectionPredictionSummary[],
+  friendsNameFilter: string
+): FriendTableColumn[] {
+  const peers = new Map<string, FriendTableColumn>();
 
-        <div className="predictions-unified-peers">
-          {group.friends.length > 0 ? (
-            <ul className="predictions-unified-friends">
-              {group.friends.map((pick) => (
-                <li className="predictions-unified-friend" key={`${pick.userId}-${pick.updatedAt}`}>
-                  <span className="predictions-unified-role predictions-unified-role--peer">
-                    <strong>{pick.displayName}</strong>
-                    <span className="connections-search-username">@{pick.username}</span>
-                  </span>
-                  <CompactPickLines pick={pick} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="predictions-unified-no-friends">No friends picked this match yet.</p>
-          )}
-        </div>
-      </div>
-    </li>
-  );
+  for (const pick of connectionsPredictions) {
+    if (!peerMatchesNameFilter(pick, friendsNameFilter)) continue;
+    if (peers.has(pick.userId)) continue;
+    peers.set(pick.userId, {
+      key: pick.userId,
+      userId: pick.userId,
+      username: pick.username,
+      label: pick.displayName?.trim() || pick.username
+    });
+  }
+
+  const columns = Array.from(peers.values()).sort((a, b) => a.label.localeCompare(b.label));
+  const targetCount = Math.max(MIN_FRIEND_COLUMNS, columns.length);
+
+  while (columns.length < targetCount) {
+    const index = columns.length + 1;
+    columns.push({
+      key: `placeholder-${index}`,
+      userId: null,
+      label: `Friend ${index}`
+    });
+  }
+
+  return columns;
+}
+
+function friendPickForColumn(
+  friends: ConnectionPredictionSummary[],
+  column: FriendTableColumn
+): ConnectionPredictionSummary | null {
+  if (!column.userId) return null;
+  return friends.find((pick) => pick.userId === column.userId) ?? null;
+}
+
+function TablePickCell({ pick, placeholder = "—" }: { pick: PredictionPickSummary | null; placeholder?: string }) {
+  if (!pick) {
+    return <span className="predictions-picks-placeholder">{placeholder}</span>;
+  }
+  return <CompactPickLines pick={pick} />;
 }
 
 export function PredictionsPicksSection({
@@ -598,6 +581,10 @@ export function PredictionsPicksSection({
   );
 
   const visibleGroups = picksTab === "upcoming" ? upcomingGroups : pastGroups;
+  const friendColumns = useMemo(
+    () => buildFriendColumns(connectionsPredictions, friendsNameFilter),
+    [connectionsPredictions, friendsNameFilter]
+  );
   const friendPickCount = visibleGroups.reduce((sum, group) => sum + group.friends.length, 0);
 
   return (
@@ -605,18 +592,8 @@ export function PredictionsPicksSection({
       className="predictions-overview-card predictions-unified-picks"
       id="predictions-match-picks"
     >
-      <div className="predictions-unified-picks-toolbar">
+      <header className="predictions-unified-picks-header">
         <h3 className="predictions-unified-picks-title">Yours &amp; friends&apos; picks</h3>
-        <FeedTabBar
-          ariaLabel="Upcoming or past picks"
-          className="predictions-unified-picks-tabs kickboard-tab-bar"
-          tabs={PICKS_TIME_TABS.map((tab) => ({
-            id: tab.id,
-            label: `${tab.label} (${tab.id === "upcoming" ? upcomingGroups.length : pastGroups.length})`
-          }))}
-          value={picksTab}
-          onChange={(id) => setPicksTab(id as PicksTimeTabId)}
-        />
         {connectionsPredictions.length > 0 ? (
           <label className="predictions-overview-name-filter predictions-unified-picks-filter">
             <span className="sr-only">Filter friends by name</span>
@@ -629,6 +606,19 @@ export function PredictionsPicksSection({
             />
           </label>
         ) : null}
+      </header>
+
+      <div className="kickboard-tab-rail predictions-unified-picks-tabs-rail">
+        <FeedTabBar
+          ariaLabel="Upcoming or past picks"
+          className="predictions-unified-picks-tabs kickboard-tab-bar"
+          tabs={PICKS_TIME_TABS.map((tab) => ({
+            id: tab.id,
+            label: `${tab.label} (${tab.id === "upcoming" ? upcomingGroups.length : pastGroups.length})`
+          }))}
+          value={picksTab}
+          onChange={(id) => setPicksTab(id as PicksTimeTabId)}
+        />
       </div>
 
       {myPredictions.length === 0 ? (
@@ -640,18 +630,77 @@ export function PredictionsPicksSection({
             : "No past picks yet."}
         </p>
       ) : (
-        <ul className="predictions-unified-list" role="tabpanel">
-          {visibleGroups.map((group) => (
-            <UnifiedMatchCard
-              key={group.fixtureKey}
-              activeFixtureKey={activeFixtureKey}
-              group={group}
-              viewerDisplayName={viewerDisplayName}
-              onEditPick={onEditPick}
-              onPickNavigate={onPickNavigate}
-            />
-          ))}
-        </ul>
+        <div className="predictions-picks-table-wrap" role="tabpanel">
+          <table className="predictions-results-table predictions-results-table--compact predictions-picks-table">
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th>You</th>
+                {friendColumns.map((column) => (
+                  <th key={column.key}>
+                    <span className="predictions-picks-col-label">{column.label}</span>
+                    {column.username ? (
+                      <span className="predictions-picks-col-meta">@{column.username}</span>
+                    ) : (
+                      <span className="predictions-picks-col-meta predictions-picks-col-meta--placeholder">
+                        Open slot
+                      </span>
+                    )}
+                  </th>
+                ))}
+                <th className="predictions-picks-actions-head"> </th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleGroups.map((group) => {
+                const isActive = activeFixtureKey === group.fixtureKey;
+                const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
+                return (
+                  <tr
+                    key={group.fixtureKey}
+                    className={isActive ? "predictions-picks-row--active" : undefined}
+                  >
+                    <td className="predictions-picks-match-cell">
+                      <button
+                        className="predictions-picks-match-link"
+                        type="button"
+                        onClick={() => onPickNavigate?.(group.fixtureKey)}
+                      >
+                        {group.fixtureLabel}
+                      </button>
+                    </td>
+                    <td className="predictions-results-cell">
+                      <TablePickCell pick={group.mine} />
+                    </td>
+                    {friendColumns.map((column) => (
+                      <td className="predictions-results-cell" key={`${group.fixtureKey}-${column.key}`}>
+                        <TablePickCell pick={friendPickForColumn(group.friends, column)} />
+                      </td>
+                    ))}
+                    <td className="predictions-picks-actions-cell">
+                      <PredictionShareButtons
+                        className="prediction-share--compact"
+                        payload={sharePayload}
+                      />
+                      {onEditPick ? (
+                        <button
+                          className="text-button predictions-overview-edit"
+                          type="button"
+                          onClick={() => {
+                            dismissSessionCheckpoint();
+                            onEditPick(group.fixtureKey);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      ) : null}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {myPredictions.length > 0 && friendPickCount === 0 && connectionsPredictions.length > 0 ? (
