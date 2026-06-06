@@ -1256,8 +1256,8 @@ h3 {
 /* Full-bleed Spain hero — assets in /public/images/ (see README there) */
 .feed-browser--hero-backdrop {
   --kickboard-hero-image: url("/images/kickboard-hero-spain-mobile.webp");
-  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 76%, transparent);
-  --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 68%, transparent);
+  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 62%, transparent);
+  --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 54%, transparent);
   isolation: isolate;
   position: relative;
 }
@@ -1384,8 +1384,8 @@ h3 {
 }
 
 [data-theme="dark"] .feed-browser--hero-backdrop {
-  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 84%, transparent);
-  --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 76%, transparent);
+  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 64%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
