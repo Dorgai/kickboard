@@ -18,6 +18,11 @@ type TournamentGroupScheduleProps = {
   };
 };
 
+function splitFixtureColumns<T>(items: T[]): [T[], T[]] {
+  const splitAt = Math.ceil(items.length / 2);
+  return [items.slice(0, splitAt), items.slice(splitAt)];
+}
+
 function TournamentFixtureRow({
   fixtureKey,
   fixture,
@@ -51,6 +56,48 @@ function TournamentFixtureRow({
   );
 }
 
+function TournamentFixtureBlock({
+  ariaLabel,
+  fixtures
+}: {
+  ariaLabel: string;
+  fixtures: Array<{ fixture: TournamentScheduleFixture; fixtureKey: string; metaLabel?: string }>;
+}) {
+  if (!fixtures.length) return null;
+
+  return (
+    <section className="current-event-fixture-block data-card">
+      <ul className="current-event-fixture-list" aria-label={ariaLabel}>
+        {fixtures.map((entry) => (
+          <TournamentFixtureRow
+            key={entry.fixtureKey}
+            fixture={entry.fixture}
+            fixtureKey={entry.fixtureKey}
+            metaLabel={entry.metaLabel}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function TournamentFixtureColumns({
+  ariaLabel,
+  entries
+}: {
+  ariaLabel: string;
+  entries: Array<{ fixture: TournamentScheduleFixture; fixtureKey: string; metaLabel?: string }>;
+}) {
+  const [leftEntries, rightEntries] = splitFixtureColumns(entries);
+
+  return (
+    <div className="current-event-fixture-columns">
+      <TournamentFixtureBlock ariaLabel={`${ariaLabel} · column 1`} fixtures={leftEntries} />
+      <TournamentFixtureBlock ariaLabel={`${ariaLabel} · column 2`} fixtures={rightEntries} />
+    </div>
+  );
+}
+
 export function TournamentGroupSchedule({ group }: TournamentGroupScheduleProps) {
   const fixtures = fixturesForGroupDisplay(group);
 
@@ -72,15 +119,13 @@ export function TournamentGroupSchedule({ group }: TournamentGroupScheduleProps)
         </div>
       </div>
 
-      <ul className="current-event-fixture-list" aria-label={`Group ${group.group} fixtures`}>
-        {fixtures.map((fixture, index) => (
-          <TournamentFixtureRow
-            key={`${group.group}-fixture-${index}`}
-            fixture={fixture}
-            fixtureKey={fixtureKeyForGroupMatch(group.group, fixture, index)}
-          />
-        ))}
-      </ul>
+      <TournamentFixtureColumns
+        ariaLabel={`Group ${group.group} fixtures`}
+        entries={fixtures.map((fixture, index) => ({
+          fixture,
+          fixtureKey: fixtureKeyForGroupMatch(group.group, fixture, index)
+        }))}
+      />
     </div>
   );
 }
@@ -89,15 +134,13 @@ export function TournamentKnockoutSchedule({ stage }: { stage: string }) {
   const matches = knockoutPlaceholdersForStage(stage);
 
   return (
-    <ul className="current-event-fixture-list" aria-label={`${stage} fixtures`}>
-      {matches.map((match) => (
-        <TournamentFixtureRow
-          key={match.matchId}
-          fixture={match}
-          fixtureKey={match.fixtureKey}
-          metaLabel={match.label}
-        />
-      ))}
-    </ul>
+    <TournamentFixtureColumns
+      ariaLabel={`${stage} fixtures`}
+      entries={matches.map((match) => ({
+        fixture: match,
+        fixtureKey: match.fixtureKey,
+        metaLabel: match.label
+      }))}
+    />
   );
 }
