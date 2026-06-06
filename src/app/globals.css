@@ -6050,6 +6050,14 @@ h3 {
   min-width: 0;
 }
 
+.fixture-prediction-scorers-progress {
+  color: color-mix(in srgb, var(--color-text-primary) 68%, var(--color-text-secondary));
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .fixture-prediction-scorers-toggle-title {
   font-size: 12px;
   font-weight: 800;
@@ -6185,13 +6193,13 @@ h3 {
   color: var(--color-text-primary);
   display: inline-flex;
   flex: 0 0 auto;
-  font-size: 15px;
+  font-size: 1.35rem;
   font-variant-numeric: tabular-nums;
   font-weight: 800;
-  height: 1.5rem;
+  height: 2.25rem;
   justify-content: center;
   line-height: 1;
-  min-width: 1.5rem;
+  min-width: 2.75rem;
   text-align: center;
 }
 
@@ -6221,8 +6229,8 @@ h3 {
   align-items: center;
   display: inline-flex;
   flex: 0 0 auto;
-  gap: 3px;
-  height: 1.5rem;
+  gap: 4px;
+  height: 2.25rem;
 }
 
 .fixture-scorer-chip--selected:has(.fixture-scorer-chip-actions) {
@@ -6246,13 +6254,13 @@ h3 {
   display: inline-flex;
   flex: 0 0 auto;
   font-family: inherit;
-  font-size: 15px;
+  font-size: 1.1rem;
   font-weight: 600;
-  height: 1.5rem;
+  height: 2.25rem;
   justify-content: center;
   line-height: 1;
   margin: 0;
-  min-width: 1.5rem;
+  min-width: 2.25rem;
   padding: 0;
 }
 
