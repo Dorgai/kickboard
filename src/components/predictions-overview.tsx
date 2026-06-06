@@ -208,10 +208,10 @@ function StatusLine({
 function CompactPickLines({ pick }: { pick: PredictionPickSummary }) {
   const lines = formatPickSummary(pick);
   if (!lines.length) {
-    return <p className="predictions-overview-empty">No picks saved.</p>;
+    return <p className="predictions-overview-empty predictions-overview-empty--inline">No picks</p>;
   }
   return (
-    <div className="predictions-type-lines predictions-type-lines--compact">
+    <div className="predictions-type-lines predictions-type-lines--unified">
       {lines.map((line) => (
         <StatusLine key={line.label} {...line} />
       ))}
@@ -470,41 +470,47 @@ function UnifiedMatchCard({
         >
           {group.fixtureLabel}
         </button>
-        {onEditPick ? (
-          <button
-            className="text-button predictions-overview-edit"
-            type="button"
-            onClick={() => {
-              dismissSessionCheckpoint();
-              onEditPick(group.fixtureKey);
-            }}
-          >
-            Edit yours
-          </button>
-        ) : null}
+        <div className="predictions-unified-match-actions">
+          <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
+          {onEditPick ? (
+            <button
+              className="text-button predictions-overview-edit"
+              type="button"
+              onClick={() => {
+                dismissSessionCheckpoint();
+                onEditPick(group.fixtureKey);
+              }}
+            >
+              Edit
+            </button>
+          ) : null}
+        </div>
       </div>
 
-      <div className="predictions-unified-yours">
-        <span className="predictions-unified-role">You</span>
-        <CompactPickLines pick={group.mine} />
-        <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
-      </div>
+      <div className="predictions-unified-match-body">
+        <div className="predictions-unified-yours">
+          <span className="predictions-unified-role">You</span>
+          <CompactPickLines pick={group.mine} />
+        </div>
 
-      {group.friends.length > 0 ? (
-        <ul className="predictions-unified-friends">
-          {group.friends.map((pick) => (
-            <li className="predictions-unified-friend" key={`${pick.userId}-${pick.updatedAt}`}>
-              <span className="predictions-unified-role">
-                <strong>{pick.displayName}</strong>
-                <span className="connections-search-username">@{pick.username}</span>
-              </span>
-              <CompactPickLines pick={pick} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="predictions-unified-no-friends">No friends have picked this match yet.</p>
-      )}
+        <div className="predictions-unified-peers">
+          {group.friends.length > 0 ? (
+            <ul className="predictions-unified-friends">
+              {group.friends.map((pick) => (
+                <li className="predictions-unified-friend" key={`${pick.userId}-${pick.updatedAt}`}>
+                  <span className="predictions-unified-role predictions-unified-role--peer">
+                    <strong>{pick.displayName}</strong>
+                    <span className="connections-search-username">@{pick.username}</span>
+                  </span>
+                  <CompactPickLines pick={pick} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="predictions-unified-no-friends">No friends picked this match yet.</p>
+          )}
+        </div>
+      </div>
     </li>
   );
 }
@@ -583,24 +589,8 @@ export function PredictionsPicksSection({
       className="predictions-overview-card predictions-unified-picks"
       id="predictions-match-picks"
     >
-      <header className="predictions-overview-card-header predictions-overview-card-header--unified">
-        <h3>Yours &amp; friends&apos; picks</h3>
-        {connectionsPredictions.length > 0 ? (
-          <label className="predictions-overview-name-filter">
-            <span className="sr-only">Filter friends by name</span>
-            <input
-              className="predictions-overview-name-filter-input"
-              placeholder="Filter friends"
-              type="search"
-              value={friendsNameFilter}
-              onChange={(event) => setFriendsNameFilter(event.target.value)}
-            />
-          </label>
-        ) : null}
-        <span className="predictions-overview-count">{visibleGroups.length}</span>
-      </header>
-
-      <div className="predictions-unified-picks-tabs-rail">
+      <div className="predictions-unified-picks-toolbar">
+        <h3 className="predictions-unified-picks-title">Yours &amp; friends&apos; picks</h3>
         <FeedTabBar
           ariaLabel="Upcoming or past picks"
           className="predictions-unified-picks-tabs kickboard-tab-bar"
@@ -611,6 +601,18 @@ export function PredictionsPicksSection({
           value={picksTab}
           onChange={(id) => setPicksTab(id as PicksTimeTabId)}
         />
+        {connectionsPredictions.length > 0 ? (
+          <label className="predictions-overview-name-filter predictions-unified-picks-filter">
+            <span className="sr-only">Filter friends by name</span>
+            <input
+              className="predictions-overview-name-filter-input predictions-unified-picks-filter-input"
+              placeholder="Filter friends"
+              type="search"
+              value={friendsNameFilter}
+              onChange={(event) => setFriendsNameFilter(event.target.value)}
+            />
+          </label>
+        ) : null}
       </div>
 
       {myPredictions.length === 0 ? (
