@@ -13,7 +13,6 @@ import {
 } from "@/components/predictions-overview";
 import {
   TournamentPicksSection,
-  TournamentPointsBoard,
   useTournamentPredictionsOverview
 } from "@/components/tournament-predictions-overview";
 import { UserPickActivityPanel } from "@/components/user-pick-activity-panel";
@@ -258,28 +257,19 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
         {subTab === "tournament" ? (
           <div className="predictions-sub-panel" id="predictions-tournament" role="tabpanel">
             <div className="predictions-tournament-layout">
-              <div className="predictions-match-form-points-row">
-                <TournamentPredictionsForm
-                  groups={groups}
-                  onSaved={() => {
-                    setOverviewRefresh((token) => token + 1);
-                    setActivityRefresh((token) => token + 1);
-                  }}
-                />
-                {tournamentOverviewLoading ? (
-                  <p className="inline-status predictions-points-loading">Loading points…</p>
-                ) : null}
-                {tournamentOverviewError ? (
-                  <p className="inline-status predictions-points-loading">{tournamentOverviewError}</p>
-                ) : null}
-                {!tournamentOverviewLoading && !tournamentOverviewError && tournamentOverviewData ? (
-                  <TournamentPointsBoard
-                    myPrediction={tournamentOverviewData.myPrediction}
-                    wallet={tournamentOverviewData.wallet}
-                  />
-                ) : null}
-              </div>
-
+              <TournamentPredictionsForm
+                groups={groups}
+                onSaved={() => {
+                  setOverviewRefresh((token) => token + 1);
+                  setActivityRefresh((token) => token + 1);
+                }}
+              />
+              {tournamentOverviewLoading ? (
+                <p className="inline-status predictions-points-loading">Loading picks…</p>
+              ) : null}
+              {tournamentOverviewError ? (
+                <p className="inline-status predictions-points-loading">{tournamentOverviewError}</p>
+              ) : null}
               {!tournamentOverviewLoading && !tournamentOverviewError && tournamentOverviewData ? (
                 <TournamentPicksSection
                   data={tournamentOverviewData}

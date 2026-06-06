@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { HelpTooltip } from "@/components/help-tooltip";
 import { TOURNAMENT_PREDICTION_BLOCKS } from "@/lib/tournament-predictions/labels";
 import type { TournamentPredictionRecord } from "@/lib/tournament-predictions/types";
 import {
@@ -10,18 +9,17 @@ import {
   tournamentCategoryValue,
   type ConnectionTournamentPredictionSummary,
   type TournamentCategory,
-  type TournamentPredictionsOverview,
-  type TournamentWalletSummary
+  type TournamentPredictionsOverview
 } from "@/lib/tournament-predictions/overview-shared";
 
 export type TournamentPredictionsOverviewData = TournamentPredictionsOverview;
 
-type TournamentTableRow = {
+type TournamentTableColumn = {
   key: TournamentCategory | "topScorerBoard";
   label: string;
 };
 
-const TOURNAMENT_TABLE_ROWS: TournamentTableRow[] = [
+const TOURNAMENT_TABLE_COLUMNS: TournamentTableColumn[] = [
   { key: "champion", label: TOURNAMENT_PREDICTION_BLOCKS.champion },
   { key: "finalists", label: TOURNAMENT_PREDICTION_BLOCKS.finalOpponent },
   { key: "topScorer", label: TOURNAMENT_PREDICTION_BLOCKS.topScorer },
@@ -29,12 +27,13 @@ const TOURNAMENT_TABLE_ROWS: TournamentTableRow[] = [
   { key: "bestPlayer", label: TOURNAMENT_PREDICTION_BLOCKS.bestPlayer }
 ];
 
-const POINTS_BOARD_ROWS: { key: TournamentCategory; label: string }[] = [
-  { key: "champion", label: TOURNAMENT_PREDICTION_BLOCKS.champion },
-  { key: "finalists", label: "Finalists" },
-  { key: "topScorer", label: TOURNAMENT_PREDICTION_BLOCKS.topScorer },
-  { key: "bestPlayer", label: TOURNAMENT_PREDICTION_BLOCKS.bestPlayer }
-];
+type TournamentPersonRow = {
+  key: string;
+  label: string;
+  username?: string;
+  record: TournamentPredictionRecord | null;
+  isViewer?: boolean;
+};
 
 function resultBadge(status: string) {
   if (status === "won") return { label: "Won", className: "predictions-result--won" };
@@ -52,108 +51,37 @@ function peerMatchesNameFilter(pick: ConnectionTournamentPredictionSummary, quer
   return displayName.includes(term) || username.includes(term);
 }
 
-function rowVisibleForAnyone(
-  row: TournamentTableRow,
+function columnVisibleForAnyone(
+  column: TournamentTableColumn,
   mine: TournamentPredictionRecord | null,
   friends: ConnectionTournamentPredictionSummary[]
 ) {
-  if (tournamentCategoryValue(mine, row.key)) return true;
-  return friends.some((friend) => tournamentCategoryValue(friend, row.key));
-}
-
-function categoryHasPick(record: TournamentPredictionRecord | null, category: TournamentCategory) {
-  if (!record) return false;
-  if (category === "champion") return Boolean(record.predictedChampion);
-  if (category === "finalists") return record.predictedFinalists.length > 0;
-  if (category === "topScorer") return Boolean(record.predictedTopScorer);
-  return Boolean(record.predictedBestPlayer);
-}
-
-function categoryStatusCount(
-  record: TournamentPredictionRecord | null,
-  category: TournamentCategory,
-  status: "won" | "lost" | "pending"
-) {
-  if (!record || !categoryHasPick(record, category)) return 0;
-  const pickStatus = tournamentCategoryResultStatus(record, category);
-  if (status === "won") return pickStatus === "won" || pickStatus === "partial" ? 1 : 0;
-  if (status === "lost") return pickStatus === "lost" ? 1 : 0;
-  return pickStatus !== "won" && pickStatus !== "partial" && pickStatus !== "lost" && pickStatus !== "void"
-    ? 1
-    : 0;
-}
-
-const MIN_FRIEND_COLUMNS = 3;
-
-type FriendTableColumn = {
-  key: string;
-  label: string;
-  userId: string | null;
-  username?: string;
-};
-
-function buildFriendColumns(
-  connectionsPredictions: ConnectionTournamentPredictionSummary[],
-  friendsNameFilter: string
-): FriendTableColumn[] {
-  const peers = new Map<string, FriendTableColumn>();
-
-  for (const pick of connectionsPredictions) {
-    if (!peerMatchesNameFilter(pick, friendsNameFilter)) continue;
-    if (peers.has(pick.userId)) continue;
-    peers.set(pick.userId, {
-      key: pick.userId,
-      userId: pick.userId,
-      username: pick.username,
-      label: pick.displayName?.trim() || pick.username
-    });
-  }
-
-  const columns = Array.from(peers.values()).sort((a, b) => a.label.localeCompare(b.label));
-  const targetCount = Math.max(MIN_FRIEND_COLUMNS, columns.length);
-
-  while (columns.length < targetCount) {
-    const index = columns.length + 1;
-    columns.push({
-      key: `placeholder-${index}`,
-      userId: null,
-      label: `Friend ${index}`
-    });
-  }
-
-  return columns;
-}
-
-function friendPickForColumn(
-  friends: ConnectionTournamentPredictionSummary[],
-  column: FriendTableColumn
-) {
-  if (!column.userId) return null;
-  return friends.find((pick) => pick.userId === column.userId) ?? null;
+  if (tournamentCategoryValue(mine, column.key)) return true;
+  return friends.some((friend) => tournamentCategoryValue(friend, column.key));
 }
 
 function TournamentPickCell({
   record,
-  row
+  column
 }: {
   record: TournamentPredictionRecord | null;
-  row: TournamentTableRow;
+  column: TournamentTableColumn;
 }) {
-  const value = tournamentCategoryValue(record, row.key);
+  const value = tournamentCategoryValue(record, column.key);
   if (!value) {
     return <span className="predictions-picks-placeholder">—</span>;
   }
 
-  const status = tournamentCategoryResultStatus(record, row.key);
+  const status = tournamentCategoryResultStatus(record, column.key);
   const points =
-    row.key === "topScorerBoard" ? 0 : tournamentCategoryPoints(record, row.key as TournamentCategory);
+    column.key === "topScorerBoard" ? 0 : tournamentCategoryPoints(record, column.key as TournamentCategory);
   const badge = resultBadge(status);
 
   return (
     <div className="predictions-type-lines predictions-type-lines--unified">
       <div className="predictions-type-line">
         <span className="predictions-type-line-value">{value}</span>
-        {row.key !== "topScorerBoard" ? (
+        {column.key !== "topScorerBoard" ? (
           <span className={`predictions-result-badge ${badge.className}`}>
             {badge.label}
             {points > 0 ? ` · +${points}` : ""}
@@ -215,74 +143,6 @@ export function useTournamentPredictionsOverview({
   return { data, loading, error };
 }
 
-export function TournamentPointsBoard({
-  wallet,
-  myPrediction
-}: {
-  wallet: TournamentWalletSummary;
-  myPrediction: TournamentPredictionRecord | null;
-}) {
-  return (
-    <section className="predictions-results-board data-card predictions-points-board">
-      <header className="predictions-results-board-header">
-        <h3 className="panel-help-row">
-          Your points
-          <HelpTooltip label="How tournament points settle" size="sm">
-            Tournament picks settle when the competition awards are decided. Until then, picks show as{" "}
-            <strong>Pending</strong>. Earned <strong>{wallet.pointsWon}</strong> pts so far ·{" "}
-            <strong>{wallet.picksPending}</strong> picks still waiting on results.
-          </HelpTooltip>
-        </h3>
-        <p className="predictions-wallet-balance">
-          <span className="predictions-wallet-balance-value">{wallet.balance}</span>
-          <span className="predictions-wallet-balance-label">points total</span>
-        </p>
-      </header>
-      <table className="predictions-results-table predictions-results-table--compact">
-        <thead>
-          <tr>
-            <th>Pick</th>
-            <th>Won</th>
-            <th>Lost</th>
-            <th>Pnd</th>
-            <th>Pts</th>
-          </tr>
-        </thead>
-        <tbody>
-          {POINTS_BOARD_ROWS.map(({ key, label }) => {
-            const row = wallet.byCategory[key];
-            return (
-              <tr key={key}>
-                <td className="predictions-results-label-cell">{label}</td>
-                <td className="predictions-results-cell">
-                  <span className="predictions-results-count">
-                    {categoryStatusCount(myPrediction, key, "won")}
-                  </span>
-                </td>
-                <td className="predictions-results-cell">
-                  <span className="predictions-results-count">
-                    {categoryStatusCount(myPrediction, key, "lost")}
-                  </span>
-                </td>
-                <td className="predictions-results-cell">
-                  <span className="predictions-results-count">
-                    {categoryStatusCount(myPrediction, key, "pending")}
-                  </span>
-                </td>
-                <td className="predictions-results-cell predictions-results-cell--points">
-                  <span className="predictions-results-count">
-                    {row.points > 0 ? `+${row.points}` : "—"}
-                  </span>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </section>
-  );
-}
-
 export function TournamentPicksSection({
   data,
   onEditPick
@@ -298,15 +158,42 @@ export function TournamentPicksSection({
     [connectionsPredictions, friendsNameFilter]
   );
 
-  const friendColumns = useMemo(
-    () => buildFriendColumns(connectionsPredictions, friendsNameFilter),
-    [connectionsPredictions, friendsNameFilter]
-  );
-
-  const visibleRows = useMemo(
-    () => TOURNAMENT_TABLE_ROWS.filter((row) => rowVisibleForAnyone(row, myPrediction, filteredFriends)),
+  const visibleColumns = useMemo(
+    () =>
+      TOURNAMENT_TABLE_COLUMNS.filter((column) =>
+        columnVisibleForAnyone(column, myPrediction, filteredFriends)
+      ),
     [filteredFriends, myPrediction]
   );
+
+  const personRows = useMemo(() => {
+    const rows: TournamentPersonRow[] = [
+      {
+        key: "you",
+        label: "You",
+        record: myPrediction,
+        isViewer: true
+      }
+    ];
+
+    const seen = new Set<string>();
+    for (const friend of filteredFriends) {
+      if (seen.has(friend.userId)) continue;
+      seen.add(friend.userId);
+      rows.push({
+        key: friend.userId,
+        label: friend.displayName?.trim() || friend.username,
+        username: friend.username,
+        record: friend
+      });
+    }
+
+    return rows.sort((a, b) => {
+      if (a.isViewer) return -1;
+      if (b.isViewer) return 1;
+      return a.label.localeCompare(b.label);
+    });
+  }, [filteredFriends, myPrediction]);
 
   const hasAnyPicks = Boolean(myPrediction) || connectionsPredictions.length > 0;
 
@@ -340,39 +227,34 @@ export function TournamentPicksSection({
 
       {!hasAnyPicks ? (
         <p className="predictions-overview-empty">No tournament picks yet — add yours above.</p>
-      ) : visibleRows.length === 0 ? (
+      ) : visibleColumns.length === 0 ? (
         <p className="predictions-overview-empty">No friends match that filter.</p>
       ) : (
         <div className="predictions-picks-table-wrap">
-          <table className="predictions-results-table predictions-results-table--compact predictions-picks-table">
+          <table className="predictions-results-table predictions-results-table--compact predictions-picks-table predictions-picks-table--pivoted">
             <thead>
               <tr>
-                <th>Pick</th>
-                <th>You</th>
-                {friendColumns.map((column) => (
-                  <th key={column.key}>
-                    <span className="predictions-picks-col-label">{column.label}</span>
-                    {column.username ? (
-                      <span className="predictions-picks-col-meta">@{column.username}</span>
-                    ) : (
-                      <span className="predictions-picks-col-meta predictions-picks-col-meta--placeholder">
-                        Open slot
-                      </span>
-                    )}
-                  </th>
+                <th>Fan</th>
+                {visibleColumns.map((column) => (
+                  <th key={column.key}>{column.label}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {visibleRows.map((row) => (
-                <tr key={row.key}>
-                  <td className="predictions-picks-match-cell">{row.label}</td>
-                  <td className="predictions-results-cell">
-                    <TournamentPickCell record={myPrediction} row={row} />
+              {personRows.map((person) => (
+                <tr
+                  key={person.key}
+                  className={person.isViewer ? "predictions-picks-row--active" : undefined}
+                >
+                  <td className="predictions-picks-match-cell">
+                    <span className="predictions-picks-col-label">{person.label}</span>
+                    {person.username ? (
+                      <span className="predictions-picks-col-meta">@{person.username}</span>
+                    ) : null}
                   </td>
-                  {friendColumns.map((column) => (
-                    <td className="predictions-results-cell" key={`${row.key}-${column.key}`}>
-                      <TournamentPickCell record={friendPickForColumn(filteredFriends, column)} row={row} />
+                  {visibleColumns.map((column) => (
+                    <td className="predictions-results-cell" key={`${person.key}-${column.key}`}>
+                      <TournamentPickCell column={column} record={person.record} />
                     </td>
                   ))}
                 </tr>

@@ -5756,6 +5756,16 @@ h3 {
   table-layout: fixed;
 }
 
+.predictions-picks-table--pivoted .predictions-picks-match-cell {
+  min-width: 6.5rem;
+  vertical-align: top;
+  width: 14%;
+}
+
+.predictions-picks-table--pivoted thead th:not(:first-child) {
+  min-width: 7rem;
+}
+
 .predictions-picks-table th,
 .predictions-picks-table td {
   padding: 5px 4px;
