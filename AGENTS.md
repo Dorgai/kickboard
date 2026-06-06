@@ -65,7 +65,7 @@ If GitHub Actions fails with `Unauthorized` on **Resolve kickboard production ta
 
 ### Home feed hero background
 
-The main feed uses `feed-browser--hero-backdrop` with optimized WebP in `public/images/` (`kickboard-hero-spain*.webp`). Layers: fixed photo (right-weighted) + left readability gradient + subtle Spain red radial tint. Do not put text directly on the raw photo — cards stay on `--color-surface`. See `public/images/README.md` for replace/optimize steps and photo attribution.
+The main feed uses `feed-browser--hero-backdrop` with optimized WebP in `public/images/` (`kickboard-hero-spain*.webp`). Layers: fixed photo (right-weighted) + left readability gradient + subtle Spain red radial tint. Do not put text directly on the raw photo — feed cards use semi-transparent `--kickboard-hero-surface` (frosted) over the hero, not opaque full-bleed text on the photo. See `public/images/README.md` for replace/optimize steps and photo attribution.
 
 ### Selection surfaces (no contour lines)
 
