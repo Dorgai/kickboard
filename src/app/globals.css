@@ -4201,12 +4201,27 @@ h3 {
   font-weight: 400;
 }
 
-.tournament-predictions-form .tournament-team-pick-option .team-label-text {
+.tournament-predictions-form .tournament-team-pick-option .team-label-text,
+.tournament-predictions-form
+  .tournament-team-pick-option
+  .fixture-prediction-outcome-body
+  .team-label-stacked
+  .team-label-text,
+.tournament-predictions-form
+  .tournament-team-pick-option
+  .fixture-prediction-outcome-body
+  .team-label-sm
+  .team-label-text {
   font-size: 13px;
   font-weight: 400;
 }
 
-.tournament-predictions-form .tournament-team-pick-option.is-selected .team-label-text {
+.tournament-predictions-form .tournament-team-pick-option.is-selected .team-label-text,
+.tournament-predictions-form
+  .tournament-team-pick-option.is-selected
+  .fixture-prediction-outcome-body
+  .team-label-stacked
+  .team-label-text {
   font-weight: 400;
 }
 
@@ -4271,7 +4286,7 @@ h3 {
 
 .tournament-team-pick-grid {
   display: grid;
-  gap: 8px;
+  gap: 12px;
   grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
   max-height: min(14rem, 32vh);
   overflow: auto;
@@ -4451,7 +4466,7 @@ h3 {
   .tournament-team-pick-grid {
     display: flex;
     flex-wrap: nowrap;
-    gap: 8px;
+    gap: 12px;
     grid-template-columns: unset;
     max-height: none;
     overflow-x: auto;
@@ -4729,7 +4744,7 @@ h3 {
   font-size: 13px;
 }
 
-.fixture-predictions-form:not(.fixture-predictions-form--compact)
+.fixture-predictions-form:not(.fixture-predictions-form--compact):not(.tournament-predictions-form)
   .fixture-prediction-outcome-body
   .team-label-stacked
   .team-label-text {
