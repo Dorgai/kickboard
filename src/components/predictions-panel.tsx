@@ -11,6 +11,11 @@ import {
   PredictionsPointsBoard,
   usePredictionsOverview
 } from "@/components/predictions-overview";
+import {
+  TournamentPicksSection,
+  TournamentPointsBoard,
+  useTournamentPredictionsOverview
+} from "@/components/tournament-predictions-overview";
 import { UserPickActivityPanel } from "@/components/user-pick-activity-panel";
 import {
   FixtureMatchPicker,
@@ -218,6 +223,20 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     refreshToken: overviewRefresh
   });
 
+  const {
+    data: tournamentOverviewData,
+    loading: tournamentOverviewLoading,
+    error: tournamentOverviewError
+  } = useTournamentPredictionsOverview({
+    refreshToken: overviewRefresh
+  });
+
+  const scrollToTournamentForm = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      document.getElementById("tournament-predictions")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, []);
+
   const subTabButtons = PREDICTION_SUB_TABS.map((tab) => ({
     id: tab.id,
     label: touchLayout ? tab.shortLabel : tab.label
@@ -238,13 +257,36 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
 
         {subTab === "tournament" ? (
           <div className="predictions-sub-panel" id="predictions-tournament" role="tabpanel">
-            <TournamentPredictionsForm
-              groups={groups}
-              onSaved={() => {
-                setOverviewRefresh((token) => token + 1);
-                setActivityRefresh((token) => token + 1);
-              }}
-            />
+            <div className="predictions-tournament-layout">
+              <div className="predictions-match-form-points-row">
+                <TournamentPredictionsForm
+                  groups={groups}
+                  onSaved={() => {
+                    setOverviewRefresh((token) => token + 1);
+                    setActivityRefresh((token) => token + 1);
+                  }}
+                />
+                {tournamentOverviewLoading ? (
+                  <p className="inline-status predictions-points-loading">Loading points…</p>
+                ) : null}
+                {tournamentOverviewError ? (
+                  <p className="inline-status predictions-points-loading">{tournamentOverviewError}</p>
+                ) : null}
+                {!tournamentOverviewLoading && !tournamentOverviewError && tournamentOverviewData ? (
+                  <TournamentPointsBoard
+                    myPrediction={tournamentOverviewData.myPrediction}
+                    wallet={tournamentOverviewData.wallet}
+                  />
+                ) : null}
+              </div>
+
+              {!tournamentOverviewLoading && !tournamentOverviewError && tournamentOverviewData ? (
+                <TournamentPicksSection
+                  data={tournamentOverviewData}
+                  onEditPick={scrollToTournamentForm}
+                />
+              ) : null}
+            </div>
           </div>
         ) : (
           <div className="predictions-sub-panel" id="predictions-match" role="tabpanel">
