@@ -3,7 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { MatchTeamsLine } from "@/components/team-label";
 import { writeFixtureDragData } from "@/lib/fixtures/drag-fixture";
-import { groupFixturesByDate, type FixtureOption } from "@/lib/fixtures/fixture-key";
+import {
+  groupFixturesByDate,
+  sortFixtureOptions,
+  type FixtureOption
+} from "@/lib/fixtures/fixture-key";
 import {
   buildGroupFixtureOptions,
   buildKnockoutFixtureOptions
@@ -70,7 +74,7 @@ export function useFixtureOptions(groups: WorldCupGroupInput[]) {
     for (const fixture of buildKnockoutFixtureOptions()) {
       if (!byKey.has(fixture.key)) byKey.set(fixture.key, fixture);
     }
-    return Array.from(byKey.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    return sortFixtureOptions(Array.from(byKey.values()));
   }, [groups, liveFixtures]);
 }
 
