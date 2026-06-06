@@ -15,6 +15,7 @@
     "db:schema": "node scripts/apply-db-schema.mjs",
     "db:schema:psql": "sh -c 'test -n \"$DATABASE_URL\" && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/schema.sql -f db/community-extensions.sql'",
     "check": "npm run typecheck && npm run build",
+    "push:daily": "npx tsx scripts/push-daily-digest.ts",
     "railway:connect": "bash scripts/railway-connect.sh",
     "railway:deploy": "bash scripts/deploy-production.sh",
     "railway:variables": "bash scripts/configure-railway-variables.sh",
@@ -47,7 +48,8 @@
     "next-auth": "^5.0.0-beta.30",
     "pg": "^8.21.0",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
@@ -55,6 +57,8 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
+    "@types/web-push": "^3.6.4",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   },
   "overrides": {

@@ -144,7 +144,9 @@ export async function createConnectionRequest(requesterId: string, addresseeUser
     [requesterId, peer.id]
   );
 
-  return inserted.rows[0]?.id ?? null;
+  const connectionId = inserted.rows[0]?.id;
+  if (!connectionId) return null;
+  return { connectionId, addresseeId: peer.id };
 }
 
 export async function respondToConnectionRequest(
@@ -183,7 +185,11 @@ export async function respondToConnectionRequest(
        WHERE id = $1`,
       [connectionId]
     );
-    return { status: "accepted" as const };
+    return {
+      status: "accepted" as const,
+      requesterId: connection.requester_id,
+      addresseeId: connection.addressee_id
+    };
   }
 
   if (action === "block") {

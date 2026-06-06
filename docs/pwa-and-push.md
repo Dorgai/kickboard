@@ -17,13 +17,33 @@ The site also shows a short **install hint** on mobile until you dismiss it or i
 - `apple-mobile-web-app-capable` via Next metadata
 - Mobile layout (Predictions, Coach Board, etc.)
 
-## Optional: Web Push
+## Web Push (mobile & tablet by default)
 
-Set on Railway / GitHub secrets:
+On **phones and tablets** (viewport ≤ 1024px), signed-in users are prompted once for notification permission and subscribed automatically when they allow it. Desktop users are only subscribed if permission was already granted.
+
+Push covers:
+
+- Daily match-day digest (scheduled cron)
+- Connection requests and acceptances
+- Friends' prediction updates
+
+User preferences default to `notification_channels.push: true` in `user_preferences`.
+
+### Railway / production env
+
+Set:
 
 - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
 - `VAPID_PRIVATE_KEY`
 - `VAPID_SUBJECT` (mailto: or https URL)
-- `CRON_SECRET` for scheduled push jobs
+- `CRON_SECRET` for `POST /api/cron/push-daily` and GitHub Actions digest
 
-Without VAPID, install and in-app use still work; OS notification push does not.
+Generate keys: `npx web-push generate-vapid-keys`
+
+Apply schema (includes `push_subscriptions`):
+
+```bash
+npm run db:schema
+```
+
+Without VAPID keys, install and in-app use still work; OS notification push does not.

@@ -1,5 +1,6 @@
 import { upsertUserAlert } from "@/lib/alerts/store";
 import { recordActivityEvent } from "@/lib/activity/store";
+import { notifyConnectionActivity } from "@/lib/push/connection-notify";
 import { listAcceptedPeerIds } from "@/lib/connections/store";
 import { query } from "@/lib/db";
 import { fixtureKeyToShortLabel } from "@/lib/fixtures/fixture-key";
@@ -137,8 +138,8 @@ export async function recordFixturePredictionEvent(input: {
       : `${fixtureLabel} — ${describePredictionSnapshot(input.nextSnapshot)}`;
 
   await Promise.all(
-    peerIds.map((peerId) =>
-      upsertUserAlert({
+    peerIds.map(async (peerId) => {
+      await upsertUserAlert({
         userId: peerId,
         alertKey: `connection:prediction-event:${eventId}`,
         category: "connection_activity",
@@ -148,8 +149,14 @@ export async function recordFixturePredictionEvent(input: {
         actorUserId: input.userId,
         fixtureKey: input.fixtureKey,
         occurredAt: new Date()
-      })
-    )
+      });
+      notifyConnectionActivity(peerId, {
+        title,
+        body,
+        tag: `connection:prediction-event:${eventId}`,
+        url: "/#predictions"
+      });
+    })
   );
 
   return eventId;
