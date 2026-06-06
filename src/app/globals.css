@@ -1459,7 +1459,7 @@ h3 {
 
 .fan-chat-float-panel {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 14px 14px 0 0;
   box-shadow: -8px 0 32px color-mix(in srgb, #000 18%, transparent);
   display: grid;
@@ -1481,7 +1481,8 @@ h3 {
 
 .fan-chat-float-header {
   align-items: center;
-  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg) 28%, var(--color-surface));
+  border-bottom: none;
   display: flex;
   justify-content: space-between;
   padding: 12px 14px;
@@ -1494,7 +1495,7 @@ h3 {
 
 .fan-chat-float-close {
   background: transparent;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 8px;
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -1502,6 +1503,11 @@ h3 {
   line-height: 0;
   padding: 6px;
   place-items: center;
+}
+
+.fan-chat-float-close:hover {
+  background: var(--kickboard-tab-hover-bg);
+  color: var(--color-text-primary);
 }
 
 .fan-chat-float-body {
@@ -1532,7 +1538,7 @@ h3 {
 
 .fan-chat-inbox-list {
   background: color-mix(in srgb, var(--color-bg) 50%, transparent);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 12px;
   display: grid;
   gap: 6px;
@@ -1573,7 +1579,7 @@ h3 {
 
 .fan-chat-inbox-thread {
   background: transparent;
-  border: 1px solid transparent;
+  border: none;
   border-radius: 10px;
   color: inherit;
   cursor: pointer;
@@ -1586,12 +1592,10 @@ h3 {
 
 .fan-chat-inbox-thread:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-brand) 8%, var(--color-bg));
-  border-color: color-mix(in srgb, var(--color-brand) 20%, var(--color-border));
 }
 
 .fan-chat-inbox-thread--active {
   background: color-mix(in srgb, var(--color-brand) 14%, var(--color-bg));
-  border-color: color-mix(in srgb, var(--color-brand) 35%, var(--color-border));
 }
 
 .fan-chat-inbox-thread--unread .fan-chat-inbox-thread-name {
@@ -1672,7 +1676,7 @@ h3 {
 
 .fan-chat-thread {
   background: color-mix(in srgb, var(--color-bg) 55%, transparent);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 12px;
   display: grid;
   gap: 8px;
@@ -1707,20 +1711,23 @@ h3 {
 
 .fan-chat-message--incoming {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
+  box-shadow: var(--shadow-surface);
   justify-self: start;
 }
 
 .fan-chat-message--outgoing {
   background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border: none;
+  box-shadow: var(--shadow-surface);
   justify-self: end;
 }
 
 .fan-chat-broadcast-item {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 12px;
+  box-shadow: var(--shadow-surface);
   padding: 8px 10px;
 }
 
@@ -1793,7 +1800,11 @@ h3 {
   margin: 0;
 }
 
-.fan-chat-compose-input {
+.fan-chat-compose-input,
+.fan-chat-messenger .feed-control-input {
+  background: color-mix(in srgb, var(--color-bg) 40%, var(--color-surface));
+  border: none;
+  box-shadow: none;
   min-height: 4.5rem;
   resize: vertical;
 }
