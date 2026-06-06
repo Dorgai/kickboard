@@ -33,3 +33,13 @@ export function scrollToPredictionsEditor() {
 
   target.scrollIntoView({ behavior: "smooth", block: "start" });
 }
+
+/** Scroll the unified picks list (yours + friends on shared matches). */
+export function scrollToPredictionsPicks() {
+  if (typeof window === "undefined") return;
+
+  const target = document.getElementById("predictions-match-picks");
+  if (!target) return;
+
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+}

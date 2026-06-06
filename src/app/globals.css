@@ -3900,7 +3900,7 @@ h3 {
 }
 
 .predictions-match-form-points-row {
-  align-items: stretch;
+  align-items: start;
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3914,6 +3914,7 @@ h3 {
 }
 
 .predictions-points-board {
+  align-self: start;
   min-width: 0;
 }
 
@@ -5423,6 +5424,178 @@ h3 {
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.predictions-match-form-points-row .predictions-results-table--compact {
+  table-layout: fixed;
+}
+
+.predictions-match-form-points-row .predictions-results-table--compact tbody tr {
+  height: 3.35rem;
+  vertical-align: top;
+}
+
+.predictions-match-form-points-row .predictions-results-table--compact th,
+.predictions-match-form-points-row .predictions-results-table--compact td {
+  padding: 5px 4px;
+}
+
+.predictions-match-form-points-row .predictions-results-table--compact th:not(:first-child),
+.predictions-match-form-points-row .predictions-results-table--compact td:not(.predictions-results-label-cell) {
+  text-align: center;
+  width: 18%;
+}
+
+.predictions-results-label-cell {
+  font-weight: 700;
+  width: 28%;
+}
+
+.predictions-results-cell {
+  overflow: hidden;
+}
+
+.predictions-results-cell--points .predictions-results-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.predictions-results-count {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.predictions-results-mini {
+  display: grid;
+  gap: 1px;
+  margin-top: 2px;
+  max-height: 1.65rem;
+  overflow: hidden;
+}
+
+.predictions-results-mini-link {
+  background: transparent;
+  border: none;
+  color: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary));
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.15;
+  overflow: hidden;
+  padding: 0;
+  text-align: center;
+  text-decoration: underline;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.predictions-results-mini-link:hover {
+  color: var(--color-accent);
+}
+
+.predictions-unified-picks {
+  width: 100%;
+}
+
+.predictions-overview-card-header--unified {
+  flex-wrap: wrap;
+}
+
+.predictions-unified-list {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  max-height: min(36rem, 72vh);
+  overflow: auto;
+  padding: 0;
+}
+
+.predictions-unified-match {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.predictions-unified-match--active {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
+.predictions-unified-match-header {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.predictions-unified-match-title {
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
+}
+
+.predictions-unified-yours,
+.predictions-unified-friend {
+  display: grid;
+  gap: 6px;
+}
+
+.predictions-unified-role {
+  align-items: baseline;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  flex-wrap: wrap;
+  font-size: 10px;
+  font-weight: 800;
+  gap: 4px 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.predictions-unified-friends {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 0;
+}
+
+.predictions-unified-no-friends {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  margin: 0;
+}
+
+.predictions-unified-filter-empty {
+  margin-top: 4px;
+}
+
+.predictions-type-lines--compact .predictions-type-line {
+  gap: 4px 8px;
+}
+
+.predictions-type-lines--compact .predictions-type-line-label,
+.predictions-type-lines--compact .predictions-type-line-value {
+  font-size: 11px;
+}
+
+.predictions-type-lines--compact .predictions-result-badge {
+  font-size: 9px;
+  padding: 1px 6px;
 }
 
 .predictions-overview-grid,

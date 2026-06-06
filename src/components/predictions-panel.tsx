@@ -17,10 +17,10 @@ import {
   useFixtureOptions,
   type WorldCupGroupInput
 } from "@/components/fixture-match-picker";
-import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
 import {
   scrollToPredictionOutcomeOnMobile,
   scrollToPredictionsEditor,
+  scrollToPredictionsPicks,
   scrollToPredictionsTop
 } from "@/lib/scroll-to-prediction-outcome";
 import {
@@ -127,6 +127,24 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     setSelectedKey(key);
   }, []);
 
+  const handlePickNavigate = useCallback(
+    (key: string) => {
+      const exists = fixtures.some((fixture) => fixture.key === key);
+      if (!exists) return;
+      setSubTab("match");
+      setSelectedKey(key);
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("predictionsFixture", key);
+        url.searchParams.set("predictionsTab", "match");
+        url.hash = "predictions-match";
+        window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+      window.requestAnimationFrame(() => scrollToPredictionsPicks());
+    },
+    [fixtures]
+  );
+
   const handleEditPick = useCallback(
     (key: string, options?: { scrollToTop?: boolean }) => {
       const exists = fixtures.some((fixture) => fixture.key === key);
@@ -192,17 +210,11 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
 
   const viewerDisplayName = session?.user?.name ?? null;
   const selected = fixtures.find((fixture) => fixture.key === selectedKey) ?? null;
-  const teamsFromKey = selectedKey ? parseFixtureKeyTeams(selectedKey) : null;
-  const overviewHomeTeam = selected?.homeTeam ?? teamsFromKey?.homeTeam ?? null;
-  const overviewAwayTeam = selected?.awayTeam ?? teamsFromKey?.awayTeam ?? null;
   const {
     data: overviewData,
     loading: overviewLoading,
     error: overviewError
   } = usePredictionsOverview({
-    fixtureKey: selectedKey,
-    homeTeam: overviewHomeTeam,
-    awayTeam: overviewAwayTeam,
     refreshToken: overviewRefresh
   });
 
@@ -267,16 +279,21 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                       <p className="inline-status predictions-points-loading">{overviewError}</p>
                     ) : null}
                     {!overviewLoading && !overviewError && overviewData ? (
-                      <PredictionsPointsBoard wallet={overviewData.wallet} />
+                      <PredictionsPointsBoard
+                        myPredictions={overviewData.myPredictions}
+                        wallet={overviewData.wallet}
+                        onPickClick={handlePickNavigate}
+                      />
                     ) : null}
                   </div>
 
                   {!overviewLoading && !overviewError && overviewData ? (
                     <PredictionsPicksSection
+                      activeFixtureKey={selectedKey}
                       data={overviewData}
-                      fixtureKey={selectedKey}
                       viewerDisplayName={viewerDisplayName}
                       onEditPick={handleEditPick}
+                      onPickNavigate={handlePickNavigate}
                     />
                   ) : null}
 
