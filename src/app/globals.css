@@ -2610,8 +2610,10 @@ h3 {
 
   .match-coach-board-panel .squad-pitch,
   .squad-builder-pitch-stage .squad-pitch {
-    --pitch-max-height: min(20.5rem, 44vh);
-    width: min(100%, calc(var(--pitch-max-height) * var(--pitch-width) / var(--pitch-length) * 1.05));
+    --pitch-max-width: 100%;
+    --pitch-max-height: min(40rem, 72vh);
+    --pitch-width-scale: 1.22;
+    width: 100%;
   }
 
   .match-coach-board-panel .squad-pitch-hint {
@@ -3957,9 +3959,12 @@ h3 {
 .squad-pitch {
   --pitch-length: 105;
   --pitch-width: 68;
-  --pitch-max-height: min(52rem, 82vh);
+  --pitch-width-scale: 1.16;
+  --pitch-effective-width: calc(var(--pitch-width) * var(--pitch-width-scale));
+  --pitch-max-width: min(100%, 58rem);
+  --pitch-max-height: min(56rem, 86vh);
   --pitch-line: color-mix(in srgb, #fff 22%, transparent);
-  aspect-ratio: var(--pitch-width) / var(--pitch-length);
+  aspect-ratio: var(--pitch-effective-width) / var(--pitch-length);
   background: linear-gradient(
     165deg,
     #2a3142 0%,
@@ -3977,7 +3982,7 @@ h3 {
   overflow: hidden;
   position: relative;
   touch-action: none;
-  width: min(100%, calc(var(--pitch-max-height) * var(--pitch-width) / var(--pitch-length)));
+  width: var(--pitch-max-width);
 }
 
 [data-theme="light"] .squad-pitch,
