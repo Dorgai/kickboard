@@ -1674,6 +1674,16 @@ h3 {
   width: 100%;
 }
 
+/* Tournament overview trigger lives in the header — hide any legacy page duplicates */
+.feed-browser .current-event-overview,
+.feed-browser .current-event-dock-heading,
+.feed-browser .current-event-title-trigger,
+.current-event-tabs-layout .current-event-overview,
+.current-event-tabs-layout .current-event-dock-heading,
+.current-event-tabs-layout .current-event-title-trigger {
+  display: none !important;
+}
+
 .current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
   justify-content: center;
   margin: 0;
@@ -9175,6 +9185,10 @@ h3 {
   width: 100%;
 }
 
+.timeline-modal:not([open]) {
+  display: none;
+}
+
 .timeline-modal::backdrop {
   background: color-mix(in srgb, var(--color-text-primary) 55%, transparent);
 }
@@ -9989,6 +10003,10 @@ h3 {
   text-align: left;
   text-decoration: none;
   width: 100%;
+}
+
+.help-menu-item--event-overview {
+  display: none;
 }
 
 .help-menu-item svg {
@@ -10868,6 +10886,10 @@ code {
 
   .tournament-switcher {
     display: none;
+  }
+
+  .help-menu-item--event-overview {
+    display: flex;
   }
 
   .nav-tabs {

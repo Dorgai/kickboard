@@ -6,12 +6,18 @@ import {
   Menu,
   MessageCircleQuestion,
   Sparkles,
+  Trophy,
   Users
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { ThemeSelector } from "@/components/theme-selector";
-import { OPEN_HELP_CENTER_EVENT, requestHelpCenter, requestWelcomeDialog } from "@/lib/help/events";
+import {
+  OPEN_HELP_CENTER_EVENT,
+  requestHelpCenter,
+  requestTournamentSummary,
+  requestWelcomeDialog
+} from "@/lib/help/events";
 import { handleKickboardCommunityNav } from "@/lib/navigation/location-hash";
 
 export function HelpMenu() {
@@ -69,6 +75,18 @@ export function HelpMenu() {
             <Users size={16} aria-hidden />
             Community
           </Link>
+          <button
+            className="help-menu-item help-menu-item--event-overview"
+            role="menuitem"
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              requestTournamentSummary();
+            }}
+          >
+            <Trophy size={16} aria-hidden />
+            Event overview
+          </button>
           <div className="app-menu-divider" role="separator" />
           <p className="app-menu-section-label">Help</p>
           <button
