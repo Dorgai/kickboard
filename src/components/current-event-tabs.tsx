@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
-import { FloatingFanChat } from "@/components/floating-fan-chat";
 import {
   navigateToHome,
   readLocationHash,
@@ -80,18 +79,15 @@ type CurrentWorldCup = {
   }>;
 };
 
-function parseHash(hash: string): { tab: CurrentEventTabId; chatOpen: boolean } {
-  if (hash === "fan-chat") {
-    return { tab: "coach-board", chatOpen: true };
-  }
+function parseHash(hash: string): CurrentEventTabId {
   if (hash === "community") {
-    return { tab: "community", chatOpen: false };
+    return "community";
   }
   if (hash === "tournament" || hash === "bracket") {
-    return { tab: "tournament", chatOpen: false };
+    return "tournament";
   }
   if (hash === "coach-board") {
-    return { tab: "coach-board", chatOpen: false };
+    return "coach-board";
   }
   if (
     hash === "predictions" ||
@@ -99,9 +95,9 @@ function parseHash(hash: string): { tab: CurrentEventTabId; chatOpen: boolean } 
     hash === "predictions-match" ||
     hash === "tournament-picks"
   ) {
-    return { tab: "predictions", chatOpen: false };
+    return "predictions";
   }
-  return { tab: "predictions", chatOpen: false };
+  return "predictions";
 }
 
 function setHashForTab(tab: CurrentEventTabId) {
@@ -115,16 +111,16 @@ export function CurrentEventTabs({
 }) {
   const groups = currentWorldCup?.groups ?? [];
   const [activeTab, setActiveTab] = useState<CurrentEventTabId>("predictions");
-  const [chatOpen, setChatOpen] = useState(false);
   const [activeGroupLetter, setActiveGroupLetter] = useState(groups[0]?.group ?? "A");
   const [activeKnockoutStage, setActiveKnockoutStage] = useState<string>(CURRENT_KNOCKOUT_STAGES[0]);
   const mobileDock = useNarrowViewport(861);
 
   const applyHash = useCallback(() => {
     const hash = readLocationHash();
-    const { tab, chatOpen: openChat } = parseHash(hash);
-    setActiveTab(tab);
-    setChatOpen(openChat);
+    if (hash === "fan-chat") {
+      return;
+    }
+    setActiveTab(parseHash(hash));
     scrollToLocationHashTarget(hash);
   }, []);
 
@@ -140,7 +136,6 @@ export function CurrentEventTabs({
     function onNavigatePredictions(event: Event) {
       const detail = (event as CustomEvent<NavigatePredictionsDetail>).detail;
       setActiveTab("predictions");
-      setChatOpen(false);
       if (detail?.scrollToTop) {
         window.requestAnimationFrame(() => {
           window.requestAnimationFrame(() => scrollToPredictionsTop());
@@ -165,18 +160,8 @@ export function CurrentEventTabs({
     setHashForTab(tab);
   }
 
-  function setChatOpenWithHash(open: boolean) {
-    setChatOpen(open);
-    if (typeof window === "undefined") return;
-    if (open) {
-      writeLocationHash("fan-chat");
-    } else if (readLocationHash() === "fan-chat") {
-      writeLocationHash(activeTab);
-    }
-  }
-
   return (
-    <section className={`current-event-tabs-layout${chatOpen ? " fan-chat-dock-open" : ""}`}>
+    <section className="current-event-tabs-layout">
       <div className="kickboard-mobile-dock-event">
         <nav
           className="event-tab-bar current-event-section-tabs kickboard-tab-bar"
@@ -288,7 +273,6 @@ export function CurrentEventTabs({
         ) : null}
       </div>
 
-      <FloatingFanChat open={chatOpen} onOpenChange={setChatOpenWithHash} />
     </section>
   );
 }
