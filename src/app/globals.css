@@ -29,6 +29,9 @@
   --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 42%, transparent);
   --kickboard-tab-active-bg: var(--color-button-fill);
   --kickboard-tab-active-fg: var(--color-button-fill-fg);
+  --kickboard-pick-active-bg: var(--color-brand-light);
+  --kickboard-pick-active-fg: color-mix(in srgb, var(--color-accent) 78%, #052e16);
+  --kickboard-pick-hover-bg: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
   --kickboard-tab-item-radius: 9999px;
@@ -71,6 +74,9 @@
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
   --kickboard-mobile-dock-bg: color-mix(in srgb, var(--color-bg) 58%, transparent);
   --kickboard-tab-active-fg: var(--color-button-fill-fg);
+  --kickboard-pick-active-bg: color-mix(in srgb, var(--color-accent) 30%, var(--color-surface));
+  --kickboard-pick-active-fg: color-mix(in srgb, var(--color-accent) 22%, #f9fafb);
+  --kickboard-pick-hover-bg: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface));
   --kickboard-tab-hover-bg: color-mix(in srgb, var(--color-text-primary) 8%, var(--color-surface));
   --kickboard-tab-rail-radius: 9999px;
   --kickboard-tab-item-radius: 9999px;
@@ -248,13 +254,9 @@ button:disabled {
   color: var(--kickboard-tab-active-fg);
 }
 
-/* Dark grey fills (active tabs, selected boards/picks): light text on all descendants */
+/* Dark grey fills (nav / feed tabs): light text on all descendants */
 :is(
   .saved-squad-card.selected,
-  .match-fixture-picker-btn.selected,
-  .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-  .tournament-predictions-form .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-  .fixture-scorer-chip--selected,
   .feed-tab-bar.kickboard-tab-bar button.active,
   .event-tab-bar.kickboard-tab-bar button.active,
   .nav-tabs a.active
@@ -268,10 +270,6 @@ button:disabled {
 [data-theme="light"]
   :is(
     .saved-squad-card.selected,
-    .match-fixture-picker-btn.selected,
-    .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-    .tournament-predictions-form .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-    .fixture-scorer-chip--selected,
     .feed-tab-bar.kickboard-tab-bar button.active,
     .event-tab-bar.kickboard-tab-bar button.active,
     .nav-tabs a.active
@@ -280,10 +278,6 @@ button:disabled {
 :root:not([data-theme])
   :is(
     .saved-squad-card.selected,
-    .match-fixture-picker-btn.selected,
-    .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-    .tournament-predictions-form .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-    .fixture-scorer-chip--selected,
     .feed-tab-bar.kickboard-tab-bar button.active,
     .event-tab-bar.kickboard-tab-bar button.active,
     .nav-tabs a.active
@@ -291,24 +285,66 @@ button:disabled {
   .team-label-text,
 :is(
   .saved-squad-card.selected,
-  .match-fixture-picker-btn.selected,
-  .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-  .tournament-predictions-form .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-  .fixture-scorer-chip--selected,
   .feed-tab-bar.kickboard-tab-bar button.active,
   .event-tab-bar.kickboard-tab-bar button.active,
   .nav-tabs a.active
 )
-  .fixture-prediction-outcome-text,
+  .fixture-prediction-outcome-text {
+  color: inherit;
+}
+
+/* Accent fills (selected teams / players in picks): tuned text on all descendants */
 :is(
-  .saved-squad-card.selected,
   .match-fixture-picker-btn.selected,
   .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-  .tournament-predictions-form .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
-  .fixture-scorer-chip--selected
+  .fixture-scorer-chip--selected,
+  .tournament-scorer-board-size-option.is-selected .fixture-prediction-outcome-body,
+  .tournament-player-pick-trigger:has(.tournament-player-pick-value)
+) {
+  --color-text-primary: var(--kickboard-pick-active-fg);
+  --color-text-secondary: color-mix(in srgb, var(--kickboard-pick-active-fg) 82%, transparent);
+  --color-text-muted: color-mix(in srgb, var(--kickboard-pick-active-fg) 68%, transparent);
+  color: var(--kickboard-pick-active-fg);
+}
+
+[data-theme="light"]
+  :is(
+    .match-fixture-picker-btn.selected,
+    .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
+    .fixture-scorer-chip--selected,
+    .tournament-scorer-board-size-option.is-selected .fixture-prediction-outcome-body,
+    .tournament-player-pick-trigger:has(.tournament-player-pick-value)
+  )
+  .team-label-text,
+:root:not([data-theme])
+  :is(
+    .match-fixture-picker-btn.selected,
+    .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
+    .fixture-scorer-chip--selected,
+    .tournament-scorer-board-size-option.is-selected .fixture-prediction-outcome-body,
+    .tournament-player-pick-trigger:has(.tournament-player-pick-value)
+  )
+  .team-label-text,
+:is(
+  .match-fixture-picker-btn.selected,
+  .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
+  .fixture-scorer-chip--selected,
+  .tournament-scorer-board-size-option.is-selected .fixture-prediction-outcome-body,
+  .tournament-player-pick-trigger:has(.tournament-player-pick-value)
 )
-  :is(.match-fixture-picker-status, .fixture-scorer-chip-side) {
-  color: color-mix(in srgb, var(--kickboard-tab-active-fg) 78%, transparent);
+  .fixture-prediction-outcome-text,
+:is(
+  .match-fixture-picker-btn.selected,
+  .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body,
+  .fixture-scorer-chip--selected,
+  .tournament-player-pick-trigger:has(.tournament-player-pick-value)
+)
+  :is(.match-fixture-picker-status, .fixture-scorer-chip-side, .tournament-player-pick-meta) {
+  color: color-mix(in srgb, var(--kickboard-pick-active-fg) 78%, transparent);
+}
+
+.tournament-player-pick-trigger:has(.tournament-player-pick-value) .tournament-player-pick-name {
+  color: var(--kickboard-pick-active-fg);
 }
 
 .nav-actions {
@@ -2294,9 +2330,9 @@ h3 {
 }
 
 .match-fixture-picker-btn.selected {
-  background: var(--kickboard-tab-active-bg);
+  background: var(--kickboard-pick-active-bg);
   box-shadow: var(--shadow-surface-hover);
-  color: var(--kickboard-tab-active-fg);
+  color: var(--kickboard-pick-active-fg);
 }
 
 .match-fixture-picker-status {
@@ -3466,9 +3502,10 @@ h3 {
 }
 
 .squad-player-chip--selected {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  background: var(--kickboard-pick-active-bg);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  box-shadow: var(--shadow-surface);
+  color: var(--kickboard-pick-active-fg);
 }
 
 .squad-player-chip-number {
@@ -4098,15 +4135,29 @@ h3 {
 
   .tournament-predictions-form .fixture-scorer-chip--selected:not(:disabled):hover,
   .tournament-predictions-form .fixture-scorer-chip--selected:not(:disabled):focus-visible {
+    background: var(--kickboard-pick-hover-bg);
     box-shadow: var(--shadow-surface-hover);
   }
 }
 
 .tournament-predictions-form .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
-  background: var(--kickboard-tab-active-bg);
+  background: var(--kickboard-pick-active-bg);
   box-shadow: var(--shadow-surface);
-  color: var(--kickboard-tab-active-fg);
+  color: var(--kickboard-pick-active-fg);
   outline: none;
+}
+
+.tournament-player-pick-trigger:has(.tournament-player-pick-value) {
+  background: var(--kickboard-pick-active-bg);
+  border-color: color-mix(in srgb, var(--color-accent) 28%, var(--color-border));
+  box-shadow: var(--shadow-surface);
+  color: var(--kickboard-pick-active-fg);
+}
+
+.tournament-scorer-board-size-option.is-selected .fixture-prediction-outcome-body {
+  background: var(--kickboard-pick-active-bg);
+  box-shadow: var(--shadow-surface);
+  color: var(--kickboard-pick-active-fg);
 }
 
 .tournament-predictions-form .tournament-champion-field {
@@ -4395,9 +4446,9 @@ h3 {
 }
 
 .fixture-prediction-outcome-option.is-selected .fixture-prediction-outcome-body {
-  background: var(--kickboard-tab-active-bg);
+  background: var(--kickboard-pick-active-bg);
   box-shadow: var(--shadow-surface);
-  color: var(--kickboard-tab-active-fg);
+  color: var(--kickboard-pick-active-fg);
   outline: none;
 }
 
@@ -4959,15 +5010,23 @@ h3 {
 }
 
 .fixture-scorer-chip--selected {
-  background: var(--kickboard-tab-active-bg);
+  background: var(--kickboard-pick-active-bg);
   box-shadow: var(--shadow-surface-hover);
-  color: var(--kickboard-tab-active-fg);
+  color: var(--kickboard-pick-active-fg);
 }
 
 [data-theme="dark"] .fixture-scorer-chip--selected {
-  background: var(--kickboard-tab-active-bg);
+  background: var(--kickboard-pick-active-bg);
   box-shadow: var(--shadow-surface-hover);
-  color: var(--kickboard-tab-active-fg);
+  color: var(--kickboard-pick-active-fg);
+}
+
+.fixture-scorer-chip--selected .fixture-scorer-chip-count {
+  color: color-mix(in srgb, var(--kickboard-pick-active-fg) 88%, var(--color-accent));
+}
+
+.fixture-scorer-chip--selected .fixture-scorer-chip-side {
+  color: color-mix(in srgb, var(--kickboard-pick-active-fg) 76%, transparent);
 }
 
 .fixture-scorer-chip-name {
