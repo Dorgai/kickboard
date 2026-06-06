@@ -5,6 +5,12 @@ import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { FloatingFanChat } from "@/components/floating-fan-chat";
+import {
+  navigateToHome,
+  readLocationHash,
+  subscribeLocationHash,
+  writeLocationHash
+} from "@/lib/navigation/location-hash";
 import { NAVIGATE_PREDICTIONS_EVENT } from "@/lib/session-checkpoint/navigate";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
@@ -70,11 +76,6 @@ type CurrentWorldCup = {
   }>;
 };
 
-function hashTarget() {
-  if (typeof window === "undefined") return "";
-  return window.location.hash.replace(/^#/, "").trim().toLowerCase();
-}
-
 function parseHash(hash: string): { tab: CurrentEventTabId; chatOpen: boolean } {
   if (hash === "fan-chat") {
     return { tab: "coach-board", chatOpen: true };
@@ -100,10 +101,7 @@ function parseHash(hash: string): { tab: CurrentEventTabId; chatOpen: boolean } 
 }
 
 function setHashForTab(tab: CurrentEventTabId) {
-  const next = tab === "tournament" ? "tournament" : tab;
-  if (typeof window !== "undefined") {
-    window.location.hash = next;
-  }
+  writeLocationHash(tab === "tournament" ? "tournament" : tab);
 }
 
 type SummaryTileProps = {
@@ -214,18 +212,17 @@ export function CurrentEventTabs({
   const mobileDock = useNarrowViewport(861);
 
   const applyHash = useCallback(() => {
-    const { tab, chatOpen: openChat } = parseHash(hashTarget());
+    const { tab, chatOpen: openChat } = parseHash(readLocationHash());
     setActiveTab(tab);
     setChatOpen(openChat);
   }, []);
 
   useEffect(() => {
     applyHash();
-    if (!hashTarget()) {
-      window.location.hash = "predictions";
+    if (!readLocationHash()) {
+      navigateToHome({ replace: true });
     }
-    window.addEventListener("hashchange", applyHash);
-    return () => window.removeEventListener("hashchange", applyHash);
+    return subscribeLocationHash(applyHash);
   }, [applyHash]);
 
   useEffect(() => {
@@ -255,9 +252,9 @@ export function CurrentEventTabs({
     setChatOpen(open);
     if (typeof window === "undefined") return;
     if (open) {
-      window.location.hash = "fan-chat";
-    } else if (hashTarget() === "fan-chat") {
-      window.location.hash = activeTab;
+      writeLocationHash("fan-chat");
+    } else if (readLocationHash() === "fan-chat") {
+      writeLocationHash(activeTab);
     }
   }
 
