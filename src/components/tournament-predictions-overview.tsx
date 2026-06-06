@@ -349,7 +349,7 @@ export function TournamentPicksSection({
 
       {showingPlaceholderFriends && connectionsPredictions.length > 0 ? (
         <p className="predictions-overview-hint predictions-unified-filter-empty">
-          Friend slots fill in when connections submit tournament picks.
+          Friend rows fill in when connections submit tournament picks.
         </p>
       ) : null}
     </section>
