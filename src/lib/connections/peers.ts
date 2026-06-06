@@ -1,7 +1,14 @@
 import { query } from "@/lib/db";
 import { areUsersConnected, listAcceptedPeerIds } from "@/lib/connections/store";
-import { listApiFootballFixtureKeysForTeams } from "@/lib/fixtures/fixture-key-query";
-import { teamNameToFixtureSlug } from "@/lib/fixtures/fixture-key";
+import {
+  listApiFootballFixtureKeysForTeams,
+  teamsUsableForApiFootballLookup
+} from "@/lib/fixtures/fixture-key-query";
+import {
+  fixtureKeyMatchBindParams,
+  fixtureKeyMatchSql,
+  resolveFixtureKeyMatchParams
+} from "@/lib/fixtures/fixture-key-match";
 import {
   formatFormationsLabel,
   normalizeLineupSlots,
@@ -94,35 +101,27 @@ export async function listPeersMatchActivity(
   fixtureKey: string,
   teams?: { homeTeam?: string; awayTeam?: string }
 ) {
-  const key = fixtureKey.trim().slice(0, 120);
-  if (!key) return [];
-
   const peerIds = await listAcceptedPeerIds(viewerId);
   if (!peerIds.length) return [];
 
+  const match = resolveFixtureKeyMatchParams({
+    fixtureKey,
+    homeTeam: teams?.homeTeam,
+    awayTeam: teams?.awayTeam
+  });
+  if (!match) return [];
+
   const homeTeam = teams?.homeTeam?.trim() ?? "";
   const awayTeam = teams?.awayTeam?.trim() ?? "";
-  const homeSlug = homeTeam ? teamNameToFixtureSlug(homeTeam) : "";
-  const awaySlug = awayTeam ? teamNameToFixtureSlug(awayTeam) : "";
   const apiKeys =
-    homeTeam && awayTeam ? await listApiFootballFixtureKeysForTeams(homeTeam, awayTeam) : [];
+    match.homeSlug && match.awaySlug && teamsUsableForApiFootballLookup(homeTeam, awayTeam)
+      ? await listApiFootballFixtureKeysForTeams(homeTeam, awayTeam)
+      : [];
 
-  const fixtureMatchSql =
-    homeSlug && awaySlug
-      ? `(
-           fixture_key = $2
-           OR (
-             split_part(fixture_key, ':', 1) = 'wc26'
-             AND split_part(fixture_key, ':', 3) = $3
-             AND split_part(fixture_key, ':', 4) = $4
-           )
-           OR (cardinality($5::text[]) > 0 AND fixture_key = ANY($5::text[]))
-         )`
-      : `fixture_key = $2`;
-
-  const squadsParams =
-    homeSlug && awaySlug ? [peerIds, key, homeSlug, awaySlug, apiKeys] : [peerIds, key];
+  const squadsParams = [...fixtureKeyMatchBindParams(peerIds, match, apiKeys)];
   const predictionsParams = squadsParams;
+  const fixtureMatchSql =
+    match.homeSlug && match.awaySlug ? fixtureKeyMatchSql() : "fixture_key = $2";
 
   const squadsResult = await query<{
     user_id: string;

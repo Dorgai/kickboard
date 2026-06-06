@@ -1,7 +1,16 @@
 import { query } from "@/lib/db";
 import { listAcceptedPeerIds } from "@/lib/connections/store";
-import { listApiFootballFixtureKeysForTeams } from "@/lib/fixtures/fixture-key-query";
-import { fixtureKeyToShortLabel, teamNameToFixtureSlug } from "@/lib/fixtures/fixture-key";
+import {
+  listApiFootballFixtureKeysForTeams,
+  teamsUsableForApiFootballLookup
+} from "@/lib/fixtures/fixture-key-query";
+import {
+  dedupeConnectionPredictionsByUser,
+  fixtureKeyMatchQueryParams,
+  fixtureKeyMatchSql,
+  resolveFixtureKeyMatchParams
+} from "@/lib/fixtures/fixture-key-match";
+import { fixtureKeyToShortLabel } from "@/lib/fixtures/fixture-key";
 import {
   normalizeResultStatus,
   parseScorerPicks,
@@ -264,48 +273,38 @@ export async function listConnectionsFixturePredictions(
   if (!peerIds.length) return [];
 
   const limit = options?.limit ?? 30;
-  const key = options?.fixtureKey?.trim().slice(0, 120) ?? "";
-  const homeTeam = options?.homeTeam?.trim() ?? "";
-  const awayTeam = options?.awayTeam?.trim() ?? "";
+  const match = resolveFixtureKeyMatchParams({
+    fixtureKey: options?.fixtureKey,
+    homeTeam: options?.homeTeam,
+    awayTeam: options?.awayTeam
+  });
 
-  const result = key
+  const result = match
     ? await (async () => {
-        const homeSlug = homeTeam ? teamNameToFixtureSlug(homeTeam) : "";
-        const awaySlug = awayTeam ? teamNameToFixtureSlug(awayTeam) : "";
+        const homeTeam = options?.homeTeam?.trim() ?? "";
+        const awayTeam = options?.awayTeam?.trim() ?? "";
         const apiKeys =
-          homeTeam && awayTeam
+          match.homeSlug &&
+          match.awaySlug &&
+          teamsUsableForApiFootballLookup(homeTeam, awayTeam)
             ? await listApiFootballFixtureKeysForTeams(homeTeam, awayTeam)
             : [];
 
-        if (homeSlug && awaySlug) {
-          return query<PredictionRow>(
-            `${CONNECTION_PREDICTION_SELECT}
-         FROM fixture_predictions fp
-         INNER JOIN users u ON u.id = fp.user_id
-         WHERE fp.user_id = ANY($1::uuid[])
-           AND (
-             fp.fixture_key = $2
-             OR (
-               split_part(fp.fixture_key, ':', 1) = 'wc26'
-               AND split_part(fp.fixture_key, ':', 3) = $3
-               AND split_part(fp.fixture_key, ':', 4) = $4
-             )
-             OR (cardinality($5::text[]) > 0 AND fp.fixture_key = ANY($5::text[]))
-           )
-         ORDER BY fp.updated_at DESC
-         LIMIT $6`,
-            [peerIds, key, homeSlug, awaySlug, apiKeys, limit]
-          );
-        }
-
+        const { params } = fixtureKeyMatchQueryParams(peerIds, match, apiKeys, limit);
+        const limitParam = params.length;
+        const matchSql =
+          match.homeSlug && match.awaySlug
+            ? fixtureKeyMatchSql("fp.fixture_key")
+            : "fp.fixture_key = $2";
         return query<PredictionRow>(
           `${CONNECTION_PREDICTION_SELECT}
          FROM fixture_predictions fp
          INNER JOIN users u ON u.id = fp.user_id
-         WHERE fp.user_id = ANY($1::uuid[]) AND fp.fixture_key = $2
+         WHERE fp.user_id = ANY($1::uuid[])
+           AND ${matchSql}
          ORDER BY fp.updated_at DESC
-         LIMIT $3`,
-          [peerIds, key, limit]
+         LIMIT $${limitParam}`,
+          [...params]
         );
       })()
     : await query<PredictionRow>(
@@ -318,12 +317,14 @@ export async function listConnectionsFixturePredictions(
         [peerIds, limit]
       );
 
-  return result.rows.map((row) => ({
+  const mapped = result.rows.map((row) => ({
     ...mapPick(row),
     userId: row.user_id,
     username: row.username ?? "fan",
     displayName: row.display_name ?? row.username ?? "Fan"
   }));
+
+  return match ? dedupeConnectionPredictionsByUser(mapped) : mapped;
 }
 
 export async function getPredictionsOverview(
