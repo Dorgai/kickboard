@@ -1275,25 +1275,26 @@ h3 {
   background-position: 72% 8%;
   background-repeat: no-repeat;
   background-size: cover;
+  filter: saturate(1.14) contrast(1.07);
   inset: 0;
-  opacity: 0.42;
+  opacity: 0.5;
 }
 
 .feed-browser--hero-backdrop::after {
   background:
     linear-gradient(
       108deg,
-      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
-      color-mix(in srgb, var(--color-bg) 82%, transparent) 38%,
-      color-mix(in srgb, var(--color-bg) 42%, transparent) 58%,
+      var(--color-bg) 0%,
+      color-mix(in srgb, var(--color-bg) 94%, transparent) 38%,
+      color-mix(in srgb, var(--color-bg) 55%, transparent) 58%,
       transparent 76%
     ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-bg) 84%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
       transparent 18%,
       transparent 70%,
-      color-mix(in srgb, var(--color-bg) 88%, transparent) 100%
+      color-mix(in srgb, var(--color-bg) 96%, transparent) 100%
     ),
     radial-gradient(
       ellipse 70% 55% at 88% 28%,
@@ -1304,24 +1305,25 @@ h3 {
 }
 
 [data-theme="dark"] .feed-browser--hero-backdrop::before {
-  opacity: 0.42;
+  filter: saturate(1.1) contrast(1.05);
+  opacity: 0.4;
 }
 
 [data-theme="dark"] .feed-browser--hero-backdrop::after {
   background:
     linear-gradient(
       108deg,
-      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
-      color-mix(in srgb, var(--color-bg) 82%, transparent) 38%,
-      color-mix(in srgb, var(--color-bg) 42%, transparent) 58%,
+      var(--color-bg) 0%,
+      color-mix(in srgb, var(--color-bg) 94%, transparent) 38%,
+      color-mix(in srgb, var(--color-bg) 55%, transparent) 58%,
       transparent 76%
     ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-bg) 84%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 92%, transparent) 0%,
       transparent 18%,
       transparent 70%,
-      color-mix(in srgb, var(--color-bg) 88%, transparent) 100%
+      color-mix(in srgb, var(--color-bg) 96%, transparent) 100%
     ),
     radial-gradient(
       ellipse 70% 55% at 88% 28%,
@@ -1337,13 +1339,18 @@ h3 {
 
   .feed-browser--hero-backdrop::before {
     background-position: 84% 10%;
-    opacity: 0.56;
+    opacity: 0.62;
+  }
+
+  [data-theme="dark"] .feed-browser--hero-backdrop::before {
+    opacity: 0.48;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .feed-browser--hero-backdrop::before {
-    opacity: 0.24;
+    filter: none;
+    opacity: 0.22;
   }
 }
 
@@ -6725,17 +6732,19 @@ h3 {
 
 .info-tooltip-bubble {
   background: var(--color-text-primary);
-  border-radius: 10px;
+  border-radius: 12px;
+  box-sizing: border-box;
   color: var(--color-bg);
   font-size: 12px;
   font-weight: 500;
   left: 50%;
   letter-spacing: normal;
   line-height: 1.45;
-  max-width: min(22rem, calc(100vw - 24px));
-  min-width: min(17rem, calc(100vw - 32px));
+  max-width: min(21rem, calc(100vw - 24px));
+  min-height: min(9.5rem, calc(100vw - 24px));
+  min-width: min(21rem, calc(100vw - 24px));
   opacity: 0;
-  padding: 12px 14px;
+  padding: 14px 16px;
   pointer-events: none;
   position: absolute;
   text-align: left;
@@ -6743,7 +6752,7 @@ h3 {
   transform: translateX(-50%);
   transition: opacity 0.15s ease;
   white-space: normal;
-  width: max-content;
+  width: min(21rem, calc(100vw - 24px));
   z-index: 20;
 }
 
@@ -8120,24 +8129,26 @@ h3 {
 
 .col-tooltip-bubble {
   background: var(--color-text-primary);
-  border-radius: 10px;
+  border-radius: 12px;
+  box-sizing: border-box;
   color: var(--color-bg);
   font-size: 12px;
   font-weight: 500;
   left: 0;
   letter-spacing: normal;
   line-height: 1.45;
-  max-width: min(22rem, calc(100vw - 24px));
-  min-width: min(17rem, calc(100vw - 32px));
+  max-width: min(21rem, calc(100vw - 24px));
+  min-height: min(9.5rem, calc(100vw - 24px));
+  min-width: min(21rem, calc(100vw - 24px));
   opacity: 0;
-  padding: 12px 14px;
+  padding: 14px 16px;
   pointer-events: none;
   position: absolute;
   text-transform: none;
   top: calc(100% + 6px);
   transition: opacity 0.15s ease;
   white-space: normal;
-  width: max-content;
+  width: min(21rem, calc(100vw - 24px));
   z-index: 5;
 }
 
