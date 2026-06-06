@@ -3030,6 +3030,7 @@ h3 {
 }
 
 .fixture-prediction-save {
+  box-shadow: none;
   font-size: 13px;
   font-weight: 700;
   margin-inline: auto;
@@ -3038,6 +3039,15 @@ h3 {
   min-width: 10rem;
   padding: 8px 16px;
   width: auto;
+}
+
+.fixture-predictions-form .fixture-prediction-form-actions .button {
+  box-shadow: none;
+}
+
+.fixture-predictions-form .fixture-prediction-form-actions .button:hover:not(:disabled),
+.fixture-predictions-form .fixture-prediction-form-actions .button:focus-visible:not(:disabled) {
+  box-shadow: none;
 }
 
 .prediction-submit-fx-layer {
@@ -5136,6 +5146,21 @@ h3 {
   max-height: 10rem;
   overflow: auto;
   padding: 0;
+}
+
+/* Picked scorers sit directly above Save — no chip shadow (not enough room) */
+.fixture-scorer-selected .fixture-scorer-chip,
+.fixture-scorer-selected .fixture-scorer-chip--selected {
+  box-shadow: none;
+}
+
+.fixture-prediction-field--scorers:has(.fixture-scorer-selected li) {
+  gap: 12px;
+}
+
+.fixture-prediction-field--scorers:has(.fixture-scorer-selected li) + .fixture-prediction-form-footer {
+  margin-top: 2px;
+  padding-top: 4px;
 }
 
 .fixture-scorer-chip {
