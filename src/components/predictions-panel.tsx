@@ -207,7 +207,9 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
             )}
 
             <PredictionsOverview
+              awayTeam={selected?.awayTeam ?? null}
               fixtureKey={selectedKey}
+              homeTeam={selected?.homeTeam ?? null}
               refreshToken={overviewRefresh}
               viewerDisplayName={viewerDisplayName}
               onEditPick={handleEditPick}

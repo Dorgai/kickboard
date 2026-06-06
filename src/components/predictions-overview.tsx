@@ -63,6 +63,8 @@ type PredictionsOverviewData = {
 
 type PredictionsOverviewProps = {
   fixtureKey?: string | null;
+  homeTeam?: string | null;
+  awayTeam?: string | null;
   refreshToken?: number;
   onEditPick?: (fixtureKey: string) => void;
 };
@@ -219,6 +221,8 @@ function peerMatchesNameFilter(
 
 export function PredictionsOverview({
   fixtureKey,
+  homeTeam,
+  awayTeam,
   refreshToken = 0,
   viewerDisplayName = null,
   onEditPick
@@ -234,6 +238,8 @@ export function PredictionsOverview({
     try {
       const params = new URLSearchParams();
       if (fixtureKey) params.set("fixtureKey", fixtureKey);
+      if (homeTeam) params.set("homeTeam", homeTeam);
+      if (awayTeam) params.set("awayTeam", awayTeam);
       const response = await fetch(`/api/predictions/overview?${params}`, { cache: "no-store" });
       const payload = (await response.json()) as PredictionsOverviewData & { error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to load overview.");
@@ -244,7 +250,7 @@ export function PredictionsOverview({
     } finally {
       setLoading(false);
     }
-  }, [fixtureKey]);
+  }, [fixtureKey, homeTeam, awayTeam]);
 
   useEffect(() => {
     void load();
@@ -252,7 +258,7 @@ export function PredictionsOverview({
 
   useEffect(() => {
     setFriendsNameFilter("");
-  }, [fixtureKey]);
+  }, [fixtureKey, homeTeam, awayTeam]);
 
   if (loading) {
     return <p className="inline-status">Loading your predictions summary…</p>;

@@ -11,13 +11,17 @@ export type FixtureOption = {
   awayGoals?: number | null;
 };
 
-function slugPart(value: string) {
+export function teamNameToFixtureSlug(value: string) {
   return value
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 36);
+}
+
+function slugPart(value: string) {
+  return teamNameToFixtureSlug(value);
 }
 
 export function buildWorldCupFixtureKey(input: {

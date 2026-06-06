@@ -1,6 +1,7 @@
 import { query } from "@/lib/db";
 import { listAcceptedPeerIds } from "@/lib/connections/store";
-import { fixtureKeyToShortLabel } from "@/lib/fixtures/fixture-key";
+import { listApiFootballFixtureKeysForTeams } from "@/lib/fixtures/fixture-key-query";
+import { fixtureKeyToShortLabel, teamNameToFixtureSlug } from "@/lib/fixtures/fixture-key";
 import {
   normalizeResultStatus,
   parseScorerPicks,
@@ -240,18 +241,7 @@ export async function listUserFixturePredictions(userId: string, limit = 20) {
   return result.rows.map((row) => mapPick(row));
 }
 
-export async function listConnectionsFixturePredictions(
-  userId: string,
-  fixtureKey?: string,
-  limit = 30
-) {
-  const peerIds = await listAcceptedPeerIds(userId);
-  if (!peerIds.length) return [];
-
-  const key = fixtureKey?.trim().slice(0, 120);
-  const result = key
-    ? await query<PredictionRow>(
-        `SELECT fp.id, fp.user_id, fp.fixture_key, fp.predicted_outcome, fp.home_score, fp.away_score, fp.scorer_picks,
+const CONNECTION_PREDICTION_SELECT = `SELECT fp.id, fp.user_id, fp.fixture_key, fp.predicted_outcome, fp.home_score, fp.away_score, fp.scorer_picks,
                 COALESCE(fp.outcome_status, 'pending') AS outcome_status,
                 COALESCE(fp.score_status, fp.result_status, 'pending') AS score_status,
                 COALESCE(fp.scorers_status, 'pending') AS scorers_status,
@@ -259,24 +249,67 @@ export async function listConnectionsFixturePredictions(
                 COALESCE(fp.score_points_awarded, fp.points_awarded, 0) AS score_points_awarded,
                 COALESCE(fp.scorers_points_awarded, 0) AS scorers_points_awarded,
                 fp.result_status, fp.points_awarded, fp.updated_at,
-                u.username, u.display_name
+                u.username, u.display_name`;
+
+export async function listConnectionsFixturePredictions(
+  userId: string,
+  options?: {
+    fixtureKey?: string;
+    homeTeam?: string;
+    awayTeam?: string;
+    limit?: number;
+  }
+) {
+  const peerIds = await listAcceptedPeerIds(userId);
+  if (!peerIds.length) return [];
+
+  const limit = options?.limit ?? 30;
+  const key = options?.fixtureKey?.trim().slice(0, 120) ?? "";
+  const homeTeam = options?.homeTeam?.trim() ?? "";
+  const awayTeam = options?.awayTeam?.trim() ?? "";
+
+  const result = key
+    ? await (async () => {
+        const homeSlug = homeTeam ? teamNameToFixtureSlug(homeTeam) : "";
+        const awaySlug = awayTeam ? teamNameToFixtureSlug(awayTeam) : "";
+        const apiKeys =
+          homeTeam && awayTeam
+            ? await listApiFootballFixtureKeysForTeams(homeTeam, awayTeam)
+            : [];
+
+        if (homeSlug && awaySlug) {
+          return query<PredictionRow>(
+            `${CONNECTION_PREDICTION_SELECT}
+         FROM fixture_predictions fp
+         INNER JOIN users u ON u.id = fp.user_id
+         WHERE fp.user_id = ANY($1::uuid[])
+           AND (
+             fp.fixture_key = $2
+             OR (
+               split_part(fp.fixture_key, ':', 1) = 'wc26'
+               AND split_part(fp.fixture_key, ':', 3) = $3
+               AND split_part(fp.fixture_key, ':', 4) = $4
+             )
+             OR (cardinality($5::text[]) > 0 AND fp.fixture_key = ANY($5::text[]))
+           )
+         ORDER BY fp.updated_at DESC
+         LIMIT $6`,
+            [peerIds, key, homeSlug, awaySlug, apiKeys, limit]
+          );
+        }
+
+        return query<PredictionRow>(
+          `${CONNECTION_PREDICTION_SELECT}
          FROM fixture_predictions fp
          INNER JOIN users u ON u.id = fp.user_id
          WHERE fp.user_id = ANY($1::uuid[]) AND fp.fixture_key = $2
          ORDER BY fp.updated_at DESC
          LIMIT $3`,
-        [peerIds, key, limit]
-      )
+          [peerIds, key, limit]
+        );
+      })()
     : await query<PredictionRow>(
-        `SELECT fp.id, fp.user_id, fp.fixture_key, fp.predicted_outcome, fp.home_score, fp.away_score, fp.scorer_picks,
-                COALESCE(fp.outcome_status, 'pending') AS outcome_status,
-                COALESCE(fp.score_status, fp.result_status, 'pending') AS score_status,
-                COALESCE(fp.scorers_status, 'pending') AS scorers_status,
-                COALESCE(fp.outcome_points_awarded, 0) AS outcome_points_awarded,
-                COALESCE(fp.score_points_awarded, fp.points_awarded, 0) AS score_points_awarded,
-                COALESCE(fp.scorers_points_awarded, 0) AS scorers_points_awarded,
-                fp.result_status, fp.points_awarded, fp.updated_at,
-                u.username, u.display_name
+        `${CONNECTION_PREDICTION_SELECT}
          FROM fixture_predictions fp
          INNER JOIN users u ON u.id = fp.user_id
          WHERE fp.user_id = ANY($1::uuid[])
@@ -293,11 +326,14 @@ export async function listConnectionsFixturePredictions(
   }));
 }
 
-export async function getPredictionsOverview(userId: string, fixtureKey?: string) {
+export async function getPredictionsOverview(
+  userId: string,
+  options?: { fixtureKey?: string; homeTeam?: string; awayTeam?: string }
+) {
   const [wallet, myPredictions, connectionsPredictions] = await Promise.all([
     getPredictionsWalletSummary(userId),
     listUserFixturePredictions(userId),
-    listConnectionsFixturePredictions(userId, fixtureKey)
+    listConnectionsFixturePredictions(userId, options)
   ]);
 
   return { wallet, myPredictions, connectionsPredictions };

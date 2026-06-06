@@ -48,7 +48,7 @@ export function FriendsMatchActivity({ fixtureKey, homeTeam, awayTeam }: Friends
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ fixtureKey });
+      const params = new URLSearchParams({ fixtureKey, homeTeam, awayTeam });
       const response = await fetch(`/api/peers/match-activity?${params}`, { cache: "no-store" });
       const payload = (await response.json()) as { peers?: PeerMatchActivity[]; error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to load friends.");
@@ -59,7 +59,7 @@ export function FriendsMatchActivity({ fixtureKey, homeTeam, awayTeam }: Friends
     } finally {
       setLoading(false);
     }
-  }, [fixtureKey]);
+  }, [fixtureKey, homeTeam, awayTeam]);
 
   useEffect(() => {
     setExpandedSquad(null);
