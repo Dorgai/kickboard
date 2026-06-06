@@ -4,7 +4,7 @@
 
 MyPicks is a **Progressive Web App (PWA)**:
 
-- Open **https://kickboard-production.up.railway.app** in **Safari** (Chrome on iOS cannot install PWAs).
+- Open **https://mypicks.live** in **Safari** (Chrome on iOS cannot install PWAs).
 - Tap **Share** → **Add to Home Screen**.
 - Launch **MyPicks** from the home screen for a full-screen, app-like experience.
 

@@ -46,7 +46,7 @@ Inviters’ Gmail addresses are still used as **Reply-To**, so replies go to the
 
 `POST /api/invitations` accepts `sendEmail` (default `true` when `inviteeEmail` is set). If email is requested but these variables are missing or `EMAIL_FROM` uses a blocked domain, the API returns **503** with setup instructions. If sending fails after the invite is created, the API still returns the invitation and `emailDelivery.reason = "send_failed"`.
 
-For production, add your domain at [resend.com/domains](https://resend.com/domains), then set e.g. `MyPicks <invites@hellokickboard.com>` once DNS is verified.
+For production, add your domain at [resend.com/domains](https://resend.com/domains), then set e.g. `MyPicks <invites@mypicks.live>` once DNS is verified.
 
 Also ensure `AUTH_URL` or `NEXT_PUBLIC_APP_URL` points at your public site so invite links in emails are correct.
 
@@ -56,7 +56,7 @@ Two different “domains” are involved:
 
 | Purpose | What to use |
 |---------|-------------|
-| **Invite links in the app** | Your Railway URL is fine, e.g. `https://kickboard-production.up.railway.app`. Set `AUTH_URL` and `NEXT_PUBLIC_APP_URL` to that value on Railway. |
+| **Invite links in the app** | Your Railway URL is fine, e.g. `https://mypicks.live`. Set `AUTH_URL` and `NEXT_PUBLIC_APP_URL` to that value on Railway. |
 | **Sending email via Resend** | You **cannot** use `*.up.railway.app` as `EMAIL_FROM` — you do not control DNS for Railway’s domain, so Resend will not verify it. |
 
 **Without buying a domain**, the supported path is:

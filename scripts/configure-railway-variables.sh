@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Push recommended Kickboard variables to the existing kickboard Railway service.
+# Push recommended MyPicks variables to the existing kickboard Railway service.
 # Requires: RAILWAY_TOKEN, RAILWAY_PROJECT_ID, RAILWAY_SERVICE_ID (never creates a new project).
 
 set -euo pipefail

@@ -85,7 +85,7 @@ jobs:
 
       - name: Wait for production rollout
         run: |
-          BASE="${PRODUCTION_URL:-https://kickboard-production.up.railway.app}"
+          BASE="${PRODUCTION_URL:-https://mypicks.live}"
           BASE="${BASE%/}"
           echo "Waiting for ${BASE} to serve current main (health + new routes) ..."
           for attempt in $(seq 1 36); do

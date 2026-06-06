@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand";
 import { parseFixtureKeyTeams } from "@/lib/fixtures/fixture-key";
 import {
   formatScorerPicksSummary,
@@ -156,7 +157,7 @@ export function resolveAppOrigin() {
   }
   const fromEnv =
     process.env.NEXT_PUBLIC_APP_URL?.trim() || process.env.AUTH_URL?.trim() || "";
-  return fromEnv.replace(/\/$/, "") || "https://kickboard-production.up.railway.app";
+  return fromEnv.replace(/\/$/, "") || BRAND.url;
 }
 
 /** Short share URL stored server-side (preferred). */

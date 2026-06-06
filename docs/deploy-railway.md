@@ -50,7 +50,7 @@ After that, each merge to `main` deploys automatically. To push env vars from Gi
 
 | Variable | Purpose |
 |----------|---------|
-| `NEXT_PUBLIC_APP_URL` | Production URL for post-deploy checks (default: `https://kickboard-production.up.railway.app`) |
+| `NEXT_PUBLIC_APP_URL` | Production URL for post-deploy checks (default: `https://mypicks.live`) |
 
 **If CI logs show `Unauthorized` on `railway project list`**
 
@@ -105,7 +105,7 @@ Optional overrides:
 
 ```bash
 export RAILWAY_SERVICE_NAME=exact-service-name   # if service is not named kickboard
-export NEXT_PUBLIC_APP_URL=https://kickboard-production.up.railway.app
+export NEXT_PUBLIC_APP_URL=https://mypicks.live
 export VERIFY_DEPLOY=0                           # skip post-deploy curl checks
 ```
 

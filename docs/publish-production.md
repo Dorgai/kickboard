@@ -6,14 +6,14 @@ When your Google OAuth app is in **Testing** mode, only emails listed under **Te
 
 ### 1. Production site is live
 
-- URL works: `https://kickboard-production.up.railway.app` (or your custom domain).
+- URL works: `https://mypicks.live` (or your custom domain).
 - Railway **kickboard** service variables:
   - `AUTH_URL` = your public URL (no trailing slash)
   - `NEXT_PUBLIC_APP_URL` = same URL
   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET`
 - Verify:
-  - [`/api/auth/config`](https://kickboard-production.up.railway.app/api/auth/config) → `oauthConfigured: true`, `privacyPolicyUrl` set
-  - [`/api/auth/providers`](https://kickboard-production.up.railway.app/api/auth/providers) → `callbackUrl` uses your public host (not `0.0.0.0`)
+  - [`/api/auth/config`](https://mypicks.live/api/auth/config) → `oauthConfigured: true`, `privacyPolicyUrl` set
+  - [`/api/auth/providers`](https://mypicks.live/api/auth/providers) → `callbackUrl` uses your public host (not `0.0.0.0`)
 
 ### 2. Google OAuth client redirect URIs
 
@@ -59,7 +59,7 @@ export DATABASE_URL="<public-postgres-url>"
 npm run db:schema
 ```
 
-Confirm [`/api/community/status`](https://kickboard-production.up.railway.app/api/community/status) → `schemaReady: true`.
+Confirm [`/api/community/status`](https://mypicks.live/api/community/status) → `schemaReady: true`.
 
 ### 6. Custom domain (optional)
 

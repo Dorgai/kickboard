@@ -55,7 +55,7 @@ CLI deploy (same token): `export RAILWAY_TOKEN=... && npm run railway:deploy`
 ### Production deploy status (verify after any deploy)
 
 ```bash
-BASE=https://kickboard-production.up.railway.app
+BASE=https://mypicks.live
 curl -fsS "$BASE/api/health"
 curl -sS -o /dev/null -w "admin/session: %{http_code}\n" "$BASE/api/admin/session"   # expect not 404 on current main
 curl -sS "$BASE/" | grep -c feed-status-grid || true                                 # expect 0 on current main
