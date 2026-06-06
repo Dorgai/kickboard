@@ -43,35 +43,49 @@ export function UserPickActivityPanel({ refreshToken = 0 }: { refreshToken?: num
   }, [load, refreshToken]);
 
   return (
-    <section className="user-pick-activity data-card surface-muted" aria-label="Your pick history">
-      <header className="user-pick-activity-header">
-        <h3 className="panel-help-row">
-          Your pick history
-          <HelpTooltip label="Pick history" size="sm">
+    <details className="user-pick-activity user-pick-activity-disclosure data-card surface-muted">
+      <summary className="user-pick-activity-toggle">
+        <span className="user-pick-activity-header panel-help-row">
+          <span className="user-pick-activity-title">Your pick history</span>
+          <HelpTooltip
+            label="Pick history"
+            size="sm"
+            onClick={(event) => event.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
+          >
             Every save, change, or removal is logged here. Connections see updates in their timeline
             and alerts.
           </HelpTooltip>
-        </h3>
-      </header>
+          {!loading ? (
+            <span className="user-pick-activity-count">{events.length}</span>
+          ) : null}
+        </span>
+        <span aria-hidden className="user-pick-activity-chevron" />
+      </summary>
 
-      {loading ? <p className="inline-status">Loading history…</p> : null}
-      {!loading && events.length === 0 ? (
-        <p className="inline-status">No logged pick changes yet.</p>
-      ) : null}
+      <div className="user-pick-activity-body">
+        {loading ? <p className="inline-status">Loading history…</p> : null}
+        {!loading && events.length === 0 ? (
+          <p className="inline-status">No logged pick changes yet.</p>
+        ) : null}
 
-      {!loading && events.length > 0 ? (
-        <ul className="user-pick-activity-list">
-          {events.map((event) => (
-            <li className={`user-pick-activity-item user-pick-activity-item--${event.action}`} key={event.id}>
-              <span className={`user-pick-activity-badge user-pick-activity-badge--${event.action}`}>
-                {actionLabel(event.action)}
-              </span>
-              <p className="user-pick-activity-summary">{event.summary}</p>
-              <time dateTime={event.createdAt}>{new Date(event.createdAt).toLocaleString()}</time>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </section>
+        {!loading && events.length > 0 ? (
+          <ul className="user-pick-activity-list">
+            {events.map((event) => (
+              <li
+                className={`user-pick-activity-item user-pick-activity-item--${event.action}`}
+                key={event.id}
+              >
+                <span className={`user-pick-activity-badge user-pick-activity-badge--${event.action}`}>
+                  {actionLabel(event.action)}
+                </span>
+                <p className="user-pick-activity-summary">{event.summary}</p>
+                <time dateTime={event.createdAt}>{new Date(event.createdAt).toLocaleString()}</time>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </details>
   );
 }

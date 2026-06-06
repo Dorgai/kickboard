@@ -4919,6 +4919,75 @@ h3 {
   gap: 10px;
 }
 
+.user-pick-activity-disclosure {
+  gap: 0;
+}
+
+.user-pick-activity-toggle {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  list-style: none;
+  width: 100%;
+}
+
+.user-pick-activity-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.user-pick-activity-header {
+  align-items: center;
+  display: inline-flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin: 0;
+  min-width: 0;
+}
+
+.user-pick-activity-title {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.user-pick-activity-count {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  border-radius: 9999px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 1.35rem;
+  padding: 4px 7px;
+  text-align: center;
+}
+
+.user-pick-activity-chevron {
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  color: var(--color-accent);
+  flex-shrink: 0;
+  height: 8px;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  width: 8px;
+}
+
+.user-pick-activity-disclosure[open] .user-pick-activity-chevron {
+  margin-top: 4px;
+  transform: rotate(-135deg);
+}
+
+.user-pick-activity-body {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+}
+
 .user-pick-activity-lead,
 .connection-activity-timeline-lead {
   color: var(--color-text-secondary);
