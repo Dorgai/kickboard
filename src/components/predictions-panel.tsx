@@ -231,7 +231,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                       <p className="inline-status predictions-points-loading">{overviewError}</p>
                     ) : null}
                     {!overviewLoading && !overviewError && overviewData ? (
-                      <PredictionsPointsBoard wallet={overviewData.wallet} />
+                      <PredictionsPointsBoard narrow wallet={overviewData.wallet} />
                     ) : null}
                   </div>
 
