@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
@@ -13,7 +13,6 @@ import {
   writeLocationHash
 } from "@/lib/navigation/location-hash";
 import { NAVIGATE_PREDICTIONS_EVENT } from "@/lib/session-checkpoint/navigate";
-import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { PredictionsPanel } from "@/components/predictions-panel";
 import { TeamLabel } from "@/components/team-label";
@@ -105,107 +104,12 @@ function setHashForTab(tab: CurrentEventTabId) {
   writeLocationHash(tab === "tournament" ? "tournament" : tab);
 }
 
-type SummaryTileProps = {
-  label: string;
-  value: string;
-  compact?: boolean;
-};
-
-function SummaryTile({ label, value, compact = false }: SummaryTileProps) {
-  return (
-    <div className={`summary-tile${compact ? " summary-tile--compact" : ""}`}>
-      <span className="summary-tile-label">{label}</span>
-      <strong className="summary-tile-value">{value}</strong>
-    </div>
-  );
-}
-
-type TournamentSummary = CurrentWorldCup["summary"];
-
-function TournamentSummaryDialog({
-  title,
-  summary
-}: {
-  title: string;
-  summary: TournamentSummary;
-}) {
-  const [open, setOpen] = useState(false);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) {
-      dialog.showModal();
-    }
-    if (!open && dialog.open) {
-      dialog.close();
-    }
-  }, [open]);
-
-  function close() {
-    setOpen(false);
-  }
-
-  return (
-    <>
-      <button
-        aria-haspopup="dialog"
-        className="current-event-title-trigger"
-        type="button"
-        onClick={() => setOpen(true)}
-      >
-        {title}
-      </button>
-
-      <dialog
-        ref={dialogRef}
-        aria-labelledby={titleId}
-        className="timeline-modal tournament-summary-modal"
-        onCancel={(event) => {
-          event.preventDefault();
-          close();
-        }}
-        onClick={(event) => closeDialogOnBackdropClick(event, close)}
-        onClose={close}
-      >
-        <div className="timeline-modal-panel">
-          <header className="timeline-modal-header">
-            <div>
-              <p className="eyebrow">Overview</p>
-              <h2 id={titleId}>{title}</h2>
-            </div>
-            <button className="button secondary timeline-modal-close" type="button" onClick={close}>
-              Close
-            </button>
-          </header>
-          <div className="timeline-modal-body">
-            <div className="current-summary-grid current-summary-grid--popup">
-              <SummaryTile label="Hosts" value={summary.hostCountries ?? "—"} />
-              <SummaryTile label="Dates" value={summary.dates ?? "—"} />
-              <SummaryTile label="Teams" value={summary.teams ?? "—"} />
-              <SummaryTile label="Venues" value={summary.venueCount ?? "—"} />
-            </div>
-          </div>
-        </div>
-      </dialog>
-    </>
-  );
-}
-
 export function CurrentEventTabs({
   currentWorldCup
 }: {
   currentWorldCup: CurrentWorldCup | null;
 }) {
   const groups = currentWorldCup?.groups ?? [];
-  const summary = currentWorldCup?.summary ?? {
-    hostCountries: null,
-    dates: null,
-    teams: null,
-    venueCount: null
-  };
   const [activeTab, setActiveTab] = useState<CurrentEventTabId>("predictions");
   const [chatOpen, setChatOpen] = useState(false);
   const [activeGroupLetter, setActiveGroupLetter] = useState(groups[0]?.group ?? "A");
@@ -264,12 +168,6 @@ export function CurrentEventTabs({
   return (
     <section className={`current-event-tabs-layout${chatOpen ? " fan-chat-dock-open" : ""}`}>
       <div className="kickboard-mobile-dock-event">
-        <div className="current-event-dock-heading">
-          <TournamentSummaryDialog
-            summary={summary}
-            title={currentWorldCup?.title ?? "2026 FIFA World Cup"}
-          />
-        </div>
         <nav
           className="event-tab-bar current-event-section-tabs kickboard-tab-bar"
           aria-label="Current event sections"

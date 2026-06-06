@@ -216,9 +216,14 @@ button:disabled {
 }
 
 .tournament-switcher--label {
-  cursor: default;
+  cursor: pointer;
+  font: inherit;
   font-size: 13px;
   font-weight: 600;
+  max-width: min(12rem, 28vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .nav-tabs {
@@ -1662,33 +1667,15 @@ h3 {
 
 .kickboard-mobile-dock-event {
   align-items: center;
-  display: grid;
-  gap: 10px 16px;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
+  justify-content: center;
   margin: 4px 0 18px;
   position: relative;
   width: 100%;
 }
 
-.current-event-dock-heading {
-  align-items: center;
-  display: flex;
-  grid-column: 1;
-  justify-self: start;
-  min-width: 0;
-}
-
-.current-event-dock-heading .current-event-title-trigger {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
-  grid-column: 2;
   justify-content: center;
-  justify-self: center;
   margin: 0;
   max-width: min(24rem, calc(100vw - 2 * var(--page-gutter)));
   min-width: 0;
@@ -11162,8 +11149,6 @@ code {
     bottom: calc(var(--kickboard-mobile-dock-bottom) + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
     box-shadow: none;
-    gap: 8px 10px;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     left: 50%;
     margin: 0;
     max-width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
@@ -11172,14 +11157,6 @@ code {
     transform: translateX(-50%);
     width: calc(100% - 2 * var(--kickboard-mobile-dock-inset));
     z-index: 31;
-  }
-
-  .current-event-dock-heading {
-    max-width: 100%;
-  }
-
-  .current-event-dock-heading .current-event-title-trigger {
-    font-size: 0.8rem;
   }
 
   .kickboard-mobile-dock-event .current-event-section-tabs.event-tab-bar.kickboard-tab-bar {
@@ -11192,8 +11169,6 @@ code {
     box-sizing: border-box;
     flex-wrap: nowrap;
     gap: var(--kickboard-tab-rail-gap);
-    grid-column: 2;
-    justify-self: center;
     margin: 0;
     max-width: min(24rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
     min-width: min(16rem, calc(100% - 2 * var(--kickboard-mobile-dock-inset)));
