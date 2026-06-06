@@ -1257,6 +1257,8 @@ h3 {
 /* Full-bleed Spain hero — assets in /public/images/ (see README there) */
 .feed-browser--hero-backdrop {
   --kickboard-hero-image: url("/images/kickboard-hero-spain-mobile.webp");
+  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 76%, transparent);
+  --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 68%, transparent);
   isolation: isolate;
   position: relative;
 }
@@ -1350,6 +1352,67 @@ h3 {
   .feed-browser--hero-backdrop::before,
   .feed-browser--hero-backdrop::after {
     display: none;
+  }
+}
+
+/* Let the hero photo show through feed cards (one level above the backdrop). */
+.feed-browser--hero-backdrop :is(
+  .data-card,
+  .squad-card,
+  .feed-status-card,
+  .match-coach-row,
+  .squad-builder,
+  .saved-squads-bar,
+  .friends-match-activity,
+  .fixture-prediction-pick--card,
+  .fan-chat-float-panel,
+  .community-post-card,
+  .predictions-coming-soon,
+  .feed-control-card,
+  .current-world-cup-card,
+  .bracket-tree-card,
+  .fixture-predictions-form,
+  .predictions-results-board,
+  .predictions-overview-card,
+  .feed-status-panel
+) {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: var(--kickboard-hero-surface);
+}
+
+.feed-browser--hero-backdrop .surface-muted {
+  background: var(--kickboard-hero-surface-muted);
+}
+
+[data-theme="dark"] .feed-browser--hero-backdrop {
+  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 84%, transparent);
+  --kickboard-hero-surface-muted: color-mix(in srgb, var(--color-surface) 76%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed-browser--hero-backdrop :is(
+    .data-card,
+    .squad-card,
+    .feed-status-card,
+    .match-coach-row,
+    .squad-builder,
+    .saved-squads-bar,
+    .friends-match-activity,
+    .fixture-prediction-pick--card,
+    .fan-chat-float-panel,
+    .community-post-card,
+    .predictions-coming-soon,
+    .feed-control-card,
+    .current-world-cup-card,
+    .bracket-tree-card,
+    .fixture-predictions-form,
+    .predictions-results-board,
+    .predictions-overview-card,
+    .feed-status-panel
+  ) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
