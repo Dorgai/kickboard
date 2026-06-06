@@ -426,15 +426,9 @@ export function SquadBuilder({
               onTogglePlayerSelect={toggleAwaySelection}
             />
           </div>
-          <aside className="squad-builder-predictions" aria-label="Predictions for this match">
-            <h4 className="squad-builder-predictions-title">Predictions for this match</h4>
-            <FixturePredictionPick
-              awayTeam={awayTeam}
-              fixtureKey={fixtureKey}
-              homeTeam={homeTeam}
-              coachBoard
-            />
-          </aside>
+          <div className="squad-builder-predictions">
+            <FixturePredictionPick awayTeam={awayTeam} fixtureKey={fixtureKey} homeTeam={homeTeam} />
+          </div>
         </div>
       </div>
 

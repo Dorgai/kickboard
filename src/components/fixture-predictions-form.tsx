@@ -34,7 +34,6 @@ type FixturePredictionsFormProps = {
   homeTeam: string;
   awayTeam: string;
   compact?: boolean;
-  coachBoard?: boolean;
   onSaved?: (change?: string) => void;
 };
 
@@ -53,7 +52,6 @@ export function FixturePredictionsForm({
   homeTeam,
   awayTeam,
   compact = false,
-  coachBoard = false,
   onSaved
 }: FixturePredictionsFormProps) {
   const { data: session } = useSession();
@@ -227,13 +225,12 @@ export function FixturePredictionsForm({
       predictedOutcome,
       homeScore: hasScore ? Number(homeScore) : null,
       awayScore: hasScore ? Number(awayScore) : null,
-      scorerPicks: coachBoard ? [] : scorerPicks,
+      scorerPicks,
       displayName: session?.user?.name ?? null
     };
   }, [
     awayScore,
     awayTeam,
-    coachBoard,
     fixtureKey,
     homeScore,
     homeTeam,
@@ -257,7 +254,7 @@ export function FixturePredictionsForm({
           predictedOutcome,
           homeScore: hasScore ? Number(homeScore) : null,
           awayScore: hasScore ? Number(awayScore) : null,
-          ...(coachBoard ? {} : { scorerPicks })
+          scorerPicks
         })
       });
       const payload = (await response.json()) as {
@@ -323,12 +320,12 @@ export function FixturePredictionsForm({
 
   return (
     <form
-      className={`fixture-predictions-form${compact ? " fixture-predictions-form--compact" : ""}${coachBoard ? " fixture-predictions-form--coach-board" : ""}`}
+      className={`fixture-predictions-form${compact ? " fixture-predictions-form--compact" : ""}`}
       onSubmit={savePick}
     >
       <fieldset
         className="fixture-prediction-field section-anchor"
-        id={coachBoard ? undefined : PREDICTION_OUTCOME_SECTION_ID}
+        id={PREDICTION_OUTCOME_SECTION_ID}
       >
         <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
           {PREDICTION_BLOCKS.outcome}
@@ -456,8 +453,7 @@ export function FixturePredictionsForm({
         </div>
       </fieldset>
 
-      {!coachBoard ? (
-        <fieldset className="fixture-prediction-field fixture-prediction-field--scorers">
+      <fieldset className="fixture-prediction-field fixture-prediction-field--scorers">
           <legend className="sr-only">{PREDICTION_BLOCKS.scorers}</legend>
           <button
             aria-controls="fixture-scorers-picker"
@@ -567,8 +563,7 @@ export function FixturePredictionsForm({
               </ul>
             </div>
           ) : null}
-        </fieldset>
-      ) : null}
+      </fieldset>
 
       <div className="fixture-prediction-form-footer">
         <div className="fixture-prediction-form-actions">

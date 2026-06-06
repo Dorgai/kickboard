@@ -3894,21 +3894,16 @@ h3 {
 }
 
 .squad-builder-predictions {
-  display: grid;
-  gap: 8px;
+  display: flex;
+  justify-content: center;
   min-width: 0;
   width: 100%;
 }
 
-.squad-builder-predictions-title {
-  color: var(--color-text-primary);
-  font-size: 13px;
-  font-weight: 800;
-  margin: 0;
-}
-
-.squad-builder-predictions .fixture-predictions-form--coach-board {
-  width: 100%;
+.squad-builder-predictions-link {
+  font-weight: 700;
+  min-height: 2.5rem;
+  padding-inline: 1.25rem;
 }
 
 .squad-builder-grid {
