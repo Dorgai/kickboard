@@ -1,15 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CoachBoardPanel } from "@/components/coach-board-panel";
 import { HelpTooltip } from "@/components/help-tooltip";
+import { SavedSquadsBar } from "@/components/saved-squads-bar";
 import {
   FixtureMatchPicker,
   useFixtureOptions,
   type WorldCupGroupInput
 } from "@/components/fixture-match-picker";
+import {
+  fixtureKeyToShortLabel,
+  formatFixtureTeamsLabel
+} from "@/lib/fixtures/fixture-key";
 import { isFixtureDragEvent, readFixtureDragData } from "@/lib/fixtures/drag-fixture";
+import type { SquadSummary } from "@/lib/squads/store";
 
 type MatchCoachBoardRowProps = {
   groups: WorldCupGroupInput[];
@@ -17,10 +24,88 @@ type MatchCoachBoardRowProps = {
 
 export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
   const touchLayout = useNarrowViewport();
+  const { data: session, status: sessionStatus } = useSession();
   const fixtures = useFixtureOptions(groups);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const fixtureDragDepthRef = useRef(0);
   const [panelFixtureDragOver, setPanelFixtureDragOver] = useState(false);
+  const [squads, setSquads] = useState<SquadSummary[]>([]);
+  const [squadsLoading, setSquadsLoading] = useState(false);
+  const [activeSquadId, setActiveSquadId] = useState<string | null>(null);
+  const [newBoardNonce, setNewBoardNonce] = useState(0);
+
+  const canLoadSquads =
+    sessionStatus === "authenticated" && Boolean(session?.user?.onboardingComplete);
+
+  const fixtureLabelForKey = useCallback(
+    (fixtureKey: string) => {
+      const fixture = fixtures.find((entry) => entry.key === fixtureKey);
+      if (fixture) {
+        return formatFixtureTeamsLabel(fixture.homeTeam, fixture.awayTeam) || fixture.label;
+      }
+      return fixtureKeyToShortLabel(fixtureKey);
+    },
+    [fixtures]
+  );
+
+  const refreshSquads = useCallback(async () => {
+    if (!canLoadSquads) {
+      setSquads([]);
+      return [];
+    }
+
+    setSquadsLoading(true);
+    try {
+      const response = await fetch("/api/squads", { cache: "no-store" });
+      if (!response.ok) {
+        setSquads([]);
+        return [];
+      }
+      const payload = (await response.json()) as { squads?: SquadSummary[] };
+      const list = payload.squads ?? [];
+      setSquads(list);
+      return list;
+    } catch {
+      setSquads([]);
+      return [];
+    } finally {
+      setSquadsLoading(false);
+    }
+  }, [canLoadSquads]);
+
+  useEffect(() => {
+    void refreshSquads();
+  }, [refreshSquads]);
+
+  useEffect(() => {
+    if (!fixtures.length) {
+      setSelectedKey(null);
+      return;
+    }
+    setSelectedKey((current) =>
+      current && fixtures.some((fixture) => fixture.key === current) ? current : fixtures[0].key
+    );
+  }, [fixtures]);
+
+  useEffect(() => {
+    setNewBoardNonce(0);
+  }, [selectedKey]);
+
+  useEffect(() => {
+    if (!selectedKey) {
+      setActiveSquadId(null);
+      return;
+    }
+    if (newBoardNonce > 0) return;
+
+    const squadForFixture = squads.find((squad) => squad.fixtureKey === selectedKey);
+    setActiveSquadId((current) => {
+      if (current && squads.some((squad) => squad.id === current && squad.fixtureKey === selectedKey)) {
+        return current;
+      }
+      return squadForFixture?.id ?? null;
+    });
+  }, [selectedKey, squads, newBoardNonce]);
 
   function handlePanelFixtureDragEnter(event: React.DragEvent) {
     if (!isFixtureDragEvent(event)) return;
@@ -53,15 +138,31 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
     setSelectedKey(fixtureKey);
   }
 
-  useEffect(() => {
-    if (!fixtures.length) {
-      setSelectedKey(null);
-      return;
+  function handleSelectSquad(squad: SquadSummary) {
+    if (squad.fixtureKey) {
+      setSelectedKey(squad.fixtureKey);
     }
-    setSelectedKey((current) =>
-      current && fixtures.some((fixture) => fixture.key === current) ? current : fixtures[0].key
-    );
-  }, [fixtures]);
+    setNewBoardNonce(0);
+    setActiveSquadId(squad.id);
+  }
+
+  function handleNewBoard() {
+    setActiveSquadId(null);
+    setNewBoardNonce((value) => value + 1);
+  }
+
+  const handleSquadSaved = useCallback(
+    async (savedId: string) => {
+      setNewBoardNonce(0);
+      const list = await refreshSquads();
+      const saved = list.find((squad) => squad.id === savedId);
+      if (saved?.fixtureKey) {
+        setSelectedKey(saved.fixtureKey);
+      }
+      setActiveSquadId(savedId || list.find((squad) => squad.fixtureKey === selectedKey)?.id || null);
+    },
+    [refreshSquads, selectedKey]
+  );
 
   const selected = fixtures.find((fixture) => fixture.key === selectedKey) ?? null;
 
@@ -101,8 +202,23 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
           onDragOver={handlePanelFixtureDragOver}
           onDrop={handlePanelFixtureDrop}
         >
+          {canLoadSquads ? (
+            <SavedSquadsBar
+              activeSquadId={activeSquadId}
+              fixtureLabelForKey={fixtureLabelForKey}
+              loading={squadsLoading}
+              selectedFixtureKey={selectedKey}
+              squads={squads}
+              touchLayout={touchLayout}
+              onFixtureDrop={touchLayout ? undefined : setSelectedKey}
+              onNew={handleNewBoard}
+              onSelect={handleSelectSquad}
+            />
+          ) : null}
+
           {selected ? (
             <CoachBoardPanel
+              activeSquadId={activeSquadId}
               awayGoals={selected.awayGoals}
               awayTeam={selected.awayTeam}
               date={selected.date}
@@ -111,9 +227,9 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
               group={selected.group}
               homeGoals={selected.homeGoals}
               homeTeam={selected.homeTeam}
+              newBoardNonce={newBoardNonce}
               status={selected.status}
-              touchLayout={touchLayout}
-              onFixtureDrop={touchLayout ? undefined : setSelectedKey}
+              onSquadSaved={handleSquadSaved}
             />
           ) : (
             <p className="inline-status match-coach-board-panel-empty">
