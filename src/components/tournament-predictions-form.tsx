@@ -227,6 +227,7 @@ function TopScorerBoardField({
   search,
   activeRank,
   expanded,
+  nested = false,
   onEnabledChange,
   onSizeChange,
   onSearchChange,
@@ -243,6 +244,7 @@ function TopScorerBoardField({
   search: string;
   activeRank: number | null;
   expanded: boolean;
+  nested?: boolean;
   onEnabledChange: (enabled: boolean) => void;
   onSizeChange: (size: TournamentTopScorerBoardSize) => void;
   onSearchChange: (value: string) => void;
@@ -275,14 +277,28 @@ function TopScorerBoardField({
 
   const ranks = useMemo(() => Array.from({ length: size }, (_, index) => index + 1), [size]);
 
+  const heading = (
+    <>
+      {TOURNAMENT_PREDICTION_BLOCKS.topScorerBoard}
+      <HelpTooltip label="Top scorer leaderboard help" size="sm">
+        {TOURNAMENT_PREDICTION_HINTS.topScorerBoard}
+      </HelpTooltip>
+    </>
+  );
+
   return (
-    <fieldset className="fixture-prediction-field tournament-scorer-board-field">
-      <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
-        {TOURNAMENT_PREDICTION_BLOCKS.topScorerBoard}
-        <HelpTooltip label="Top scorer leaderboard help" size="sm">
-          {TOURNAMENT_PREDICTION_HINTS.topScorerBoard}
-        </HelpTooltip>
-      </legend>
+    <fieldset
+      className={`fixture-prediction-field tournament-scorer-board-field${
+        nested ? " tournament-scorer-board-field--nested" : ""
+      }`}
+    >
+      {nested ? (
+        <div className="tournament-scorer-board-subheading">{heading}</div>
+      ) : (
+        <legend className="fixture-prediction-field-label fixture-prediction-field-label--with-help">
+          {heading}
+        </legend>
+      )}
 
       <label className="tournament-scorer-board-enable">
         <input
@@ -798,23 +814,26 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
               }}
             />
 
-            <TopScorerBoardField
-              activeRank={topScorerBoardActiveRank}
-              enabled={topScorerBoardEnabled}
-              expanded={topScorerBoardExpanded}
-              picks={topScorerBoardPicks}
-              players={players}
-              poolLoading={poolLoading}
-              search={topScorerBoardSearch}
-              size={topScorerBoardSize}
-              onClearRank={clearTopScorerBoardRank}
-              onEnabledChange={setTopScorerBoardEnabledState}
-              onGoalsChange={setTopScorerBoardGoals}
-              onSearchChange={setTopScorerBoardSearch}
-              onSelectRank={selectTopScorerBoardPlayer}
-              onSizeChange={setTopScorerBoardSizeState}
-              onToggleExpanded={toggleTopScorerBoardExpanded}
-            />
+            <div className="tournament-scorer-board-inset">
+              <TopScorerBoardField
+                activeRank={topScorerBoardActiveRank}
+                enabled={topScorerBoardEnabled}
+                expanded={topScorerBoardExpanded}
+                nested
+                picks={topScorerBoardPicks}
+                players={players}
+                poolLoading={poolLoading}
+                search={topScorerBoardSearch}
+                size={topScorerBoardSize}
+                onClearRank={clearTopScorerBoardRank}
+                onEnabledChange={setTopScorerBoardEnabledState}
+                onGoalsChange={setTopScorerBoardGoals}
+                onSearchChange={setTopScorerBoardSearch}
+                onSelectRank={selectTopScorerBoardPlayer}
+                onSizeChange={setTopScorerBoardSizeState}
+                onToggleExpanded={toggleTopScorerBoardExpanded}
+              />
+            </div>
           </section>
 
           <section className="tournament-pick-block data-card" id="tournament-pick-best-player">

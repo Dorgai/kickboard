@@ -5412,6 +5412,58 @@ h3 {
   gap: 12px;
 }
 
+.tournament-scorer-board-inset {
+  background: color-mix(in srgb, var(--color-bg) 40%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
+  border-radius: 10px;
+  margin-top: 2px;
+  padding: 12px;
+}
+
+.tournament-scorer-board-field--nested {
+  gap: 10px;
+}
+
+.tournament-scorer-board-subheading {
+  align-items: center;
+  color: var(--color-text-primary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 6px;
+  letter-spacing: 0.02em;
+}
+
+.tournament-picks-board-inset {
+  background: color-mix(in srgb, var(--color-bg) 42%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 8px 10px;
+}
+
+.tournament-picks-board-inset-label {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.tournament-picks-board-inset-value {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.predictions-type-lines--top-scorer-stack .predictions-type-line:last-child {
+  border-bottom: none;
+}
+
 .tournament-scorer-board-enable {
   align-items: center;
   color: var(--color-text-primary);
