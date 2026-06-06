@@ -1,9 +1,9 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { HelpTooltip } from "@/components/help-tooltip";
 
 type InvitePreview = {
@@ -121,18 +121,11 @@ export default function InviteRegistrationPage() {
             <p className="invite-registration-expiry">
               Link valid until {new Date(preview.expiresAt).toLocaleString()}.
             </p>
-            <button
-              className="button google-sign-in-cta"
+            <GoogleSignInButton
+              block
+              callbackUrl={typeof window !== "undefined" ? window.location.origin : "/"}
               disabled={!ready}
-              type="button"
-              onClick={() => {
-                void signIn("google", {
-                  callbackUrl: typeof window !== "undefined" ? window.location.origin : "/"
-                });
-              }}
-            >
-              Continue with Google
-            </button>
+            />
             <div className="invite-registration-footnote-row">
               <HelpTooltip label="After you sign in" size="sm">
                 After sign-in you&apos;ll confirm your birth year. You&apos;ll then be connected with{" "}

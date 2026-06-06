@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowRight, LayoutGrid, LogIn, Target, Trophy, Users } from "lucide-react";
-import { signIn } from "next-auth/react";
+import { ArrowRight, LayoutGrid, Target, Trophy, Users } from "lucide-react";
+import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { useEffect, useId, useRef, useState } from "react";
 import { OPEN_WELCOME_EVENT } from "@/lib/help/events";
 import { writeLocationHash } from "@/lib/navigation/location-hash";
@@ -91,13 +91,6 @@ export function WelcomeDialog() {
     window.setTimeout(() => closeWelcome(), 520);
   }
 
-  function handleSignIn() {
-    closeWelcome();
-    void signIn("google", {
-      callbackUrl: typeof window !== "undefined" ? window.location.href : "/"
-    });
-  }
-
   if (hasSeenWelcome() && !open && !forced) {
     return null;
   }
@@ -155,10 +148,11 @@ export function WelcomeDialog() {
             >
               Start exploring
             </button>
-            <button className="button google-sign-in-cta welcome-dialog-cta-secondary" type="button" onClick={handleSignIn}>
-              <LogIn aria-hidden size={15} strokeWidth={2.25} />
-              Continue with Google
-            </button>
+            <GoogleSignInButton
+              block
+              className="welcome-dialog-google-sign-in"
+              onBeforeSignIn={closeWelcome}
+            />
             <p className="welcome-dialog-footnote">Free to browse. Sign in to save picks, squads, and chat.</p>
           </footer>
         </div>

@@ -9362,44 +9362,53 @@ h3 {
   filter: brightness(1.05);
 }
 
-.button.google-sign-in-cta,
-.welcome-dialog-cta-secondary {
+.button.google-sign-in-button {
   -webkit-appearance: none;
   appearance: none;
-  align-items: center;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  box-shadow: var(--shadow-surface);
+  color: var(--color-text-primary);
   cursor: pointer;
-  display: inline-flex;
-  filter: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  gap: 6px;
-  justify-content: center;
-  min-height: 32px;
-  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 18px;
   width: auto;
 }
 
-.button.google-sign-in-cta:hover:not(:disabled),
-.button.google-sign-in-cta:active:not(:disabled),
-.button.google-sign-in-cta:focus:not(:disabled),
-.button.google-sign-in-cta:focus-visible:not(:disabled),
-.welcome-dialog-cta-secondary:hover:not(:disabled),
-.welcome-dialog-cta-secondary:active:not(:disabled),
-.welcome-dialog-cta-secondary:focus:not(:disabled),
-.welcome-dialog-cta-secondary:focus-visible:not(:disabled) {
-  background: transparent;
-  border: none;
-  box-shadow: none;
+.button.google-sign-in-button:hover:not(:disabled),
+.button.google-sign-in-button:active:not(:disabled) {
+  background: var(--color-surface);
+  border-color: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  box-shadow: var(--shadow-surface-hover);
   color: var(--color-text-primary);
   filter: none;
 }
 
-.welcome-dialog-footer .welcome-dialog-cta-secondary {
+.button.google-sign-in-button:focus-visible:not(:disabled) {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.button.google-sign-in-button--block {
+  justify-content: center;
+  width: 100%;
+}
+
+.google-sign-in-mark {
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+}
+
+.auth-gate .google-sign-in-button {
   justify-self: center;
+}
+
+.welcome-dialog-google-sign-in {
+  justify-self: stretch;
 }
 
 .welcome-dialog-footnote {

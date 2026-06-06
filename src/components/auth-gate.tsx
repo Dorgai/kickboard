@@ -1,7 +1,8 @@
 "use client";
 
+import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { HelpTooltip } from "@/components/help-tooltip";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { FormEvent, useEffect, useState } from "react";
 
 type AuthConfig = {
@@ -83,15 +84,7 @@ export function AuthGate({
             </p>
           </div>
         ) : (
-          <button
-            className="button google-sign-in-cta"
-            type="button"
-            onClick={() => {
-              void signIn("google", { callbackUrl: typeof window !== "undefined" ? window.location.href : "/" });
-            }}
-          >
-            Continue with Google
-          </button>
+          <GoogleSignInButton block />
         )}
       </div>
     );

@@ -1,6 +1,7 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { GoogleSignInButton } from "@/components/google-sign-in-button";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -90,15 +91,7 @@ export function AdminAccessGate({ adminConfigured, oauthConfigured }: AdminAcces
                 account, or use the operator token below.
               </p>
             ) : (
-              <button
-                className="button primary"
-                type="button"
-                onClick={() => {
-                  void signIn("google", { callbackUrl: "/admin/data-sources" });
-                }}
-              >
-                Continue with Google
-              </button>
+              <GoogleSignInButton callbackUrl="/admin/data-sources" />
             )}
           </div>
         ) : (
