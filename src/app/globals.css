@@ -9212,9 +9212,9 @@ h3 {
 
 .welcome-dialog-panel {
   background: transparent;
-  border: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+  border: none;
   border-radius: 20px;
-  box-shadow: var(--shadow-elevation-3);
+  box-shadow: none;
   overflow: hidden;
   position: relative;
 }
@@ -9305,69 +9305,38 @@ h3 {
 .welcome-dialog-action {
   -webkit-appearance: none;
   appearance: none;
-  align-items: center;
-  background: color-mix(in srgb, var(--welcome-action-accent) 14%, var(--kickboard-hero-surface));
-  border: 1px solid color-mix(in srgb, var(--welcome-action-accent) 34%, transparent);
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--kickboard-hero-surface) 88%, transparent);
+  border: none;
   border-radius: 14px;
-  box-shadow: 0 1px 0 color-mix(in srgb, #fff 18%, transparent) inset;
+  box-shadow: none;
   color: var(--color-text-primary);
   cursor: pointer;
   display: flex;
-  gap: 12px;
-  min-height: 4.25rem;
+  min-height: 4rem;
   padding: 12px 14px;
   text-align: left;
   transition:
     background 160ms ease,
-    border-color 160ms ease,
     transform 160ms ease;
   width: 100%;
 }
 
 .welcome-dialog-action:hover {
-  background: color-mix(in srgb, var(--welcome-action-accent) 22%, var(--kickboard-hero-surface));
-  border-color: color-mix(in srgb, var(--welcome-action-accent) 48%, transparent);
+  background: color-mix(in srgb, var(--kickboard-hero-surface) 96%, var(--color-brand) 4%);
   transform: translateY(-1px);
 }
 
 .welcome-dialog-action:focus-visible {
-  outline: 2px solid var(--welcome-action-accent);
+  outline: 2px solid color-mix(in srgb, var(--color-brand) 55%, transparent);
   outline-offset: 2px;
-}
-
-.welcome-dialog-action--predictions {
-  --welcome-action-accent: #16a34a;
-}
-
-.welcome-dialog-action--coach {
-  --welcome-action-accent: #2563eb;
-}
-
-.welcome-dialog-action--tournament {
-  --welcome-action-accent: #d97706;
-}
-
-.welcome-dialog-action--community {
-  --welcome-action-accent: #7c3aed;
-}
-
-.welcome-dialog-action-icon {
-  align-items: center;
-  background: color-mix(in srgb, var(--welcome-action-accent) 18%, var(--color-surface));
-  border-radius: 12px;
-  color: var(--welcome-action-accent);
-  display: inline-flex;
-  flex-shrink: 0;
-  height: 2.75rem;
-  justify-content: center;
-  width: 2.75rem;
 }
 
 .welcome-dialog-action-copy {
   display: grid;
-  flex: 1 1 auto;
   gap: 3px;
   min-width: 0;
+  width: 100%;
 }
 
 .welcome-dialog-action-copy strong {
@@ -9382,16 +9351,10 @@ h3 {
   line-height: 1.35;
 }
 
-.welcome-dialog-action-arrow {
-  color: var(--welcome-action-accent);
-  flex-shrink: 0;
-  opacity: 0.85;
-}
-
 .welcome-dialog-footer {
   backdrop-filter: blur(10px);
   background: color-mix(in srgb, var(--color-bg) 72%, transparent);
-  border-top: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  border-top: none;
   display: grid;
   gap: 10px;
   padding: 16px 20px 22px;
