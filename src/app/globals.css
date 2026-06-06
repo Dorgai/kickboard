@@ -3030,7 +3030,11 @@ h3 {
 }
 
 .fixture-prediction-save {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
   box-shadow: none;
+  filter: none;
   font-size: 13px;
   font-weight: 700;
   margin-inline: auto;
@@ -3042,11 +3046,29 @@ h3 {
 }
 
 .fixture-predictions-form .fixture-prediction-form-actions .button {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
   box-shadow: none;
+  filter: none;
 }
 
 .fixture-predictions-form .fixture-prediction-form-actions .button:hover:not(:disabled),
+.fixture-predictions-form .fixture-prediction-form-actions .button:active:not(:disabled),
+.fixture-predictions-form .fixture-prediction-form-actions .button:focus:not(:disabled),
 .fixture-predictions-form .fixture-prediction-form-actions .button:focus-visible:not(:disabled) {
+  border: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.fixture-predictions-form .fixture-prediction-form-actions .button.primary.fixture-prediction-save:focus-visible:not(:disabled) {
+  outline: 2px solid color-mix(in srgb, #fff 55%, var(--color-brand));
+  outline-offset: 2px;
+}
+
+.predictions-match-detail .fixture-predictions-form,
+.tournament-predictions-section .fixture-predictions-form {
   box-shadow: none;
 }
 
