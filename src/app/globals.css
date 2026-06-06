@@ -9367,11 +9367,11 @@ h3 {
   box-shadow: var(--shadow-surface);
   color: var(--color-text-primary);
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 700;
-  gap: 10px;
-  min-height: 44px;
-  padding: 0 18px;
+  font-size: 12px;
+  font-weight: 600;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 14px;
   width: auto;
 }
 
@@ -9391,13 +9391,15 @@ h3 {
 
 .button.google-sign-in-button--block {
   justify-content: center;
+  margin-inline: auto;
+  max-width: min(100%, 17.5rem);
   width: 100%;
 }
 
 .google-sign-in-mark {
   flex-shrink: 0;
-  height: 18px;
-  width: 18px;
+  height: 16px;
+  width: 16px;
 }
 
 .auth-gate .google-sign-in-button {
@@ -9405,7 +9407,7 @@ h3 {
 }
 
 .welcome-dialog-google-sign-in {
-  justify-self: stretch;
+  justify-self: center;
 }
 
 .welcome-dialog-footnote {
