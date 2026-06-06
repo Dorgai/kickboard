@@ -352,9 +352,13 @@ export function FanChatMessenger() {
               </div>
 
               <form className="fan-chat-compose" onSubmit={handleSend}>
-                <label className="feed-control-field fan-chat-compose-field">
-                  <span>Message</span>
+                <div className="feed-control-field fan-chat-compose-field">
                   <textarea
+                    aria-label={
+                      viewingBroadcasts
+                        ? "Message all connections"
+                        : `Message ${activeThread ? peerLabel(activeThread) : "your connection"}`
+                    }
                     className="feed-control-input fan-chat-compose-input"
                     disabled={busy || loading}
                     maxLength={500}
@@ -367,7 +371,7 @@ export function FanChatMessenger() {
                     value={draft}
                     onChange={(event) => setDraft(event.target.value)}
                   />
-                </label>
+                </div>
                 <button
                   className="button primary"
                   disabled={busy || loading || !draft.trim()}
