@@ -4857,12 +4857,8 @@ h3 {
   text-transform: uppercase;
 }
 
-.tournament-scorer-board-goals-value {
-  color: var(--color-text-primary);
-  font-size: 15px;
-  font-weight: 800;
-  min-width: 1.5rem;
-  text-align: center;
+.tournament-scorer-board-goals .fixture-scorer-chip-actions {
+  margin-left: 0;
 }
 
 .tournament-scorer-board-panel {
@@ -5858,13 +5854,21 @@ h3 {
   color: var(--kickboard-pick-active-fg);
 }
 
-.fixture-scorer-chip-goals-value {
+.fixture-scorer-chip-goals-value,
+.tournament-scorer-board-goals-value {
+  align-items: center;
+  border: 1px solid transparent;
+  box-sizing: border-box;
   color: var(--color-text-primary);
-  font-size: 14px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
   font-weight: 800;
+  height: 1.5rem;
+  justify-content: center;
   line-height: 1;
-  min-width: 1.25rem;
+  min-width: 1.5rem;
   text-align: center;
 }
 
@@ -5891,9 +5895,20 @@ h3 {
 
 
 .fixture-scorer-chip-actions {
+  align-items: center;
   display: inline-flex;
-  gap: 4px;
-  margin-left: 2px;
+  flex: 0 0 auto;
+  gap: 3px;
+  height: 1.5rem;
+}
+
+.fixture-scorer-chip--selected:has(.fixture-scorer-chip-actions) {
+  flex-wrap: nowrap;
+  gap: 6px 10px;
+}
+
+.fixture-scorer-chip--selected .fixture-scorer-chip-actions {
+  margin-left: auto;
 }
 
 .fixture-scorer-step {
@@ -5902,14 +5917,18 @@ h3 {
   border: 1px solid var(--color-border);
   border-radius: 6px;
   box-shadow: var(--shadow-surface);
+  box-sizing: border-box;
   color: var(--color-text-primary);
   cursor: pointer;
   display: inline-flex;
-  font-size: 14px;
+  flex: 0 0 auto;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 600;
   height: 1.5rem;
   justify-content: center;
   line-height: 1;
+  margin: 0;
   min-width: 1.5rem;
   padding: 0;
 }
