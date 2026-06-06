@@ -3101,8 +3101,19 @@ h3 {
 .invite-registration-card {
   display: grid;
   gap: 12px;
+  justify-items: center;
   max-width: 32rem;
   padding: 20px 22px;
+  text-align: center;
+  width: 100%;
+}
+
+.invite-registration-card .auth-oauth-setup-help,
+.invite-registration-card .invite-registration-message,
+.invite-registration-card .invite-registration-email-note,
+.invite-registration-card .invite-registration-expiry {
+  justify-self: stretch;
+  text-align: left;
   width: 100%;
 }
 
@@ -9435,8 +9446,8 @@ h3 {
 .button.google-sign-in-button--block {
   justify-content: center;
   margin-inline: auto;
-  max-width: min(100%, 17.5rem);
-  width: 100%;
+  max-width: min(100%, 15rem);
+  width: fit-content;
 }
 
 .google-sign-in-mark {
