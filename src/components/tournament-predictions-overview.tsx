@@ -82,7 +82,7 @@ function TournamentPickCell({
     <div className="predictions-type-lines predictions-type-lines--unified">
       <div className="predictions-type-line">
         <span className="predictions-type-line-value">{value}</span>
-        {column.key !== "topScorerBoard" ? (
+        {column.key !== "topScorerBoard" && status !== "pending" ? (
           <span className={`predictions-result-badge ${badge.className}`}>
             {badge.label}
             {points > 0 ? ` · +${points}` : ""}
