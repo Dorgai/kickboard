@@ -4,6 +4,22 @@ import { useEffect, useRef, type RefObject } from "react";
  * Calls onDismiss when the user presses the pointer outside every container ref
  * (e.g. close a popover when clicking the page).
  */
+export function useDismissOnEscape(open: boolean, onDismiss: () => void) {
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      onDismiss();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onDismiss]);
+}
+
 export function useDismissOnOutsidePointerDown(
   open: boolean,
   onDismiss: () => void,

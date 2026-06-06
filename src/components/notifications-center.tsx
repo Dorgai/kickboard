@@ -6,7 +6,10 @@ import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { UserAlert } from "@/lib/alerts/types";
 import { useToastOptional } from "@/components/toast-provider";
-import { useDismissOnOutsidePointerDown } from "@/lib/use-dismiss-on-outside-pointer-down";
+import {
+  useDismissOnEscape,
+  useDismissOnOutsidePointerDown
+} from "@/lib/use-dismiss-on-outside-pointer-down";
 
 function categoryLabel(category: UserAlert["category"]) {
   if (category === "connection_activity") return "Connection";
@@ -91,7 +94,10 @@ export function NotificationsCenter() {
     return undefined;
   }, [load, status]);
 
-  useDismissOnOutsidePointerDown(open, () => setOpen(false), [panelRef]);
+  const closePanel = useCallback(() => setOpen(false), []);
+
+  useDismissOnOutsidePointerDown(open, closePanel, [panelRef]);
+  useDismissOnEscape(open, closePanel);
 
   async function markRead(alert: UserAlert) {
     if (alert.readAt) return;
@@ -133,7 +139,7 @@ export function NotificationsCenter() {
       </button>
 
       {open ? (
-        <div className="notifications-panel" role="dialog" aria-label="Alerts">
+        <div className="notifications-panel" role="dialog" aria-label="Alerts" aria-modal="true">
           <header className="notifications-panel-header">
             <h2>Alerts</h2>
             {unreadCount > 0 ? (
