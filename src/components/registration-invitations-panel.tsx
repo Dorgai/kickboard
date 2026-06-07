@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { HelpTooltip } from "@/components/help-tooltip";
+import { useTranslation } from "@/components/locale-provider";
 import { useSession } from "next-auth/react";
 
 type InvitationRow = {
@@ -18,13 +19,16 @@ function normalizeInviteEmail(value: string) {
   return value.trim().toLowerCase();
 }
 
-const INVITE_LINK_COPIED_NOTICE =
-  "Invitation link copied to your clipboard. Send it to your friend by email, WhatsApp, text message, or any other channel you use.";
-
-const INVITE_LINK_COPY_FAILED =
-  "Could not copy automatically — select the link below, copy it, then send it by email, WhatsApp, text, or another app.";
+function inviteStatusLabel(status: string, t: ReturnType<typeof useTranslation>["t"]) {
+  if (status === "pending") return t("invitations.statusPending");
+  if (status === "accepted") return t("invitations.statusAccepted");
+  if (status === "expired") return t("invitations.statusExpired");
+  if (status === "revoked") return t("invitations.statusRevoked");
+  return status;
+}
 
 export function RegistrationInvitationsPanel() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const signedInEmail = session?.user?.email?.trim().toLowerCase() ?? null;
 
@@ -43,15 +47,15 @@ export function RegistrationInvitationsPanel() {
     try {
       const response = await fetch("/api/invitations", { cache: "no-store" });
       const payload = (await response.json()) as { invitations?: InvitationRow[]; error?: string };
-      if (!response.ok) throw new Error(payload.error ?? "Unable to load invitations.");
+      if (!response.ok) throw new Error(payload.error ?? t("invitations.loadError"));
       setInvitations(payload.invitations ?? []);
     } catch (loadError) {
       setInvitations([]);
-      setError(loadError instanceof Error ? loadError.message : "Unable to load invitations.");
+      setError(loadError instanceof Error ? loadError.message : t("invitations.loadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void refresh();
@@ -66,9 +70,7 @@ export function RegistrationInvitationsPanel() {
   async function createInvitation(event: FormEvent) {
     event.preventDefault();
     if (inviteeIsSelf) {
-      setError(
-        "That email is your sign-in address. Enter a friend's email, or leave the field blank to create a shareable link."
-      );
+      setError(t("invitations.selfError"));
       return;
     }
     setBusy(true);
@@ -91,7 +93,7 @@ export function RegistrationInvitationsPanel() {
         invitation?: InvitationRow;
         emailDelivery?: { sent: boolean; reason?: string; detail?: string };
       };
-      if (!response.ok) throw new Error(payload.error ?? "Unable to create invitation.");
+      if (!response.ok) throw new Error(payload.error ?? t("invitations.createError"));
       if (payload.emailDelivery?.reason === "send_failed" && payload.emailDelivery.detail) {
         setError(payload.emailDelivery.detail);
       }
@@ -100,13 +102,13 @@ export function RegistrationInvitationsPanel() {
       if (inviteUrl && !payload.emailDelivery?.sent) {
         await copyLink(inviteUrl);
       } else {
-        setNotice(payload.message ?? "Invitation created.");
+        setNotice(payload.message ?? t("invitations.created"));
       }
       setInviteeEmail("");
       setPersonalMessage("");
       await refresh();
     } catch (createError) {
-      setError(createError instanceof Error ? createError.message : "Unable to create invitation.");
+      setError(createError instanceof Error ? createError.message : t("invitations.createError"));
     } finally {
       setBusy(false);
     }
@@ -118,11 +120,11 @@ export function RegistrationInvitationsPanel() {
     try {
       const response = await fetch(`/api/invitations/${invitationId}`, { method: "DELETE" });
       const payload = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(payload.error ?? "Unable to revoke.");
-      setNotice("Invitation revoked.");
+      if (!response.ok) throw new Error(payload.error ?? t("invitations.revokeError"));
+      setNotice(t("invitations.revoked"));
       await refresh();
     } catch (revokeError) {
-      setError(revokeError instanceof Error ? revokeError.message : "Unable to revoke.");
+      setError(revokeError instanceof Error ? revokeError.message : t("invitations.revokeError"));
     } finally {
       setBusy(false);
     }
@@ -132,32 +134,29 @@ export function RegistrationInvitationsPanel() {
     setError(null);
     try {
       await navigator.clipboard.writeText(url);
-      setNotice(INVITE_LINK_COPIED_NOTICE);
+      setNotice(t("invitations.copiedNotice"));
     } catch {
       setNotice(null);
-      setError(INVITE_LINK_COPY_FAILED);
+      setError(t("invitations.copyFailed"));
     }
   }
 
   return (
     <section className="registration-invitations-section">
       <h3 className="panel-help-row">
-        Invite someone to register
-        <HelpTooltip label="Registration invites" size="sm">
-          Leave email blank to get a link you can share anywhere (works with your Railway app URL). Add
-          their email only to lock the invite to that Google account. After they register, you&apos;ll be
-          connected automatically. Automated invite email needs a domain you verify in Resend — not your
-          Railway URL and not Gmail. Without that, use <strong>Copy link</strong> and share it manually.
+        {t("invitations.title")}
+        <HelpTooltip label={t("invitations.tooltipLabel")} size="sm">
+          {t("invitations.tooltipBody")}
         </HelpTooltip>
       </h3>
 
       <form className="registration-invite-form" onSubmit={createInvitation}>
         <label className="feed-control-field">
-          Their email (optional)
+          {t("invitations.emailLabel")}
           <input
             aria-invalid={inviteeIsSelf}
             className="feed-control-input"
-            placeholder="friend@example.com"
+            placeholder={t("invitations.emailPlaceholder")}
             type="email"
             value={inviteeEmail}
             onChange={(event) => setInviteeEmail(event.target.value)}
@@ -165,16 +164,15 @@ export function RegistrationInvitationsPanel() {
         </label>
         {inviteeIsSelf ? (
           <p className="inline-status registration-invite-hint">
-            Invitations are for someone else. Leave email blank for a link you can copy, or use a
-            different address.
+            {t("invitations.selfHint")}
           </p>
         ) : null}
         <label className="feed-control-field">
-          Short message (optional)
+          {t("invitations.messageLabel")}
           <textarea
             className="feed-control-input registration-invite-message"
             maxLength={280}
-            placeholder="Join me on MyPicks for WC26 picks and Coach Board…"
+            placeholder={t("invitations.messagePlaceholder")}
             rows={2}
             value={personalMessage}
             onChange={(event) => setPersonalMessage(event.target.value)}
@@ -187,21 +185,21 @@ export function RegistrationInvitationsPanel() {
               type="checkbox"
               onChange={(event) => setSendEmail(event.target.checked)}
             />
-            Send invitation email to {inviteeEmail.trim()}
+            {t("invitations.sendEmailTo", { email: inviteeEmail.trim() })}
           </label>
         ) : null}
         <button className="button primary" disabled={busy || inviteeIsSelf} type="submit">
           {busy
-            ? "Sending…"
+            ? t("common.sending")
             : inviteeEmail.trim() && sendEmail
-              ? "Send invitation"
-              : "Create invite link"}
+              ? t("invitations.sendInvitation")
+              : t("invitations.createInviteLink")}
         </button>
       </form>
 
       {lastInviteUrl ? (
         <div className="registration-invite-latest">
-          <p className="registration-invite-latest-label">Latest invite link</p>
+          <p className="registration-invite-latest-label">{t("invitations.latestLink")}</p>
           <code className="registration-invite-url">{lastInviteUrl}</code>
           <button
             className="button secondary"
@@ -209,12 +207,12 @@ export function RegistrationInvitationsPanel() {
             type="button"
             onClick={() => void copyLink(lastInviteUrl)}
           >
-            Copy link
+            {t("common.copyLink")}
           </button>
         </div>
       ) : null}
 
-      {loading ? <p className="inline-status">Loading your invitations…</p> : null}
+      {loading ? <p className="inline-status">{t("invitations.loading")}</p> : null}
 
       {!loading && invitations.length > 0 ? (
         <ul className="registration-invite-list">
@@ -222,14 +220,14 @@ export function RegistrationInvitationsPanel() {
             <li key={row.id}>
               <div className="registration-invite-card">
                 <div className="registration-invite-card-main">
-                  <strong className="registration-invite-status">{row.status}</strong>
+                  <strong className="registration-invite-status">{inviteStatusLabel(row.status, t)}</strong>
                   {row.inviteeEmail ? (
                     <span className="registration-invite-email">{row.inviteeEmail}</span>
                   ) : (
-                    <span className="registration-invite-email">Any Google account</span>
+                    <span className="registration-invite-email">{t("invitations.anyGoogleAccount")}</span>
                   )}
                   <span className="registration-invite-meta">
-                    Expires {new Date(row.expiresAt).toLocaleDateString()}
+                    {t("invitations.expires")} {new Date(row.expiresAt).toLocaleDateString()}
                   </span>
                 </div>
                 <div className="registration-invite-card-actions">
@@ -241,7 +239,7 @@ export function RegistrationInvitationsPanel() {
                         type="button"
                         onClick={() => void copyLink(row.inviteUrl)}
                       >
-                        Copy link
+                        {t("common.copyLink")}
                       </button>
                       <button
                         className="button secondary"
@@ -249,7 +247,7 @@ export function RegistrationInvitationsPanel() {
                         type="button"
                         onClick={() => void revokeInvitation(row.id)}
                       >
-                        Revoke
+                        {t("invitations.revoke")}
                       </button>
                     </>
                   ) : null}
@@ -261,7 +259,7 @@ export function RegistrationInvitationsPanel() {
       ) : null}
 
       {!loading && !invitations.length ? (
-        <p className="inline-status">No invitations yet.</p>
+        <p className="inline-status">{t("invitations.noInvitationsYet")}</p>
       ) : null}
 
       {notice ? (

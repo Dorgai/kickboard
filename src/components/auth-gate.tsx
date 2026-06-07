@@ -3,7 +3,7 @@
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { LanguageSelector } from "@/components/language-selector";
-import { useTranslation } from "@/components/locale-provider";
+import { useLocale, useTranslation } from "@/components/locale-provider";
 import { writeLocaleCookie } from "@/lib/i18n/cookie";
 import { normalizeAppLocale, type AppLocale } from "@/lib/i18n/locales";
 import { useSession } from "next-auth/react";
@@ -23,6 +23,7 @@ export function AuthGate({
 }) {
   const { data: session, status, update } = useSession();
   const { t } = useTranslation();
+  const { setLocale } = useLocale();
   const [birthYear, setBirthYear] = useState(String(new Date().getFullYear() - 18));
   const [selectedLocale, setSelectedLocale] = useState<AppLocale>("en");
   const [oauthConfigured, setOauthConfigured] = useState<boolean | null>(null);
@@ -115,11 +116,11 @@ export function AuthGate({
           body: JSON.stringify({ birthYear: Number(birthYear), locale: selectedLocale })
         });
         const payload = (await response.json()) as { error?: string };
-        if (!response.ok) throw new Error(payload.error ?? "Onboarding failed.");
+        if (!response.ok) throw new Error(payload.error ?? t("auth.onboardingFailed"));
         writeLocaleCookie(selectedLocale);
         await update({ locale: selectedLocale });
       } catch (onboardingError) {
-        setError(onboardingError instanceof Error ? onboardingError.message : "Onboarding failed.");
+        setError(onboardingError instanceof Error ? onboardingError.message : t("auth.onboardingFailed"));
       } finally {
         setSubmitting(false);
       }
@@ -136,7 +137,11 @@ export function AuthGate({
         <LanguageSelector
           variant="onboarding"
           value={selectedLocale}
-          onSelect={(locale) => setSelectedLocale(normalizeAppLocale(locale))}
+          onSelect={(locale) => {
+            const next = normalizeAppLocale(locale);
+            setSelectedLocale(next);
+            void setLocale(next, { persist: false, reload: false });
+          }}
         />
         <label className="feed-control-field">
           {t("auth.birthYear")}

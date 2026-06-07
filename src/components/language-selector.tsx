@@ -18,7 +18,8 @@ export function LanguageSelector({ variant = "menu", onSelect, value }: Language
       onSelect(next);
       return;
     }
-    await setLocale(next);
+    if (next === active) return;
+    await setLocale(next, { reload: true });
   }
 
   if (variant === "onboarding") {

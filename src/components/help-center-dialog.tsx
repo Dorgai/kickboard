@@ -2,11 +2,11 @@
 
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useTranslation } from "@/components/locale-provider";
 import {
   OPEN_HELP_CENTER_EVENT,
   type HelpCenterOpenDetail
 } from "@/lib/help/events";
-import { HelpTooltip } from "@/components/help-tooltip";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 import { X } from "lucide-react";
 
@@ -29,6 +29,7 @@ type HelpConversation = {
 };
 
 export function HelpCenterDialog() {
+  const { t } = useTranslation();
   const { data: session, status: sessionStatus } = useSession();
   const [open, setOpen] = useState(false);
   const [channel, setChannel] = useState<HelpChannel>("ai");
@@ -133,18 +134,13 @@ export function HelpCenterDialog() {
       <div className="timeline-modal-panel help-center-panel">
         <header className="timeline-modal-header help-center-header">
           <div className="help-center-header-copy">
-            <p className="help-center-eyebrow">Help</p>
+            <p className="help-center-eyebrow">{t("helpCenter.eyebrow")}</p>
             <h2 className="help-center-title" id={titleId}>
-              <span>Questions & support</span>
-              <HelpTooltip label="How help works" size="sm">
-                <strong>MyPicks AI</strong> answers from our in-app help guides.{" "}
-                <strong>Ask admin</strong> sends your message to the MyPicks team (account issues,
-                bugs, policy).
-              </HelpTooltip>
+              <span>{t("helpCenter.heading")}</span>
             </h2>
           </div>
           <button
-            aria-label="Close help"
+            aria-label={t("helpCenter.close")}
             className="button secondary help-center-close"
             type="button"
             onClick={close}
@@ -163,7 +159,7 @@ export function HelpCenterDialog() {
               setConversation(null);
             }}
           >
-            MyPicks AI
+            {t("helpCenter.channelAi")}
           </button>
           <button
             aria-pressed={channel === "admin"}
@@ -174,23 +170,23 @@ export function HelpCenterDialog() {
               setConversation(null);
             }}
           >
-            Ask admin
+            {t("helpCenter.channelAdmin")}
           </button>
         </div>
 
         <div className="help-center-body">
           {sessionStatus === "loading" ? (
-            <p className="inline-status">Checking sign-in…</p>
+            <p className="inline-status">{t("common.checkingSignIn")}</p>
           ) : !signedIn ? (
-            <p className="help-center-guest-note">
-              Sign in and complete onboarding to save your help conversations and reach an admin.
-            </p>
+            <p className="help-center-guest-note">{t("helpCenter.signInPrompt")}</p>
           ) : (
             <>
               <div className="help-center-thread" ref={threadRef}>
                 {!conversation ? (
                   <p className="help-center-placeholder">
-                    {channel === "ai" ? "Ask a question below." : "Describe your issue below."}
+                    {channel === "ai"
+                      ? t("helpCenter.threadPlaceholderAi")
+                      : t("helpCenter.threadPlaceholderAdmin")}
                   </p>
                 ) : (
                   <ul className="help-center-messages">
@@ -201,12 +197,12 @@ export function HelpCenterDialog() {
                       >
                         <span className="help-center-message-role">
                           {message.role === "user"
-                            ? "You"
+                            ? t("helpCenter.roleYou")
                             : message.role === "assistant"
-                              ? "MyPicks AI"
+                              ? t("helpCenter.channelAi")
                               : message.role === "admin"
-                                ? "Admin"
-                                : "System"}
+                                ? t("helpCenter.roleAdmin")
+                                : t("helpCenter.roleSystem")}
                         </span>
                         <p>{message.body}</p>
                         <time dateTime={message.createdAt}>
@@ -226,14 +222,12 @@ export function HelpCenterDialog() {
                 }}
               >
                 <label className="help-center-compose-label">
-                  <span className="sr-only">Your message</span>
+                  <span className="sr-only">{t("helpCenter.yourMessage")}</span>
                   <textarea
                     className="help-center-compose-input"
                     disabled={busy}
                     placeholder={
-                      channel === "ai"
-                        ? "Ask MyPicks AI…"
-                        : "Message for admins (account, bugs, policy)…"
+                      channel === "ai" ? t("helpCenter.placeholderAi") : t("helpCenter.placeholderAdmin")
                     }
                     rows={3}
                     value={draft}
@@ -248,11 +242,11 @@ export function HelpCenterDialog() {
                       type="button"
                       onClick={() => setConversation(null)}
                     >
-                      New thread
+                      {t("helpCenter.newThread")}
                     </button>
                   ) : null}
                   <button className="button primary" disabled={busy || !draft.trim()} type="submit">
-                    {busy ? "Sending…" : "Send"}
+                    {busy ? t("common.sending") : t("helpCenter.send")}
                   </button>
                 </div>
               </form>

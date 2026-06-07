@@ -74,7 +74,7 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
 
   return (
     <header className="app-header">
-      <div className="nav-shell" aria-label="Primary navigation">
+      <div className="nav-shell" aria-label={t("nav.primaryAria")}>
         <Link
           className="brand"
           href="/#predictions"

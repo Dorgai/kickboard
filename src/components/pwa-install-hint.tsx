@@ -2,11 +2,13 @@
 
 import { Share, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/components/locale-provider";
 import { isIosSafari, isStandaloneDisplayMode } from "@/lib/pwa/standalone";
 
 const DISMISS_KEY = "kickboard-pwa-install-hint-dismissed";
 
 export function PwaInstallHint() {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -38,26 +40,25 @@ export function PwaInstallHint() {
   const ios = isIosSafari();
 
   return (
-    <aside className="pwa-install-hint" aria-label="Install MyPicks">
+    <aside className="pwa-install-hint" aria-label={t("pwa.installAria")}>
       <div className="pwa-install-hint-inner">
-        <p className="pwa-install-hint-title">Add MyPicks to your home screen</p>
+        <p className="pwa-install-hint-title">{t("pwa.title")}</p>
         {ios ? (
           <p className="pwa-install-hint-copy">
-            Tap <Share aria-hidden size={14} className="pwa-install-hint-icon" /> Share, then{" "}
-            <strong>Add to Home Screen</strong> for a full-screen app experience.
+            {t("pwa.iosBeforeShare")}{" "}
+            <Share aria-hidden size={14} className="pwa-install-hint-icon" /> {t("pwa.iosShare")}
+            {t("pwa.iosAfterShare")} <strong>{t("pwa.iosAddToHomeScreen")}</strong> {t("pwa.iosTail")}
           </p>
         ) : (
-          <p className="pwa-install-hint-copy">
-            Install MyPicks from your browser menu for quick access and a full-screen view.
-          </p>
+          <p className="pwa-install-hint-copy">{t("pwa.androidCopy")}</p>
         )}
         <div className="pwa-install-hint-actions">
           <button className="button secondary" type="button" onClick={dismiss}>
-            Not now
+            {t("pwa.notNow")}
           </button>
         </div>
         <button
-          aria-label="Dismiss install hint"
+          aria-label={t("pwa.dismissAria")}
           className="pwa-install-hint-close"
           type="button"
           onClick={dismiss}
