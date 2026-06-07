@@ -84,7 +84,24 @@ export async function buildAdminDataSources() {
       "Tournament summary dates and host information"
     ],
     message:
-      "Current tournament endpoint parses public tournament and group pages. Coach Board squads also fall back to Wikipedia national-team call-up tables when StatsBomb has no roster."
+      "Current tournament endpoint parses public tournament and group pages. Player pools prefer the official FIFA WC 2026 squad lists page."
+  });
+
+  sources.push({
+    id: "wikipedia-wc26-official-squads",
+    name: "FIFA WC 2026 official squad lists (Wikipedia)",
+    category: "current",
+    status: "online",
+    connected: true,
+    lastCheckedAt: checkedAt,
+    lastRefreshedAt: null,
+    refreshCadence: "Published squad page, cached for 30 minutes in app",
+    updates: [
+      "All 48 final 26-man squads (FIFA, published June 2026)",
+      "Primary Coach Board and scorer picker roster source"
+    ],
+    message:
+      "Parses https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads — mirrors FIFA's published lists. API-Football and StatsBomb are fallbacks only."
   });
 
   sources.push({
@@ -96,9 +113,9 @@ export async function buildAdminDataSources() {
     lastCheckedAt: checkedAt,
     lastRefreshedAt: null,
     refreshCadence: "Public pages, cached for 1 hour per team",
-    updates: ["Current squad tables for WC call-ups", "Coach Board player pool fallback"],
+    updates: ["Current squad tables for WC call-ups", "Coach Board player pool last resort"],
     message:
-      "Used when StatsBomb has no historical World Cup lineup and API-Football has not published squads yet."
+      "Used only when the official WC 2026 squad page and API-Football both lack a roster for a nation."
   });
 
   sources.push({

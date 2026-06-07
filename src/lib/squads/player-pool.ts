@@ -1,4 +1,5 @@
 import { loadApiFootballFixtureSquads, loadApiFootballTeamSquad } from "@/lib/api-football-lineups";
+import { loadAllWikipediaWc26Squads, loadWikipediaWc26TeamSquad } from "@/lib/squads/wikipedia-wc26-squads";
 import { loadWikipediaNationalTeamSquad } from "@/lib/squads/wikipedia-squad";
 import { primaryLineupPosition } from "@/lib/lineup-position-groups";
 import { getLineups, getMatches, getWorldCupCompetitions } from "@/lib/statsbomb";
@@ -102,6 +103,26 @@ type SupplementSources = {
   sources: string[];
   apiMatchLabel?: string;
 };
+
+async function loadPrimaryTeamSquad(teamName: string, sourceParts: string[]) {
+  const official = await loadWikipediaWc26TeamSquad(teamName);
+  if (official.length >= 11) {
+    if (!sourceParts.includes("wikipedia/wc26-official-squads")) {
+      sourceParts.push("wikipedia/wc26-official-squads");
+    }
+    return official;
+  }
+
+  const { players: statsBombPlayers } = await loadWorldCupTeamPlayers(teamName);
+  if (statsBombPlayers.length) {
+    if (!sourceParts.includes("statsbomb/open-data")) {
+      sourceParts.push("statsbomb/open-data");
+    }
+    return statsBombPlayers;
+  }
+
+  return [] as SquadPoolPlayer[];
+}
 
 async function supplementTeamFromAlternatives(
   teamName: string,
@@ -263,6 +284,28 @@ export async function getWorldCupSquadPlayerPool(options?: {
     throw new Error("NO_WORLD_CUP_DATA");
   }
 
+  const official = await loadAllWikipediaWc26Squads();
+  if (official.teamCount >= 40 && official.playerCount >= 800) {
+    const poolsByTeam = new Map<string, SquadPoolPlayer[]>();
+    for (const entry of official.teams) {
+      poolsByTeam.set(entry.teamName, entry.players);
+    }
+
+    return {
+      source: official.source,
+      competitionId: competition.competition_id,
+      seasonId: competition.season_id,
+      seasonName: competition.season_name,
+      matchId: null,
+      matchLabel: `2026 FIFA World Cup — official squads (${official.teamCount} teams)`,
+      players: official.players,
+      pools: Array.from(poolsByTeam.entries()).map(([teamName, teamPlayers]) => ({
+        teamName,
+        players: teamPlayers
+      }))
+    };
+  }
+
   const matches = await getMatches(competition.competition_id, competition.season_id);
   if (!matches.length) {
     throw new Error("NO_MATCHES");
@@ -281,7 +324,8 @@ export async function getWorldCupSquadPlayerPool(options?: {
 
   await Promise.all(
     teamNames.map(async (teamName) => {
-      const { players } = await loadWorldCupTeamPlayers(teamName);
+      const sourceParts: string[] = [];
+      const players = await loadPrimaryTeamSquad(teamName, sourceParts);
       for (const player of players) {
         if (!byId.has(player.playerId)) {
           byId.set(player.playerId, player);
@@ -309,7 +353,7 @@ export async function getWorldCupSquadPlayerPool(options?: {
   }
 
   return {
-    source: "statsbomb/open-data",
+    source: official.teamCount > 0 ? `${official.source}+statsbomb/open-data` : "statsbomb/open-data",
     competitionId: competition.competition_id,
     seasonId: competition.season_id,
     seasonName: competition.season_name,
@@ -361,13 +405,14 @@ export async function getFixtureSquadPlayerPool(
       );
     }) ?? null;
 
-  const [homeLoaded, awayLoaded] = await Promise.all([
-    loadWorldCupTeamPlayers(home),
-    loadWorldCupTeamPlayers(away)
+  const sourceParts: string[] = [];
+  const [homePlayersInitial, awayPlayersInitial] = await Promise.all([
+    loadPrimaryTeamSquad(home, sourceParts),
+    loadPrimaryTeamSquad(away, sourceParts)
   ]);
 
-  let homePlayers = homeLoaded.players;
-  let awayPlayers = awayLoaded.players;
+  let homePlayers = homePlayersInitial;
+  let awayPlayers = awayPlayersInitial;
 
   if (fixtureMatch && (homePlayers.length === 0 || awayPlayers.length === 0)) {
     const byId = new Map<number, SquadPoolPlayer>();
@@ -395,6 +440,9 @@ export async function getFixtureSquadPlayerPool(
   );
   homePlayers = supplement.homePlayers;
   awayPlayers = supplement.awayPlayers;
+  for (const part of supplement.sources) {
+    if (!sourceParts.includes(part)) sourceParts.push(part);
+  }
 
   const players = [...homePlayers, ...awayPlayers]
     .filter(
@@ -413,7 +461,7 @@ export async function getFixtureSquadPlayerPool(
     ? `${fixtureMatch.home_team.home_team_name} vs ${fixtureMatch.away_team.away_team_name}`
     : `${home} vs ${away}`;
 
-  const sources = ["statsbomb/open-data", ...supplement.sources];
+  const sources = sourceParts.length ? sourceParts : ["statsbomb/open-data"];
 
   return {
     source: [...new Set(sources)].join("+"),
@@ -443,9 +491,11 @@ export async function getTeamSquadPlayerPool(teamName: string) {
     throw new Error("TEAM_REQUIRED");
   }
 
-  const { players: statsBombPlayers, statsBombTeamName } = await loadWorldCupTeamPlayers(team);
-  const sourceParts = ["statsbomb/open-data"];
-  let players = statsBombPlayers;
+  const sourceParts: string[] = [];
+  let players = await loadPrimaryTeamSquad(team, sourceParts);
+  const statsBombTeamName = players.length
+    ? null
+    : (await loadWorldCupTeamPlayers(team)).statsBombTeamName;
 
   players = await supplementTeamFromAlternatives(team, players, sourceParts);
 

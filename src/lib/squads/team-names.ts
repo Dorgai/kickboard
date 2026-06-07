@@ -10,6 +10,10 @@ const TEAM_ALIAS_GROUPS: string[][] = [
   ["curacao", "curaçao"],
   ["czech republic", "czechia"],
   ["bosnia and herzegovina", "bosnia herzegovina"],
+  ["turkey", "turkiye", "türkiye"],
+  ["iran", "ir iran", "islamic republic of iran"],
+  ["south korea", "korea republic", "republic of korea", "korea south"],
+  ["dr congo", "congo dr", "democratic republic of the congo", "drc", "congo kinshasa"],
 ];
 
 export function normalizeTeamName(value: string) {
