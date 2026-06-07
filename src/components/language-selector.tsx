@@ -46,7 +46,7 @@ export function LanguageSelector({ variant = "menu", onSelect, value }: Language
 
   if (variant === "menu") {
     return (
-      <div className="app-menu-theme" role="group" aria-label={t("common.language")}>
+      <div className="app-menu-theme app-menu-theme--locale" role="group" aria-label={t("common.language")}>
         <p className="app-menu-theme-label" id="app-menu-language-label">
           {t("common.language")}
         </p>

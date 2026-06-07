@@ -28,7 +28,7 @@ export function HeaderUserMenu() {
         }}
       >
         <UserRound size={16} aria-hidden="true" />
-        {t("auth.signIn")}
+        <span className="header-user-menu-sign-in-label">{t("auth.signIn")}</span>
       </button>
     );
   }
