@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminHelpSupportPanel } from "@/components/admin-help-support-panel";
+import { AdminOnboardingTipsPanel } from "@/components/admin-onboarding-tips-panel";
 import { AdminFanChatModerationPanel } from "@/components/admin-fan-chat-moderation-panel";
 import { AdminUserActivityPanel } from "@/components/admin-user-activity-panel";
 import { AdminUserManagementPanel } from "@/components/admin-user-management-panel";
@@ -13,7 +14,7 @@ import type { AdminDataSource } from "@/lib/admin/data-sources";
 import type { AdminAuthMode } from "@/lib/admin/fetch";
 import type { CommunityHealth } from "@/lib/community/health";
 
-export const ADMIN_DASHBOARD_TAB_IDS = ["overview", "sources", "users", "moderation", "help"] as const;
+export const ADMIN_DASHBOARD_TAB_IDS = ["overview", "sources", "users", "moderation", "help", "tips"] as const;
 export type AdminDashboardTabId = (typeof ADMIN_DASHBOARD_TAB_IDS)[number];
 
 const ADMIN_DASHBOARD_TABS: { id: AdminDashboardTabId; label: string }[] = [
@@ -21,7 +22,8 @@ const ADMIN_DASHBOARD_TABS: { id: AdminDashboardTabId; label: string }[] = [
   { id: "sources", label: "Data sources" },
   { id: "users", label: "Users" },
   { id: "moderation", label: "Moderation" },
-  { id: "help", label: "Help" }
+  { id: "help", label: "Help" },
+  { id: "tips", label: "Tips" }
 ];
 
 type AdminDashboardProps = {
@@ -42,7 +44,7 @@ type AdminDashboardProps = {
 function parseTab(value: string | null, schemaReady: boolean): AdminDashboardTabId {
   const allowed = schemaReady
     ? ADMIN_DASHBOARD_TAB_IDS
-    : (["overview", "sources"] as const);
+    : (["overview", "sources", "tips"] as const);
   if (value && (allowed as readonly string[]).includes(value)) {
     return value as AdminDashboardTabId;
   }
@@ -75,7 +77,9 @@ export function AdminDashboard({
     () =>
       schemaReady
         ? ADMIN_DASHBOARD_TABS
-        : ADMIN_DASHBOARD_TABS.filter((tab) => tab.id === "overview" || tab.id === "sources"),
+        : ADMIN_DASHBOARD_TABS.filter(
+            (tab) => tab.id === "overview" || tab.id === "sources" || tab.id === "tips"
+          ),
     [schemaReady]
   );
 
@@ -169,6 +173,8 @@ export function AdminDashboard({
         ) : null}
 
         {effectiveTab === "help" && schemaReady ? <AdminHelpSupportPanel auth={auth} /> : null}
+
+        {effectiveTab === "tips" ? <AdminOnboardingTipsPanel auth={auth} /> : null}
       </div>
     </main>
   );
