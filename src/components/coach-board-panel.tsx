@@ -69,7 +69,7 @@ export function CoachBoardPanel({
     <AuthGate featureLabel="Coach Board">
       <div className="coach-board-panel">
         <SquadBuilder
-          key={`${fixtureKey}:${activeSquadId ?? "new"}:${newBoardNonce}`}
+          key={`${fixtureKey}:${newBoardNonce}`}
           activeSquadId={activeSquadId}
           awayTeam={awayTeam}
           fixtureKey={fixtureKey}

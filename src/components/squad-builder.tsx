@@ -10,7 +10,6 @@ import {
   defaultMatchLineupWithFormations,
   alignLineupSlotCoordinates,
   applyBenchSelectionToSideFormation,
-  applyFormationChangeForSide,
   normalizeLineupTeamLabels,
   type BenchPlayerPick,
   parseStoredFormations,
@@ -162,53 +161,73 @@ export function SquadBuilder({
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    async function loadPlayerPool() {
+      setPoolLoading(true);
+      setPoolError(null);
+
+      try {
+        const poolParams = new URLSearchParams({ homeTeam, awayTeam, fixtureKey });
+        const poolRes = await fetch(`/api/squads/player-pool?${poolParams}`);
+        if (cancelled) return;
+
+        if (poolRes.ok) {
+          const poolPayload = (await poolRes.json()) as {
+            players?: SquadPoolPlayer[];
+            homePlayers?: SquadPoolPlayer[];
+            awayPlayers?: SquadPoolPlayer[];
+            seasonName: string;
+            matchLabel: string;
+            source?: string;
+          };
+          const all = poolPayload.players ?? [];
+          const mergedHome = [
+            ...(poolPayload.homePlayers ?? []),
+            ...all.filter((player) => teamsMatch(player.teamName, homeTeam))
+          ].filter(
+            (player, index, list) =>
+              list.findIndex((entry) => entry.playerId === player.playerId) === index
+          );
+          const mergedAway = [
+            ...(poolPayload.awayPlayers ?? []),
+            ...all.filter((player) => teamsMatch(player.teamName, awayTeam))
+          ].filter(
+            (player, index, list) =>
+              list.findIndex((entry) => entry.playerId === player.playerId) === index
+          );
+          setHomePlayers(mergedHome);
+          setAwayPlayers(mergedAway);
+          setPoolError(null);
+        } else {
+          const poolFail = (await poolRes.json()) as { error?: string };
+          setPoolError(poolFail.error ?? "Unable to load player pool.");
+        }
+      } catch {
+        if (!cancelled) {
+          setPoolError("Unable to load player pool.");
+        }
+      } finally {
+        if (!cancelled) setPoolLoading(false);
+      }
+    }
+
+    void loadPlayerPool();
+    return () => {
+      cancelled = true;
+    };
+  }, [awayTeam, fixtureKey, homeTeam]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSquad() {
       setLoadState("loading");
       setNotice(null);
       setError(null);
       setSelectedSlot(null);
       setHomeSelectedIds(new Set());
       setAwaySelectedIds(new Set());
-      setPoolLoading(true);
 
       try {
-        const poolParams = new URLSearchParams({ homeTeam, awayTeam, fixtureKey });
-        const poolRes = await fetch(`/api/squads/player-pool?${poolParams}`);
-        if (!cancelled) {
-          if (poolRes.ok) {
-            const poolPayload = (await poolRes.json()) as {
-              players?: SquadPoolPlayer[];
-              homePlayers?: SquadPoolPlayer[];
-              awayPlayers?: SquadPoolPlayer[];
-              seasonName: string;
-              matchLabel: string;
-              source?: string;
-            };
-            const all = poolPayload.players ?? [];
-            const mergedHome = [
-              ...(poolPayload.homePlayers ?? []),
-              ...all.filter((player) => teamsMatch(player.teamName, homeTeam))
-            ].filter(
-              (player, index, list) =>
-                list.findIndex((entry) => entry.playerId === player.playerId) === index
-            );
-            const mergedAway = [
-              ...(poolPayload.awayPlayers ?? []),
-              ...all.filter((player) => teamsMatch(player.teamName, awayTeam))
-            ].filter(
-              (player, index, list) =>
-                list.findIndex((entry) => entry.playerId === player.playerId) === index
-            );
-            setHomePlayers(mergedHome);
-            setAwayPlayers(mergedAway);
-            setPoolError(null);
-          } else {
-            const poolFail = (await poolRes.json()) as { error?: string };
-            setPoolError(poolFail.error ?? "Unable to load player pool.");
-          }
-          setPoolLoading(false);
-        }
-
         if (activeSquadId) {
           const squadRes = await fetch(`/api/squads/${activeSquadId}`, { cache: "no-store" });
           if (!cancelled && squadRes.ok) {
@@ -243,13 +262,12 @@ export function SquadBuilder({
       } catch {
         if (!cancelled) {
           setLoadState("error");
-          setPoolLoading(false);
-          setPoolError("Unable to load squad data.");
+          setError("Unable to load squad data.");
         }
       }
     }
 
-    void load();
+    void loadSquad();
     return () => {
       cancelled = true;
     };
@@ -261,10 +279,7 @@ export function SquadBuilder({
         const nextFormations = { ...currentFormations, home: next };
         setLineup((current) => {
           const benchPicks = benchPicksForSide(homeSelectedIds, homePlayers, homeTeam);
-          const merged =
-            benchPicks.length > 0
-              ? applyBenchSelectionToSideFormation("home", next, current, benchPicks)
-              : applyFormationChangeForSide("home", next, current);
+          const merged = applyBenchSelectionToSideFormation("home", next, current, benchPicks);
           return alignLineupSlotCoordinates(
             normalizeLineupTeamLabels(merged, homeTeam, awayTeam),
             nextFormations
@@ -284,10 +299,7 @@ export function SquadBuilder({
         const nextFormations = { ...currentFormations, away: next };
         setLineup((current) => {
           const benchPicks = benchPicksForSide(awaySelectedIds, awayPlayers, awayTeam);
-          const merged =
-            benchPicks.length > 0
-              ? applyBenchSelectionToSideFormation("away", next, current, benchPicks)
-              : applyFormationChangeForSide("away", next, current);
+          const merged = applyBenchSelectionToSideFormation("away", next, current, benchPicks);
           return alignLineupSlotCoordinates(
             normalizeLineupTeamLabels(merged, homeTeam, awayTeam),
             nextFormations

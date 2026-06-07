@@ -348,17 +348,66 @@ function assignPlayersToSideTemplate(
   });
 }
 
-/** Place bench-selected players onto formation slots; keeps the other side unchanged. */
+/** Fill only empty slots; never replace players already on the pitch. */
+function assignPlayersToEmptySideSlots(
+  template: SquadLineupSlot[],
+  players: BenchPlayerPick[]
+): SquadLineupSlot[] {
+  const onPitchIds = new Set(
+    template
+      .filter((slot) => slot.label?.trim() && slot.playerId !== undefined)
+      .map((slot) => String(slot.playerId))
+  );
+  const available = players.filter((player) => !onPitchIds.has(String(player.playerId)));
+  const used = new Set<number>();
+
+  return template.map((slot) => {
+    if (slot.label?.trim()) return slot;
+
+    let pickIndex = available.findIndex(
+      (player, index) => !used.has(index) && player.role === slot.role
+    );
+    if (pickIndex < 0) {
+      pickIndex = available.findIndex((player, index) => !used.has(index));
+    }
+    if (pickIndex < 0) return slot;
+
+    used.add(pickIndex);
+    const player = available[pickIndex];
+    return {
+      ...slot,
+      label: player.name,
+      playerId: player.playerId,
+      teamName: player.teamName,
+      jerseyNumber: player.jerseyNumber
+    };
+  });
+}
+
+/** Remap formation, keep on-pitch players, then line up bench picks in open slots. */
 export function applyBenchSelectionToSideFormation(
   side: SquadLineupSide,
   formation: SquadFormation,
   previous: SquadLineupSlot[],
   selectedPlayers: BenchPlayerPick[]
 ): SquadLineupSlot[] {
-  const template = sideLineupFromFormation(formation, side);
-  const filled = assignPlayersToSideTemplate(template, selectedPlayers);
-  const otherSide = previous.filter((slot) => slotSide(slot) !== side);
-  return side === "home" ? [...filled, ...otherSide] : [...otherSide, ...filled];
+  const remapped = applyFormationChangeForSide(side, formation, previous);
+  if (selectedPlayers.length === 0) {
+    return remapped;
+  }
+
+  const withBench = remapped.map((slot) => ({ ...slot }));
+  const sideIndices = withBench
+    .map((slot, index) => (slotSide(slot) === side ? index : -1))
+    .filter((index) => index >= 0);
+  const sideSlots = sideIndices.map((index) => withBench[index]);
+  const filledSide = assignPlayersToEmptySideSlots(sideSlots, selectedPlayers);
+
+  sideIndices.forEach((lineupIndex, slotIndex) => {
+    withBench[lineupIndex] = filledSide[slotIndex];
+  });
+
+  return withBench;
 }
 
 export function mergeMatchFormationChange(
