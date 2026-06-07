@@ -1,4 +1,4 @@
-import { LOGO_LIVE, LOGO_NAVY } from "@/lib/brand/logo-colors";
+import { LOGO_NAVY, WORDMARK_FONT, WORDMARK_LAYOUT } from "@/lib/brand/logo-colors";
 import { BRAND } from "@/lib/brand";
 
 type BrandWordmarkProps = {
@@ -13,6 +13,8 @@ export function BrandWordmark({
   compact = false,
   title = BRAND.url.replace("https://", "")
 }: BrandWordmarkProps) {
+  const { mypicks, live } = WORDMARK_LAYOUT;
+
   return (
     <svg
       aria-hidden={title ? undefined : true}
@@ -22,42 +24,30 @@ export function BrandWordmark({
       xmlns="http://www.w3.org/2000/svg"
     >
       {title ? <title>{title}</title> : null}
-      <defs>
-        <filter height="150%" id="brand-wordmark-depth" width="116%" x="-8%" y="-20%">
-          <feDropShadow
-            dx="0"
-            dy="2.5"
-            floodColor="#0f172a"
-            floodOpacity="0.22"
-            stdDeviation="1.8"
-          />
-        </filter>
-      </defs>
-      <g filter="url(#brand-wordmark-depth)">
+      <text
+        fill={LOGO_NAVY}
+        fontFamily={WORDMARK_FONT}
+        fontSize={mypicks.fontSize}
+        fontWeight={mypicks.fontWeight}
+        letterSpacing={mypicks.letterSpacing}
+        x={mypicks.x}
+        y={mypicks.y}
+      >
+        mypicks
+      </text>
+      {compact ? null : (
         <text
           fill={LOGO_NAVY}
-          fontFamily="system-ui, -apple-system, 'Segoe UI', sans-serif"
-          fontSize="42"
-          fontWeight="800"
-          letterSpacing="-0.04em"
-          x="2"
-          y="44"
+          fontFamily={WORDMARK_FONT}
+          fontSize={live.fontSize}
+          fontWeight={live.fontWeight}
+          letterSpacing={live.letterSpacing}
+          x={live.x}
+          y={live.y}
         >
-          mypicks
+          .live
         </text>
-        {compact ? null : (
-          <text
-            fill={LOGO_LIVE}
-            fontFamily="system-ui, -apple-system, 'Segoe UI', sans-serif"
-            fontSize="21"
-            fontWeight="700"
-            x="206"
-            y="58"
-          >
-            .live
-          </text>
-        )}
-      </g>
+      )}
     </svg>
   );
 }
