@@ -11,6 +11,7 @@ import {
   TournamentSummaryDialog,
   type TournamentSummary
 } from "@/components/tournament-summary-dialog";
+import { useTranslation } from "@/components/locale-provider";
 import { BRAND } from "@/lib/brand";
 import { navigation } from "@/lib/kickboard-data";
 import {
@@ -35,8 +36,13 @@ const DEFAULT_EVENT_SUMMARY: TournamentSummary = {
   venueCount: null
 };
 
+function navLabel(item: (typeof navigation)[number], t: ReturnType<typeof useTranslation>["t"]) {
+  return item === "Home" ? t("nav.home") : t("nav.community");
+}
+
 export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const hash = useLocationHash();
   const [eventTitle, setEventTitle] = useState(DEFAULT_EVENT_TITLE);
   const [eventSummary, setEventSummary] = useState<TournamentSummary>(DEFAULT_EVENT_SUMMARY);
@@ -72,7 +78,7 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
         <Link
           className="brand"
           href="/#predictions"
-          aria-label={`${BRAND.name} home`}
+          aria-label={t("nav.homeAria", { brand: BRAND.name })}
           scroll={false}
           onClick={handleKickboardHomeNav}
         >
@@ -101,13 +107,13 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
                 scroll={false}
                 onClick={item === "Home" ? handleKickboardHomeNav : handleKickboardCommunityNav}
               >
-                {item}
+                {navLabel(item, t)}
               </Link>
             );
           })}
           {session?.user?.isAdmin ? (
             <Link className={activeNav === "Admin" ? "active" : ""} href="/admin/data-sources">
-              Admin
+              {t("nav.admin")}
             </Link>
           ) : null}
         </nav>

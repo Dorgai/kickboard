@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import { recordActivityWithPresence } from "@/lib/activity/store";
 import { isAdminEmail } from "@/lib/admin/emails";
 import { findAuthUserById, upsertOAuthUser } from "@/lib/auth/users";
+import { normalizeAppLocale } from "@/lib/i18n/locales";
 
 const googleEnabled = Boolean(
   process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim()
@@ -67,7 +68,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ profile }) {
       return Boolean(profile?.email);
     },
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, trigger, session }) {
+      if (trigger === "update" && session && typeof session === "object" && "locale" in session) {
+        token.locale = normalizeAppLocale(String((session as { locale?: string }).locale));
+        return token;
+      }
+
       if (account?.provider && account.providerAccountId && profile?.email) {
         try {
           const user = await upsertOAuthUser({
@@ -83,6 +89,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             token.sub = user.id;
             token.onboardingComplete = user.onboardingComplete;
             token.pointsBalance = user.pointsBalance;
+            token.locale = user.locale;
             token.email = profile.email;
             token.isAdmin = isAdminEmail(profile.email);
             void recordActivityWithPresence({
@@ -103,6 +110,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (user) {
           token.onboardingComplete = user.onboardingComplete;
           token.pointsBalance = user.pointsBalance;
+          token.locale = user.locale;
           token.email = user.email;
           token.isAdmin = isAdminEmail(user.email);
         }
@@ -116,6 +124,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = String(token.sub);
         session.user.onboardingComplete = Boolean(token.onboardingComplete);
         session.user.pointsBalance = Number(token.pointsBalance ?? 0);
+        session.user.locale = normalizeAppLocale(
+          typeof token.locale === "string" ? token.locale : undefined
+        );
         session.user.isAdmin = Boolean(token.isAdmin);
       }
       return session;

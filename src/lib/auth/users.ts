@@ -1,6 +1,7 @@
 import { query } from "@/lib/db";
 import { isAdminEmail } from "@/lib/admin/emails";
 import { isChildAccount } from "@/lib/community/users";
+import { isAppLocale, normalizeAppLocale, type AppLocale } from "@/lib/i18n/locales";
 
 export type AuthUser = {
   id: string;
@@ -11,6 +12,7 @@ export type AuthUser = {
   isChild: boolean;
   pointsBalance: number;
   onboardingComplete: boolean;
+  locale: AppLocale;
 };
 
 function slugUsername(base: string) {
@@ -36,10 +38,12 @@ export async function findAuthUserById(userId: string): Promise<AuthUser | null>
     is_suspended: boolean;
     suspended_until: Date | null;
     is_banned: boolean;
+    locale: string;
   }>(
     `SELECT id, email, username, display_name, birth_year, is_child, points_balance,
             onboarding_completed_at, is_suspended, suspended_until,
-            COALESCE(is_banned, false) AS is_banned
+            COALESCE(is_banned, false) AS is_banned,
+            locale
      FROM users
      WHERE id = $1 AND deleted_at IS NULL`,
     [userId]
@@ -67,8 +71,31 @@ export async function findAuthUserById(userId: string): Promise<AuthUser | null>
     birthYear: row.birth_year,
     isChild: row.is_child,
     pointsBalance: row.points_balance,
-    onboardingComplete: Boolean(row.onboarding_completed_at && row.birth_year !== null)
+    onboardingComplete: Boolean(row.onboarding_completed_at && row.birth_year !== null),
+    locale: normalizeAppLocale(row.locale)
   };
+}
+
+export async function getUserLocale(userId: string): Promise<AppLocale | null> {
+  const result = await query<{ locale: string }>(
+    `SELECT locale FROM users WHERE id = $1 AND deleted_at IS NULL`,
+    [userId]
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  return normalizeAppLocale(row.locale);
+}
+
+export async function updateUserLocale(userId: string, locale: AppLocale): Promise<AppLocale | null> {
+  if (!isAppLocale(locale)) return null;
+  const result = await query<{ locale: string }>(
+    `UPDATE users SET locale = $2, updated_at = now()
+     WHERE id = $1 AND deleted_at IS NULL
+     RETURNING locale`,
+    [userId, locale]
+  );
+  const row = result.rows[0];
+  return row ? normalizeAppLocale(row.locale) : null;
 }
 
 export async function upsertOAuthUser(input: {
@@ -182,21 +209,23 @@ export async function upsertOAuthUser(input: {
 export async function completeUserOnboarding(
   userId: string,
   birthYear: number,
-  options?: { registrationInviteToken?: string | null }
+  options?: { registrationInviteToken?: string | null; locale?: AppLocale | null }
 ) {
   if (!Number.isInteger(birthYear) || birthYear < 1900 || birthYear > new Date().getFullYear()) {
     throw new Error("INVALID_BIRTH_YEAR");
   }
 
   const child = isChildAccount(birthYear);
+  const locale = options?.locale && isAppLocale(options.locale) ? options.locale : null;
   await query(
     `UPDATE users
      SET birth_year = $2,
          is_child = $3,
+         locale = COALESCE($4, locale),
          onboarding_completed_at = now(),
          updated_at = now()
      WHERE id = $1 AND deleted_at IS NULL`,
-    [userId, birthYear, child]
+    [userId, birthYear, child, locale]
   );
 
   if (child) {

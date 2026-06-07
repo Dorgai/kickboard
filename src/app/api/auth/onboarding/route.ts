@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { recordActivityEvent } from "@/lib/activity/store";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { completeUserOnboarding } from "@/lib/auth/users";
+import { isAppLocale, LOCALE_COOKIE } from "@/lib/i18n/locales";
 import { mapDatabaseError } from "@/lib/community/health";
 import {
   getRegistrationInviteTokenFromCookies,
@@ -19,11 +20,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as { birthYear?: number };
+    const body = (await request.json()) as { birthYear?: number; locale?: string };
     const birthYear = Number(body.birthYear);
+    const locale = isAppLocale(body.locale) ? body.locale : null;
     const registrationInviteToken = await getRegistrationInviteTokenFromCookies();
     const updated = await completeUserOnboarding(user.id, birthYear, {
-      registrationInviteToken
+      registrationInviteToken,
+      locale
     });
     if (!updated) {
       return NextResponse.json({ error: "Unable to complete onboarding." }, { status: 500 });
@@ -41,9 +44,19 @@ export async function POST(request: Request) {
         id: updated.id,
         displayName: updated.displayName ?? updated.username,
         onboardingComplete: updated.onboardingComplete,
-        pointsBalance: updated.pointsBalance
+        pointsBalance: updated.pointsBalance,
+        locale: updated.locale
       }
     });
+
+    if (locale) {
+      response.cookies.set(LOCALE_COOKIE, locale, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production"
+      });
+    }
 
     if (registrationInviteToken) {
       response.cookies.set(REGISTRATION_INVITE_COOKIE, "", {

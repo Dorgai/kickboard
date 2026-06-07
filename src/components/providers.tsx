@@ -7,12 +7,14 @@ import { PredictionCelebrationListener } from "@/components/prediction-celebrati
 import { PredictionSubmitCelebration } from "@/components/prediction-submit-celebration";
 import { PushNotificationBootstrap } from "@/components/push-notification-bootstrap";
 import { PwaInstallHint } from "@/components/pwa-install-hint";
+import { LocaleProvider } from "@/components/locale-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/components/toast-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
+      <LocaleProvider>
       <ThemeProvider>
         <ToastProvider>
           <ActivityTracker />
@@ -24,6 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           {children}
         </ToastProvider>
       </ThemeProvider>
+      </LocaleProvider>
     </SessionProvider>
   );
 }

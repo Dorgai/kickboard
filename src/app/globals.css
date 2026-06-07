@@ -11263,6 +11263,28 @@ h3 {
   padding: 4px 4px 8px;
 }
 
+.locale-onboarding-field {
+  border: 0;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.locale-onboarding-field legend {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.locale-onboarding-option {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 14px;
+  gap: 8px;
+}
+
 .app-menu-theme-label,
 .app-menu-section-label {
   align-items: center;

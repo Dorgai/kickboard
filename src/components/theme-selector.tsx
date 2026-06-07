@@ -1,13 +1,14 @@
 "use client";
 
 import { HelpTooltip } from "@/components/help-tooltip";
+import { useTranslation } from "@/components/locale-provider";
 import { useTheme } from "@/components/theme-provider";
 import type { ThemeMode } from "@/lib/theme";
 
-const OPTIONS: { id: ThemeMode; label: string }[] = [
-  { id: "light", label: "Light" },
-  { id: "dark", label: "Dark" },
-  { id: "system", label: "Auto" }
+const OPTIONS: { id: ThemeMode; labelKey: "theme.light" | "theme.dark" | "theme.auto" }[] = [
+  { id: "light", labelKey: "theme.light" },
+  { id: "dark", labelKey: "theme.dark" },
+  { id: "system", labelKey: "theme.auto" }
 ];
 
 type ThemeSelectorProps = {
@@ -17,14 +18,15 @@ type ThemeSelectorProps = {
 
 export function ThemeSelector({ variant = "header" }: ThemeSelectorProps) {
   const { mode, setMode } = useTheme();
+  const { t } = useTranslation();
 
   if (variant === "menu") {
     return (
       <div className="app-menu-theme" role="group" aria-label="Color theme">
         <p className="app-menu-theme-label panel-help-row" id="app-menu-theme-label">
-          Theme
-          <HelpTooltip label="Auto theme behavior" size="sm">
-            Auto is light on mobile; on desktop it follows your device.
+          {t("theme.label")}
+          <HelpTooltip label={t("theme.auto")} size="sm">
+            {t("theme.autoHint")}
           </HelpTooltip>
         </p>
         <div aria-labelledby="app-menu-theme-label" className="app-menu-theme-options">
@@ -36,7 +38,7 @@ export function ThemeSelector({ variant = "header" }: ThemeSelectorProps) {
               type="button"
               onClick={() => setMode(option.id)}
             >
-              {option.label}
+              {t(option.labelKey)}
             </button>
           ))}
         </div>
@@ -45,7 +47,7 @@ export function ThemeSelector({ variant = "header" }: ThemeSelectorProps) {
   }
 
   return (
-    <nav className="theme-selector event-tab-bar" aria-label="Color theme">
+    <nav className="theme-selector event-tab-bar" aria-label={t("theme.label")}>
       {OPTIONS.map((option) => (
         <button
           key={option.id}
@@ -54,7 +56,7 @@ export function ThemeSelector({ variant = "header" }: ThemeSelectorProps) {
           type="button"
           onClick={() => setMode(option.id)}
         >
-          {option.label}
+          {t(option.labelKey)}
         </button>
       ))}
     </nav>

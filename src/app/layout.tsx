@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Providers } from "@/components/providers";
+import { SkipLink } from "@/components/skip-link";
 import { BRAND } from "@/lib/brand";
 import { themeInitScript, THEME_META_LIGHT } from "@/lib/theme";
 import "./globals.css";
@@ -39,10 +40,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
-        <a className="skip-link" href="#main-content">
-          Skip to main content
-        </a>
-        <Providers>{children}</Providers>
+        <Providers>
+          <SkipLink />
+          {children}
+        </Providers>
       </body>
     </html>
   );

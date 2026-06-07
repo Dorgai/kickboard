@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
+import { LanguageSelector } from "@/components/language-selector";
+import { useTranslation } from "@/components/locale-provider";
 import { ThemeSelector } from "@/components/theme-selector";
 import {
   OPEN_HELP_CENTER_EVENT,
@@ -21,6 +23,7 @@ import {
 import { handleKickboardCommunityNav } from "@/lib/navigation/location-hash";
 
 export function HelpMenu() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -53,15 +56,16 @@ export function HelpMenu() {
         onClick={() => setOpen((value) => !value)}
       >
         <Menu size={18} aria-hidden />
-        <span className="app-menu-trigger-label">Menu</span>
+        <span className="app-menu-trigger-label">{t("common.menu")}</span>
         <ChevronDown aria-hidden size={14} />
       </button>
 
       {open ? (
         <div className="help-menu-dropdown app-menu-dropdown" id={menuId} role="menu">
           <ThemeSelector variant="menu" />
+          <LanguageSelector variant="menu" />
           <div className="app-menu-divider" role="separator" />
-          <p className="app-menu-section-label">Navigate</p>
+          <p className="app-menu-section-label">{t("common.navigate")}</p>
           <Link
             className="help-menu-item"
             href="/#community"
@@ -73,7 +77,7 @@ export function HelpMenu() {
             }}
           >
             <Users size={16} aria-hidden />
-            Community
+            {t("nav.community")}
           </Link>
           <button
             className="help-menu-item help-menu-item--event-overview"
@@ -85,10 +89,10 @@ export function HelpMenu() {
             }}
           >
             <Trophy size={16} aria-hidden />
-            Event overview
+            {t("helpMenu.eventOverview")}
           </button>
           <div className="app-menu-divider" role="separator" />
-          <p className="app-menu-section-label">Help</p>
+          <p className="app-menu-section-label">{t("common.help")}</p>
           <button
             className="help-menu-item"
             role="menuitem"
@@ -99,7 +103,7 @@ export function HelpMenu() {
             }}
           >
             <Sparkles size={16} aria-hidden />
-            Welcome tour
+            {t("helpMenu.welcomeTour")}
           </button>
           <button
             className="help-menu-item"
@@ -111,7 +115,7 @@ export function HelpMenu() {
             }}
           >
             <MessageCircleQuestion size={16} aria-hidden />
-            Ask MyPicks AI
+            {t("helpMenu.askAi")}
           </button>
           <button
             className="help-menu-item"
@@ -123,7 +127,7 @@ export function HelpMenu() {
             }}
           >
             <CircleHelp size={16} aria-hidden />
-            Ask an admin
+            {t("helpMenu.askAdmin")}
           </button>
         </div>
       ) : null}

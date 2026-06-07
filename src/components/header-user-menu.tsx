@@ -1,15 +1,17 @@
 "use client";
 
 import { LogOut, UserRound } from "lucide-react";
+import { useTranslation } from "@/components/locale-provider";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 export function HeaderUserMenu() {
   const { data: session, status } = useSession();
+  const { t } = useTranslation();
 
   if (status === "loading") {
     return (
       <div className="header-user-menu header-user-menu--loading" aria-busy="true">
-        <span className="header-user-menu-label">Account…</span>
+        <span className="header-user-menu-label">{t("common.accountLoading")}</span>
       </div>
     );
   }
@@ -26,7 +28,7 @@ export function HeaderUserMenu() {
         }}
       >
         <UserRound size={16} aria-hidden="true" />
-        Sign in
+        {t("auth.signIn")}
       </button>
     );
   }
@@ -54,21 +56,21 @@ export function HeaderUserMenu() {
           <span className="header-user-menu-name">{displayName}</span>
           <span className="header-user-menu-meta">
             {session.user.onboardingComplete
-              ? `${session.user.pointsBalance} pts`
-              : "Complete onboarding"}
+              ? t("auth.points", { count: session.user.pointsBalance })
+              : t("auth.completeOnboarding")}
           </span>
         </span>
       </div>
       <button
         className="header-user-menu-logout"
         type="button"
-        aria-label="Sign out"
+        aria-label={t("auth.signOutAria")}
         onClick={() => {
           void signOut({ callbackUrl: "/" });
         }}
       >
         <LogOut size={16} aria-hidden="true" />
-        <span>Log out</span>
+        <span>{t("auth.logOut")}</span>
       </button>
     </div>
   );

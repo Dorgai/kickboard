@@ -2,6 +2,10 @@
 
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { HelpTooltip } from "@/components/help-tooltip";
+import { LanguageSelector } from "@/components/language-selector";
+import { useTranslation } from "@/components/locale-provider";
+import { writeLocaleCookie } from "@/lib/i18n/cookie";
+import { normalizeAppLocale, type AppLocale } from "@/lib/i18n/locales";
 import { useSession } from "next-auth/react";
 import { FormEvent, useEffect, useState } from "react";
 
@@ -18,7 +22,9 @@ export function AuthGate({
   featureLabel: string;
 }) {
   const { data: session, status, update } = useSession();
+  const { t } = useTranslation();
   const [birthYear, setBirthYear] = useState(String(new Date().getFullYear() - 18));
+  const [selectedLocale, setSelectedLocale] = useState<AppLocale>("en");
   const [oauthConfigured, setOauthConfigured] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -31,6 +37,17 @@ export function AuthGate({
   }, []);
 
   useEffect(() => {
+    if (status !== "authenticated" || session?.user?.onboardingComplete) return;
+
+    void fetch("/api/locale/suggest", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((payload: { locale?: string }) => {
+        setSelectedLocale(normalizeAppLocale(payload.locale));
+      })
+      .catch(() => undefined);
+  }, [session?.user?.onboardingComplete, status]);
+
+  useEffect(() => {
     if (status !== "authenticated" || !session?.user?.onboardingComplete) return;
 
     void fetch("/api/invitations/redeem", { method: "POST" }).catch(() => {
@@ -39,25 +56,21 @@ export function AuthGate({
   }, [session?.user?.onboardingComplete, status]);
 
   if (status === "loading") {
-    return <p className="inline-status">Checking sign-in…</p>;
+    return <p className="inline-status">{t("common.checkingSignIn")}</p>;
   }
 
   if (!session?.user) {
     return (
       <div className="auth-gate">
         <h3 className="panel-help-row">
-          Sign in to use {featureLabel}
-          <HelpTooltip label="Why sign in" size="sm">
-            Register with Google (OAuth). We use your account for squads, Fan Chat, and predictions — not a
-            separate community password.
+          {t("auth.signInToUse", { feature: featureLabel })}
+          <HelpTooltip label={t("auth.signInWhy")} size="sm">
+            {t("auth.signInWhyBody")}
           </HelpTooltip>
         </h3>
         {oauthConfigured === false ? (
           <div className="auth-oauth-setup-help">
-            <p className="inline-status">
-              Google OAuth is not configured on this server. Add variables on the Railway <strong>MyPicks</strong>{" "}
-              web service, then redeploy.
-            </p>
+            <p className="inline-status">{t("auth.oauthNotConfigured")}</p>
             <ul className="auth-oauth-setup-list">
               <li>
                 <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> from Google Cloud Console
@@ -99,11 +112,12 @@ export function AuthGate({
         const response = await fetch("/api/auth/onboarding", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ birthYear: Number(birthYear) })
+          body: JSON.stringify({ birthYear: Number(birthYear), locale: selectedLocale })
         });
         const payload = (await response.json()) as { error?: string };
         if (!response.ok) throw new Error(payload.error ?? "Onboarding failed.");
-        await update();
+        writeLocaleCookie(selectedLocale);
+        await update({ locale: selectedLocale });
       } catch (onboardingError) {
         setError(onboardingError instanceof Error ? onboardingError.message : "Onboarding failed.");
       } finally {
@@ -114,14 +128,18 @@ export function AuthGate({
     return (
       <form className="auth-gate" onSubmit={handleOnboarding}>
         <h3 className="panel-help-row">
-          Confirm your age
-          <HelpTooltip label="Why we ask" size="sm">
-            Required for child-safety rules. Accounts under 13 stay in Fan Mode and cannot post on the
-            Coach Board.
+          {t("auth.confirmAge")}
+          <HelpTooltip label={t("auth.confirmAgeWhy")} size="sm">
+            {t("auth.confirmAgeWhyBody")}
           </HelpTooltip>
         </h3>
+        <LanguageSelector
+          variant="onboarding"
+          value={selectedLocale}
+          onSelect={(locale) => setSelectedLocale(normalizeAppLocale(locale))}
+        />
         <label className="feed-control-field">
-          Birth year
+          {t("auth.birthYear")}
           <input
             className="feed-control-input"
             max={new Date().getFullYear()}
@@ -134,7 +152,7 @@ export function AuthGate({
         </label>
         {error ? <p className="inline-status">{error}</p> : null}
         <button className="button primary" disabled={submitting} type="submit">
-          {submitting ? "Saving…" : "Continue"}
+          {submitting ? t("common.saving") : t("common.continue")}
         </button>
       </form>
     );

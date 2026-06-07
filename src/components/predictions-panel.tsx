@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { AuthGate } from "@/components/auth-gate";
+import { useTranslation } from "@/components/locale-provider";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { FixturePredictionsForm } from "@/components/fixture-predictions-form";
 import { TournamentPredictionsForm } from "@/components/tournament-predictions-form";
@@ -36,9 +37,9 @@ import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 export const PREDICTION_SUB_TAB_IDS = ["tournament", "match"] as const;
 export type PredictionSubTabId = (typeof PREDICTION_SUB_TAB_IDS)[number];
 
-const PREDICTION_SUB_TABS = [
-  { id: "tournament" as const, label: "Tournament picks", shortLabel: "Tournament" },
-  { id: "match" as const, label: "Match picks", shortLabel: "Matches" }
+const PREDICTION_SUB_TAB_IDS_LIST = [
+  { id: "tournament" as const, labelKey: "predictions.tournamentPicks" as const, shortKey: "predictions.tournamentShort" as const },
+  { id: "match" as const, labelKey: "predictions.matchPicks" as const, shortKey: "predictions.matchShort" as const }
 ] as const;
 
 function readPredictionSubTab(): PredictionSubTabId {
@@ -64,6 +65,7 @@ type PredictionsPanelProps = {
 
 export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const touchLayout = useNarrowViewport();
   const fixtures = useFixtureOptions(groups);
   const [subTab, setSubTab] = useState<PredictionSubTabId>("match");
@@ -236,9 +238,9 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     });
   }, []);
 
-  const subTabButtons = PREDICTION_SUB_TABS.map((tab) => ({
+  const subTabButtons = PREDICTION_SUB_TAB_IDS_LIST.map((tab) => ({
     id: tab.id,
-    label: touchLayout ? tab.shortLabel : tab.label
+    label: touchLayout ? t(tab.shortKey) : t(tab.labelKey)
   }));
 
   return (

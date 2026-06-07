@@ -1,6 +1,7 @@
 "use client";
 
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
+import { useTranslation } from "@/components/locale-provider";
 import { useEffect, useId, useRef, useState } from "react";
 import { OPEN_WELCOME_EVENT } from "@/lib/help/events";
 import { writeLocationHash } from "@/lib/navigation/location-hash";
@@ -8,30 +9,15 @@ import { celebrateWelcomeStart } from "@/lib/welcome/celebrate";
 import { hasSeenWelcome, markWelcomeSeen } from "@/lib/welcome";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
 
-const HIGHLIGHTS = [
-  {
-    title: "Predictions",
-    line: "Pick scores and outcomes. Climb the points board.",
-    hash: "predictions"
-  },
-  {
-    title: "Coach Board",
-    line: "Set lineups for any match — drag players onto the pitch.",
-    hash: "coach-board"
-  },
-  {
-    title: "Tournament",
-    line: "Groups, fixtures, and the road to the final.",
-    hash: "tournament"
-  },
-  {
-    title: "Community",
-    line: "Add friends, share boards, and compare picks.",
-    hash: "community"
-  }
+const HIGHLIGHT_HASHES = [
+  { titleKey: "welcome.highlights.predictionsTitle" as const, lineKey: "welcome.highlights.predictionsLine" as const, hash: "predictions" },
+  { titleKey: "welcome.highlights.coachBoardTitle" as const, lineKey: "welcome.highlights.coachBoardLine" as const, hash: "coach-board" },
+  { titleKey: "welcome.highlights.tournamentTitle" as const, lineKey: "welcome.highlights.tournamentLine" as const, hash: "tournament" },
+  { titleKey: "welcome.highlights.communityTitle" as const, lineKey: "welcome.highlights.communityLine" as const, hash: "community" }
 ] as const;
 
 export function WelcomeDialog() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [forced, setForced] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -101,26 +87,23 @@ export function WelcomeDialog() {
       <div className="welcome-dialog-panel kickboard-hero-backdrop kickboard-hero-backdrop--nico-accent">
         <div className="welcome-dialog-shell">
           <header className="welcome-dialog-header">
-            <p className="welcome-dialog-eyebrow">World Cup 2026</p>
-            <h2 id={titleId}>Welcome to MyPicks</h2>
-            <p className="welcome-dialog-lead">
-              Predict matches, build squads, follow the tournament, and connect with fans — all in one
-              place.
-            </p>
+            <p className="welcome-dialog-eyebrow">{t("welcome.eyebrow")}</p>
+            <h2 id={titleId}>{t("welcome.title")}</h2>
+            <p className="welcome-dialog-lead">{t("welcome.lead")}</p>
           </header>
 
           <div className="welcome-dialog-actions" role="list">
-            {HIGHLIGHTS.map((item) => (
+            {HIGHLIGHT_HASHES.map((item) => (
               <button
-                key={item.title}
+                key={item.hash}
                 className="welcome-dialog-action"
                 role="listitem"
                 type="button"
                 onClick={() => goToSection(item.hash)}
               >
                 <span className="welcome-dialog-action-copy">
-                  <strong>{item.title}</strong>
-                  <span>{item.line}</span>
+                  <strong>{t(item.titleKey)}</strong>
+                  <span>{t(item.lineKey)}</span>
                 </span>
               </button>
             ))}
@@ -133,13 +116,13 @@ export function WelcomeDialog() {
               type="button"
               onClick={handleStartExploring}
             >
-              Start exploring
+              {t("welcome.startExploring")}
             </button>
             <GoogleSignInButton
               className="welcome-dialog-google-sign-in"
               onBeforeSignIn={closeWelcome}
             />
-            <p className="welcome-dialog-footnote">Free to browse. Sign in to save picks, squads, and chat.</p>
+            <p className="welcome-dialog-footnote">{t("welcome.footnote")}</p>
           </footer>
         </div>
       </div>
