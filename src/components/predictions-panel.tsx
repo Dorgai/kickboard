@@ -244,11 +244,11 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   }));
 
   return (
-    <AuthGate featureLabel="Predictions">
+    <AuthGate featureLabel={t("predictions.featureLabel")}>
       <div className="predictions-panel">
         <div className="kickboard-tab-rail predictions-sub-tabs-rail">
           <FeedTabBar
-            ariaLabel="Prediction type"
+            ariaLabel={t("predictions.typeAria")}
             className="predictions-sub-tabs kickboard-tab-bar"
             tabs={subTabButtons}
             value={subTab}
@@ -267,7 +267,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                 }}
               />
               {tournamentOverviewLoading ? (
-                <p className="inline-status predictions-points-loading">Loading picks…</p>
+                <p className="inline-status predictions-points-loading">{t("predictions.loadingPicks")}</p>
               ) : null}
               {tournamentOverviewError ? (
                 <p className="inline-status predictions-points-loading">{tournamentOverviewError}</p>
@@ -286,7 +286,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
               <div className="predictions-match-layout">
                 <div className="predictions-match-timeline">
                   <FixtureMatchPicker
-                    ariaLabel="Select a match for your prediction"
+                    ariaLabel={t("predictions.selectMatchAria")}
                     fixtures={fixtures}
                     rail={touchLayout}
                     selectedKey={selectedKey}
@@ -307,7 +307,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                       }}
                     />
                     {overviewLoading ? (
-                      <p className="inline-status predictions-points-loading">Loading points…</p>
+                      <p className="inline-status predictions-points-loading">{t("predictions.loadingPoints")}</p>
                     ) : null}
                     {overviewError ? (
                       <p className="inline-status predictions-points-loading">{overviewError}</p>
@@ -336,8 +336,8 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
               </div>
             ) : (
               <div className="predictions-coming-soon data-card surface-muted">
-                <h3>Pick a match</h3>
-                <p>Loading upcoming fixtures from the tournament feed.</p>
+                <h3>{t("predictions.pickMatch")}</h3>
+                <p>{t("predictions.loadingFixtures")}</p>
               </div>
             )}
           </div>

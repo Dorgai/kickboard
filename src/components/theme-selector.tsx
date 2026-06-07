@@ -21,7 +21,7 @@ export function ThemeSelector({ variant = "header" }: ThemeSelectorProps) {
 
   if (variant === "menu") {
     return (
-      <div className="app-menu-theme" role="group" aria-label="Color theme">
+      <div className="app-menu-theme" role="group" aria-label={t("theme.ariaLabel")}>
         <p className="app-menu-theme-label" id="app-menu-theme-label">
           {t("theme.label")}
         </p>

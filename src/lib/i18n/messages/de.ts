@@ -4,19 +4,25 @@ export const deMessages: Messages = {
   common: {
     continue: "Weiter",
     saving: "Speichern…",
+    sending: "Senden…",
     menu: "Menü",
     skipToMain: "Zum Hauptinhalt springen",
     checkingSignIn: "Anmeldung wird geprüft…",
     accountLoading: "Konto…",
     navigate: "Navigation",
     help: "Hilfe",
-    language: "Sprache"
+    language: "Sprache",
+    notNow: "Nicht jetzt",
+    dismiss: "Schließen",
+    copyLink: "Link kopieren",
+    loading: "Laden…"
   },
   nav: {
     home: "Start",
     community: "Community",
     admin: "Admin",
-    homeAria: "{brand} Startseite"
+    homeAria: "{brand} Startseite",
+    primaryAria: "Hauptnavigation"
   },
   auth: {
     signInToUse: "Melde dich an, um {feature} zu nutzen",
@@ -37,7 +43,8 @@ export const deMessages: Messages = {
     signOutAria: "Abmelden",
     logOut: "Abmelden",
     completeOnboarding: "Onboarding abschließen",
-    points: "{count} Pkt."
+    points: "{count} Pkt.",
+    onboardingFailed: "Onboarding fehlgeschlagen."
   },
   helpMenu: {
     eventOverview: "Turnierübersicht",
@@ -45,18 +52,122 @@ export const deMessages: Messages = {
     askAi: "MyPicks KI fragen",
     askAdmin: "Admin fragen"
   },
+  helpCenter: {
+    title: "Hilfe",
+    eyebrow: "Hilfe",
+    heading: "Fragen & Support",
+    channelAi: "MyPicks KI",
+    channelAdmin: "Admin fragen",
+    signInPrompt:
+      "Melde dich an und schließe das Onboarding ab, um Hilfe-Chats zu speichern und einen Admin zu erreichen.",
+    placeholderAi: "MyPicks KI fragen…",
+    placeholderAdmin: "Nachricht an Admins (Konto, Bugs, Richtlinien)…",
+    threadPlaceholderAi: "Stelle unten eine Frage.",
+    threadPlaceholderAdmin: "Beschreibe unten dein Problem.",
+    send: "Senden",
+    close: "Hilfe schließen",
+    newThread: "Neuer Thread",
+    yourMessage: "Deine Nachricht",
+    roleYou: "Du",
+    roleAdmin: "Admin",
+    roleSystem: "System"
+  },
   theme: {
     label: "Design",
     light: "Hell",
     dark: "Dunkel",
     auto: "Auto",
-    autoHint: "Auf dem Handy hell; am Desktop folgt es deinem Gerät."
+    autoHint: "Auf dem Handy hell; am Desktop folgt es deinem Gerät.",
+    ariaLabel: "Farbschema"
   },
   predictions: {
     tournamentPicks: "Turniertipps",
     tournamentShort: "Turnier",
     matchPicks: "Spieltipp",
-    matchShort: "Spiele"
+    matchShort: "Spiele",
+    featureLabel: "Tipps",
+    loadingPicks: "Tipps werden geladen…",
+    loadingPoints: "Punkte werden geladen…",
+    pickMatch: "Spiel wählen",
+    loadingFixtures: "Kommende Spiele werden aus dem Turnier-Feed geladen.",
+    typeAria: "Tipp-Art",
+    selectMatchAria: "Spiel für deinen Tipp wählen"
+  },
+  eventTabs: {
+    tournament: "Turnier",
+    predictions: "Tipps",
+    coachBoard: "Coach Board",
+    coachBoardLine1: "Coach",
+    coachBoardLine2: "Board",
+    community: "Community",
+    groupStage: "Gruppenphase",
+    knockout: "K.-o.-Runde",
+    sectionAria: "Aktuelle Turnier-Bereiche"
+  },
+  notifications: {
+    title: "Benachrichtigungen",
+    markAllRead: "Alle gelesen",
+    signInToSee: "Melde dich an, um Verbindungs- und Spiel-Hinweise zu sehen.",
+    updating: "Benachrichtigungen werden aktualisiert…",
+    empty:
+      "Noch keine Benachrichtigungen. Vernetze dich mit Fans für Tipps und Boards; WC26-Anpfiffe erscheinen bis drei Tage vor dem Spiel.",
+    openAlerts: "Benachrichtigungen öffnen",
+    unreadAlerts: "{count} ungelesen",
+    categoryConnection: "Verbindung",
+    categoryUpcoming: "Bevorstehend",
+    categoryResult: "Ergebnis",
+    timeJustNow: "Gerade eben",
+    timeMinutesAgo: "vor {count} Min.",
+    timeHoursAgo: "vor {count} Std.",
+    loadError: "Benachrichtigungen konnten nicht geladen werden."
+  },
+  pwa: {
+    installAria: "MyPicks installieren",
+    title: "MyPicks zum Home-Bildschirm hinzufügen",
+    iosBeforeShare: "Tippe auf",
+    iosShare: "Teilen",
+    iosAfterShare: ", dann",
+    iosAddToHomeScreen: "Zum Home-Bildschirm",
+    iosTail: "für die Vollbild-App.",
+    androidCopy: "Installiere MyPicks über das Browser-Menü für schnellen Zugriff im Vollbild.",
+    notNow: "Nicht jetzt",
+    dismissAria: "Installationshinweis schließen"
+  },
+  invitations: {
+    title: "Jemanden zur Registrierung einladen",
+    tooltipLabel: "Registrierungseinladungen",
+    tooltipBody:
+      "E-Mail leer lassen für einen teilbaren Link. Mit E-Mail wird die Einladung an dieses Google-Konto gebunden. Nach der Registrierung seid ihr automatisch verbunden.",
+    emailLabel: "E-Mail (optional)",
+    emailPlaceholder: "freund@beispiel.de",
+    selfHint:
+      "Einladungen sind für andere. E-Mail leer lassen für einen kopierbaren Link oder eine andere Adresse nutzen.",
+    selfError:
+      "Das ist deine Anmelde-E-Mail. Gib die E-Mail eines Freundes ein oder lass das Feld leer für einen Link.",
+    messageLabel: "Kurze Nachricht (optional)",
+    messagePlaceholder: "Komm zu MyPicks für WM26-Tipps und Coach Board…",
+    sendEmailTo: "Einladungs-E-Mail an {email} senden",
+    sendInvitation: "Einladung senden",
+    createInviteLink: "Einladungslink erstellen",
+    latestLink: "Neuester Einladungslink",
+    loading: "Einladungen werden geladen…",
+    copiedNotice:
+      "Einladungslink kopiert. Sende ihn per E-Mail, WhatsApp, SMS oder einem anderen Kanal.",
+    copyFailed:
+      "Automatisches Kopieren fehlgeschlagen — Link unten markieren, kopieren und manuell teilen.",
+    created: "Einladung erstellt.",
+    revoked: "Einladung widerrufen.",
+    loadError: "Einladungen konnten nicht geladen werden.",
+    createError: "Einladung konnte nicht erstellt werden.",
+    revokeError: "Widerruf fehlgeschlagen.",
+    revoke: "Widerrufen",
+    statusPending: "Ausstehend",
+    statusAccepted: "Angenommen",
+    statusExpired: "Abgelaufen",
+    statusRevoked: "Widerrufen",
+    anyGoogleAccount: "Beliebiges Google-Konto",
+    expires: "Läuft ab",
+    noInvitationsYet: "Noch keine Einladungen."
   },
   welcome: {
     eyebrow: "WM 2026",

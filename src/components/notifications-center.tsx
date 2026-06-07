@@ -4,6 +4,7 @@ import { Bell } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "@/components/locale-provider";
 import type { UserAlert } from "@/lib/alerts/types";
 import { useToastOptional } from "@/components/toast-provider";
 import {
@@ -11,24 +12,28 @@ import {
   useDismissOnOutsidePointerDown
 } from "@/lib/use-dismiss-on-outside-pointer-down";
 
-function categoryLabel(category: UserAlert["category"]) {
-  if (category === "connection_activity") return "Connection";
-  if (category === "match_upcoming") return "Upcoming";
-  return "Result";
+function categoryLabel(
+  category: UserAlert["category"],
+  t: ReturnType<typeof useTranslation>["t"]
+) {
+  if (category === "connection_activity") return t("notifications.categoryConnection");
+  if (category === "match_upcoming") return t("notifications.categoryUpcoming");
+  return t("notifications.categoryResult");
 }
 
-function formatWhen(iso: string) {
+function formatWhen(iso: string, t: ReturnType<typeof useTranslation>["t"]) {
   const date = new Date(iso);
   const diffMs = Date.now() - date.getTime();
   const mins = Math.round(diffMs / 60_000);
-  if (mins < 1) return "Just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t("notifications.timeJustNow");
+  if (mins < 60) return t("notifications.timeMinutesAgo", { count: mins });
   const hours = Math.round(mins / 60);
-  if (hours < 48) return `${hours}h ago`;
+  if (hours < 48) return t("notifications.timeHoursAgo", { count: hours });
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 export function NotificationsCenter() {
+  const { t } = useTranslation();
   const { status } = useSession();
   const [open, setOpen] = useState(false);
   const [alerts, setAlerts] = useState<UserAlert[]>([]);
@@ -56,7 +61,7 @@ export function NotificationsCenter() {
         unreadCount?: number;
         error?: string;
       };
-      if (!response.ok) throw new Error(payload.error ?? "Unable to load alerts.");
+      if (!response.ok) throw new Error(payload.error ?? t("notifications.loadError"));
       const nextAlerts = payload.alerts ?? [];
       if (!alertsSeededRef.current) {
         for (const alert of nextAlerts) {
@@ -79,11 +84,11 @@ export function NotificationsCenter() {
       setAlerts(nextAlerts);
       setUnreadCount(payload.unreadCount ?? 0);
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Unable to load alerts.");
+      setError(loadError instanceof Error ? loadError.message : t("notifications.loadError"));
     } finally {
       setLoading(false);
     }
-  }, [status, toast]);
+  }, [status, t, toast]);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -128,7 +133,11 @@ export function NotificationsCenter() {
         aria-expanded={open}
         className="notification-button"
         type="button"
-        aria-label={unreadCount > 0 ? `${unreadCount} unread alerts` : "Open alerts"}
+        aria-label={
+          unreadCount > 0
+            ? t("notifications.unreadAlerts", { count: unreadCount })
+            : t("notifications.openAlerts")
+        }
         onClick={() => {
           setOpen((value) => !value);
           if (!open) void load();
@@ -139,28 +148,25 @@ export function NotificationsCenter() {
       </button>
 
       {open ? (
-        <div className="notifications-panel" role="dialog" aria-label="Alerts" aria-modal="true">
+        <div className="notifications-panel" role="dialog" aria-label={t("notifications.title")} aria-modal="true">
           <header className="notifications-panel-header">
-            <h2>Alerts</h2>
+            <h2>{t("notifications.title")}</h2>
             {unreadCount > 0 ? (
               <button className="text-button" type="button" onClick={() => void markAllRead()}>
-                Mark all read
+                {t("notifications.markAllRead")}
               </button>
             ) : null}
           </header>
 
           {status !== "authenticated" ? (
-            <p className="inline-status">Sign in to see connection activity and match alerts.</p>
+            <p className="inline-status">{t("notifications.signInToSee")}</p>
           ) : null}
 
-          {loading ? <p className="inline-status">Updating alerts…</p> : null}
+          {loading ? <p className="inline-status">{t("notifications.updating")}</p> : null}
           {error ? <p className="inline-status">{error}</p> : null}
 
           {!loading && status === "authenticated" && alerts.length === 0 ? (
-            <p className="inline-status">
-              No alerts yet. Connect with fans to see their predictions and boards; upcoming WC26
-              kickoffs appear within three days of the match.
-            </p>
+            <p className="inline-status">{t("notifications.empty")}</p>
           ) : null}
 
           <ul className="notifications-panel-list">
@@ -175,8 +181,8 @@ export function NotificationsCenter() {
                   }}
                 >
                   <span className="notifications-panel-item-meta">
-                    <span className="notifications-panel-category">{categoryLabel(alert.category)}</span>
-                    <time dateTime={alert.occurredAt}>{formatWhen(alert.occurredAt)}</time>
+                    <span className="notifications-panel-category">{categoryLabel(alert.category, t)}</span>
+                    <time dateTime={alert.occurredAt}>{formatWhen(alert.occurredAt, t)}</time>
                   </span>
                   <strong>{alert.title}</strong>
                   <span className="notifications-panel-body">{alert.body}</span>

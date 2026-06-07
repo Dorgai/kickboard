@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "@/components/locale-provider";
 import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { CommunityConnectionsPanel } from "@/components/community-connections-panel";
 import { FeedTabBar } from "@/components/feed-tab-bar";
@@ -31,27 +32,34 @@ export const CURRENT_EVENT_TAB_IDS = [
 ] as const;
 export type CurrentEventTabId = (typeof CURRENT_EVENT_TAB_IDS)[number];
 
-const CURRENT_EVENT_TABS = [
-  { id: "tournament" as const, label: "Tournament" },
-  { id: "predictions" as const, label: "Predictions" },
-  { id: "coach-board" as const, label: "Coach Board" },
-  { id: "community" as const, label: "Community" }
-] as const;
+const CURRENT_EVENT_TABS: Array<{ id: CurrentEventTabId }> = [
+  { id: "tournament" },
+  { id: "predictions" },
+  { id: "coach-board" },
+  { id: "community" }
+];
 
 /** Shown in the section tab dock — Community lives in the header menu. */
 const CURRENT_EVENT_DOCK_TABS = CURRENT_EVENT_TABS.filter((tab) => tab.id !== "community");
 
-function dockTabLabel(tab: (typeof CURRENT_EVENT_DOCK_TABS)[number], mobile: boolean) {
+function dockTabLabel(
+  tab: (typeof CURRENT_EVENT_DOCK_TABS)[number],
+  mobile: boolean,
+  t: ReturnType<typeof useTranslation>["t"]
+) {
   if (mobile && tab.id === "coach-board") {
     return (
       <>
-        Coach
+        {t("eventTabs.coachBoardLine1")}
         <br />
-        Board
+        {t("eventTabs.coachBoardLine2")}
       </>
     );
   }
-  return tab.label;
+  if (tab.id === "tournament") return t("eventTabs.tournament");
+  if (tab.id === "predictions") return t("eventTabs.predictions");
+  if (tab.id === "coach-board") return t("eventTabs.coachBoard");
+  return t("eventTabs.community");
 }
 
 const CURRENT_KNOCKOUT_STAGES = [
@@ -62,12 +70,12 @@ const CURRENT_KNOCKOUT_STAGES = [
   "Final"
 ] as const;
 
-const TOURNAMENT_PHASE_TABS = [
-  { id: "group-stage", label: "Group stage" },
-  { id: "knockout", label: "Knockout" }
+const TOURNAMENT_PHASE_TAB_IDS = [
+  { id: "group-stage" as const },
+  { id: "knockout" as const }
 ] as const;
 
-type TournamentPhaseId = (typeof TOURNAMENT_PHASE_TABS)[number]["id"];
+type TournamentPhaseId = (typeof TOURNAMENT_PHASE_TAB_IDS)[number]["id"];
 
 type CurrentWorldCup = {
   title: string;
@@ -119,6 +127,7 @@ export function CurrentEventTabs({
 }: {
   currentWorldCup: CurrentWorldCup | null;
 }) {
+  const { t } = useTranslation();
   const groups = currentWorldCup?.groups ?? [];
   const [activeTab, setActiveTab] = useState<CurrentEventTabId>("predictions");
   const [activeTournamentPhase, setActiveTournamentPhase] = useState<TournamentPhaseId>("group-stage");
@@ -176,7 +185,7 @@ export function CurrentEventTabs({
       <div className="kickboard-mobile-dock-event">
         <nav
           className="event-tab-bar current-event-section-tabs kickboard-tab-bar"
-          aria-label="Current event sections"
+          aria-label={t("eventTabs.sectionAria")}
         >
           {CURRENT_EVENT_DOCK_TABS.map((tab) => (
             <button
@@ -185,7 +194,7 @@ export function CurrentEventTabs({
               type="button"
               onClick={() => selectTab(tab.id)}
             >
-              {dockTabLabel(tab, mobileDock)}
+              {dockTabLabel(tab, mobileDock, t)}
             </button>
           ))}
         </nav>
@@ -206,7 +215,10 @@ export function CurrentEventTabs({
               <FeedTabBar
                 ariaLabel="Tournament stage"
                 className="tournament-phase-tabs kickboard-tab-bar"
-                tabs={TOURNAMENT_PHASE_TABS.map((tab) => ({ id: tab.id, label: tab.label }))}
+                tabs={TOURNAMENT_PHASE_TAB_IDS.map((tab) => ({
+                  id: tab.id,
+                  label: tab.id === "group-stage" ? t("eventTabs.groupStage") : t("eventTabs.knockout")
+                }))}
                 value={activeTournamentPhase}
                 onChange={(id) => setActiveTournamentPhase(id as TournamentPhaseId)}
               />

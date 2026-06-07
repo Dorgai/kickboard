@@ -6,6 +6,18 @@ import { huMessages } from "@/lib/i18n/messages/hu";
 
 export type { Messages };
 
+type DotNestedKeys<T> = T extends string
+  ? never
+  : {
+      [K in keyof T & string]: T[K] extends string
+        ? K
+        : T[K] extends Record<string, unknown>
+          ? `${K}.${DotNestedKeys<T[K]>}`
+          : never;
+    }[keyof T & string];
+
+export type MessageKey = DotNestedKeys<Messages>;
+
 const CATALOG: Record<AppLocale, Messages> = {
   en: enMessages,
   de: deMessages,
@@ -16,16 +28,6 @@ const CATALOG: Record<AppLocale, Messages> = {
 export function getMessages(locale: AppLocale): Messages {
   return CATALOG[locale] ?? enMessages;
 }
-
-export type MessageKey =
-  | `common.${keyof Messages["common"]}`
-  | `nav.${keyof Messages["nav"]}`
-  | `auth.${keyof Messages["auth"]}`
-  | `helpMenu.${keyof Messages["helpMenu"]}`
-  | `theme.${keyof Messages["theme"]}`
-  | `predictions.${keyof Messages["predictions"]}`
-  | `welcome.${Exclude<keyof Messages["welcome"], "highlights">}`
-  | `welcome.highlights.${keyof Messages["welcome"]["highlights"]}`;
 
 function resolvePath(messages: Messages, key: string): string | undefined {
   const parts = key.split(".");

@@ -13,9 +13,15 @@ import { readLocaleCookie, writeLocaleCookie } from "@/lib/i18n/cookie";
 import { translate, type MessageKey } from "@/lib/i18n/messages";
 import { APP_LOCALES, DEFAULT_LOCALE, normalizeAppLocale, type AppLocale } from "@/lib/i18n/locales";
 
+type SetLocaleOptions = {
+  persist?: boolean;
+  /** Full page reload so server-rendered and client-only copy pick up the new locale. */
+  reload?: boolean;
+};
+
 type LocaleContextValue = {
   locale: AppLocale;
-  setLocale: (locale: AppLocale, options?: { persist?: boolean }) => Promise<void>;
+  setLocale: (locale: AppLocale, options?: SetLocaleOptions) => Promise<void>;
   t: (key: MessageKey, vars?: Record<string, string | number>) => string;
 };
 
@@ -82,26 +88,32 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   }, [locale, ready]);
 
   const setLocale = useCallback(
-    async (next: AppLocale, options?: { persist?: boolean }) => {
+    async (next: AppLocale, options?: SetLocaleOptions) => {
       const normalized = normalizeAppLocale(next);
-      setLocaleState(normalized);
       writeLocaleCookie(normalized);
 
       const shouldPersist = options?.persist ?? Boolean(session?.user?.id);
-      if (!shouldPersist) return;
-
-      try {
-        const response = await fetch("/api/user/locale", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ locale: normalized })
-        });
-        if (response.ok) {
-          await update({ locale: normalized });
+      if (shouldPersist) {
+        try {
+          const response = await fetch("/api/user/locale", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ locale: normalized })
+          });
+          if (response.ok) {
+            await update({ locale: normalized });
+          }
+        } catch {
+          /* cookie still updated */
         }
-      } catch {
-        /* cookie still updated */
       }
+
+      if (options?.reload && typeof window !== "undefined") {
+        window.location.reload();
+        return;
+      }
+
+      setLocaleState(normalized);
     },
     [session?.user?.id, update]
   );
