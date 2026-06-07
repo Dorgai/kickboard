@@ -191,16 +191,35 @@ button:disabled {
   letter-spacing: 0.04em;
 }
 
-.brand-mark {
+.brand-logo {
   align-items: center;
-  background: var(--color-brand);
-  border-radius: 12px;
-  color: white;
-  display: grid;
-  font-size: 12px;
+  display: inline-flex;
+  gap: 10px;
+}
+
+.brand-mark {
+  display: block;
+  flex-shrink: 0;
   height: 40px;
-  place-items: center;
   width: 40px;
+}
+
+.brand-wordmark {
+  letter-spacing: 0.04em;
+}
+
+.brand-live {
+  align-items: center;
+  background: #ff4757;
+  border-radius: 9999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  padding: 4px 7px;
+  translate: 0 -1px;
 }
 
 .tournament-switcher,
@@ -10656,6 +10675,12 @@ h3 {
   text-align: left;
 }
 
+.welcome-dialog-mark {
+  height: 56px;
+  margin-bottom: 4px;
+  width: 56px;
+}
+
 .welcome-dialog-eyebrow {
   background: linear-gradient(90deg, var(--color-brand), color-mix(in srgb, #f59e0b 70%, var(--color-brand)));
   background-clip: text;
@@ -12882,6 +12907,11 @@ code {
   padding: 12px 40px 12px 14px;
   pointer-events: auto;
   position: relative;
+}
+
+.pwa-install-hint-mark {
+  height: 44px;
+  width: 44px;
 }
 
 .pwa-install-hint-title {

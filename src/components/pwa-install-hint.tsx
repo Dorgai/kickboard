@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandMark } from "@/components/brand-logo";
 import { Share, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { isIosSafari, isStandaloneDisplayMode } from "@/lib/pwa/standalone";
@@ -40,7 +41,8 @@ export function PwaInstallHint() {
   return (
     <aside className="pwa-install-hint" aria-label="Install MyPicks">
       <div className="pwa-install-hint-inner">
-        <p className="pwa-install-hint-title">Add MyPicks to your home screen</p>
+        <BrandMark className="pwa-install-hint-mark" size={44} />
+        <p className="pwa-install-hint-title">Add MyPicks Live to your home screen</p>
         {ios ? (
           <p className="pwa-install-hint-copy">
             Tap <Share aria-hidden size={14} className="pwa-install-hint-icon" /> Share, then{" "}

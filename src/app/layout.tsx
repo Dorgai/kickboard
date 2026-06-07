@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   description: BRAND.tagline,
   applicationName: BRAND.name,
   metadataBase: new URL(BRAND.url),
+  icons: {
+    icon: [
+      { url: BRAND.markPath, type: "image/svg+xml" },
+      { url: "/icon", sizes: "512x512", type: "image/png" }
+    ],
+    apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }]
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
