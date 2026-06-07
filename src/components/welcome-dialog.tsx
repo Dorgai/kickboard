@@ -1,6 +1,5 @@
 "use client";
 
-import { BrandMark } from "@/components/brand-logo";
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { useTranslation } from "@/components/locale-provider";
 import { useEffect, useId, useRef, useState } from "react";
@@ -88,7 +87,6 @@ export function WelcomeDialog() {
       <div className="welcome-dialog-panel kickboard-hero-backdrop kickboard-hero-backdrop--nico-accent">
         <div className="welcome-dialog-shell">
           <header className="welcome-dialog-header">
-            <BrandMark className="welcome-dialog-mark" size={56} />
             <p className="welcome-dialog-eyebrow">{t("welcome.eyebrow")}</p>
             <h2 id={titleId}>{t("welcome.title")}</h2>
             <p className="welcome-dialog-lead">{t("welcome.lead")}</p>

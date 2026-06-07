@@ -12,7 +12,6 @@ import {
   type TournamentSummary
 } from "@/components/tournament-summary-dialog";
 import { useTranslation } from "@/components/locale-provider";
-import { BrandLogo } from "@/components/brand-logo";
 import { BRAND } from "@/lib/brand";
 import { navigation } from "@/lib/kickboard-data";
 import {
@@ -83,7 +82,10 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
           scroll={false}
           onClick={handleKickboardHomeNav}
         >
-          <BrandLogo />
+          <span className="brand-mark" aria-hidden="true">
+            {BRAND.shortMark}
+          </span>
+          <span>{BRAND.wordmark}</span>
         </Link>
 
         <TournamentSummaryDialog

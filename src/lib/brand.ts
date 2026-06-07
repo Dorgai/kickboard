@@ -1,11 +1,9 @@
 /** Public product branding — https://mypicks.live */
 export const BRAND = {
   name: "MyPicks",
-  liveLabel: "LIVE",
   url: "https://mypicks.live",
   wordmark: "MYPICKS",
   shortMark: "MP",
-  markPath: "/brand/mypicks-mark.svg",
   tagline: "World Cup predictions, Coach Board squads, and fan community on MyPicks.",
   pageTitle: "MyPicks | World Cup fan and analytics platform",
   helpAi: "MyPicks AI",
