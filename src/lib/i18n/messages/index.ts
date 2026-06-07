@@ -2,13 +2,15 @@ import type { AppLocale } from "@/lib/i18n/locales";
 import { deMessages } from "@/lib/i18n/messages/de";
 import { enMessages, type Messages } from "@/lib/i18n/messages/en";
 import { frMessages } from "@/lib/i18n/messages/fr";
+import { huMessages } from "@/lib/i18n/messages/hu";
 
 export type { Messages };
 
 const CATALOG: Record<AppLocale, Messages> = {
   en: enMessages,
   de: deMessages,
-  fr: frMessages
+  fr: frMessages,
+  hu: huMessages
 };
 
 export function getMessages(locale: AppLocale): Messages {
