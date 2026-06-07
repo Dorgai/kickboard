@@ -3379,6 +3379,16 @@ h3 {
   resize: vertical;
 }
 
+.registration-invite-copy-notice {
+  background: color-mix(in srgb, var(--color-accent, #1a7f4b) 12%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, var(--color-accent, #1a7f4b) 28%, transparent);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  line-height: 1.45;
+  margin-top: 10px;
+  padding: 10px 12px;
+}
+
 .registration-invite-latest {
   background: var(--color-bg);
   border-radius: 8px;

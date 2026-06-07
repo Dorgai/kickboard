@@ -18,6 +18,12 @@ function normalizeInviteEmail(value: string) {
   return value.trim().toLowerCase();
 }
 
+const INVITE_LINK_COPIED_NOTICE =
+  "Invitation link copied to your clipboard. Send it to your friend by email, WhatsApp, text message, or any other channel you use.";
+
+const INVITE_LINK_COPY_FAILED =
+  "Could not copy automatically — select the link below, copy it, then send it by email, WhatsApp, text, or another app.";
+
 export function RegistrationInvitationsPanel() {
   const { data: session } = useSession();
   const signedInEmail = session?.user?.email?.trim().toLowerCase() ?? null;
@@ -86,11 +92,16 @@ export function RegistrationInvitationsPanel() {
         emailDelivery?: { sent: boolean; reason?: string; detail?: string };
       };
       if (!response.ok) throw new Error(payload.error ?? "Unable to create invitation.");
-      setNotice(payload.message ?? "Invitation created.");
       if (payload.emailDelivery?.reason === "send_failed" && payload.emailDelivery.detail) {
         setError(payload.emailDelivery.detail);
       }
-      setLastInviteUrl(payload.invitation?.inviteUrl ?? null);
+      const inviteUrl = payload.invitation?.inviteUrl ?? null;
+      setLastInviteUrl(inviteUrl);
+      if (inviteUrl && !payload.emailDelivery?.sent) {
+        await copyLink(inviteUrl);
+      } else {
+        setNotice(payload.message ?? "Invitation created.");
+      }
       setInviteeEmail("");
       setPersonalMessage("");
       await refresh();
@@ -118,11 +129,13 @@ export function RegistrationInvitationsPanel() {
   }
 
   async function copyLink(url: string) {
+    setError(null);
     try {
       await navigator.clipboard.writeText(url);
-      setNotice("Invite link copied.");
+      setNotice(INVITE_LINK_COPIED_NOTICE);
     } catch {
-      setError("Could not copy link — select and copy manually.");
+      setNotice(null);
+      setError(INVITE_LINK_COPY_FAILED);
     }
   }
 
@@ -251,7 +264,11 @@ export function RegistrationInvitationsPanel() {
         <p className="inline-status">No invitations yet.</p>
       ) : null}
 
-      {notice ? <p className="inline-status community-notice">{notice}</p> : null}
+      {notice ? (
+        <p className="inline-status community-notice registration-invite-copy-notice" role="status">
+          {notice}
+        </p>
+      ) : null}
       {error ? <p className="inline-status">{error}</p> : null}
     </section>
   );
