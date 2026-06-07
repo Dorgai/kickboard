@@ -1,0 +1,6467 @@
+{
+  "generatedAt": "2026-06-07T18:32:13.824Z",
+  "source": "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads",
+  "teamCount": 48,
+  "teams": [
+    {
+      "teamName": "Czech Republic",
+      "players": [
+        {
+          "name": "Matěj Kovář",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "David Zima",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Tomáš Holeš",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Robin Hranáč",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Vladimír Coufal",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Štěpán Chaloupek",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Ladislav Krejčí",
+          "role": "2DF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Vladimír Darida",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Adam Hložek",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Patrik Schick",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Jan Kuchta",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Lukáš Červ",
+          "role": "3MF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Mojmír Chytil",
+          "role": "4FW",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "David Jurásek",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Pavel Šulc",
+          "role": "4FW",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Jindřich Staněk",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Lukáš Provod",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Michal Sadílek",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Tomáš Chorý",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Jaroslav Zelený",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "David Douděra",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Tomáš Souček",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Lukáš Horníček",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Alexandr Sojka",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Hugo Sochůrek",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Denis Višinský",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Mexico",
+      "players": [
+        {
+          "name": "Raúl Rangel",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Jorge Sánchez",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "César Montes",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Edson Álvarez",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Johan Vásquez",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Érik Lira",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Luis Romo",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Álvaro Fidalgo",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Raúl Jiménez",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Alexis Vega",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Santiago Giménez",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Carlos Acevedo",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Guillermo Ochoa",
+          "role": "1GK",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Armando González",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Israel Reyes",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Julián Quiñones",
+          "role": "4FW",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Orbelín Pineda",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Obed Vargas",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Gilberto Mora",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Mateo Chávez",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "César Huerta",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Guillermo Martínez",
+          "role": "4FW",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Jesús Gallardo",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Luis Chávez",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Roberto Alvarado",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Brian Gutiérrez",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "South Africa",
+      "players": [
+        {
+          "name": "Ronwen Williams",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Thabang Matuludi",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Khulumani Ndamane",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Teboho Mokoena",
+          "role": "3MF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Thalente Mbatha",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Aubrey Modiba",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Oswin Appollis",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Tshepang Moremi",
+          "role": "4FW",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Lyle Foster",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Relebohile Mofokeng",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Themba Zwane",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Thapelo Maseko",
+          "role": "4FW",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Sphephelo Sithole",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Mbekezeli Mbokazi",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Iqraam Rayners",
+          "role": "4FW",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Sipho Chaine",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Evidence Makgopa",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Samukele Kabini",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Nkosinathi Sibisi",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Khuliso Mudau",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Ime Okon",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Ricardo Goss",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Jayden Adams",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Olwethu Makhanya",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Kamogelo Sebelebele",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Bradley Cross",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "South Korea",
+      "players": [
+        {
+          "name": "Kim Seung-gyu",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Lee Han-beom",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Lee Gi-hyuk",
+          "role": "3MF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Kim Min-jae",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Kim Tae-hyeon",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Hwang In-beom",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Son Heung-min",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Paik Seung-ho",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Cho Gue-sung",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Lee Jae-sung",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Hwang Hee-chan",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Song Bum-keun",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Lee Tae-seok",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Cho Wi-je",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Kim Moon-hwan",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Park Jin-seob",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Bae Jun-ho",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Oh Hyeon-gyu",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Lee Kang-in",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Yang Hyun-jun",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Jo Hyeon-woo",
+          "role": "1GK",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Seol Young-woo",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Jens Castrop",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Kim Jin-gyu",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Eom Ji-sung",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Lee Dong-gyeong",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Bosnia and Herzegovina",
+      "players": [
+        {
+          "name": "Nikola Vasilj",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Nihad Mujakić",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Dennis Hadžikadunić",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Tarik Muharemović",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Sead Kolašinac",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Benjamin Tahirović",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Amar Dedić",
+          "role": "2DF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Armin Gigović",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Samed Baždar",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Ermedin Demirović",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Edin Džeko",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Mladen Jurkas",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Ivan Bašić",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Ivan Šunjić",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Amar Memić",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Amir Hadžiahmetović",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Dženis Burnić",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Nikola Katić",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Kerim Alajbegović",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Esmir Bajraktarević",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Stjepan Radeljić",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Martin Zlomislić",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Haris Tabaković",
+          "role": "4FW",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Nidal Čelik",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Jovo Lukić",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Ermin Mahmić",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Canada",
+      "players": [
+        {
+          "name": "Dayne St. Clair",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Alistair Johnston",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Alfie Jones",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Luc de Fougerolles",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Joel Waterman",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Mathieu Choinière",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Stephen Eustáquio",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Ismaël Koné",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Cyle Larin",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Jonathan David",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Liam Millar",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Tani Oluwaseyi",
+          "role": "4FW",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Derek Cornelius",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Jacob Shaffelburg",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Moïse Bombito",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Maxime Crépeau",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Tajon Buchanan",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Owen Goodman",
+          "role": "1GK",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Alphonso Davies",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Ali Ahmed",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Jonathan Osorio",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Richie Laryea",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Niko Sigur",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Promise David",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Nathan Saliba",
+          "role": "3MF",
+          "jerseyNumber": 25
+        }
+      ]
+    },
+    {
+      "teamName": "Qatar",
+      "players": [
+        {
+          "name": "Mahmud Abunada",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Pedro Miguel",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Lucas Mendes",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Issa Laye",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Jassem Gaber",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Abdulaziz Hatem",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Ahmed Alaaeldin",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Edmilson Junior",
+          "role": "4FW",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Mohammed Muntari",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Hassan Al-Haydos",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Akram Afif",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Karim Boudiaf",
+          "role": "3MF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Ayoub Al-Oui",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Homam Ahmed",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Yusuf Abdurisag",
+          "role": "4FW",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Boualem Khoukhi",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Ahmed Al-Ganehi",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Sultan Al-Brake",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Almoez Ali",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Ahmed Fathy",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Salah Zakaria",
+          "role": "1GK",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Meshaal Barsham",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Assim Madibo",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Tahsin Jamshid",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Al-Hashmi Al-Hussain",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Mohamed Manai",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Switzerland",
+      "players": [
+        {
+          "name": "Gregor Kobel",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Miro Muheim",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Silvan Widmer",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Nico Elvedi",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Manuel Akanji",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Denis Zakaria",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Breel Embolo",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Remo Freuler",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Johan Manzambi",
+          "role": "3MF",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Granit Xhaka",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Dan Ndoye",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Yvon Mvogo",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Ricardo Rodriguez",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Ardon Jashari",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Djibril Sow",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Christian Fassnacht",
+          "role": "4FW",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Rubén Vargas",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Eray Cömert",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Noah Okafor",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Michel Aebischer",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Marvin Keller",
+          "role": "1GK",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Fabian Rieder",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Zeki Amdouni",
+          "role": "4FW",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Aurèle Amenda",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Luca Jaquez",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Cedric Itten",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Brazil",
+      "players": [
+        {
+          "name": "Alisson",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Éderson Silva",
+          "role": "3MF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Gabriel Magalhães",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Marquinhos",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Casemiro",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Alex Sandro",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Vinícius Júnior",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Bruno Guimarães",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Matheus Cunha",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Neymar",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Raphinha",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Weverton",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Danilo Luiz",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Bremer",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Léo Pereira",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Douglas Santos",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Fabinho",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Danilo Santos",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Endrick",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Lucas Paquetá",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Luiz Henrique",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Gabriel Martinelli",
+          "role": "4FW",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Ederson Moraes",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Roger Ibañez",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Igor Thiago",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Rayan",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Haiti",
+      "players": [
+        {
+          "name": "Johny Placide",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Carlens Arcus",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Keeto Thermoncy",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Ricardo Adé",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Hannes Delcroix",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Carl Sainté",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Derrick Etienne Jr.",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Martin Expérience",
+          "role": "2DF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Duckens Nazon",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Jean-Ricner Bellegarde",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Louicius Deedson",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Alexandre Pierre",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Duke Lacroix",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Leverton Pierre",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Ruben Providence",
+          "role": "4FW",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Lenny Joseph",
+          "role": "4FW",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Danley Jean Jacques",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Wilson Isidor",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Yassin Fortuné",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Frantzdy Pierrot",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Josué Casimir",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Jean-Kévin Duverne",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Josué Duverger",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Wilguens Paugain",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Dominique Simon",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Woodensky Pierre",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Morocco",
+      "players": [
+        {
+          "name": "Yassine Bounou",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Achraf Hakimi",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Noussair Mazraoui",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Sofyan Amrabat",
+          "role": "3MF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Nayef Aguerd",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Ayyoub Bouaddi",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Chemsdine Talbi",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Azzedine Ounahi",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Soufiane Rahimi",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Brahim Díaz",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Ismael Saibari",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Munir Mohamedi",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Zakaria El Ouahdi",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Issa Diop",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Samir El Mourabet",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Gessime Yassine",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Abde Ezzalzouli",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Chadi Riad",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Youssef Belammari",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Ayoub El Kaabi",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Ayoube Amaimouni",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Ahmed Reda Tagnaouti",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Bilal El Khannouss",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Neil El Aynaoui",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Redouane Halhal",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Anass Salah-Eddine",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Scotland",
+      "players": [
+        {
+          "name": "Angus Gunn",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Aaron Hickey",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Andy Robertson",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Scott McTominay",
+          "role": "3MF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Grant Hanley",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Kieran Tierney",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "John McGinn",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Tyler Fletcher",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Lyndon Dykes",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Ché Adams",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Ryan Christie",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Liam Kelly",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Jack Hendry",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Ross Stewart",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "John Souttar",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Dominic Hyam",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Ben Gannon-Doak",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "George Hirst",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Lewis Ferguson",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Lawrence Shankland",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Craig Gordon",
+          "role": "1GK",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Nathan Patterson",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Kenny McLean",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Anthony Ralston",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Findlay Curtis",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Scott McKenna",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Australia",
+      "players": [
+        {
+          "name": "Mathew Ryan",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Miloš Degenek",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Alessandro Circati",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Jacob Italiano",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Jordan Bos",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Jason Geria",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Mathew Leckie",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Connor Metcalfe",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Mohamed Touré",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Ajdin Hrustic",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Awer Mabil",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Paul Izzo",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Aiden O'Neill",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Cammy Devlin",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Kai Trewin",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Aziz Behich",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Nestory Irankunda",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Patrick Beach",
+          "role": "1GK",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Harry Souttar",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Cristian Volpato",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Cameron Burgess",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Jackson Irvine",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Nishan Velupillay",
+          "role": "4FW",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Paul Okon-Engstler",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Lucas Herrington",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Tete Yengi",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Paraguay",
+      "players": [
+        {
+          "name": "Gatito Fernández",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Gustavo Velázquez",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Omar Alderete",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Juan José Cáceres",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Fabián Balbuena",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Júnior Alonso",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Ramón Sosa",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Diego Gómez",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Antonio Sanabria",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Miguel Almirón",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Maurício",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Orlando Gill",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "José Canale",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Andrés Cubas",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Gustavo Gómez",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Damián Bobadilla",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Kaku",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Álex Arce",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Julio Enciso",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Braian Ojeda",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Gabriel Ávalos",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Gastón Olveira",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Matías Galarza",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Gustavo Caballero",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Isidro Pitta",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Alexandro Maidana",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Turkey",
+      "players": [
+        {
+          "name": "Mert Günok",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Zeki Çelik",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Merih Demiral",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Çağlar Söyüncü",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Salih Özcan",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Orkun Kökçü",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Kerem Aktürkoğlu",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Arda Güler",
+          "role": "4FW",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Deniz Gül",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Hakan Çalhanoğlu",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Kenan Yıldız",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Altay Bayındır",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Eren Elmalı",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Abdülkerim Bardakcı",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Ozan Kabak",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "İsmail Yüksek",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "İrfan Can Kahveci",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Mert Müldür",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Yunus Akgün",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Ferdi Kadıoğlu",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Barış Alper Yılmaz",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Kaan Ayhan",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Uğurcan Çakır",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Oğuz Aydın",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Samet Akaydin",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Can Uzun",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "United States",
+      "players": [
+        {
+          "name": "Matt Turner",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Sergiño Dest",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Chris Richards",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Tyler Adams",
+          "role": "3MF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Antonee Robinson",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Auston Trusty",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Giovanni Reyna",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Weston McKennie",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Ricardo Pepi",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Christian Pulisic",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Brenden Aaronson",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Miles Robinson",
+          "role": "2DF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Tim Ream",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Sebastian Berhalter",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Cristian Roldan",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Alex Freeman",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Malik Tillman",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Maximilian Arfsten",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Haji Wright",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Folarin Balogun",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Timothy Weah",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Mark McKenzie",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Joe Scally",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Matt Freese",
+          "role": "1GK",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Chris Brady",
+          "role": "1GK",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Alejandro Zendejas",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Curaçao",
+      "players": [
+        {
+          "name": "Eloy Room",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Shurandy Sambo",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Juriën Gaari",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Roshon van Eijma",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Sherel Floranus",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Godfried Roemeratoe",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Juninho Bacuna",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Livano Comenencia",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Jürgen Locadia",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Leandro Bacuna",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Jeremy Antonisse",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Sontje Hansen",
+          "role": "4FW",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Tyrese Noslin",
+          "role": "4FW",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Kenji Gorré",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Ar'jany Martha",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Jearl Margaritha",
+          "role": "4FW",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Brandley Kuwas",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Armando Obispo",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Gervane Kastaneer",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Joshua Brenet",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Tahith Chong",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Kevin Felida",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Riechedly Bazoer",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Deveron Fonville",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Tyrick Bodak",
+          "role": "1GK",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Trevor Doornbusch",
+          "role": "1GK",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Ecuador",
+      "players": [
+        {
+          "name": "Hernán Galíndez",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Félix Torres",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Piero Hincapié",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Joel Ordóñez",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Jordy Alcívar",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Willian Pacho",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Pervis Estupiñán",
+          "role": "2DF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Anthony Valencia",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "John Yeboah",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Kendry Páez",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Kevin Rodríguez",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Moisés Ramírez",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Enner Valencia",
+          "role": "4FW",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Alan Minda",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Pedro Vite",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Jordy Caicedo",
+          "role": "4FW",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Ángelo Preciado",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Denil Castillo",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Gonzalo Plata",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Nilson Angulo",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Alan Franco",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Gonzalo Valle",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Moisés Caicedo",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Jeremy Arévalo",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Jackson Porozo",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Yaimar Medina",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Germany",
+      "players": [
+        {
+          "name": "Manuel Neuer",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Antonio Rüdiger",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Waldemar Anton",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Jonathan Tah",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Aleksandar Pavlović",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Joshua Kimmich",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Kai Havertz",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Leon Goretzka",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Jamie Leweling",
+          "role": "3MF",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Jamal Musiala",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Nick Woltemade",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Oliver Baumann",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Pascal Groß",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Maximilian Beier",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Nico Schlotterbeck",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Angelo Stiller",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Florian Wirtz",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Nathaniel Brown",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Leroy Sané",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Nadiem Amiri",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Alexander Nübel",
+          "role": "1GK",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "David Raum",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Felix Nmecha",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Malick Thiaw",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Assan Ouédraogo",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Deniz Undav",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Ivory Coast",
+      "players": [
+        {
+          "name": "Yahia Fofana",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Ousmane Diomande",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Ghislain Konan",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Jean Michaël Seri",
+          "role": "3MF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Wilfried Singo",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Seko Fofana",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Odilon Kossounou",
+          "role": "2DF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Franck Kessié",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Ange-Yoan Bonny",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Simon Adingra",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Yan Diomande",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Elye Wahi",
+          "role": "4FW",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Christopher Opéri",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Oumar Diakité",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Amad Diallo",
+          "role": "4FW",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Mohamed Koné",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Guéla Doué",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Ibrahim Sangaré",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Nicolas Pépé",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Emmanuel Agbadou",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Evan Ndicka",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Evann Guessand",
+          "role": "4FW",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Alban Lafont",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Bazoumana Touré",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Parfait Guiagon",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Christ Inao Oulaï",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Japan",
+      "players": [
+        {
+          "name": "Zion Suzuki",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Yukinari Sugawara",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Shōgo Taniguchi",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Kō Itakura",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Yūto Nagatomo",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Wataru Endo",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Ao Tanaka",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Takefusa Kubo",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Keisuke Gotō",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Ritsu Dōan",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Daizen Maeda",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Keisuke Ōsako",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Keito Nakamura",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Junya Itō",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Daichi Kamada",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Tsuyoshi Watanabe",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Yuito Suzuki",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Ayase Ueda",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Kōki Ogawa",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Ayumu Seko",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Hiroki Itō",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Takehiro Tomiyasu",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Tomoki Hayakawa",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Kaishū Sano",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Junnosuke Suzuki",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Kento Shiogai",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Netherlands",
+      "players": [
+        {
+          "name": "Bart Verbruggen",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Jurriën Timber",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Marten de Roon",
+          "role": "3MF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Virgil van Dijk",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Nathan Aké",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Jan Paul van Hecke",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Justin Kluivert",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Ryan Gravenberch",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Wout Weghorst",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Memphis Depay",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Cody Gakpo",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Mats Wieffer",
+          "role": "2DF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Robin Roefs",
+          "role": "1GK",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Tijjani Reijnders",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Micky van de Ven",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Guus Til",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Noa Lang",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Donyell Malen",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Brian Brobbey",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Teun Koopmeiners",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Frenkie de Jong",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Denzel Dumfries",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Mark Flekken",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Crysencio Summerville",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Jorrel Hato",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Quinten Timber",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Sweden",
+      "players": [
+        {
+          "name": "Jacob Widell Zetterström",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Gustaf Lagerbielke",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Victor Lindelöf",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Isak Hien",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Gabriel Gudmundsson",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Herman Johansson",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Lucas Bergvall",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Daniel Svensson",
+          "role": "2DF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Alexander Isak",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Benjamin Nygren",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Anthony Elanga",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Viktor Johansson",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Ken Sema",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Hjalmar Ekdal",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Carl Starfelt",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Jesper Karlström",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Viktor Gyökeres",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Yasin Ayari",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Mattias Svanberg",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Eric Smith",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Alexander Bernhardsson",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Besfort Zeneli",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Kristoffer Nordfeldt",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Elliot Stroud",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Gustaf Nilsson",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Taha Ali",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Tunisia",
+      "players": [
+        {
+          "name": "Mouhib Chamakh",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Ali Abdi",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Montassar Talbi",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Omar Rekik",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Adem Arous",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Dylan Bronn",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Elias Achouri",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Elias Saad",
+          "role": "4FW",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Hazem Mastouri",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Hannibal Mejbri",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Ismaël Gharbi",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Mortadha Ben Ouanes",
+          "role": "2DF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Rani Khedira",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Khalil Ayari",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Hadj Mahmoud",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Aymen Dahmen",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Ellyes Skhiri",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Rayan Elloumi",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Firas Chaouat",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Yan Valery",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Mohamed Amine Ben Hamida",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Sabri Ben Hessen",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Moutaz Neffati",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Raed Chikhaoui",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Anis Ben Slimane",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Sebastian Tounekti",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Belgium",
+      "players": [
+        {
+          "name": "Thibaut Courtois",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Zeno Debast",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Arthur Theate",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Brandon Mechele",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Maxim De Cuyper",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Axel Witsel",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Kevin De Bruyne",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Youri Tielemans",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Romelu Lukaku",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Leandro Trossard",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Jérémy Doku",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Senne Lammens",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Mike Penders",
+          "role": "1GK",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Dodi Lukébakio",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Thomas Meunier",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Koni De Winter",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Charles De Ketelaere",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Joaquin Seys",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Diego Moreira",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Hans Vanaken",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Timothy Castagne",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Alexis Saelemaekers",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Nicolas Raskin",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Amadou Onana",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Nathan Ngoy",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Matias Fernandez-Pardo",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Egypt",
+      "players": [
+        {
+          "name": "Mohamed El Shenawy",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Yasser Ibrahim",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Mohamed Hany",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Hossam Abdelmaguid",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Ramy Rabia",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Mohamed Abdelmonem",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Trézéguet",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Emam Ashour",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Hamza Abdelkarim",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Mohamed Salah",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Mostafa Ziko",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Haissem Hassan",
+          "role": "4FW",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Ahmed Fatouh",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Hamdy Fathy",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Karim Hafez",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "El Mahdy Soliman",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Mohanad Lasheen",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Nabil Emad",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Marwan Attia",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Ibrahim Adel",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Mahmoud Saber",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Omar Marmoush",
+          "role": "4FW",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Mostafa Shobeir",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Tarek Alaa",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Zizo",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Mohamed Alaa",
+          "role": "1GK",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Iran",
+      "players": [
+        {
+          "name": "Alireza Beiranvand",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Saleh Hardani",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Ehsan Hajsafi",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Shojae Khalilzadeh",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Milad Mohammadi",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Saeid Ezatolahi",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Alireza Jahanbakhsh",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Mohammad Mohebi",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Mehdi Taremi",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Mehdi Ghayedi",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Ali Alipour",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Payam Niazmand",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Hossein Kanaanizadegan",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Saman Ghoddos",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Rouzbeh Cheshmi",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Mehdi Torabi",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Aria Yousefi",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Amirhossein Hosseinzadeh",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Ali Nemati",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Shahriyar Moghanlou",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Mohammad Ghorbani",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Hossein Hosseini",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Ramin Rezaeian",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Dennis Eckert",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Danial Eiri",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Amirmohammad Razzaghinia",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "New Zealand",
+      "players": [
+        {
+          "name": "Max Crocombe",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Tim Payne",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Francis de Vries",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Tyler Bindon",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Michael Boxall",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Joe Bell",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Matthew Garbett",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Marko Stamenić",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Chris Wood",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Sarpreet Singh",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Elijah Just",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Alex Paulsen",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Liberato Cacace",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Alex Rufer",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Nando Pijnaker",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Finn Surman",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Kosta Barbarouses",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Ben Waine",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Ben Old",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Callum McCowatt",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Jesse Randall",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Michael Woud",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Ryan Thomas",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Callan Elliot",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Lachlan Bayliss",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Tommy Smith",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Cape Verde",
+      "players": [
+        {
+          "name": "Vozinha",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Stopira",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Diney",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Roberto Lopes",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Logan Costa",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Kevin Pina",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Jovane Cabral",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "João Paulo",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Gilson Benchimol",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Jamiro Monteiro",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Garry Rodrigues",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Márcio Rosa",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Sidny Lopes Cabral",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Deroy Duarte",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Laros Duarte",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Yannick Semedo",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Willy Semedo",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Telmo Arcanjo",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Dailon Livramento",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Ryan Mendes",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Nuno da Costa",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Steven Moreira",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "CJ dos Santos",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Wagner Pina",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Kelvin Pires",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Hélio Varela",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Saudi Arabia",
+      "players": [
+        {
+          "name": "Nawaf Al-Aqidi",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Ali Majrashi",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Ali Lajami",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Abdulelah Al-Amri",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Hassan Al-Tambakti",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Nasser Al-Dawsari",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Musab Al-Juwayr",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Ayman Yahya",
+          "role": "4FW",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Firas Al-Buraikan",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Salem Al-Dawsari",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Saleh Al-Shehri",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Saud Abdulhamid",
+          "role": "2DF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Nawaf Boushal",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Hassan Kadesh",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Abdullah Al-Khaibari",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Ziyad Al-Johani",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Khalid Al-Ghannam",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Alaa Al-Hejji",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Abdullah Al-Hamdan",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Sultan Mandash",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Mohammed Al-Owais",
+          "role": "1GK",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Ahmed Al-Kassar",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Mohamed Kanno",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Moteb Al-Harbi",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Jehad Thakri",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Mohammed Abu Al-Shamat",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Spain",
+      "players": [
+        {
+          "name": "David Raya",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Marc Pubill",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Álex Grimaldo",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Eric García",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Marcos Llorente",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Mikel Merino",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Ferran Torres",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Fabián Ruiz",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Gavi",
+          "role": "3MF",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Dani Olmo",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Yéremy Pino",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Pedro Porro",
+          "role": "2DF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Joan Garcia",
+          "role": "1GK",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Aymeric Laporte",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Álex Baena",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Rodri",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Nico Williams",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Martín Zubimendi",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Lamine Yamal",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Pedri",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Mikel Oyarzabal",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Pau Cubarsí",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Unai Simón",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Marc Cucurella",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Víctor Muñoz",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Borja Iglesias",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Uruguay",
+      "players": [
+        {
+          "name": "Sergio Rochet",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "José Giménez",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Sebastián Cáceres",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Ronald Araújo",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Manuel Ugarte",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Rodrigo Bentancur",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Nicolás de la Cruz",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Federico Valverde",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Darwin Núñez",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Giorgian de Arrascaeta",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Facundo Pellistri",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Santiago Mele",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Guillermo Varela",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Agustín Canobbio",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Emiliano Martínez",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Mathías Olivera",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Matías Viña",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Brian Rodríguez",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Rodrigo Aguirre",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Maximiliano Araújo",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Federico Viñas",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Joaquín Piquerez",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Fernando Muslera",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Santiago Bueno",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Juan Manuel Sanabria",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Rodrigo Zalazar",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "France",
+      "players": [
+        {
+          "name": "Brice Samba",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Malo Gusto",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Lucas Digne",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Dayot Upamecano",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Jules Koundé",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Manu Koné",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Ousmane Dembélé",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Aurélien Tchouaméni",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Marcus Thuram",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Kylian Mbappé",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Michael Olise",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Bradley Barcola",
+          "role": "4FW",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "N'Golo Kanté",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Adrien Rabiot",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Ibrahima Konaté",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Mike Maignan",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "William Saliba",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Warren Zaïre-Emery",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Théo Hernandez",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Désiré Doué",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Lucas Hernandez",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Jean-Philippe Mateta",
+          "role": "4FW",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Robin Risser",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Rayan Cherki",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Maghnes Akliouche",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Maxence Lacroix",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Iraq",
+      "players": [
+        {
+          "name": "Fahad Talib",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Rebin Sulaka",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Hussein Ali",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Zaid Tahseen",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Akam Hashim",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Manaf Younis",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Youssef Amyn",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Ibrahim Bayesh",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Ali Al-Hamadi",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Mohanad Ali",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Ahmed Qasem",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Jalal Hassan",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Ali Yousif",
+          "role": "4FW",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Zidane Iqbal",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Ahmed Maknzi",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Amir Al-Ammari",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Ali Jasim",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Aymen Hussein",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Kevin Yakob",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Aimar Sher",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Marko Farji",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Ahmed Basil",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Merchas Doski",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Zaid Ismail",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Mustafa Saadoon",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Frans Putros",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Norway",
+      "players": [
+        {
+          "name": "Ørjan Nyland",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Morten Thorsby",
+          "role": "3MF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Kristoffer Ajer",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Leo Østigård",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "David Møller Wolfe",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Patrick Berg",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Alexander Sørloth",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Sander Berge",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Erling Haaland",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Martin Ødegaard",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Jørgen Strand Larsen",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Sander Tangvik",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Egil Selvik",
+          "role": "1GK",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Fredrik Aursnes",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Fredrik André Bjørkan",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Marcus Holmgren Pedersen",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Torbjørn Heggem",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Kristian Thorstvedt",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Thelo Aasgaard",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Antonio Nusa",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Andreas Schjelderup",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Oscar Bobb",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Jens Petter Hauge",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Sondre Langås",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Henrik Falchener",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Julian Ryerson",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Senegal",
+      "players": [
+        {
+          "name": "Yehvann Diouf",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Mamadou Sarr",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Kalidou Koulibaly",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Abdoulaye Seck",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Idrissa Gueye",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Pathé Ciss",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Assane Diao",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Lamine Camara",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Bamba Dieng",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Sadio Mané",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Nicolas Jackson",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Cherif Ndiaye",
+          "role": "4FW",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Iliman Ndiaye",
+          "role": "4FW",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Ismail Jakobs",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Krépin Diatta",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Édouard Mendy",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Pape Matar Sarr",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Ismaïla Sarr",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Moussa Niakhaté",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Ibrahim Mbaye",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Habib Diarra",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Bara Sapoko Ndiaye",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Mory Diaw",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Antoine Mendy",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "El Hadji Malick Diouf",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Pape Gueye",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Algeria",
+      "players": [
+        {
+          "name": "Melvin Mastil",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Aïssa Mandi",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Achref Abada",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Mohamed Amine Tougai",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Zineddine Belaïd",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Ramiz Zerrouki",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Riyad Mahrez",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Houssem Aouar",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Amine Gouiri",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Farès Chaïbi",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Anis Hadj Moussa",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Nadhir Benbouali",
+          "role": "4FW",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Jaouen Hadjam",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Hicham Boudaoui",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Rayan Aït-Nouri",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Oussama Benbot",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Rafik Belghali",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Mohamed Amoura",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Nabil Bentaleb",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Adil Boulbina",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Ramy Bensebaini",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Ibrahim Maza",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Luca Zidane",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Yacine Titraoui",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Farès Ghedjemis",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Samir Chergui",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Argentina",
+      "players": [
+        {
+          "name": "Juan Musso",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Nicolás Tagliafico",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Gonzalo Montiel",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Leandro Paredes",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Lisandro Martínez",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Rodrigo De Paul",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Valentín Barco",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Julián Alvarez",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Lionel Messi",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Giovani Lo Celso",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Gerónimo Rulli",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Cristian Romero",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Exequiel Palacios",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Nicolás González",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Thiago Almada",
+          "role": "4FW",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Giuliano Simeone",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Nico Paz",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Nicolás Otamendi",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Alexis Mac Allister",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "José Manuel López",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Lautaro Martínez",
+          "role": "4FW",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Emiliano Martínez",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Enzo Fernández",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Facundo Medina",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Nahuel Molina",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Austria",
+      "players": [
+        {
+          "name": "Alexander Schlager",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "David Affengruber",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Kevin Danso",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Xaver Schlager",
+          "role": "3MF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Stefan Posch",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Nicolas Seiwald",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Marko Arnautović",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "David Alaba",
+          "role": "2DF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Marcel Sabitzer",
+          "role": "3MF",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Florian Grillitsch",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Michael Gregoritsch",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Florian Wiegele",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Patrick Pentz",
+          "role": "1GK",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Saša Kalajdžić",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Philipp Lienhart",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Phillipp Mwene",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Carney Chukwuemeka",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Romano Schmid",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Konrad Laimer",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Patrick Wimmer",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Alexander Prass",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Marco Friedl",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Paul Wanner",
+          "role": "3MF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Michael Svoboda",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Alessandro Schöpf",
+          "role": "3MF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Jordan",
+      "players": [
+        {
+          "name": "Yazeed Abulaila",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Mohammad Abu Hashish",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Abdallah Nasib",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Husam Abu Dahab",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Yazan Al-Arab",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Amer Jamous",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Mohammad Abu Zrayq",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Noor Al-Rawabdeh",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Ali Olwan",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Musa Al-Taamari",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Odeh Al-Fakhouri",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Nour Bani Attiah",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Mahmoud Al-Mardi",
+          "role": "4FW",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Rajaei Ayed",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Ibrahim Sadeh",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Mo Abualnadi",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Salim Obaid",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Saed Al-Rosan",
+          "role": "2DF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Mohannad Abu Taha",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Nizar Al-Rashdan",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Abdallah Al-Fakhouri",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Ihsan Haddad",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Ali Azaizeh",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Mohammad Al-Dawoud",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Anas Badawi",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Colombia",
+      "players": [
+        {
+          "name": "David Ospina",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Daniel Muñoz",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Jhon Lucumí",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Santiago Arias",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Kevin Castaño",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Richard Ríos",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Luis Díaz",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Jorge Carrascal",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Jhon Córdoba",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "James Rodríguez",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Jhon Arias",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Camilo Vargas",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Yerry Mina",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Gustavo Puerta",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Juan Portilla",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Jefferson Lerma",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Johan Mojica",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Willer Ditta",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Cucho Hernández",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Juan Fernando Quintero",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Jaminton Campaz",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Deiver Machado",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Davinson Sánchez",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Álvaro Montero",
+          "role": "1GK",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Luis Suárez",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Andrés Gómez",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "DR Congo",
+      "players": [
+        {
+          "name": "Lionel Mpasi",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Aaron Wan-Bissaka",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Steve Kapuadi",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Axel Tuanzebe",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Dylan Batubinsika",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Ngal'ayel Mukau",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Nathanaël Mbuku",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Samuel Moutoussamy",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Brian Cipenga",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Théo Bongonda",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Gaël Kakuta",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Joris Kayembe",
+          "role": "2DF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Meschak Elia",
+          "role": "4FW",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Noah Sadiki",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Aaron Tshibola",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Timothy Fayulu",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Cédric Bakambu",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Charles Pickel",
+          "role": "3MF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Fiston Mayele",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Yoane Wissa",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Matthieu Epolo",
+          "role": "1GK",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Chancel Mbemba",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Simon Banza",
+          "role": "4FW",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Gédéon Kalulu",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Edo Kayembe",
+          "role": "3MF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Arthur Masuaku",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Portugal",
+      "players": [
+        {
+          "name": "Diogo Costa",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Nélson Semedo",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Rúben Dias",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Tomás Araújo",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Diogo Dalot",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Matheus Nunes",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Cristiano Ronaldo",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Bruno Fernandes",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Gonçalo Ramos",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Bernardo Silva",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "João Félix",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "José Sá",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Renato Veiga",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Gonçalo Inácio",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "João Neves",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Francisco Trincão",
+          "role": "4FW",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Rafael Leão",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Pedro Neto",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Gonçalo Guedes",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "João Cancelo",
+          "role": "2DF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Rúben Neves",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Rui Silva",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Vitinha",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Samú Costa",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Nuno Mendes",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Francisco Conceição",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Uzbekistan",
+      "players": [
+        {
+          "name": "Utkir Yusupov",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Abdukodir Khusanov",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Khojiakbar Alijonov",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Farrukh Sayfiev",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Rustam Ashurmatov",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Akmal Mozgovoy",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Otabek Shukurov",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Jamshid Iskanderov",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Odiljon Hamrobekov",
+          "role": "3MF",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Jaloliddin Masharipov",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Oston Urunov",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Abduvohid Nematov",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Sherzod Nasrullaev",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Eldor Shomurodov",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Umar Eshmurodov",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Botirali Ergashev",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Dostonbek Khamdamov",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Abdulla Abdullaev",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Azizjon Ganiev",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Azizbek Amonov",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Igor Sergeev",
+          "role": "4FW",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Abbosbek Fayzullaev",
+          "role": "3MF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Sherzod Esanov",
+          "role": "3MF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Bekhruz Karimov",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Avazbek Ulmasaliev",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Jakhongir Urozov",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Croatia",
+      "players": [
+        {
+          "name": "Dominik Livaković",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Josip Stanišić",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Marin Pongračić",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Joško Gvardiol",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Duje Ćaleta-Car",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Josip Šutalo",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Nikola Moro",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Mateo Kovačić",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Andrej Kramarić",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Luka Modrić",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Ante Budimir",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Ivor Pandur",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Nikola Vlašić",
+          "role": "3MF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Ivan Perišić",
+          "role": "4FW",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Mario Pašalić",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Martin Baturina",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Petar Sučić",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Kristijan Jakić",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Toni Fruk",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Igor Matanović",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Luka Sučić",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Luka Vušković",
+          "role": "2DF",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Dominik Kotarski",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Marco Pašalić",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Martin Erlić",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Petar Musa",
+          "role": "4FW",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "England",
+      "players": [
+        {
+          "name": "Jordan Pickford",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Ezri Konsa",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Nico O'Reilly",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Declan Rice",
+          "role": "3MF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "John Stones",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Marc Guéhi",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Bukayo Saka",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Elliot Anderson",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Harry Kane",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Jude Bellingham",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Marcus Rashford",
+          "role": "4FW",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Tino Livramento",
+          "role": "2DF",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Dean Henderson",
+          "role": "1GK",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Jordan Henderson",
+          "role": "3MF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Dan Burn",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Kobbie Mainoo",
+          "role": "3MF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Morgan Rogers",
+          "role": "3MF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Anthony Gordon",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Ollie Watkins",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Noni Madueke",
+          "role": "4FW",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Eberechi Eze",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Ivan Toney",
+          "role": "4FW",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "James Trafford",
+          "role": "1GK",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Reece James",
+          "role": "2DF",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Djed Spence",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Jarell Quansah",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Ghana",
+      "players": [
+        {
+          "name": "Lawrence Ati-Zigi",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "Alidu Seidu",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "Caleb Yirenkyi",
+          "role": "3MF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Jonas Adjetey",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Thomas Partey",
+          "role": "3MF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Abdul Mumin",
+          "role": "2DF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "Abdul Fatawu",
+          "role": "4FW",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Kwasi Sibo",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Jordan Ayew",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Brandon Thomas-Asante",
+          "role": "4FW",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Antoine Semenyo",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "Joseph Anang",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Christopher Bonsu Baah",
+          "role": "4FW",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Gideon Mensah",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Elisha Owusu",
+          "role": "3MF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Benjamin Asare",
+          "role": "1GK",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "Abdul Rahman Baba",
+          "role": "2DF",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Jerome Opoku",
+          "role": "2DF",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Iñaki Williams",
+          "role": "4FW",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Augustine Boakye",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "Kojo Peprah Oppong",
+          "role": "2DF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Kamaldeen Sulemana",
+          "role": "4FW",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Derrick Luckassen",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Ernest Nuamah",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Prince Kwabena Adu",
+          "role": "4FW",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Marvin Senaya",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    },
+    {
+      "teamName": "Panama",
+      "players": [
+        {
+          "name": "Luis Mejía",
+          "role": "1GK",
+          "jerseyNumber": 1
+        },
+        {
+          "name": "César Blackman",
+          "role": "2DF",
+          "jerseyNumber": 2
+        },
+        {
+          "name": "José Córdoba",
+          "role": "2DF",
+          "jerseyNumber": 3
+        },
+        {
+          "name": "Fidel Escobar",
+          "role": "2DF",
+          "jerseyNumber": 4
+        },
+        {
+          "name": "Edgardo Fariña",
+          "role": "2DF",
+          "jerseyNumber": 5
+        },
+        {
+          "name": "Cristian Martínez",
+          "role": "3MF",
+          "jerseyNumber": 6
+        },
+        {
+          "name": "José Luis Rodríguez",
+          "role": "3MF",
+          "jerseyNumber": 7
+        },
+        {
+          "name": "Adalberto Carrasquilla",
+          "role": "3MF",
+          "jerseyNumber": 8
+        },
+        {
+          "name": "Tomás Rodríguez",
+          "role": "4FW",
+          "jerseyNumber": 9
+        },
+        {
+          "name": "Ismael Díaz",
+          "role": "3MF",
+          "jerseyNumber": 10
+        },
+        {
+          "name": "Yoel Bárcenas",
+          "role": "3MF",
+          "jerseyNumber": 11
+        },
+        {
+          "name": "César Samudio",
+          "role": "1GK",
+          "jerseyNumber": 12
+        },
+        {
+          "name": "Jiovany Ramos",
+          "role": "2DF",
+          "jerseyNumber": 13
+        },
+        {
+          "name": "Carlos Harvey",
+          "role": "2DF",
+          "jerseyNumber": 14
+        },
+        {
+          "name": "Eric Davis",
+          "role": "2DF",
+          "jerseyNumber": 15
+        },
+        {
+          "name": "Andrés Andrade",
+          "role": "2DF",
+          "jerseyNumber": 16
+        },
+        {
+          "name": "José Fajardo",
+          "role": "4FW",
+          "jerseyNumber": 17
+        },
+        {
+          "name": "Cecilio Waterman",
+          "role": "4FW",
+          "jerseyNumber": 18
+        },
+        {
+          "name": "Alberto Quintero",
+          "role": "3MF",
+          "jerseyNumber": 19
+        },
+        {
+          "name": "Aníbal Godoy",
+          "role": "3MF",
+          "jerseyNumber": 20
+        },
+        {
+          "name": "César Yanis",
+          "role": "3MF",
+          "jerseyNumber": 21
+        },
+        {
+          "name": "Orlando Mosquera",
+          "role": "1GK",
+          "jerseyNumber": 22
+        },
+        {
+          "name": "Michael Amir Murillo",
+          "role": "2DF",
+          "jerseyNumber": 23
+        },
+        {
+          "name": "Azarias Londoño",
+          "role": "4FW",
+          "jerseyNumber": 24
+        },
+        {
+          "name": "Roderick Miller",
+          "role": "2DF",
+          "jerseyNumber": 25
+        },
+        {
+          "name": "Jorge Gutiérrez",
+          "role": "2DF",
+          "jerseyNumber": 26
+        }
+      ]
+    }
+  ]
+}

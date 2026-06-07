@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * Cross-check official WC 2026 squads against Wikipedia (FIFA-published lists).
- * Run: node scripts/verify-wc26-squads.mjs
+ * Optionally refresh content/wc26-squads.json: node scripts/verify-wc26-squads.mjs --write
  */
+import fs from "node:fs";
 
 const URL = "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads?action=render";
 
@@ -59,6 +60,25 @@ async function main() {
   });
 
   console.log(`Parsed ${squads.size} team squads from Wikipedia FIFA lists.`);
+
+  if (process.argv.includes("--write")) {
+    const teams = [...squads.entries()].map(([teamName, players]) => ({
+      teamName,
+      players: players.map((name, index) => ({
+        name,
+        role: "",
+        jerseyNumber: index + 1
+      }))
+    }));
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      source: URL.replace("?action=render", ""),
+      teamCount: teams.length,
+      teams
+    };
+    fs.writeFileSync("content/wc26-squads.json", `${JSON.stringify(payload, null, 2)}\n`);
+    console.log("Wrote content/wc26-squads.json");
+  }
 
   if (squads.size < 48) {
     console.error(`Expected 48 teams, got ${squads.size}`);

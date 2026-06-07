@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     if (team) {
       const pool = await getTeamSquadPlayerPool(team);
       return NextResponse.json(pool, {
-        headers: { "Cache-Control": "public, max-age=3600" }
+        headers: { "Cache-Control": "public, max-age=1800" }
       });
     }
 
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
         fixtureKey: fixtureKey || null
       });
       return NextResponse.json(pool, {
-        headers: { "Cache-Control": "public, max-age=3600" }
+        headers: { "Cache-Control": "public, max-age=1800" }
       });
     }
 
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(pool, {
-      headers: { "Cache-Control": "public, max-age=3600" }
+      headers: { "Cache-Control": "public, max-age=1800" }
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to load player pool.";

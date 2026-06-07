@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import bundledSquads from "../../../content/wc26-squads.json";
 import type { SquadPlayerRole } from "@/lib/squads/player-roles";
 import type { SquadPoolPlayer } from "@/lib/squads/player-pool";
 import { normalizeTeamName, teamsMatch } from "@/lib/squads/team-names";
@@ -39,6 +40,17 @@ type SquadCache = {
 };
 
 let pageCache: SquadCache | null = null;
+let bundledCache: SquadCache | null = null;
+
+type BundledSquadsFile = {
+  generatedAt: string;
+  source: string;
+  teamCount: number;
+  teams: Array<{
+    teamName: string;
+    players: Array<{ name: string; role: string; jerseyNumber: number | null }>;
+  }>;
+};
 
 function wikiPlayerId(teamName: string, playerName: string) {
   const key = `${normalizeTeamName(teamName)}:${normalizeTeamName(playerName)}`;
@@ -153,16 +165,54 @@ async function fetchWc26SquadsPage() {
   return response.text();
 }
 
+function loadBundledWc26Squads() {
+  if (bundledCache) return bundledCache;
+
+  const file = bundledSquads as BundledSquadsFile;
+  const byWikiName = new Map<string, SquadPoolPlayer[]>();
+  const byNormalized = new Map<string, string>();
+
+  for (const entry of file.teams) {
+    const wikiTeamName = entry.teamName.trim();
+    const displayTeam = feedLabelForWikiTeam(wikiTeamName);
+    const players = entry.players
+      .map((player) => ({
+        playerId: wikiPlayerId(displayTeam, player.name),
+        name: player.name,
+        teamName: displayTeam,
+        role: mapWikiRole(player.role),
+        jerseyNumber: player.jerseyNumber
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+
+    if (players.length < 11) continue;
+    byWikiName.set(wikiTeamName, players);
+    byNormalized.set(normalizeTeamName(wikiTeamName), wikiTeamName);
+    byNormalized.set(normalizeTeamName(displayTeam), wikiTeamName);
+  }
+
+  bundledCache = { loadedAt: Date.now(), byWikiName, byNormalized };
+  return bundledCache;
+}
+
 async function loadAllWc26Squads() {
   const now = Date.now();
   if (pageCache && now - pageCache.loadedAt < CACHE_MS) {
     return pageCache;
   }
 
-  const html = await fetchWc26SquadsPage();
-  const parsed = parseWikipediaWc26SquadsHtml(html);
-  pageCache = { loadedAt: now, ...parsed };
-  return pageCache;
+  try {
+    const html = await fetchWc26SquadsPage();
+    const parsed = parseWikipediaWc26SquadsHtml(html);
+    if (parsed.byWikiName.size >= 40) {
+      pageCache = { loadedAt: now, ...parsed };
+      return pageCache;
+    }
+  } catch (error) {
+    console.error("[wc26-squads] live Wikipedia fetch failed:", error);
+  }
+
+  return loadBundledWc26Squads();
 }
 
 function resolveWikiTeamName(teamName: string, byNormalized: Map<string, string>, byWikiName: Map<string, SquadPoolPlayer[]>) {
@@ -198,9 +248,13 @@ export async function loadAllWikipediaWc26Squads() {
 
   const players = teams.flatMap((entry) => entry.players);
 
+  const bundled = bundledSquads as BundledSquadsFile;
+  const usedLive = pageCache && pageCache.byWikiName.size >= 40;
+
   return {
-    source: "wikipedia/wc26-official-squads",
-    sourceUrl: WC26_SQUADS_URL,
+    source: usedLive ? "wikipedia/wc26-official-squads" : "content/wc26-squads-snapshot",
+    sourceUrl: usedLive ? WC26_SQUADS_URL : bundled.source,
+    snapshotGeneratedAt: bundled.generatedAt,
     teamCount: teams.length,
     playerCount: players.length,
     teams,
