@@ -36,7 +36,16 @@ export function WelcomeDialog() {
   useEffect(() => {
     if (hasSeenWelcome()) return;
     const frame = window.requestAnimationFrame(() => setOpen(true));
-    return () => window.cancelAnimationFrame(frame);
+    const onVisibility = () => {
+      if (document.visibilityState === "visible" && !hasSeenWelcome()) {
+        setOpen(true);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   useEffect(() => {
