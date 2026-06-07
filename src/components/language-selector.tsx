@@ -1,6 +1,5 @@
 "use client";
 
-import { HelpTooltip } from "@/components/help-tooltip";
 import { useTranslation } from "@/components/locale-provider";
 import { APP_LOCALES, LOCALE_LABELS } from "@/lib/i18n/locales";
 
@@ -48,11 +47,8 @@ export function LanguageSelector({ variant = "menu", onSelect, value }: Language
   if (variant === "menu") {
     return (
       <div className="app-menu-theme" role="group" aria-label={t("common.language")}>
-        <p className="app-menu-theme-label panel-help-row" id="app-menu-language-label">
+        <p className="app-menu-theme-label" id="app-menu-language-label">
           {t("common.language")}
-          <HelpTooltip label={t("auth.chooseLanguage")} size="sm">
-            {t("auth.chooseLanguageHint")}
-          </HelpTooltip>
         </p>
         <div aria-labelledby="app-menu-language-label" className="app-menu-theme-options">
           {APP_LOCALES.map((option) => (

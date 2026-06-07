@@ -1,6 +1,5 @@
 "use client";
 
-import { HelpTooltip } from "@/components/help-tooltip";
 import { useTranslation } from "@/components/locale-provider";
 import { useTheme } from "@/components/theme-provider";
 import type { ThemeMode } from "@/lib/theme";
@@ -23,11 +22,8 @@ export function ThemeSelector({ variant = "header" }: ThemeSelectorProps) {
   if (variant === "menu") {
     return (
       <div className="app-menu-theme" role="group" aria-label="Color theme">
-        <p className="app-menu-theme-label panel-help-row" id="app-menu-theme-label">
+        <p className="app-menu-theme-label" id="app-menu-theme-label">
           {t("theme.label")}
-          <HelpTooltip label={t("theme.auto")} size="sm">
-            {t("theme.autoHint")}
-          </HelpTooltip>
         </p>
         <div aria-labelledby="app-menu-theme-label" className="app-menu-theme-options">
           {OPTIONS.map((option) => (
