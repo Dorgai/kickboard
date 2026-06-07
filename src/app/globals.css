@@ -11309,11 +11309,6 @@ h3 {
   text-transform: uppercase;
 }
 
-.app-menu-theme-label.panel-help-row {
-  display: flex;
-  width: 100%;
-}
-
 .app-menu-section-label {
   padding: 4px 6px 0;
 }
