@@ -4,6 +4,7 @@ import { Copy, Loader2, Share2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { useToastOptional } from "@/components/toast-provider";
+import { recordPredictionShared } from "@/lib/onboarding-tips/record-share";
 import {
   buildFacebookShareUrl,
   buildShareCaption,
@@ -144,6 +145,7 @@ export function PredictionShareButtons({
     if (linkNotReady) return;
     try {
       await navigator.clipboard.writeText(shareText);
+      recordPredictionShared();
       notify("Caption and link copied.");
     } catch {
       notify("Could not copy.", "warning");
@@ -162,6 +164,7 @@ export function PredictionShareButtons({
         text: caption,
         url: sharePageUrl
       });
+      recordPredictionShared();
       notify("Shared.");
     } catch (shareError) {
       if (shareError instanceof Error && shareError.name === "AbortError") return;
@@ -173,6 +176,7 @@ export function PredictionShareButtons({
     if (linkNotReady) return;
     const url = buildFacebookShareUrl(sharePageUrl);
     window.open(url, "_blank", "noopener,noreferrer,width=600,height=720");
+    recordPredictionShared();
     notify("Opened Facebook share.");
   }
 

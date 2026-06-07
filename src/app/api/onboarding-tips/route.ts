@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { filterOnboardingTipsForUser } from "@/lib/onboarding-tips/features";
 import { loadEnabledOnboardingTips, isUserEligibleForOnboardingTips } from "@/lib/onboarding-tips/store";
 import { ONBOARDING_TIPS_NEW_USER_DAYS } from "@/lib/onboarding-tips/types";
 
@@ -20,7 +21,8 @@ export async function GET() {
     }
 
     const eligible = await isUserEligibleForOnboardingTips(userId);
-    const tips = eligible ? await loadEnabledOnboardingTips() : [];
+    const allTips = eligible ? await loadEnabledOnboardingTips() : [];
+    const tips = eligible ? await filterOnboardingTipsForUser(userId, allTips) : [];
 
     return NextResponse.json({
       eligible,

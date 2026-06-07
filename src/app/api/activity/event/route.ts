@@ -5,7 +5,7 @@ import { mapDatabaseError } from "@/lib/community/health";
 
 export const dynamic = "force-dynamic";
 
-const ALLOWED_CLIENT_EVENTS = new Set(["page_view"]);
+const ALLOWED_CLIENT_EVENTS = new Set(["page_view", "prediction_shared"]);
 
 export async function POST(request: Request) {
   const user = await requireAuthUser();

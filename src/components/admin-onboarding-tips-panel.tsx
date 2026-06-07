@@ -82,7 +82,8 @@ export function AdminOnboardingTipsPanel({ auth }: { auth: { mode: AdminAuthMode
               {ONBOARDING_TIPS_NEW_USER_DAYS} days. Each tip shows briefly; the session stops after{" "}
               {Math.round(ONBOARDING_TIPS_CAMPAIGN_MS / 60000)} minutes. Defaults ship from{" "}
               <code>content/onboarding-tips.json</code>; saving here publishes to the database for
-              production.
+              production. Tips linked to a product feature are skipped once that user has already
+              used it (picks, Coach Board, Fan Chat, sharing, etc.).
             </HelpTooltip>
           </h2>
           <p className="admin-onboarding-tips-lead">

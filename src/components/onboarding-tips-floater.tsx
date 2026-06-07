@@ -71,9 +71,29 @@ export function OnboardingTipsFloater() {
     [dismissTip, userId]
   );
 
-  const showNextTip = useCallback(() => {
+  const showNextTip = useCallback(async () => {
     if (!userId || !isTipsCampaignActive(userId)) return;
-    const next = pickNextTip(userId, tips);
+
+    let pool = tips;
+    try {
+      const response = await fetch("/api/onboarding-tips", { cache: "no-store" });
+      if (response.ok) {
+        const payload = (await response.json()) as {
+          eligible?: boolean;
+          tips?: OnboardingTip[];
+        };
+        if (payload.eligible && payload.tips?.length) {
+          pool = payload.tips;
+          setTips(payload.tips);
+        } else if (!payload.eligible) {
+          return;
+        }
+      }
+    } catch {
+      /* use cached tips */
+    }
+
+    const next = pickNextTip(userId, pool);
     if (!next) return;
     showTip(next);
   }, [showTip, tips, userId]);
