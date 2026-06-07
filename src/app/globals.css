@@ -10579,8 +10579,9 @@ h3 {
 .welcome-dialog {
   background: transparent;
   border: 0;
+  border-radius: 20px;
   max-width: min(36rem, 94vw);
-  overflow: visible;
+  overflow: hidden;
   padding: 0;
 }
 
@@ -10588,7 +10589,8 @@ h3 {
   background: transparent;
   border: none;
   border-radius: 20px;
-  box-shadow: none;
+  box-shadow: var(--shadow-elevation-3);
+  isolation: isolate;
   overflow: hidden;
   position: relative;
 }
@@ -10610,8 +10612,14 @@ h3 {
 .welcome-dialog-panel.kickboard-hero-backdrop::before,
 .welcome-dialog-panel.kickboard-hero-backdrop::after {
   border-radius: inherit;
+  inset: 0;
   position: absolute;
   z-index: 0;
+}
+
+.welcome-dialog-panel.kickboard-hero-backdrop > * {
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-dialog-panel.kickboard-hero-backdrop::before {
