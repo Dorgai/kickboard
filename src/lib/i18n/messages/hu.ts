@@ -169,6 +169,32 @@ export const huMessages: Messages = {
     expires: "Lejár",
     noInvitationsYet: "Még nincs meghívó."
   },
+  connections: {
+    profileVisible: "A profilom bárki számára látható",
+    profileVisibleHint:
+      "Alapértelmezetten bekapcsolva. Más szurkolók megtalálhatnak a Közösségben és küldhetnek kapcsolódási kérelmet. Kapcsold ki, ha el szeretnéd rejteni a keresésből és listákból.",
+    profileVisibleSaving: "Láthatóság mentése…",
+    profileHiddenNotice: "A profilod rejtve van a Közösség felfedezéséből.",
+    discoverableFansTitle: "Szurkolók, akikkel kapcsolódhatsz",
+    discoverableFansEmpty: "Jelenleg nincs felfedezhető szurkoló. Próbálj felhasználónévre keresni.",
+    searching: "Keresés…",
+    loading: "Kapcsolatok betöltése…",
+    connectByUsername: "Kapcsolódás felhasználónévvel",
+    searchPlaceholder: "Keresés vagy @felhasználónév",
+    sendRequest: "Kérelem küldése",
+    connect: "Kapcsolódás",
+    requestsForYou: "Bejövő kérelmek",
+    pendingSent: "Elküldött függőben",
+    connected: "Kapcsolódva ({count})",
+    onlineSummary: "· {count} online",
+    noConnections: "Még nincs kapcsolat. Küldj egy kérelmet a kezdéshez.",
+    accept: "Elfogadás",
+    decline: "Elutasítás",
+    cancel: "Mégse",
+    requestSent: "Kérelem elküldve.",
+    connectedNotice: "Kapcsolódva.",
+    requestUpdated: "Kérelem frissítve."
+  },
   welcome: {
     eyebrow: "2026-os vb",
     title: "Üdvözöl a MyPicks",

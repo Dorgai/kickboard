@@ -169,6 +169,32 @@ export const frMessages: Messages = {
     expires: "Expire",
     noInvitationsYet: "Pas encore d'invitations."
   },
+  connections: {
+    profileVisible: "Mon profil est visible par tous",
+    profileVisibleHint:
+      "Activé par défaut. Les autres fans peuvent vous trouver dans la Communauté et envoyer des demandes de connexion. Désactivez pour vous masquer de la recherche et des listes.",
+    profileVisibleSaving: "Enregistrement de la visibilité…",
+    profileHiddenNotice: "Votre profil est masqué de la découverte Communauté.",
+    discoverableFansTitle: "Fans avec qui vous connecter",
+    discoverableFansEmpty: "Aucun fan découvrable pour le moment. Essayez de chercher par nom d'utilisateur.",
+    searching: "Recherche…",
+    loading: "Chargement des connexions…",
+    connectByUsername: "Se connecter par nom d'utilisateur",
+    searchPlaceholder: "Rechercher ou @nom",
+    sendRequest: "Envoyer la demande",
+    connect: "Connecter",
+    requestsForYou: "Demandes pour vous",
+    pendingSent: "En attente envoyées",
+    connected: "Connectés ({count})",
+    onlineSummary: "· {count} en ligne",
+    noConnections: "Pas encore de connexions. Envoyez une demande pour commencer.",
+    accept: "Accepter",
+    decline: "Refuser",
+    cancel: "Annuler",
+    requestSent: "Demande envoyée.",
+    connectedNotice: "Connecté.",
+    requestUpdated: "Demande mise à jour."
+  },
   welcome: {
     eyebrow: "Coupe du monde 2026",
     title: "Bienvenue sur MyPicks",

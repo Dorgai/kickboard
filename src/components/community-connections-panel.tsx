@@ -6,6 +6,7 @@ import { ConnectionActivityTimeline } from "@/components/connection-activity-tim
 import { RegistrationInvitationsPanel } from "@/components/registration-invitations-panel";
 import { ConnectionOnlineIndicator } from "@/components/connection-online-indicator";
 import { PanelHelpRow } from "@/components/help-tooltip";
+import { useTranslation } from "@/components/locale-provider";
 import { notifyConnectionsChanged } from "@/lib/social/events";
 import { useConnectionsPresence } from "@/lib/social/use-connections-presence";
 
@@ -31,20 +32,28 @@ type ConnectionsPayload = {
 };
 
 export function CommunityConnectionsPanel() {
+  const { t } = useTranslation();
+
   return (
-    <AuthGate featureLabel="Community connections">
+    <AuthGate featureLabel={t("nav.community")}>
       <ConnectionsPanelInner />
     </AuthGate>
   );
 }
 
 function ConnectionsPanelInner() {
+  const { t } = useTranslation();
   const [data, setData] = useState<ConnectionsPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<PublicUserCard[]>([]);
+  const [discoverableUsers, setDiscoverableUsers] = useState<PublicUserCard[]>([]);
+  const [discoverableLoading, setDiscoverableLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [connectUsername, setConnectUsername] = useState("");
+  const [profileDiscoverable, setProfileDiscoverable] = useState(true);
+  const [visibilityLoading, setVisibilityLoading] = useState(true);
+  const [visibilitySaving, setVisibilitySaving] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -64,9 +73,45 @@ function ConnectionsPanelInner() {
     }
   }, []);
 
+  const refreshDiscoverable = useCallback(async () => {
+    setDiscoverableLoading(true);
+    try {
+      const response = await fetch("/api/users/discoverable", { cache: "no-store" });
+      if (!response.ok) {
+        setDiscoverableUsers([]);
+        return;
+      }
+      const payload = (await response.json()) as { users?: PublicUserCard[] };
+      setDiscoverableUsers(payload.users ?? []);
+    } finally {
+      setDiscoverableLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     void refresh();
-  }, [refresh]);
+    void refreshDiscoverable();
+  }, [refresh, refreshDiscoverable]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      setVisibilityLoading(true);
+      try {
+        const response = await fetch("/api/user/profile-discoverable", { cache: "no-store" });
+        if (!response.ok) return;
+        const payload = (await response.json()) as { profileDiscoverable?: boolean };
+        if (!cancelled && typeof payload.profileDiscoverable === "boolean") {
+          setProfileDiscoverable(payload.profileDiscoverable);
+        }
+      } finally {
+        if (!cancelled) setVisibilityLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const term = searchQuery.trim();
@@ -106,15 +151,43 @@ function ConnectionsPanelInner() {
       });
       const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to connect.");
-      setNotice(payload.message ?? "Request sent.");
+      setNotice(payload.message ?? t("connections.requestSent"));
       setConnectUsername("");
       setSearchQuery("");
       await refresh();
+      await refreshDiscoverable();
       notifyConnectionsChanged();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Unable to connect.");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function handleVisibilityChange(next: boolean) {
+    setVisibilitySaving(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/user/profile-discoverable", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileDiscoverable: next })
+      });
+      const payload = (await response.json()) as {
+        error?: string;
+        profileDiscoverable?: boolean;
+      };
+      if (!response.ok) throw new Error(payload.error ?? "Unable to update visibility.");
+      setProfileDiscoverable(Boolean(payload.profileDiscoverable));
+      if (!payload.profileDiscoverable) {
+        await refreshDiscoverable();
+      }
+    } catch (visibilityError) {
+      setError(
+        visibilityError instanceof Error ? visibilityError.message : "Unable to update visibility."
+      );
+    } finally {
+      setVisibilitySaving(false);
     }
   }
 
@@ -135,7 +208,9 @@ function ConnectionsPanelInner() {
       });
       const payload = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to update request.");
-      setNotice(action === "accept" ? "Connected." : "Request updated.");
+      setNotice(
+        action === "accept" ? t("connections.connectedNotice") : t("connections.requestUpdated")
+      );
       await refresh();
       notifyConnectionsChanged();
     } catch (actionError) {
@@ -161,9 +236,35 @@ function ConnectionsPanelInner() {
     }
   }
 
+  const selectionUsers = searchQuery.trim().length >= 2 ? searchResults : discoverableUsers;
+  const showDiscoverableHeading = searchQuery.trim().length < 2;
+
   return (
     <div className="community-connections-panel">
       <RegistrationInvitationsPanel />
+
+      <section className="profile-visibility-panel">
+        <label className="profile-visibility-toggle">
+          <input
+            checked={profileDiscoverable}
+            disabled={visibilityLoading || visibilitySaving}
+            type="checkbox"
+            onChange={(event) => void handleVisibilityChange(event.target.checked)}
+          />
+          <span className="profile-visibility-toggle-copy">
+            <strong>{t("connections.profileVisible")}</strong>
+            <span>{t("connections.profileVisibleHint")}</span>
+          </span>
+        </label>
+        {visibilitySaving ? (
+          <p className="inline-status">{t("connections.profileVisibleSaving")}</p>
+        ) : null}
+        {!visibilityLoading && !profileDiscoverable ? (
+          <p className="inline-status profile-visibility-hidden-note">
+            {t("connections.profileHiddenNotice")}
+          </p>
+        ) : null}
+      </section>
 
       <PanelHelpRow
         className="panel-help-row--block community-panel-help"
@@ -183,10 +284,10 @@ function ConnectionsPanelInner() {
 
       <form className="connections-connect-form" onSubmit={handleConnectSubmit}>
         <label className="feed-control-field">
-          Connect by username
+          {t("connections.connectByUsername")}
           <input
             className="feed-control-input"
-            placeholder="Search or type @username"
+            placeholder={t("connections.searchPlaceholder")}
             value={connectUsername || searchQuery}
             onChange={(event) => {
               setSearchQuery(event.target.value);
@@ -195,39 +296,49 @@ function ConnectionsPanelInner() {
           />
         </label>
         <button className="button primary" disabled={busy || connectUsername.trim().length < 3} type="submit">
-          Send request
+          {t("connections.sendRequest")}
         </button>
       </form>
 
-      {searching ? <p className="inline-status">Searching…</p> : null}
-      {searchResults.length > 0 ? (
-        <ul className="connections-search-results">
-          {searchResults.map((user) => (
-            <li key={user.id}>
-              <div className="connections-search-card">
-                <span>
-                  <strong>{user.displayName ?? user.username}</strong>
-                  <span className="connections-search-username">@{user.username}</span>
-                </span>
-                <button
-                  className="button secondary"
-                  disabled={busy}
-                  type="button"
-                  onClick={() => void sendRequest(user.username)}
-                >
-                  Connect
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+      {searching || (showDiscoverableHeading && discoverableLoading) ? (
+        <p className="inline-status">
+          {searching ? t("connections.searching") : t("common.loading")}
+        </p>
       ) : null}
 
-      {loading ? <p className="inline-status">Loading connections…</p> : null}
+      {selectionUsers.length > 0 ? (
+        <section className="connections-section">
+          {showDiscoverableHeading ? <h3>{t("connections.discoverableFansTitle")}</h3> : null}
+          <ul className="connections-search-results">
+            {selectionUsers.map((user) => (
+              <li key={user.id}>
+                <div className="connections-search-card">
+                  <span>
+                    <strong>{user.displayName ?? user.username}</strong>
+                    <span className="connections-search-username">@{user.username}</span>
+                  </span>
+                  <button
+                    className="button secondary"
+                    disabled={busy}
+                    type="button"
+                    onClick={() => void sendRequest(user.username)}
+                  >
+                    {t("connections.connect")}
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : showDiscoverableHeading && !discoverableLoading ? (
+        <p className="inline-status">{t("connections.discoverableFansEmpty")}</p>
+      ) : null}
+
+      {loading ? <p className="inline-status">{t("connections.loading")}</p> : null}
 
       {!loading && data?.pendingIncoming.length ? (
         <section className="connections-section">
-          <h3>Requests for you</h3>
+          <h3>{t("connections.requestsForYou")}</h3>
           <ul className="connections-list">
             {data.pendingIncoming.map((row) => (
               <li key={row.id}>
@@ -245,7 +356,7 @@ function ConnectionsPanelInner() {
 
       {!loading && data?.pendingOutgoing.length ? (
         <section className="connections-section">
-          <h3>Pending sent</h3>
+          <h3>{t("connections.pendingSent")}</h3>
           <ul className="connections-list">
             {data.pendingOutgoing.map((row) => (
               <li key={row.id}>
@@ -257,7 +368,7 @@ function ConnectionsPanelInner() {
                     type="button"
                     onClick={() => void cancelRequest(row.id)}
                   >
-                    Cancel
+                    {t("connections.cancel")}
                   </button>
                 </div>
               </li>
@@ -269,15 +380,15 @@ function ConnectionsPanelInner() {
       {!loading ? (
         <section className="connections-section">
           <h3 className="connections-section-heading">
-            Connected ({data?.accepted.length ?? 0})
+            {t("connections.connected", { count: data?.accepted.length ?? 0 })}
             {onlineCount > 0 ? (
               <span className="connections-online-summary">
-                · {onlineCount} online
+                {t("connections.onlineSummary", { count: onlineCount })}
               </span>
             ) : null}
           </h3>
           {!data?.accepted.length ? (
-            <p className="inline-status">No connections yet. Send a request to get started.</p>
+            <p className="inline-status">{t("connections.noConnections")}</p>
           ) : (
             <ul className="connections-list">
               {data.accepted.map((row) => (
@@ -325,15 +436,17 @@ function ConnectionCard({
   onAccept: () => void;
   onReject: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="connections-card">
       <PeerLabel peer={row.peer} />
       <div className="connections-card-actions">
         <button className="button primary" disabled={busy} type="button" onClick={onAccept}>
-          Accept
+          {t("connections.accept")}
         </button>
         <button className="button secondary" disabled={busy} type="button" onClick={onReject}>
-          Decline
+          {t("connections.decline")}
         </button>
       </div>
     </div>
