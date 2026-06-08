@@ -4,18 +4,15 @@ import { Lightbulb, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import {
-  endTipsCampaign,
-  getTipsCampaignState,
-  isTipsCampaignActive,
+  canShowTipToday,
   markTipShown,
-  pickNextTip,
-  startTipsCampaign
+  pickNextTip
 } from "@/lib/onboarding-tips/client-storage";
 import { hasSeenWelcome } from "@/lib/welcome";
 import type { OnboardingTip } from "@/lib/onboarding-tips/types";
 import {
-  ONBOARDING_TIPS_CAMPAIGN_MS,
-  ONBOARDING_TIPS_INTERVAL_MS,
+  ONBOARDING_TIPS_FLOW_MS,
+  ONBOARDING_TIPS_GAP_MS,
   ONBOARDING_TIPS_VISIBLE_MS
 } from "@/lib/onboarding-tips/types";
 
@@ -31,48 +28,86 @@ export function OnboardingTipsFloater() {
   const [ready, setReady] = useState(false);
 
   const hideTimerRef = useRef<number | null>(null);
-  const intervalRef = useRef<number | null>(null);
-  const campaignTimerRef = useRef<number | null>(null);
+  const gapTimerRef = useRef<number | null>(null);
+  const flowTimerRef = useRef<number | null>(null);
+  const showingRef = useRef(false);
 
   const clearTimers = useCallback(() => {
     if (hideTimerRef.current !== null) {
       window.clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
-    if (intervalRef.current !== null) {
-      window.clearInterval(intervalRef.current);
-      intervalRef.current = null;
+    if (gapTimerRef.current !== null) {
+      window.clearTimeout(gapTimerRef.current);
+      gapTimerRef.current = null;
     }
-    if (campaignTimerRef.current !== null) {
-      window.clearTimeout(campaignTimerRef.current);
-      campaignTimerRef.current = null;
+    if (flowTimerRef.current !== null) {
+      window.clearTimeout(flowTimerRef.current);
+      flowTimerRef.current = null;
     }
   }, []);
 
-  const dismissTip = useCallback(() => {
-    setVisible(false);
-    window.setTimeout(() => setActiveTip(null), 280);
-  }, []);
+  const flowOut = useCallback(
+    (scheduleNext: boolean) => {
+      if (!showingRef.current) return;
+      showingRef.current = false;
+      setVisible(false);
+
+      if (flowTimerRef.current !== null) {
+        window.clearTimeout(flowTimerRef.current);
+      }
+      flowTimerRef.current = window.setTimeout(() => {
+        setActiveTip(null);
+        flowTimerRef.current = null;
+        if (!scheduleNext || !userId || !canShowTipToday(userId)) return;
+
+        gapTimerRef.current = window.setTimeout(() => {
+          gapTimerRef.current = null;
+          void showNextTipRef.current();
+        }, ONBOARDING_TIPS_GAP_MS);
+      }, ONBOARDING_TIPS_FLOW_MS);
+    },
+    [userId]
+  );
+
+  const showNextTipRef = useRef<() => Promise<void>>(async () => undefined);
+
+  const dismissTip = useCallback(
+    (scheduleNext = true) => {
+      if (hideTimerRef.current !== null) {
+        window.clearTimeout(hideTimerRef.current);
+        hideTimerRef.current = null;
+      }
+      flowOut(scheduleNext);
+    },
+    [flowOut]
+  );
 
   const showTip = useCallback(
     (tip: OnboardingTip) => {
-      if (!userId) return;
+      if (!userId || !canShowTipToday(userId)) return;
+
       markTipShown(userId, tip.id);
+      showingRef.current = true;
       setActiveTip(tip);
-      setVisible(true);
+      setVisible(false);
+
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setVisible(true));
+      });
 
       if (hideTimerRef.current !== null) {
         window.clearTimeout(hideTimerRef.current);
       }
       hideTimerRef.current = window.setTimeout(() => {
-        dismissTip();
+        dismissTip(true);
       }, ONBOARDING_TIPS_VISIBLE_MS);
     },
     [dismissTip, userId]
   );
 
   const showNextTip = useCallback(async () => {
-    if (!userId || !isTipsCampaignActive(userId)) return;
+    if (!userId || !canShowTipToday(userId) || showingRef.current) return;
 
     let pool = tips;
     try {
@@ -82,11 +117,10 @@ export function OnboardingTipsFloater() {
           eligible?: boolean;
           tips?: OnboardingTip[];
         };
-        if (payload.eligible && payload.tips?.length) {
+        if (!payload.eligible) return;
+        if (payload.tips?.length) {
           pool = payload.tips;
           setTips(payload.tips);
-        } else if (!payload.eligible) {
-          return;
         }
       }
     } catch {
@@ -97,6 +131,8 @@ export function OnboardingTipsFloater() {
     if (!next) return;
     showTip(next);
   }, [showTip, tips, userId]);
+
+  showNextTipRef.current = showNextTip;
 
   useEffect(() => {
     if (status !== "authenticated" || !userId || !onboardingComplete) {
@@ -136,50 +172,37 @@ export function OnboardingTipsFloater() {
   useEffect(() => {
     if (!ready || !eligible || !userId || tips.length === 0) return;
     const uid = userId;
+    if (!canShowTipToday(uid)) return;
 
-    function beginCampaign() {
-      const existing = getTipsCampaignState(uid);
-      if (existing?.ended) return;
-
-      const state = existing ?? startTipsCampaign(uid);
-      const remaining = ONBOARDING_TIPS_CAMPAIGN_MS - (Date.now() - state.startedAt);
-      if (remaining <= 0) {
-        endTipsCampaign(uid);
-        return;
-      }
-
-      campaignTimerRef.current = window.setTimeout(() => {
-        endTipsCampaign(uid);
-        dismissTip();
-        clearTimers();
-      }, remaining);
-
-      window.setTimeout(() => {
-        showNextTip();
+    function beginTips() {
+      if (!canShowTipToday(uid)) return;
+      gapTimerRef.current = window.setTimeout(() => {
+        gapTimerRef.current = null;
+        void showNextTipRef.current();
       }, 2400);
-
-      intervalRef.current = window.setInterval(() => {
-        if (!isTipsCampaignActive(uid)) {
-          clearTimers();
-          return;
-        }
-        showNextTip();
-      }, ONBOARDING_TIPS_INTERVAL_MS);
     }
 
     if (!hasSeenWelcome()) {
-      window.addEventListener("kickboard:welcome-dismissed", beginCampaign, { once: true });
-      const fallback = window.setTimeout(beginCampaign, 8000);
+      window.addEventListener("kickboard:welcome-dismissed", beginTips, { once: true });
+      const fallback = window.setTimeout(beginTips, 8000);
       return () => {
-        window.removeEventListener("kickboard:welcome-dismissed", beginCampaign);
+        window.removeEventListener("kickboard:welcome-dismissed", beginTips);
         window.clearTimeout(fallback);
         clearTimers();
+        showingRef.current = false;
+        setVisible(false);
+        setActiveTip(null);
       };
     }
 
-    beginCampaign();
-    return () => clearTimers();
-  }, [clearTimers, dismissTip, eligible, ready, showNextTip, tips.length, userId]);
+    beginTips();
+    return () => {
+      clearTimers();
+      showingRef.current = false;
+      setVisible(false);
+      setActiveTip(null);
+    };
+  }, [clearTimers, eligible, ready, tips.length, userId]);
 
   if (!activeTip) return null;
 
@@ -198,7 +221,7 @@ export function OnboardingTipsFloater() {
           aria-label="Dismiss tip"
           className="onboarding-tip-floater-close"
           type="button"
-          onClick={dismissTip}
+          onClick={() => dismissTip(true)}
         >
           <X size={14} />
         </button>

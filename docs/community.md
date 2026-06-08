@@ -5,6 +5,7 @@ Moderated public posting for the **Current event** tab. Historical match data st
 ## Connections (registered users)
 
 - Bidirectional **connection requests** (`connections` table): search by username, accept or decline.
+- **Profile discoverability** (`users.profile_discoverable`, default `true`): fans are visible on Community search and browse lists unless they opt out (`PATCH /api/user/profile-discoverable`). Apply `db/profile-discoverability-extensions.sql` via `npm run db:schema`.
 - After **accepted**, each user can view the other’s **Coach Board squads** and **per-fixture score picks** for the selected match (free-to-play; not wagering).
 - Apply `db/connections-social-extensions.sql` via `npm run db:schema` (included in the apply script).
 - Fan Mode (under-13) accounts cannot send or receive connection requests.

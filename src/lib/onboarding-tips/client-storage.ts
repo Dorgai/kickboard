@@ -1,84 +1,92 @@
 import {
-  ONBOARDING_TIPS_CAMPAIGN_MS,
+  ONBOARDING_TIPS_DAILY_MAX,
   type OnboardingTip
 } from "@/lib/onboarding-tips/types";
 
-const STORAGE_KEY = "kickboard-onboarding-tips:v1";
+const STORAGE_KEY = "kickboard-onboarding-tips:v2";
 
-type TipsCampaignState = {
+type TipsUserDailyState = {
   userId: string;
-  startedAt: number;
+  /** Local calendar date YYYY-MM-DD */
+  day: string;
+  shownCount: number;
   shownIds: string[];
-  ended: boolean;
 };
 
-function readState(): TipsCampaignState | null {
+function localDayKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function readRawState(): TipsUserDailyState | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<TipsCampaignState>;
-    if (!parsed.userId || typeof parsed.startedAt !== "number") return null;
+    const parsed = JSON.parse(raw) as Partial<TipsUserDailyState>;
+    if (!parsed.userId || typeof parsed.day !== "string") return null;
     return {
       userId: parsed.userId,
-      startedAt: parsed.startedAt,
-      shownIds: Array.isArray(parsed.shownIds) ? parsed.shownIds.map(String) : [],
-      ended: Boolean(parsed.ended)
+      day: parsed.day,
+      shownCount: Number(parsed.shownCount ?? 0),
+      shownIds: Array.isArray(parsed.shownIds) ? parsed.shownIds.map(String) : []
     };
   } catch {
     return null;
   }
 }
 
-function writeState(state: TipsCampaignState) {
+function writeState(state: TipsUserDailyState) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-export function getTipsCampaignState(userId: string): TipsCampaignState | null {
-  const state = readState();
-  if (!state || state.userId !== userId) return null;
+function freshState(userId: string): TipsUserDailyState {
+  return {
+    userId,
+    day: localDayKey(),
+    shownCount: 0,
+    shownIds: []
+  };
+}
+
+/** Per-user daily tip budget (resets each local calendar day). */
+export function getTipsDailyState(userId: string): TipsUserDailyState {
+  const today = localDayKey();
+  const state = readRawState();
+  if (!state || state.userId !== userId || state.day !== today) {
+    return freshState(userId);
+  }
   return state;
 }
 
-export function startTipsCampaign(userId: string): TipsCampaignState {
-  const existing = getTipsCampaignState(userId);
-  if (existing && !existing.ended) return existing;
+export function getRemainingTipsToday(userId: string) {
+  const state = getTipsDailyState(userId);
+  return Math.max(0, ONBOARDING_TIPS_DAILY_MAX - state.shownCount);
+}
 
-  const next: TipsCampaignState = {
-    userId,
-    startedAt: Date.now(),
-    shownIds: [],
-    ended: false
-  };
-  writeState(next);
-  return next;
+export function canShowTipToday(userId: string) {
+  return getRemainingTipsToday(userId) > 0;
 }
 
 export function markTipShown(userId: string, tipId: string) {
-  const state = getTipsCampaignState(userId) ?? startTipsCampaign(userId);
-  if (state.shownIds.includes(tipId)) return;
+  const state = getTipsDailyState(userId);
+  if (state.shownCount >= ONBOARDING_TIPS_DAILY_MAX) return;
+
   writeState({
     ...state,
-    shownIds: [...state.shownIds, tipId]
+    shownCount: state.shownCount + 1,
+    shownIds: state.shownIds.includes(tipId) ? state.shownIds : [...state.shownIds, tipId]
   });
 }
 
-export function endTipsCampaign(userId: string) {
-  const state = getTipsCampaignState(userId) ?? startTipsCampaign(userId);
-  writeState({ ...state, ended: true });
-}
-
-export function isTipsCampaignActive(userId: string) {
-  const state = getTipsCampaignState(userId);
-  if (!state || state.ended) return false;
-  return Date.now() - state.startedAt < ONBOARDING_TIPS_CAMPAIGN_MS;
-}
-
 export function pickNextTip(userId: string, tips: OnboardingTip[]): OnboardingTip | null {
-  if (!tips.length) return null;
-  const state = getTipsCampaignState(userId);
-  const shown = new Set(state?.shownIds ?? []);
+  if (!tips.length || !canShowTipToday(userId)) return null;
+
+  const state = getTipsDailyState(userId);
+  const shown = new Set(state.shownIds);
   const remaining = tips.filter((tip) => !shown.has(tip.id));
   const pool = remaining.length > 0 ? remaining : tips;
   const index = Math.floor(Math.random() * pool.length);
