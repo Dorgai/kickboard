@@ -9,7 +9,7 @@ export const WORDMARK_FONT =
   "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
 export const WORDMARK_VIEWBOX = {
-  width: 188,
+  width: 176,
   height: 72
 } as const;
 
@@ -24,7 +24,7 @@ export const WORDMARK_LAYOUT = {
   },
   /** Right edge aligned with “mypicks” — sits under “ks”. */
   live: {
-    x: 180,
+    x: 174,
     y: 56,
     fontSize: 20,
     fontWeight: 400,

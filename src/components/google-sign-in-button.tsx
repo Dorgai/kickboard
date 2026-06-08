@@ -54,9 +54,24 @@ export function GoogleSignInButton({
       onClick={() => {
         onBeforeSignIn?.();
         markPendingLoginCelebration();
-        void signIn("google", {
-          callbackUrl: callbackUrl ?? resolveSignInCallbackUrl("/")
-        });
+        void (async () => {
+          try {
+            const response = await fetch("/api/auth/config", { cache: "no-store" });
+            const config = (await response.json()) as {
+              oauthConfigured?: boolean;
+              sessionSecretConfigured?: boolean;
+            };
+            if (!config.oauthConfigured || !config.sessionSecretConfigured) {
+              window.location.assign("/auth/error?error=Configuration");
+              return;
+            }
+          } catch {
+            /* proceed — server will surface a clearer error if needed */
+          }
+          await signIn("google", {
+            callbackUrl: callbackUrl ?? resolveSignInCallbackUrl("/")
+          });
+        })();
       }}
     >
       <GoogleMark />

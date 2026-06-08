@@ -23,9 +23,24 @@ export function HeaderUserMenu() {
         className="header-user-menu header-user-menu--sign-in"
         type="button"
         onClick={() => {
-          void signIn("google", {
-            callbackUrl: resolveSignInCallbackUrl("/")
-          });
+          void (async () => {
+            try {
+              const response = await fetch("/api/auth/config", { cache: "no-store" });
+              const config = (await response.json()) as {
+                oauthConfigured?: boolean;
+                sessionSecretConfigured?: boolean;
+              };
+              if (!config.oauthConfigured || !config.sessionSecretConfigured) {
+                window.location.assign("/auth/error?error=Configuration");
+                return;
+              }
+            } catch {
+              /* proceed */
+            }
+            await signIn("google", {
+              callbackUrl: resolveSignInCallbackUrl("/")
+            });
+          })();
         }}
       >
         <UserRound size={16} aria-hidden="true" />

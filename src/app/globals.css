@@ -204,6 +204,22 @@ button:disabled {
   width: auto;
 }
 
+.brand-wordmark__primary {
+  fill: #14213d;
+}
+
+.brand-wordmark__live {
+  fill: #6b7280;
+}
+
+[data-theme="dark"] .brand-wordmark__primary {
+  fill: #f9fafb;
+}
+
+[data-theme="dark"] .brand-wordmark__live {
+  fill: #d1d5db;
+}
+
 .tournament-switcher,
 .nav-actions button:not(.theme-selector button) {
   background: var(--color-surface);
