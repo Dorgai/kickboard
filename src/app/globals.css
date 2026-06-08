@@ -3352,6 +3352,47 @@ h3 {
   gap: 14px;
 }
 
+.profile-visibility-panel {
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-surface);
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.profile-visibility-toggle {
+  align-items: flex-start;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto 1fr;
+}
+
+.profile-visibility-toggle input {
+  margin-top: 3px;
+}
+
+.profile-visibility-toggle-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.profile-visibility-toggle-copy strong {
+  font-size: 14px;
+}
+
+.profile-visibility-toggle-copy span {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.profile-visibility-hidden-note {
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
 .registration-invitations-section {
   background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
   border-radius: 12px;

@@ -51,6 +51,7 @@ export async function searchConnectableUsers(viewerId: string, queryText: string
        AND COALESCE(is_banned, false) = false
        AND is_child = false
        AND onboarding_completed_at IS NOT NULL
+       AND COALESCE(profile_discoverable, true) = true
        AND id <> $1
        AND (username ILIKE $2 OR display_name ILIKE $2)
      ORDER BY
@@ -58,6 +59,40 @@ export async function searchConnectableUsers(viewerId: string, queryText: string
        username
      LIMIT $4`,
     [viewerId, pattern, `${term}%`, limit]
+  );
+
+  return result.rows.map(mapUserCard);
+}
+
+/** Fans who opted in to Community discovery (excludes existing connections). */
+export async function listDiscoverableUsers(viewerId: string, limit = 24) {
+  const result = await query<{
+    id: string;
+    username: string;
+    display_name: string | null;
+    points_balance: number;
+  }>(
+    `SELECT u.id, u.username, u.display_name, u.points_balance
+     FROM users u
+     WHERE u.deleted_at IS NULL
+       AND u.is_suspended = false
+       AND COALESCE(u.is_banned, false) = false
+       AND u.is_child = false
+       AND u.onboarding_completed_at IS NOT NULL
+       AND COALESCE(u.profile_discoverable, true) = true
+       AND u.id <> $1
+       AND NOT EXISTS (
+         SELECT 1
+         FROM connections c
+         WHERE (
+             (c.requester_id = $1 AND c.addressee_id = u.id)
+             OR (c.addressee_id = $1 AND c.requester_id = u.id)
+           )
+           AND c.status IN ('accepted', 'pending', 'blocked')
+       )
+     ORDER BY u.display_name NULLS LAST, u.username
+     LIMIT $2`,
+    [viewerId, limit]
   );
 
   return result.rows.map(mapUserCard);
@@ -112,8 +147,8 @@ export async function createConnectionRequest(requesterId: string, addresseeUser
   const username = addresseeUsername.trim().toLowerCase().slice(0, 30);
   if (!username) throw new Error("USERNAME_REQUIRED");
 
-  const addressee = await query<{ id: string; is_child: boolean }>(
-    `SELECT id, is_child
+  const addressee = await query<{ id: string; is_child: boolean; profile_discoverable: boolean }>(
+    `SELECT id, is_child, COALESCE(profile_discoverable, true) AS profile_discoverable
      FROM users
      WHERE username = $1 AND deleted_at IS NULL AND is_suspended = false
        AND COALESCE(is_banned, false) = false`,
@@ -122,6 +157,7 @@ export async function createConnectionRequest(requesterId: string, addresseeUser
   const peer = addressee.rows[0];
   if (!peer) throw new Error("USER_NOT_FOUND");
   if (peer.is_child) throw new Error("CANNOT_CONNECT_CHILD");
+  if (!peer.profile_discoverable) throw new Error("PROFILE_NOT_DISCOVERABLE");
   if (peer.id === requesterId) throw new Error("CANNOT_CONNECT_SELF");
 
   const requester = await query<{ is_child: boolean }>(

@@ -4,6 +4,10 @@ export function mapConnectionError(error: unknown) {
   const map: Record<string, { status: number; error: string }> = {
     USERNAME_REQUIRED: { status: 400, error: "Enter a username to connect." },
     USER_NOT_FOUND: { status: 404, error: "No user with that username." },
+    PROFILE_NOT_DISCOVERABLE: {
+      status: 404,
+      error: "That fan has hidden their profile from Community discovery."
+    },
     CANNOT_CONNECT_CHILD: { status: 403, error: "That account cannot receive connection requests." },
     CANNOT_CONNECT_SELF: { status: 400, error: "You cannot connect with yourself." },
     CHILD_CANNOT_CONNECT: { status: 403, error: "Fan Mode accounts cannot use connections." },

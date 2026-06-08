@@ -166,6 +166,32 @@ export const enMessages = {
     expires: "Expires",
     noInvitationsYet: "No invitations yet."
   },
+  connections: {
+    profileVisible: "My profile is visible to anyone",
+    profileVisibleHint:
+      "On by default. Other fans can find you on Community and send connection requests. Turn off to hide from search and browse lists.",
+    profileVisibleSaving: "Saving visibility…",
+    profileHiddenNotice: "Your profile is hidden from Community discovery.",
+    discoverableFansTitle: "Fans you can connect with",
+    discoverableFansEmpty: "No discoverable fans right now. Try searching by username.",
+    searching: "Searching…",
+    loading: "Loading connections…",
+    connectByUsername: "Connect by username",
+    searchPlaceholder: "Search or type @username",
+    sendRequest: "Send request",
+    connect: "Connect",
+    requestsForYou: "Requests for you",
+    pendingSent: "Pending sent",
+    connected: "Connected ({count})",
+    onlineSummary: "· {count} online",
+    noConnections: "No connections yet. Send a request to get started.",
+    accept: "Accept",
+    decline: "Decline",
+    cancel: "Cancel",
+    requestSent: "Request sent.",
+    connectedNotice: "Connected.",
+    requestUpdated: "Request updated."
+  },
   welcome: {
     eyebrow: "World Cup 2026",
     title: "Welcome to MyPicks",

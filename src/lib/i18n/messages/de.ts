@@ -169,6 +169,32 @@ export const deMessages: Messages = {
     expires: "Läuft ab",
     noInvitationsYet: "Noch keine Einladungen."
   },
+  connections: {
+    profileVisible: "Mein Profil ist für alle sichtbar",
+    profileVisibleHint:
+      "Standardmäßig an. Andere Fans finden dich in der Community und können Verbindungsanfragen senden. Ausschalten, um dich aus Suche und Listen zu verbergen.",
+    profileVisibleSaving: "Sichtbarkeit wird gespeichert…",
+    profileHiddenNotice: "Dein Profil ist in der Community nicht auffindbar.",
+    discoverableFansTitle: "Fans, mit denen du dich verbinden kannst",
+    discoverableFansEmpty: "Derzeit keine auffindbaren Fans. Versuche die Suche nach Benutzernamen.",
+    searching: "Suche…",
+    loading: "Verbindungen werden geladen…",
+    connectByUsername: "Per Benutzername verbinden",
+    searchPlaceholder: "Suchen oder @benutzername",
+    sendRequest: "Anfrage senden",
+    connect: "Verbinden",
+    requestsForYou: "Anfragen an dich",
+    pendingSent: "Ausstehend gesendet",
+    connected: "Verbunden ({count})",
+    onlineSummary: "· {count} online",
+    noConnections: "Noch keine Verbindungen. Sende eine Anfrage.",
+    accept: "Annehmen",
+    decline: "Ablehnen",
+    cancel: "Abbrechen",
+    requestSent: "Anfrage gesendet.",
+    connectedNotice: "Verbunden.",
+    requestUpdated: "Anfrage aktualisiert."
+  },
   welcome: {
     eyebrow: "WM 2026",
     title: "Willkommen bei MyPicks",
