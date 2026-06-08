@@ -186,21 +186,18 @@ button:disabled {
 }
 
 .brand {
+  align-items: center;
   font-weight: 800;
   gap: 10px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 
-.brand-mark {
-  align-items: center;
-  background: var(--color-brand);
-  border-radius: 12px;
-  color: white;
-  display: grid;
-  font-size: 12px;
-  height: 40px;
-  place-items: center;
-  width: 40px;
+.brand-wordmark {
+  display: block;
+  flex-shrink: 0;
+  height: 30px;
+  max-width: min(12.5rem, 52vw);
+  width: auto;
 }
 
 .tournament-switcher,
@@ -10664,6 +10661,12 @@ h3 {
   text-align: left;
 }
 
+.welcome-dialog-brand {
+  height: 34px;
+  margin-bottom: 4px;
+  max-width: 14rem;
+}
+
 .welcome-dialog-eyebrow {
   background: linear-gradient(90deg, var(--color-brand), color-mix(in srgb, #f59e0b 70%, var(--color-brand)));
   background-clip: text;
@@ -12357,8 +12360,9 @@ code {
     min-width: 0;
   }
 
-  .brand > span:not(.brand-mark) {
-    display: none;
+  .brand-wordmark {
+    height: 26px;
+    max-width: min(10.5rem, 48vw);
   }
 
   .nav-actions {

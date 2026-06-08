@@ -2,8 +2,9 @@
 export const BRAND = {
   name: "MyPicks",
   url: "https://mypicks.live",
-  wordmark: "MYPICKS",
-  shortMark: "MP",
+  wordmark: "mypicks.live",
+  shortMark: "m",
+  wordmarkPath: "/brand/mypicks-live-wordmark.svg",
   tagline: "World Cup predictions, Coach Board squads, and fan community on MyPicks.",
   pageTitle: "MyPicks | World Cup fan and analytics platform",
   helpAi: "MyPicks AI",
