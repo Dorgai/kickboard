@@ -1,4 +1,4 @@
-import { LOGO_NAVY, WORDMARK_FONT, WORDMARK_LAYOUT } from "@/lib/brand/logo-colors";
+import { WORDMARK_FONT, WORDMARK_LAYOUT, WORDMARK_VIEWBOX } from "@/lib/brand/logo-colors";
 import { BRAND } from "@/lib/brand";
 
 type BrandWordmarkProps = {
@@ -20,12 +20,12 @@ export function BrandWordmark({
       aria-hidden={title ? undefined : true}
       className={className ?? "brand-wordmark"}
       role={title ? "img" : "presentation"}
-      viewBox="0 0 320 72"
+      viewBox={`0 0 ${WORDMARK_VIEWBOX.width} ${WORDMARK_VIEWBOX.height}`}
       xmlns="http://www.w3.org/2000/svg"
     >
       {title ? <title>{title}</title> : null}
       <text
-        fill={LOGO_NAVY}
+        className="brand-wordmark__primary"
         fontFamily={WORDMARK_FONT}
         fontSize={mypicks.fontSize}
         fontWeight={mypicks.fontWeight}
@@ -37,11 +37,12 @@ export function BrandWordmark({
       </text>
       {compact ? null : (
         <text
-          fill={LOGO_NAVY}
+          className="brand-wordmark__live"
           fontFamily={WORDMARK_FONT}
           fontSize={live.fontSize}
           fontWeight={live.fontWeight}
           letterSpacing={live.letterSpacing}
+          textAnchor={live.textAnchor}
           x={live.x}
           y={live.y}
         >

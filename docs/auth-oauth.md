@@ -29,8 +29,9 @@ In Railway → **kickboard** project → **kickboard** service → **Variables**
 | `GOOGLE_CLIENT_ID` | From Google Cloud |
 | `GOOGLE_CLIENT_SECRET` | From Google Cloud |
 | `AUTH_URL` | `https://mypicks.live` or your public host (**important**, exactly one `https://`, no trailing slash) |
-| `AUTH_SECRET` | Optional; if unset, `JWT_SECRET` is used |
-| `JWT_SECRET` | Already set (session signing) |
+| `AUTH_SECRET` | Session signing for Auth.js v5 (set to same value as `JWT_SECRET`) |
+| `AUTH_TRUST_HOST` | `true` (required behind Cloudflare / Railway proxy) |
+| `JWT_SECRET` | Already set (also copied to `AUTH_SECRET` at boot if missing) |
 | `NEXT_PUBLIC_APP_URL` | `https://mypicks.live` |
 
 `AUTH_URL` must match the public site URL so Google gets redirect_uri  
@@ -115,6 +116,14 @@ Run `npm run db:schema` so `db/fixture-scope-extensions.sql` is applied.
 ## Database
 
 Run `npm run db:schema` (includes `db/auth-extensions.sql`) on production after deploy.
+
+If you land on **`/api/auth/error?error=Configuration`** (or `/auth/error`):
+
+1. **Try again** — can happen briefly during deploys or if cookies are stale.
+2. Open **`/api/auth/config`** — `oauthConfigured`, `sessionSecretConfigured`, and `authTrustHost` should all be `true`.
+3. Use **`https://mypicks.live`** only (not an old `*.up.railway.app` bookmark).
+4. Clear site cookies or use a private window, then sign in again.
+5. On Railway, confirm **`AUTH_URL`**, **`AUTH_SECRET`** (or `JWT_SECRET`), and **`AUTH_TRUST_HOST=true`**.
 
 If Google login reaches the callback then shows **Server error / problem with the server configuration**:
 

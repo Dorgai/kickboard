@@ -44,6 +44,8 @@
   --kickboard-tab-item-font-size: 12px;
   --kickboard-tab-item-font-weight: 500;
   --kickboard-tab-item-padding-x: 14px;
+  --brand-wordmark-primary: #14213d;
+  --brand-wordmark-live: #6b7280;
 }
 
 [data-theme="dark"] {
@@ -90,6 +92,8 @@
   --kickboard-tab-item-font-size: 12px;
   --kickboard-tab-item-font-weight: 500;
   --kickboard-tab-item-padding-x: 14px;
+  --brand-wordmark-primary: #f9fafb;
+  --brand-wordmark-live: #d1d5db;
 }
 
 * {
@@ -196,8 +200,24 @@ button:disabled {
   display: block;
   flex-shrink: 0;
   height: 30px;
-  max-width: min(12.5rem, 52vw);
+  max-width: min(11.75rem, 48vw);
   width: auto;
+}
+
+.brand-wordmark__primary {
+  fill: #14213d;
+}
+
+.brand-wordmark__live {
+  fill: #6b7280;
+}
+
+[data-theme="dark"] .brand-wordmark__primary {
+  fill: #f9fafb;
+}
+
+[data-theme="dark"] .brand-wordmark__live {
+  fill: #d1d5db;
 }
 
 .tournament-switcher,
@@ -12259,6 +12279,13 @@ code {
   margin-top: 32px;
 }
 
+.auth-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
 .legal-nav a {
   color: var(--color-brand);
   font-weight: 600;
@@ -12362,7 +12389,7 @@ code {
 
   .brand-wordmark {
     height: 26px;
-    max-width: min(10.5rem, 48vw);
+    max-width: min(10rem, 44vw);
   }
 
   .nav-actions {

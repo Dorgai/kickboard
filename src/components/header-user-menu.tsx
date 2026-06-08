@@ -3,6 +3,7 @@
 import { LogOut, UserRound } from "lucide-react";
 import { useTranslation } from "@/components/locale-provider";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { resolveSignInCallbackUrl } from "@/lib/auth/sign-in";
 
 export function HeaderUserMenu() {
   const { data: session, status } = useSession();
@@ -22,9 +23,24 @@ export function HeaderUserMenu() {
         className="header-user-menu header-user-menu--sign-in"
         type="button"
         onClick={() => {
-          void signIn("google", {
-            callbackUrl: typeof window !== "undefined" ? window.location.href : "/"
-          });
+          void (async () => {
+            try {
+              const response = await fetch("/api/auth/config", { cache: "no-store" });
+              const config = (await response.json()) as {
+                oauthConfigured?: boolean;
+                sessionSecretConfigured?: boolean;
+              };
+              if (!config.oauthConfigured || !config.sessionSecretConfigured) {
+                window.location.assign("/auth/error?error=Configuration");
+                return;
+              }
+            } catch {
+              /* proceed */
+            }
+            await signIn("google", {
+              callbackUrl: resolveSignInCallbackUrl("/")
+            });
+          })();
         }}
       >
         <UserRound size={16} aria-hidden="true" />

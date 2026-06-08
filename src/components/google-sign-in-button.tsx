@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { markPendingLoginCelebration } from "@/lib/auth/login-celebrate-flag";
+import { resolveSignInCallbackUrl } from "@/lib/auth/sign-in";
 
 function GoogleMark() {
   return (
@@ -53,10 +54,24 @@ export function GoogleSignInButton({
       onClick={() => {
         onBeforeSignIn?.();
         markPendingLoginCelebration();
-        void signIn("google", {
-          callbackUrl:
-            callbackUrl ?? (typeof window !== "undefined" ? window.location.href : "/")
-        });
+        void (async () => {
+          try {
+            const response = await fetch("/api/auth/config", { cache: "no-store" });
+            const config = (await response.json()) as {
+              oauthConfigured?: boolean;
+              sessionSecretConfigured?: boolean;
+            };
+            if (!config.oauthConfigured || !config.sessionSecretConfigured) {
+              window.location.assign("/auth/error?error=Configuration");
+              return;
+            }
+          } catch {
+            /* proceed — server will surface a clearer error if needed */
+          }
+          await signIn("google", {
+            callbackUrl: callbackUrl ?? resolveSignInCallbackUrl("/")
+          });
+        })();
       }}
     >
       <GoogleMark />
