@@ -22,9 +22,14 @@ set_var() {
 if [ -n "${JWT_SECRET:-}" ]; then
   echo "Setting JWT_SECRET..."
   set_var "JWT_SECRET=${JWT_SECRET}"
+  echo "Setting AUTH_SECRET (Auth.js v5 session signing)..."
+  set_var "AUTH_SECRET=${JWT_SECRET}"
 else
   echo "skip JWT_SECRET (set in env or ALLOW_GENERATE_SECRETS=1 for local generate)"
 fi
+
+echo "Setting AUTH_TRUST_HOST=true (Cloudflare / Railway reverse proxy)..."
+set_var "AUTH_TRUST_HOST=true"
 
 if [ -n "${ADMIN_DATA_SOURCES_TOKEN:-}" ]; then
   echo "Setting ADMIN_DATA_SOURCES_TOKEN..."

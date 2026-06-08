@@ -2,59 +2,46 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { recordActivityWithPresence } from "@/lib/activity/store";
 import { isAdminEmail } from "@/lib/admin/emails";
+import { bootstrapAuthEnv, normalizePublicSiteUrl, resolveAuthSecret } from "@/lib/auth/env";
 import { findAuthUserById, upsertOAuthUser } from "@/lib/auth/users";
 import { normalizeAppLocale } from "@/lib/i18n/locales";
+
+bootstrapAuthEnv();
 
 const googleEnabled = Boolean(
   process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim()
 );
 
-/** Strip trailing slash and accidental double schemes (e.g. https://https://mypicks.live). */
-export function normalizePublicSiteUrl(url: string): string {
-  let normalized = url.trim().replace(/\/+$/, "");
-  if (!normalized) return "";
+const authSecret = resolveAuthSecret();
 
-  normalized = normalized.replace(/^(https?:\/\/)+/i, "https://");
-  if (!/^https?:\/\//i.test(normalized)) {
-    normalized = `https://${normalized}`;
-  }
-
-  return normalized;
+if (googleEnabled && !authSecret) {
+  console.error(
+    "[auth] Google OAuth is enabled but AUTH_SECRET/JWT_SECRET is missing — sign-in will fail with Configuration."
+  );
 }
+
+/** @deprecated Import from @/lib/auth/env */
+export { normalizePublicSiteUrl };
 
 /**
  * Auth.js only reads AUTH_URL / NEXTAUTH_URL for OAuth redirect_uri — not NEXT_PUBLIC_APP_URL.
  * On Railway, the internal Host is often `0.0.0.0:PORT`, which Google rejects (Error 400).
  */
 export function ensureAuthUrlEnv(): string {
-  const existing = process.env.AUTH_URL?.trim() || process.env.NEXTAUTH_URL?.trim();
-  if (existing) {
-    const normalized = normalizePublicSiteUrl(existing);
-    if (normalized !== existing.replace(/\/+$/, "")) {
-      process.env.AUTH_URL = normalized;
-    }
-    return normalized;
-  }
-  const fallback = process.env.NEXT_PUBLIC_APP_URL?.trim() || "";
-  const normalized = normalizePublicSiteUrl(fallback);
-  if (normalized) {
-    process.env.AUTH_URL = normalized;
-  }
-  return normalized;
+  return bootstrapAuthEnv();
 }
 
 /** Public site URL — required so Google receives the correct redirect_uri (not localhost). */
 export function resolveAuthBaseUrl() {
-  return ensureAuthUrlEnv();
+  return bootstrapAuthEnv();
 }
-
-const authBaseUrl = ensureAuthUrlEnv();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  /** Forces Google redirect_uri to the public site (Railway Host is often 0.0.0.0:PORT). */
-  ...(authBaseUrl ? { redirectProxyUrl: `${authBaseUrl}/api/auth` } : {}),
-  secret: process.env.AUTH_SECRET?.trim() || process.env.JWT_SECRET?.trim(),
+  secret: authSecret || undefined,
+  pages: {
+    error: "/auth/error"
+  },
   providers: googleEnabled
     ? [
         Google({
@@ -136,4 +123,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 export function isOAuthConfigured() {
   return googleEnabled;
+}
+
+export function isAuthSecretConfigured() {
+  return Boolean(authSecret);
 }
