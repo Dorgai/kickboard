@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { markPendingLoginCelebration } from "@/lib/auth/login-celebrate-flag";
+import { resolveSignInCallbackUrl } from "@/lib/auth/sign-in";
 
 function GoogleMark() {
   return (
@@ -54,8 +55,7 @@ export function GoogleSignInButton({
         onBeforeSignIn?.();
         markPendingLoginCelebration();
         void signIn("google", {
-          callbackUrl:
-            callbackUrl ?? (typeof window !== "undefined" ? window.location.href : "/")
+          callbackUrl: callbackUrl ?? resolveSignInCallbackUrl("/")
         });
       }}
     >

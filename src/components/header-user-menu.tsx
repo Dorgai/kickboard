@@ -3,6 +3,7 @@
 import { LogOut, UserRound } from "lucide-react";
 import { useTranslation } from "@/components/locale-provider";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { resolveSignInCallbackUrl } from "@/lib/auth/sign-in";
 
 export function HeaderUserMenu() {
   const { data: session, status } = useSession();
@@ -23,7 +24,7 @@ export function HeaderUserMenu() {
         type="button"
         onClick={() => {
           void signIn("google", {
-            callbackUrl: typeof window !== "undefined" ? window.location.href : "/"
+            callbackUrl: resolveSignInCallbackUrl("/")
           });
         }}
       >

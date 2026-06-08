@@ -12263,6 +12263,13 @@ code {
   margin-top: 32px;
 }
 
+.auth-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
 .legal-nav a {
   color: var(--color-brand);
   font-weight: 600;
