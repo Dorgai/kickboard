@@ -40,7 +40,12 @@ export type OnboardingTipsDocument = {
   tips: OnboardingTip[];
 };
 
-export const ONBOARDING_TIPS_CAMPAIGN_MS = 5 * 60 * 1000;
-export const ONBOARDING_TIPS_VISIBLE_MS = 14_000;
-export const ONBOARDING_TIPS_INTERVAL_MS = 38_000;
+/** How long each tip stays on screen before auto flow-out. */
+export const ONBOARDING_TIPS_VISIBLE_MS = 20_000;
+/** Max tips shown per user per local calendar day. */
+export const ONBOARDING_TIPS_DAILY_MAX = 10;
+/** Pause between flow-out and the next flow-in. */
+export const ONBOARDING_TIPS_GAP_MS = 30_000;
+/** CSS transition duration — keep in sync with globals.css. */
+export const ONBOARDING_TIPS_FLOW_MS = 320;
 export const ONBOARDING_TIPS_NEW_USER_DAYS = 21;

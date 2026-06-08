@@ -5,8 +5,8 @@ import { HelpTooltip } from "@/components/help-tooltip";
 import { adminFetch, type AdminAuthMode } from "@/lib/admin/fetch";
 import type { OnboardingTip } from "@/lib/onboarding-tips/types";
 import {
-  ONBOARDING_TIPS_CAMPAIGN_MS,
-  ONBOARDING_TIPS_INTERVAL_MS,
+  ONBOARDING_TIPS_DAILY_MAX,
+  ONBOARDING_TIPS_GAP_MS,
   ONBOARDING_TIPS_NEW_USER_DAYS,
   ONBOARDING_TIPS_VISIBLE_MS
 } from "@/lib/onboarding-tips/types";
@@ -79,16 +79,18 @@ export function AdminOnboardingTipsPanel({ auth }: { auth: { mode: AdminAuthMode
             New user tips
             <HelpTooltip label="About onboarding tips" size="sm">
               Floating “Did you know?” tips for users who completed onboarding in the last{" "}
-              {ONBOARDING_TIPS_NEW_USER_DAYS} days. Each tip shows briefly; the session stops after{" "}
-              {Math.round(ONBOARDING_TIPS_CAMPAIGN_MS / 60000)} minutes. Defaults ship from{" "}
+              {ONBOARDING_TIPS_NEW_USER_DAYS} days. Up to {ONBOARDING_TIPS_DAILY_MAX} tips per user per
+              day (stored in that user’s browser). Each tip flows in, stays visible, then flows out;
+              users can dismiss early. Defaults ship from{" "}
               <code>content/onboarding-tips.json</code>; saving here publishes to the database for
               production. Tips linked to a product feature are skipped once that user has already
               used it (picks, Coach Board, Fan Chat, sharing, etc.).
             </HelpTooltip>
           </h2>
           <p className="admin-onboarding-tips-lead">
-            {enabledCount} of {tips.length} tips enabled · visible ~{Math.round(ONBOARDING_TIPS_VISIBLE_MS / 1000)}s
-            · next tip every ~{Math.round(ONBOARDING_TIPS_INTERVAL_MS / 1000)}s
+            {enabledCount} of {tips.length} tips enabled · ~{Math.round(ONBOARDING_TIPS_VISIBLE_MS / 1000)}s
+            each · up to {ONBOARDING_TIPS_DAILY_MAX}/day · ~
+            {Math.round(ONBOARDING_TIPS_GAP_MS / 1000)}s between tips
           </p>
         </div>
         <div className="admin-onboarding-tips-actions">
