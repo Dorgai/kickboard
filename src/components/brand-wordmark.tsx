@@ -26,7 +26,7 @@ export function BrandWordmark({
       {title ? <title>{title}</title> : null}
       <text
         className="brand-wordmark__primary"
-        fill="currentColor"
+        fill="var(--brand-wordmark-primary)"
         fontFamily={WORDMARK_FONT}
         fontSize={mypicks.fontSize}
         fontWeight={mypicks.fontWeight}
@@ -39,7 +39,7 @@ export function BrandWordmark({
       {compact ? null : (
         <text
           className="brand-wordmark__live"
-          fill="currentColor"
+          fill="var(--brand-wordmark-live)"
           fontFamily={WORDMARK_FONT}
           fontSize={live.fontSize}
           fontWeight={live.fontWeight}

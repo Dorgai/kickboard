@@ -1,5 +1,7 @@
 import {
   LOGO_INK_DARK,
+  LOGO_INK_DARK_MUTED,
+  LOGO_LIVE,
   LOGO_NAVY,
   LOGO_PAPER,
   WORDMARK_FONT,
@@ -15,18 +17,23 @@ type WordmarkOptions = {
   theme?: "light" | "dark";
 };
 
-function wordmarkInk(theme: "light" | "dark") {
+function wordmarkPrimaryInk(theme: "light" | "dark") {
   return theme === "dark" ? LOGO_INK_DARK : LOGO_NAVY;
+}
+
+function wordmarkLiveInk(theme: "light" | "dark") {
+  return theme === "dark" ? LOGO_INK_DARK_MUTED : LOGO_LIVE;
 }
 
 function wordmarkTextNodes(showLive = true, theme: "light" | "dark" = "light"): string {
   const { mypicks, live } = WORDMARK_LAYOUT;
-  const ink = wordmarkInk(theme);
+  const primaryInk = wordmarkPrimaryInk(theme);
+  const liveInk = wordmarkLiveInk(theme);
   const liveText = showLive
-    ? `<text x="${live.x}" y="${live.y}" text-anchor="${live.textAnchor}" font-family="${WORDMARK_FONT}" font-size="${live.fontSize}" font-weight="${live.fontWeight}" letter-spacing="${live.letterSpacing}" fill="${ink}" opacity="0.92">.live</text>`
+    ? `<text x="${live.x}" y="${live.y}" text-anchor="${live.textAnchor}" font-family="${WORDMARK_FONT}" font-size="${live.fontSize}" font-weight="${live.fontWeight}" letter-spacing="${live.letterSpacing}" fill="${liveInk}">.live</text>`
     : "";
 
-  return `<text x="${mypicks.x}" y="${mypicks.y}" font-family="${WORDMARK_FONT}" font-size="${mypicks.fontSize}" font-weight="${mypicks.fontWeight}" letter-spacing="${mypicks.letterSpacing}" fill="${ink}">mypicks</text>
+  return `<text x="${mypicks.x}" y="${mypicks.y}" font-family="${WORDMARK_FONT}" font-size="${mypicks.fontSize}" font-weight="${mypicks.fontWeight}" letter-spacing="${mypicks.letterSpacing}" fill="${primaryInk}">mypicks</text>
   ${liveText}`;
 }
 

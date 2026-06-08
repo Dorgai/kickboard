@@ -1,5 +1,6 @@
 /** mypicks.live wordmark palette (static assets / PWA tiles). */
 export const LOGO_NAVY = "#14213d";
+export const LOGO_LIVE = "#6b7280";
 export const LOGO_PAPER = "#f3f2ee";
 export const LOGO_INK_DARK = "#f9fafb";
 export const LOGO_INK_DARK_MUTED = "#d1d5db";

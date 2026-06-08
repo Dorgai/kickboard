@@ -44,8 +44,8 @@
   --kickboard-tab-item-font-size: 12px;
   --kickboard-tab-item-font-weight: 500;
   --kickboard-tab-item-padding-x: 14px;
-  --brand-wordmark-ink: #14213d;
-  --brand-wordmark-live-ink: #14213d;
+  --brand-wordmark-primary: #14213d;
+  --brand-wordmark-live: #6b7280;
 }
 
 [data-theme="dark"] {
@@ -92,8 +92,8 @@
   --kickboard-tab-item-font-size: 12px;
   --kickboard-tab-item-font-weight: 500;
   --kickboard-tab-item-padding-x: 14px;
-  --brand-wordmark-ink: #f9fafb;
-  --brand-wordmark-live-ink: #e5e7eb;
+  --brand-wordmark-primary: #f9fafb;
+  --brand-wordmark-live: #d1d5db;
 }
 
 * {
@@ -197,21 +197,11 @@ button:disabled {
 }
 
 .brand-wordmark {
-  color: var(--brand-wordmark-ink);
   display: block;
   flex-shrink: 0;
   height: 30px;
   max-width: min(11.75rem, 48vw);
   width: auto;
-}
-
-.brand-wordmark__live {
-  opacity: 0.9;
-}
-
-[data-theme="dark"] .brand-wordmark__live {
-  color: var(--brand-wordmark-live-ink);
-  opacity: 0.88;
 }
 
 .tournament-switcher,
