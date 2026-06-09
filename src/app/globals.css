@@ -6506,10 +6506,10 @@ h3 {
 }
 
 .fixture-prediction-outcome-list {
-  background: transparent;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  box-shadow: none;
+  box-shadow: var(--shadow-surface);
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -6524,8 +6524,14 @@ h3 {
 }
 
 [data-theme="dark"] .fixture-prediction-outcome-list {
-  background: transparent;
+  background: var(--color-surface);
   border-color: var(--color-border);
+}
+
+.feed-browser--hero-backdrop .fixture-predictions-form .fixture-prediction-outcome-list {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--color-surface);
 }
 
 .fixture-prediction-outcome-option {
@@ -6577,7 +6583,7 @@ h3 {
 
 .fixture-prediction-outcome-body {
   align-items: center;
-  background: transparent;
+  background: var(--color-surface);
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -6597,7 +6603,7 @@ h3 {
 }
 
 .fixture-prediction-outcome-option.is-disabled .fixture-prediction-outcome-body {
-  background: transparent;
+  background: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
   box-shadow: none;
 }
 
