@@ -13,6 +13,7 @@ import { HelpTooltip } from "@/components/help-tooltip";
 import { PredictionShareButtons } from "@/components/prediction-share-buttons";
 import { FeedTabBar } from "@/components/feed-tab-bar";
 import { parseFixtureKeyTeams, type FixtureOption } from "@/lib/fixtures/fixture-key";
+import { isFixturePredictionLocked } from "@/lib/fixtures/prediction-window";
 import type { PredictionSharePayload } from "@/lib/predictions/share";
 import { dismissSessionCheckpoint } from "@/lib/session-checkpoint/storage";
 
@@ -422,7 +423,14 @@ type PicksTimeTabId = (typeof PICKS_TIME_TABS)[number]["id"];
 type FixturePickMeta = {
   sortKey: string;
   status: FixtureOption["status"];
+  date: string | null;
 };
+
+function fixturePickIsLocked(fixtureKey: string, fixtureMeta: Map<string, FixturePickMeta>) {
+  const meta = fixtureMeta.get(fixtureKey);
+  if (!meta) return false;
+  return isFixturePredictionLocked(meta);
+}
 
 function pickCategoriesSettled(pick: PredictionPickSummary) {
   const statuses: string[] = [];
@@ -558,7 +566,11 @@ export function PredictionsPicksSection({
   const fixtureMeta = useMemo(() => {
     const map = new Map<string, FixturePickMeta>();
     for (const fixture of fixtures) {
-      map.set(fixture.key, { sortKey: fixture.sortKey, status: fixture.status });
+      map.set(fixture.key, {
+        sortKey: fixture.sortKey,
+        status: fixture.status,
+        date: fixture.date
+      });
     }
     return map;
   }, [fixtures]);
@@ -675,6 +687,7 @@ export function PredictionsPicksSection({
           {displayGroups.map((group) => {
             const isActive = activeFixtureKey === group.fixtureKey;
             const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
+            const pickLocked = fixturePickIsLocked(group.fixtureKey, fixtureMeta);
             const matchFriends = group.friends.filter((pick) =>
               peerMatchesNameFilter(pick, friendsNameFilter)
             );
@@ -693,7 +706,7 @@ export function PredictionsPicksSection({
                       className="prediction-share--compact"
                       payload={sharePayload}
                     />
-                    {onEditPick ? (
+                    {onEditPick && !pickLocked ? (
                       <button
                         className="text-button predictions-overview-edit"
                         type="button"
@@ -754,6 +767,7 @@ export function PredictionsPicksSection({
               {displayGroups.map((group) => {
                 const isActive = activeFixtureKey === group.fixtureKey;
                 const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
+                const pickLocked = fixturePickIsLocked(group.fixtureKey, fixtureMeta);
                 return (
                   <tr
                     key={group.fixtureKey}
@@ -777,7 +791,7 @@ export function PredictionsPicksSection({
                         className="prediction-share--compact"
                         payload={sharePayload}
                       />
-                      {onEditPick ? (
+                      {onEditPick && !pickLocked ? (
                         <button
                           className="text-button predictions-overview-edit"
                           type="button"
