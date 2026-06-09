@@ -36,11 +36,19 @@ import {
   useCommunityDistribution
 } from "@/components/prediction-community-stats";
 import { outcomeCrowdPercents } from "@/lib/predictions/community-distribution";
+import { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
+import type { FixtureOption } from "@/lib/fixtures/fixture-key";
+import {
+  isFixturePredictionLocked,
+  type FixturePredictionWindow
+} from "@/lib/fixtures/prediction-window";
 
 type FixturePredictionsFormProps = {
   fixtureKey: string;
   homeTeam: string;
   awayTeam: string;
+  fixtureDate?: string | null;
+  fixtureStatus?: FixtureOption["status"];
   compact?: boolean;
   onSaved?: (change?: string) => void;
 };
@@ -59,6 +67,8 @@ export function FixturePredictionsForm({
   fixtureKey,
   homeTeam,
   awayTeam,
+  fixtureDate = null,
+  fixtureStatus,
   compact = false,
   onSaved
 }: FixturePredictionsFormProps) {
@@ -79,6 +89,13 @@ export function FixturePredictionsForm({
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [serverLocked, setServerLocked] = useState(false);
+
+  const fixtureWindow = useMemo((): FixturePredictionWindow => {
+    return { date: fixtureDate, status: fixtureStatus ?? "upcoming" };
+  }, [fixtureDate, fixtureStatus]);
+
+  const locked = serverLocked || isFixturePredictionLocked(fixtureWindow);
 
   const { data: outcomeCrowd, loading: outcomeCrowdLoading } = useCommunityDistribution({
     scope: "fixture",
@@ -97,7 +114,11 @@ export function FixturePredictionsForm({
       const params = new URLSearchParams({ fixtureKey });
       const response = await fetch(`/api/fixture-predictions?${params}`, { cache: "no-store" });
       if (response.ok) {
-        const payload = (await response.json()) as { prediction?: FixturePredictionRecord | null };
+        const payload = (await response.json()) as {
+          prediction?: FixturePredictionRecord | null;
+          locked?: boolean;
+        };
+        setServerLocked(Boolean(payload.locked));
         const prediction = payload.prediction;
         if (prediction) {
           setPredictedOutcome(prediction.predictedOutcome);
@@ -121,6 +142,21 @@ export function FixturePredictionsForm({
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    setServerLocked(false);
+  }, [fixtureKey]);
+
+  useEffect(() => {
+    const kickoff = fixtureDate ? parseWorldCupFixtureDate(fixtureDate) : null;
+    if (!kickoff) return;
+    const msUntilKickoff = kickoff.getTime() - Date.now();
+    if (msUntilKickoff <= 0) return;
+    const timer = window.setTimeout(() => {
+      setServerLocked(isFixturePredictionLocked(fixtureWindow));
+    }, msUntilKickoff + 250);
+    return () => window.clearTimeout(timer);
+  }, [fixtureDate, fixtureWindow]);
 
   useEffect(() => {
     if (scorersExpanded) {
@@ -293,6 +329,7 @@ export function FixturePredictionsForm({
 
   async function savePick(event: FormEvent) {
     event.preventDefault();
+    if (locked) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -336,7 +373,7 @@ export function FixturePredictionsForm({
   }
 
   async function removeAllPicks() {
-    if (!hasSavedPick) return;
+    if (!hasSavedPick || locked) return;
     if (!window.confirm("Remove all picks for this match? Connections will be notified.")) return;
 
     setBusy(true);
@@ -372,9 +409,16 @@ export function FixturePredictionsForm({
 
   return (
     <form
-      className={`fixture-predictions-form${compact ? " fixture-predictions-form--compact" : ""}`}
+      className={`fixture-predictions-form${compact ? " fixture-predictions-form--compact" : ""}${
+        locked ? " fixture-predictions-form--locked" : ""
+      }`}
       onSubmit={savePick}
     >
+      {locked ? (
+        <p className="fixture-prediction-locked-banner" role="status">
+          {PREDICTION_HINTS.locked}
+        </p>
+      ) : null}
       <fieldset
         className="fixture-prediction-field section-anchor"
         id={PREDICTION_OUTCOME_SECTION_ID}
@@ -401,7 +445,7 @@ export function FixturePredictionsForm({
                 <input
                   checked={selected}
                   className="fixture-prediction-outcome-input"
-                  disabled={disabledByScore}
+                  disabled={locked || disabledByScore}
                   name={`fixture-outcome-${fixtureKey}`}
                   type="radio"
                   value={option.value}
@@ -451,7 +495,7 @@ export function FixturePredictionsForm({
           ) : null}
           <button
             className="text-button fixture-prediction-clear"
-            disabled={!predictedOutcome || scoreDerivedOutcome !== null}
+            disabled={locked || !predictedOutcome || scoreDerivedOutcome !== null}
             title={
               scoreDerivedOutcome !== null
                 ? "Clear the score to change who wins"
@@ -482,6 +526,7 @@ export function FixturePredictionsForm({
             <input
               aria-label={`${homeTeam} goals`}
               className="fixture-prediction-score-field"
+              disabled={locked}
               inputMode="numeric"
               max={20}
               min={0}
@@ -505,6 +550,7 @@ export function FixturePredictionsForm({
             <input
               aria-label={`${awayTeam} goals`}
               className="fixture-prediction-score-field"
+              disabled={locked}
               inputMode="numeric"
               max={20}
               min={0}
@@ -520,7 +566,7 @@ export function FixturePredictionsForm({
         <div className="fixture-prediction-field-actions">
           <button
             className="text-button fixture-prediction-clear"
-            disabled={!homeScore && !awayScore}
+            disabled={locked || (!homeScore && !awayScore)}
             type="button"
             onClick={clearScores}
           >
@@ -542,6 +588,7 @@ export function FixturePredictionsForm({
             className={`fixture-prediction-scorers-toggle${
               scorersExpanded ? "" : " fixture-prediction-scorers-toggle--collapsed"
             }`}
+            disabled={locked}
             type="button"
             onClick={() => setScorersExpanded((open) => !open)}
           >
@@ -584,7 +631,7 @@ export function FixturePredictionsForm({
                       <button
                         aria-label={`Remove one goal for ${pick.playerName}`}
                         className="fixture-scorer-step"
-                        disabled={busy}
+                        disabled={locked || busy}
                         type="button"
                         onClick={() => removeOneScorerGoal(pick.playerId)}
                       >
@@ -596,7 +643,7 @@ export function FixturePredictionsForm({
                       <button
                         aria-label={`Add one goal for ${pick.playerName}`}
                         className="fixture-scorer-step"
-                        disabled={busy || !canAddScorerGoal(pick.teamSide)}
+                        disabled={locked || busy || !canAddScorerGoal(pick.teamSide)}
                         type="button"
                         onClick={() => addScorerGoalFromPick(pick)}
                       >
@@ -614,6 +661,7 @@ export function FixturePredictionsForm({
                 ref={scorerSearchRef}
                 aria-label="Search scorers"
                 className="feed-control-input"
+                disabled={locked}
                 placeholder="Search players"
                 value={scorerSearch}
                 onChange={(event) => setScorerSearch(event.target.value)}
@@ -627,6 +675,7 @@ export function FixturePredictionsForm({
                       <button
                         className={`fixture-scorer-chip${goals > 0 ? " fixture-scorer-chip--selected" : ""}`}
                         disabled={
+                          locked ||
                           !canAddScorerGoal(teamsMatch(player.teamName, homeTeam) ? "home" : "away")
                         }
                         type="button"
@@ -650,15 +699,17 @@ export function FixturePredictionsForm({
 
       <div className="fixture-prediction-form-footer">
         <div className="fixture-prediction-form-actions">
-          <button
-            ref={submitRef}
-            className="button primary fixture-prediction-save"
-            disabled={busy || loading}
-            type="submit"
-          >
-            {busy ? "Saving…" : PREDICTION_HINTS.saveButton}
-          </button>
-          {hasSavedPick ? (
+          {!locked ? (
+            <button
+              ref={submitRef}
+              className="button primary fixture-prediction-save"
+              disabled={busy || loading}
+              type="submit"
+            >
+              {busy ? "Saving…" : PREDICTION_HINTS.saveButton}
+            </button>
+          ) : null}
+          {hasSavedPick && !locked ? (
             <button
               className="button secondary fixture-prediction-remove"
               disabled={busy || loading}

@@ -24,5 +24,7 @@ export const PREDICTION_HINTS = {
   scorersLead: "Pick one scorer per goal in your final score",
   scorersShowList: "Tap here to show the player list",
   scorersHideList: "Tap to hide the player list",
-  saveButton: "Save picks"
+  saveButton: "Save picks",
+  locked:
+    "Picks are locked — this match has already kicked off. You can still view your saved picks and points."
 } as const;

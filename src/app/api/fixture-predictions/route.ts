@@ -6,6 +6,7 @@ import {
   getUserFixturePrediction,
   upsertUserFixturePrediction
 } from "@/lib/fixture-predictions/store";
+import { getFixturePredictionLockState } from "@/lib/fixtures/prediction-window";
 import { parseScorerPicks, type FixtureOutcome } from "@/lib/fixture-predictions/types";
 
 export const dynamic = "force-dynamic";
@@ -32,8 +33,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    const prediction = await getUserFixturePrediction(user.id, fixtureKey);
-    return NextResponse.json({ prediction });
+    const [prediction, lockState] = await Promise.all([
+      getUserFixturePrediction(user.id, fixtureKey),
+      getFixturePredictionLockState(fixtureKey)
+    ]);
+    return NextResponse.json({ prediction, ...lockState });
   } catch (error) {
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
@@ -130,6 +134,12 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+    if (error instanceof Error && error.message === "PREDICTIONS_LOCKED") {
+      return NextResponse.json(
+        { error: "Picks are locked — this match has already kicked off." },
+        { status: 403 }
+      );
+    }
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
     return NextResponse.json({ error: "Unable to save prediction." }, { status: 500 });
@@ -165,6 +175,12 @@ export async function DELETE(request: Request) {
   } catch (error) {
     if (error instanceof Error && error.message === "FIXTURE_KEY_REQUIRED") {
       return NextResponse.json({ error: "Select a match first." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "PREDICTIONS_LOCKED") {
+      return NextResponse.json(
+        { error: "Picks are locked — this match has already kicked off." },
+        { status: 403 }
+      );
     }
     const mapped = mapDatabaseError(error);
     if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
