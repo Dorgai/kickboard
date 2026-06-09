@@ -36,6 +36,11 @@ export const frMessages: Messages = {
     confirmAgeWhyBody:
       "Requis pour la protection des mineurs. Les comptes de moins de 13 ans restent en mode Fan et ne peuvent pas publier sur le Coach Board.",
     birthYear: "Année de naissance",
+    username: "Nom d'utilisateur (facultatif)",
+    usernameHint:
+      "Vos amis vous trouvent avec @nom sur la Communauté. Ignorez pour garder un identifiant auto.",
+    usernamePlaceholder: "ex. {example}",
+    usernamePlaceholderGeneric: "ex. alex_k",
     chooseLanguage: "Choisissez votre langue",
     chooseLanguageHint: "Vous pourrez la modifier à tout moment dans le menu.",
     signIn: "Se connecter",

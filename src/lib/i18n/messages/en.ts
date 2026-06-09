@@ -34,6 +34,10 @@ export const enMessages = {
     confirmAgeWhyBody:
       "Required for child-safety rules. Accounts under 13 stay in Fan Mode and cannot post on the Coach Board.",
     birthYear: "Birth year",
+    username: "Username (optional)",
+    usernameHint: "Friends find you with @username on Community. Skip to keep an auto-assigned handle.",
+    usernamePlaceholder: "e.g. {example}",
+    usernamePlaceholderGeneric: "e.g. alex_k",
     chooseLanguage: "Choose your language",
     chooseLanguageHint: "You can change this anytime from the menu.",
     signIn: "Sign in",

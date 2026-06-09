@@ -56,8 +56,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return Boolean(profile?.email);
     },
     async jwt({ token, account, profile, trigger, session }) {
-      if (trigger === "update" && session && typeof session === "object" && "locale" in session) {
-        token.locale = normalizeAppLocale(String((session as { locale?: string }).locale));
+      if (trigger === "update" && token.sub) {
+        const user = await findAuthUserById(String(token.sub));
+        if (user) {
+          token.onboardingComplete = user.onboardingComplete;
+          token.pointsBalance = user.pointsBalance;
+          if (session && typeof session === "object" && "locale" in session) {
+            token.locale = normalizeAppLocale(String((session as { locale?: string }).locale));
+          } else {
+            token.locale = user.locale;
+          }
+        }
         return token;
       }
 

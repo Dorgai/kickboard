@@ -4,10 +4,11 @@ import { GoogleSignInButton } from "@/components/google-sign-in-button";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { LanguageSelector } from "@/components/language-selector";
 import { useLocale, useTranslation } from "@/components/locale-provider";
+import { suggestUsernameFromLabel } from "@/lib/auth/username";
 import { writeLocaleCookie } from "@/lib/i18n/cookie";
 import { normalizeAppLocale, type AppLocale } from "@/lib/i18n/locales";
 import { useSession } from "next-auth/react";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type AuthConfig = {
   oauthConfigured: boolean;
@@ -25,7 +26,12 @@ export function AuthGate({
   const { t } = useTranslation();
   const { setLocale } = useLocale();
   const [birthYear, setBirthYear] = useState(String(new Date().getFullYear() - 18));
+  const [username, setUsername] = useState("");
   const [selectedLocale, setSelectedLocale] = useState<AppLocale>("en");
+  const suggestedUsername = useMemo(
+    () => suggestUsernameFromLabel(session?.user?.name),
+    [session?.user?.name]
+  );
   const [oauthConfigured, setOauthConfigured] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -113,7 +119,11 @@ export function AuthGate({
         const response = await fetch("/api/auth/onboarding", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ birthYear: Number(birthYear), locale: selectedLocale })
+          body: JSON.stringify({
+            birthYear: Number(birthYear),
+            locale: selectedLocale,
+            username: username.trim() || null
+          })
         });
         const payload = (await response.json()) as { error?: string };
         if (!response.ok) throw new Error(payload.error ?? t("auth.onboardingFailed"));
@@ -143,6 +153,27 @@ export function AuthGate({
             void setLocale(next, { persist: false, reload: false });
           }}
         />
+        <label className="feed-control-field">
+          {t("auth.username")}
+          <span className="feed-control-hint">{t("auth.usernameHint")}</span>
+          <input
+            autoCapitalize="none"
+            autoComplete="username"
+            className="feed-control-input"
+            maxLength={30}
+            placeholder={
+              suggestedUsername
+                ? t("auth.usernamePlaceholder", { example: suggestedUsername })
+                : t("auth.usernamePlaceholderGeneric")
+            }
+            spellCheck={false}
+            type="text"
+            value={username}
+            onChange={(event) =>
+              setUsername(event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
+            }
+          />
+        </label>
         <label className="feed-control-field">
           {t("auth.birthYear")}
           <input

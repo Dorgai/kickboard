@@ -36,6 +36,11 @@ export const huMessages: Messages = {
     confirmAgeWhyBody:
       "Gyermekvédelmi szabályok miatt kötelező. A 13 év alatti fiókok Fan módban maradnak, és nem posztolhatnak a Coach Boardon.",
     birthYear: "Születési év",
+    username: "Felhasználónév (opcionális)",
+    usernameHint:
+      "A barátaid a @felhasználónév alapján találnak meg a Közösségben. Hagyd üresen az automatikus névért.",
+    usernamePlaceholder: "pl. {example}",
+    usernamePlaceholderGeneric: "pl. alex_k",
     chooseLanguage: "Válaszd ki a nyelvet",
     chooseLanguageHint: "Bármikor megváltoztathatod a menüben.",
     signIn: "Bejelentkezés",
