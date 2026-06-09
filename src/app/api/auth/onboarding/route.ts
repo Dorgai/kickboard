@@ -20,13 +20,18 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as { birthYear?: number; locale?: string };
+    const body = (await request.json()) as {
+      birthYear?: number;
+      locale?: string;
+      username?: string | null;
+    };
     const birthYear = Number(body.birthYear);
     const locale = isAppLocale(body.locale) ? body.locale : null;
     const registrationInviteToken = await getRegistrationInviteTokenFromCookies();
     const updated = await completeUserOnboarding(user.id, birthYear, {
       registrationInviteToken,
-      locale
+      locale,
+      username: body.username
     });
     if (!updated) {
       return NextResponse.json({ error: "Unable to complete onboarding." }, { status: 500 });
@@ -75,6 +80,21 @@ export async function POST(request: Request) {
     }
     if (error instanceof Error && error.message === "INVALID_BIRTH_YEAR") {
       return NextResponse.json({ error: "Enter a valid birth year." }, { status: 400 });
+    }
+    if (error instanceof Error && error.message === "INVALID_USERNAME") {
+      return NextResponse.json(
+        {
+          error:
+            "Username must be 3–30 characters and use only letters, numbers, and underscores."
+        },
+        { status: 400 }
+      );
+    }
+    if (error instanceof Error && error.message === "USERNAME_TAKEN") {
+      return NextResponse.json({ error: "That username is already taken." }, { status: 409 });
+    }
+    if (error instanceof Error && error.message === "USERNAME_RESERVED") {
+      return NextResponse.json({ error: "That username is not available." }, { status: 400 });
     }
     const inviteMapped = mapInvitationError(error);
     if (inviteMapped) {

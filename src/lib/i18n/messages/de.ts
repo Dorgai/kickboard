@@ -36,6 +36,11 @@ export const deMessages: Messages = {
     confirmAgeWhyBody:
       "Erforderlich für Jugendschutz. Konten unter 13 Jahren bleiben im Fan-Modus und können nicht im Coach Board posten.",
     birthYear: "Geburtsjahr",
+    username: "Benutzername (optional)",
+    usernameHint:
+      "Freunde finden dich mit @Benutzername in der Community. Überspringen für einen automatischen Namen.",
+    usernamePlaceholder: "z. B. {example}",
+    usernamePlaceholderGeneric: "z. B. alex_k",
     chooseLanguage: "Sprache wählen",
     chooseLanguageHint: "Du kannst das jederzeit im Menü ändern.",
     signIn: "Anmelden",

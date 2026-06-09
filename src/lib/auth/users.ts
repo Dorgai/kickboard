@@ -2,6 +2,7 @@ import { query } from "@/lib/db";
 import { isAdminEmail } from "@/lib/admin/emails";
 import { isChildAccount } from "@/lib/community/users";
 import { isAppLocale, normalizeAppLocale, type AppLocale } from "@/lib/i18n/locales";
+import { isUsernameUniqueViolation, parseOptionalUsername } from "@/lib/auth/username";
 
 export type AuthUser = {
   id: string;
@@ -206,14 +207,41 @@ export async function upsertOAuthUser(input: {
   throw lastError ?? new Error("USER_INSERT_FAILED");
 }
 
+async function applyChosenUsername(userId: string, rawUsername: unknown) {
+  const username = parseOptionalUsername(rawUsername);
+  if (!username) return;
+
+  try {
+    const result = await query<{ id: string }>(
+      `UPDATE users
+       SET username = $2, updated_at = now()
+       WHERE id = $1 AND deleted_at IS NULL
+       RETURNING id`,
+      [userId, username]
+    );
+    if (!result.rows[0]?.id) throw new Error("USER_NOT_FOUND");
+  } catch (error) {
+    if (isUsernameUniqueViolation(error)) {
+      throw new Error("USERNAME_TAKEN");
+    }
+    throw error;
+  }
+}
+
 export async function completeUserOnboarding(
   userId: string,
   birthYear: number,
-  options?: { registrationInviteToken?: string | null; locale?: AppLocale | null }
+  options?: {
+    registrationInviteToken?: string | null;
+    locale?: AppLocale | null;
+    username?: string | null;
+  }
 ) {
   if (!Number.isInteger(birthYear) || birthYear < 1900 || birthYear > new Date().getFullYear()) {
     throw new Error("INVALID_BIRTH_YEAR");
   }
+
+  await applyChosenUsername(userId, options?.username);
 
   const child = isChildAccount(birthYear);
   const locale = options?.locale && isAppLocale(options.locale) ? options.locale : null;

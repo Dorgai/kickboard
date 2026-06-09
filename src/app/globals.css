@@ -3087,6 +3087,15 @@ h3 {
   width: 100%;
 }
 
+.feed-control-hint {
+  color: var(--color-text-secondary);
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: 0.2rem;
+}
+
 .fixture-predictions-form .fixture-prediction-field-label {
   text-align: center;
   width: 100%;
