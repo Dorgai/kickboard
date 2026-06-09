@@ -31,6 +31,13 @@ import {
   tournamentLabelFromKey,
   type TournamentSharePayload
 } from "@/lib/predictions/share";
+import type { CommunityDistribution } from "@/lib/predictions/community-distribution";
+import {
+  PredictionCrowdParticipation,
+  PredictionPlayerCrowdList,
+  PredictionTeamCrowdMeter,
+  useCommunityDistribution
+} from "@/components/prediction-community-stats";
 
 type TournamentPredictionsFormProps = {
   groups?: WorldCupGroupInput[];
@@ -68,12 +75,14 @@ function TeamPickGrid({
   teams,
   selected,
   name,
-  onSelect
+  onSelect,
+  crowdDistribution
 }: {
   teams: string[];
   selected: string | null;
   name: string;
   onSelect: (team: string | null) => void;
+  crowdDistribution?: CommunityDistribution | null;
 }) {
   return (
     <div className="tournament-team-pick-grid" role="radiogroup" aria-label={name}>
@@ -101,6 +110,7 @@ function TeamPickGrid({
                 name={team}
                 size="sm"
               />
+              <PredictionTeamCrowdMeter distribution={crowdDistribution} team={team} />
             </span>
           </label>
         );
@@ -120,7 +130,9 @@ function SinglePlayerPickField({
   expanded,
   onToggleExpanded,
   onSelect,
-  onClear
+  onClear,
+  crowdDistribution,
+  crowdLoading = false
 }: {
   blockLabel: string;
   help: string;
@@ -133,6 +145,8 @@ function SinglePlayerPickField({
   onToggleExpanded: () => void;
   onSelect: (player: SquadPoolPlayer) => void;
   onClear: () => void;
+  crowdDistribution?: CommunityDistribution | null;
+  crowdLoading?: boolean;
 }) {
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -194,6 +208,7 @@ function SinglePlayerPickField({
       </div>
       {expanded ? (
         <div className="fixture-prediction-scorers-panel">
+          <PredictionPlayerCrowdList distribution={crowdDistribution} loading={crowdLoading} />
           <input
             aria-label={`Search players for ${blockLabel}`}
             className="feed-control-input"
@@ -489,6 +504,23 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const { data: championCrowd, loading: championCrowdLoading } = useCommunityDistribution({
+    scope: "tournament",
+    category: "champion"
+  });
+  const { data: opponentCrowd } = useCommunityDistribution({
+    scope: "tournament",
+    category: "finalOpponent"
+  });
+  const { data: topScorerCrowd, loading: topScorerCrowdLoading } = useCommunityDistribution({
+    scope: "tournament",
+    category: "topScorer"
+  });
+  const { data: bestPlayerCrowd, loading: bestPlayerCrowdLoading } = useCommunityDistribution({
+    scope: "tournament",
+    category: "bestPlayer"
+  });
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -763,7 +795,12 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
                   {TOURNAMENT_PREDICTION_HINTS.champion}
                 </HelpTooltip>
               </legend>
+              <PredictionCrowdParticipation
+                distribution={championCrowd}
+                loading={championCrowdLoading}
+              />
               <TeamPickGrid
+                crowdDistribution={championCrowd}
                 name="tournament-champion"
                 selected={champion}
                 teams={teams}
@@ -803,7 +840,9 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
               </legend>
               {champion ? (
                 <>
+                  <PredictionCrowdParticipation distribution={opponentCrowd} />
                   <TeamPickGrid
+                    crowdDistribution={opponentCrowd}
                     name="tournament-final-opponent"
                     selected={opponent}
                     teams={opponentTeams}
@@ -828,6 +867,8 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
           <section className="tournament-pick-block data-card" id="tournament-pick-top-scorer">
             <SinglePlayerPickField
               blockLabel={TOURNAMENT_PREDICTION_BLOCKS.topScorer}
+              crowdDistribution={topScorerCrowd}
+              crowdLoading={topScorerCrowdLoading}
               expanded={topScorerExpanded}
               help={TOURNAMENT_PREDICTION_HINTS.topScorer}
               players={players}
@@ -877,6 +918,8 @@ export function TournamentPredictionsForm({ groups = [], onSaved }: TournamentPr
           <section className="tournament-pick-block data-card" id="tournament-pick-best-player">
             <SinglePlayerPickField
               blockLabel={TOURNAMENT_PREDICTION_BLOCKS.bestPlayer}
+              crowdDistribution={bestPlayerCrowd}
+              crowdLoading={bestPlayerCrowdLoading}
               expanded={bestPlayerExpanded}
               help={TOURNAMENT_PREDICTION_HINTS.bestPlayer}
               players={players}

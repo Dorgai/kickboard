@@ -6314,6 +6314,176 @@ h3 {
   font-size: 12px;
 }
 
+.prediction-crowd-meta {
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0.35rem 0 0.55rem;
+}
+
+.prediction-crowd-meta--loading {
+  opacity: 0.75;
+}
+
+.prediction-crowd-outcome {
+  margin-top: 0.65rem;
+}
+
+.prediction-crowd-bar {
+  background: color-mix(in srgb, var(--color-border) 55%, transparent);
+  border-radius: 999px;
+  display: flex;
+  height: 0.55rem;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.prediction-crowd-bar-segment {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+}
+
+.prediction-crowd-bar-segment--home {
+  background: var(--color-brand, #0f766e);
+}
+
+.prediction-crowd-bar-segment--draw {
+  background: color-mix(in srgb, var(--color-text-secondary) 70%, var(--color-surface));
+}
+
+.prediction-crowd-bar-segment--away {
+  background: color-mix(in srgb, var(--color-brand) 55%, #2563eb);
+}
+
+.prediction-crowd-bar-labels {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  margin-top: 0.45rem;
+}
+
+.prediction-crowd-bar-label {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  font-weight: 700;
+  gap: 0.1rem;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.prediction-crowd-bar-label--home {
+  text-align: left;
+}
+
+.prediction-crowd-bar-label--draw {
+  text-align: center;
+}
+
+.prediction-crowd-bar-label--away {
+  text-align: right;
+}
+
+.prediction-crowd-bar-label-name {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prediction-crowd-bar-label-pct {
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.prediction-crowd-team-meter {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.35rem;
+  width: 100%;
+}
+
+.prediction-crowd-team-meter-bar {
+  background: color-mix(in srgb, var(--color-brand) 72%, transparent);
+  border-radius: 999px;
+  display: block;
+  height: 0.28rem;
+  max-width: 100%;
+  min-width: 0.35rem;
+}
+
+.prediction-crowd-team-meter-pct {
+  color: var(--color-text-secondary);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tournament-predictions-form .fixture-prediction-outcome-body {
+  align-items: center;
+}
+
+.prediction-crowd-player-list {
+  margin-bottom: 0.65rem;
+}
+
+.prediction-crowd-player-options {
+  display: grid;
+  gap: 0.45rem;
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+}
+
+.prediction-crowd-player-option-head {
+  align-items: baseline;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.prediction-crowd-player-option-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prediction-crowd-player-option-pct {
+  color: var(--color-text-secondary);
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.prediction-crowd-player-option-track {
+  background: color-mix(in srgb, var(--color-border) 55%, transparent);
+  border-radius: 999px;
+  display: block;
+  height: 0.35rem;
+  margin-top: 0.2rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+.prediction-crowd-player-option-fill {
+  background: color-mix(in srgb, var(--color-brand) 75%, transparent);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  min-width: 0.2rem;
+}
+
 .fixture-prediction-outcome-list {
   background: transparent;
   border: 1px solid var(--color-border);
