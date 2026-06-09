@@ -2650,7 +2650,7 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 4px 4px 4px 0;
+  padding: 4px 4px 4px 10px;
   position: relative;
 }
 
@@ -2659,7 +2659,7 @@ h3 {
   border-radius: 1px;
   bottom: 10px;
   content: "";
-  left: 5px;
+  left: 12px;
   position: absolute;
   top: 10px;
   width: 2px;
@@ -2669,7 +2669,7 @@ h3 {
   display: grid;
   gap: 6px;
   list-style: none;
-  padding: 0 0 14px 18px;
+  padding: 0 0 14px 14px;
   position: relative;
 }
 
@@ -2681,7 +2681,7 @@ h3 {
   align-items: center;
   display: flex;
   gap: 8px;
-  margin: 0 0 2px -18px;
+  margin: 0 0 2px -2px;
   position: relative;
   z-index: 1;
 }
@@ -2941,7 +2941,13 @@ h3 {
 }
 
 .match-coach-board-panel {
+  display: grid;
+  gap: 14px;
   min-width: 0;
+}
+
+.match-coach-board-panel > .saved-squads-bar {
+  margin: 0;
 }
 
 @media (max-width: 1023px) {
@@ -4054,6 +4060,12 @@ h3 {
 .predictions-match-timeline {
   align-self: start;
   min-width: 0;
+  overflow: visible;
+}
+
+.predictions-match-timeline .match-fixture-picker,
+.match-coach-row-body .match-fixture-picker {
+  overflow: visible;
 }
 
 .predictions-match-content {
