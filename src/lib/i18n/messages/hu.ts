@@ -216,5 +216,18 @@ export const huMessages: Messages = {
       communityTitle: "Közösség",
       communityLine: "Adj hozzá barátokat, oszd meg a boardokat és hasonlítsd össze a tippeket."
     }
+  },
+  friendsHighlights: {
+    eyebrow: "Napi összefoglaló",
+    title: "Barátok tippjeinek kiemelései",
+    leadWithFriends: "Fontos lépések a(z) {count} kapcsolatodtól az elmúlt napban.",
+    leadNoFriends: "Kapcsolódj szurkolókhoz, hogy naponta lásd a tippjeiket itt.",
+    loading: "Barátok kiemeléseinek betöltése…",
+    emptyWithFriends: "Nincs friss baráti tipp az elmúlt napban — nézz vissza a következő kezdés után.",
+    emptyNoFriends: "Adj hozzá kapcsolatokat a Közösségben a napi tipp-összefoglalóhoz.",
+    findFriends: "Barátok keresése",
+    close: "Bezárás",
+    autoDismiss: "Ez az összefoglaló néhány másodperc múlva eltűnik…",
+    blowingUp: "Holnap találkozunk!"
   }
 };

@@ -212,6 +212,19 @@ export const enMessages = {
       communityTitle: "Community",
       communityLine: "Add friends, share boards, and compare picks."
     }
+  },
+  friendsHighlights: {
+    eyebrow: "Daily pulse",
+    title: "Friends' prediction highlights",
+    leadWithFriends: "Key moves from your {count} connections in the last day.",
+    leadNoFriends: "Connect with fans to see their picks here each day.",
+    loading: "Loading friends' highlights…",
+    emptyWithFriends: "No fresh friend picks in the last day — check back after the next kickoff.",
+    emptyNoFriends: "Add connections in Community to get a daily digest of their picks.",
+    findFriends: "Find friends",
+    close: "Close",
+    autoDismiss: "This recap disappears in a few seconds…",
+    blowingUp: "See you tomorrow!"
   }
 } as const;
 
