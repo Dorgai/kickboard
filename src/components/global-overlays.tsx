@@ -1,5 +1,6 @@
 "use client";
 
+import { FriendLiveActivityFlyIn } from "@/components/friend-live-activity-fly-in";
 import { FriendsPredictionsHighlightsDialog } from "@/components/friends-predictions-highlights-dialog";
 import { HelpCenterDialog } from "@/components/help-center-dialog";
 import { OnboardingTipsFloater } from "@/components/onboarding-tips-floater";
@@ -14,6 +15,7 @@ export function GlobalOverlays() {
       <OnboardingTipsFloater />
       <SessionCheckpointDialog />
       <FriendsPredictionsHighlightsDialog />
+      <FriendLiveActivityFlyIn />
       <HelpCenterDialog />
     </>
   );

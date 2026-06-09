@@ -217,6 +217,10 @@ export const frMessages: Messages = {
       communityLine: "Ajoutez des amis, partagez vos boards et comparez les pronos."
     }
   },
+  friendLiveActivity: {
+    eyebrow: "En direct de vos connexions",
+    dismiss: "Fermer"
+  },
   friendsHighlights: {
     eyebrow: "Puls du jour",
     title: "Temps forts des pronos de vos amis",
