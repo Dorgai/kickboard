@@ -31,6 +31,11 @@ import {
   type ScorerPick
 } from "@/lib/fixture-predictions/types";
 import { useClearOnFocusInput } from "@/lib/use-clear-on-focus-input";
+import {
+  PredictionOutcomeCrowdBar,
+  useCommunityDistribution
+} from "@/components/prediction-community-stats";
+import { outcomeCrowdPercents } from "@/lib/predictions/community-distribution";
 
 type FixturePredictionsFormProps = {
   fixtureKey: string;
@@ -74,6 +79,17 @@ export function FixturePredictionsForm({
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const { data: outcomeCrowd, loading: outcomeCrowdLoading } = useCommunityDistribution({
+    scope: "fixture",
+    category: "outcome",
+    fixtureKey,
+    homeTeam,
+    awayTeam,
+    homeLabel: homeTeam,
+    awayLabel: awayTeam
+  });
+  const crowdPercents = outcomeCrowdPercents(outcomeCrowd);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -398,11 +414,28 @@ export function FixturePredictionsForm({
                   <span className="fixture-prediction-outcome-text">
                     {teamName ? option.label : outcomeShort(option.value)}
                   </span>
+                  {crowdPercents.totalPicks > 0 ? (
+                    <span className="prediction-crowd-team-meter">
+                      <span
+                        className="prediction-crowd-team-meter-bar"
+                        style={{ width: `${Math.min(crowdPercents[option.value], 100)}%` }}
+                      />
+                      <span className="prediction-crowd-team-meter-pct">
+                        {crowdPercents[option.value]}%
+                      </span>
+                    </span>
+                  ) : null}
                 </span>
               </label>
             );
           })}
         </div>
+        <PredictionOutcomeCrowdBar
+          awayLabel={awayTeam}
+          distribution={outcomeCrowd}
+          homeLabel={homeTeam}
+          loading={outcomeCrowdLoading}
+        />
         <div className="fixture-prediction-field-actions">
           {predictedOutcome ? (
             <p className="fixture-prediction-field-summary">

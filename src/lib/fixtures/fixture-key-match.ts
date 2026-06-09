@@ -48,16 +48,25 @@ export function resolveFixtureKeyMatchParams(input: {
 
 /** SQL fragment matching the same fixture across wc26 key variants and api-football aliases. */
 export function fixtureKeyMatchSql(column = "fixture_key") {
+  return fixtureKeyMatchSqlFrom(column, 2);
+}
+
+/** Same as {@link fixtureKeyMatchSql} with a custom starting bind index ($1, $2, …). */
+export function fixtureKeyMatchSqlFrom(column = "fixture_key", startParam = 1) {
+  const key = startParam;
+  const home = startParam + 1;
+  const away = startParam + 2;
+  const api = startParam + 3;
   return `(
-  ${column} = $2
+  ${column} = $${key}
   OR (
     split_part(${column}, ':', 1) = 'wc26'
     AND (
-      (split_part(${column}, ':', 3) = $3 AND split_part(${column}, ':', 4) = $4)
-      OR (split_part(${column}, ':', 3) = $4 AND split_part(${column}, ':', 4) = $3)
+      (split_part(${column}, ':', 3) = $${home} AND split_part(${column}, ':', 4) = $${away})
+      OR (split_part(${column}, ':', 3) = $${away} AND split_part(${column}, ':', 4) = $${home})
     )
   )
-  OR (cardinality($5::text[]) > 0 AND ${column} = ANY($5::text[]))
+  OR (cardinality($${api}::text[]) > 0 AND ${column} = ANY($${api}::text[]))
 )`;
 }
 
