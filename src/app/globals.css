@@ -13297,7 +13297,7 @@ code {
 }
 
 .onboarding-tip-floater {
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   max-width: min(22rem, calc(100vw - 24px));
   opacity: 0;
@@ -13307,8 +13307,8 @@ code {
   transition:
     opacity 320ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  width: 100%;
-  z-index: 1200;
+  width: min(22rem, calc(100vw - 24px));
+  z-index: 32;
 }
 
 .onboarding-tip-floater--visible {
@@ -13360,6 +13360,24 @@ code {
 .onboarding-tip-floater-close:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
   outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .onboarding-tip-floater {
+    bottom: calc(
+      var(--kickboard-event-tabs-dock, 58px) + var(--kickboard-mobile-dock-bottom, 8px) +
+        var(--kickboard-mobile-dock-gap, 8px) + 10px + env(safe-area-inset-bottom, 0px)
+    );
+    left: max(var(--kickboard-mobile-dock-inset, 12px), env(safe-area-inset-left, 0px));
+    max-width: none;
+    right: max(var(--kickboard-mobile-dock-inset, 12px), env(safe-area-inset-right, 0px));
+    transform: translateY(18px) scale(0.98);
+    width: auto;
+  }
+
+  .onboarding-tip-floater--visible {
+    transform: translateY(0) scale(1);
+  }
 }
 
 .admin-onboarding-tips {

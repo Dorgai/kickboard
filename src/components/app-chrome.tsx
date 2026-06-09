@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { GlobalOverlays } from "@/components/global-overlays";
 import { HelpMenu } from "@/components/help-menu";
 import { HeaderUserMenu } from "@/components/header-user-menu";
 import { NotificationsCenter } from "@/components/notifications-center";
@@ -122,7 +121,6 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
           <HeaderUserMenu />
         </div>
       </div>
-      <GlobalOverlays />
     </header>
   );
 }

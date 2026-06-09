@@ -1,6 +1,7 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
+import { GlobalOverlays } from "@/components/global-overlays";
 import { ActivityTracker } from "@/components/activity-tracker";
 import { LoginCelebrationListener } from "@/components/login-celebration-listener";
 import { PredictionCelebrationListener } from "@/components/prediction-celebration-listener";
@@ -23,6 +24,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <PredictionSubmitCelebration />
           <PushNotificationBootstrap />
           <PwaInstallHint />
+          <GlobalOverlays />
           {children}
         </ToastProvider>
       </ThemeProvider>
