@@ -299,7 +299,9 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                   <div className="predictions-match-form-points-row">
                     <FixturePredictionsForm
                       awayTeam={selected.awayTeam}
+                      fixtureDate={selected.date}
                       fixtureKey={selected.key}
+                      fixtureStatus={selected.status}
                       homeTeam={selected.homeTeam}
                       onSaved={() => {
                         setOverviewRefresh((token) => token + 1);

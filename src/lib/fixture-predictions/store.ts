@@ -1,5 +1,6 @@
 import { query } from "@/lib/db";
 import { fixtureKeyToShortLabel } from "@/lib/fixtures/fixture-key";
+import { assertFixturePredictionsOpen } from "@/lib/fixtures/prediction-window";
 import { recordFixturePredictionEvent } from "@/lib/fixture-predictions/events";
 import {
   detectPredictionAction,
@@ -108,6 +109,8 @@ export async function upsertUserFixturePrediction(input: {
   const key = input.fixtureKey.trim().slice(0, 120);
   if (!key) throw new Error("FIXTURE_KEY_REQUIRED");
 
+  await assertFixturePredictionsOpen(key);
+
   const existing = await getUserFixturePrediction(input.userId, key);
 
   const predictedOutcome =
@@ -199,6 +202,8 @@ export async function deleteUserFixturePrediction(userId: string, fixtureKey: st
 
   const existing = await getUserFixturePrediction(userId, key);
   if (!existing) return { deleted: false, change: "unchanged" as const };
+
+  await assertFixturePredictionsOpen(key);
 
   const previousSnapshot = snapshotFromRecord(existing);
 
