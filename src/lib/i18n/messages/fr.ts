@@ -216,5 +216,18 @@ export const frMessages: Messages = {
       communityTitle: "Communauté",
       communityLine: "Ajoutez des amis, partagez vos boards et comparez les pronos."
     }
+  },
+  friendsHighlights: {
+    eyebrow: "Puls du jour",
+    title: "Temps forts des pronos de vos amis",
+    leadWithFriends: "Mouvements clés de vos {count} connexions sur la dernière journée.",
+    leadNoFriends: "Connectez-vous avec des fans pour voir leurs pronos ici chaque jour.",
+    loading: "Chargement des temps forts…",
+    emptyWithFriends: "Aucun nouveau prono d'ami aujourd'hui — revenez après le prochain coup d'envoi.",
+    emptyNoFriends: "Ajoutez des connexions dans Communauté pour un récap quotidien.",
+    findFriends: "Trouver des amis",
+    close: "Fermer",
+    autoDismiss: "Ce récap disparaît dans quelques secondes…",
+    blowingUp: "À demain !"
   }
 };

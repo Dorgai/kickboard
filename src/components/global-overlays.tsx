@@ -1,5 +1,6 @@
 "use client";
 
+import { FriendsPredictionsHighlightsDialog } from "@/components/friends-predictions-highlights-dialog";
 import { HelpCenterDialog } from "@/components/help-center-dialog";
 import { OnboardingTipsFloater } from "@/components/onboarding-tips-floater";
 import { SessionCheckpointDialog } from "@/components/session-checkpoint-dialog";
@@ -12,6 +13,7 @@ export function GlobalOverlays() {
       <WelcomeDialog />
       <OnboardingTipsFloater />
       <SessionCheckpointDialog />
+      <FriendsPredictionsHighlightsDialog />
       <HelpCenterDialog />
     </>
   );

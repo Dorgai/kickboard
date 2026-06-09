@@ -11439,6 +11439,159 @@ h3 {
   padding-top: 8px;
 }
 
+.friends-highlights-dialog {
+  max-width: min(28rem, 94vw);
+}
+
+.friends-highlights-eyebrow {
+  color: var(--color-brand);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.friends-highlights-lead {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 6px 0 0;
+}
+
+.friends-highlights-list {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.friends-highlights-item {
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-surface);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 10px 12px;
+  text-align: left;
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+  width: 100%;
+}
+
+.friends-highlights-item:hover {
+  background: var(--kickboard-tab-hover-bg);
+  box-shadow: var(--shadow-surface-hover);
+}
+
+.friends-highlights-item-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.friends-highlights-item-copy strong {
+  font-size: 13px;
+}
+
+.friends-highlights-item-copy span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.friends-highlights-item time {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.friends-highlights-empty {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  padding: 8px 0 4px;
+  text-align: center;
+}
+
+.friends-highlights-empty p {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 22rem;
+}
+
+.friends-highlights-empty-icon {
+  color: var(--color-brand);
+}
+
+.friends-highlights-timer {
+  color: color-mix(in srgb, var(--color-text-secondary) 80%, transparent);
+  font-size: 11px;
+  margin: 14px 0 0;
+  text-align: center;
+}
+
+@keyframes friends-highlights-blow-up {
+  0% {
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1);
+  }
+  35% {
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    filter: blur(10px);
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+
+@keyframes friends-highlights-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.friends-highlights-dialog--blow-up .friends-highlights-panel {
+  animation: friends-highlights-blow-up 0.82s cubic-bezier(0.34, 0.82, 0.46, 1) forwards;
+  pointer-events: none;
+}
+
+.friends-highlights-dialog--blow-up::backdrop {
+  animation: friends-highlights-backdrop-out 0.82s ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .friends-highlights-dialog--blow-up .friends-highlights-panel {
+    animation: none;
+    opacity: 0;
+    transform: none;
+  }
+
+  .friends-highlights-dialog--blow-up::backdrop {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 .session-checkpoint-recent-item div {
   display: grid;
   gap: 2px;

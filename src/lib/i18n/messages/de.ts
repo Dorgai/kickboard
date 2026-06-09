@@ -216,5 +216,18 @@ export const deMessages: Messages = {
       communityTitle: "Community",
       communityLine: "Freunde hinzufügen, Boards teilen und Tipps vergleichen."
     }
+  },
+  friendsHighlights: {
+    eyebrow: "Tagesüberblick",
+    title: "Highlights der Freunde-Tipps",
+    leadWithFriends: "Wichtige Züge deiner {count} Verbindungen im letzten Tag.",
+    leadNoFriends: "Vernetze dich mit Fans, um hier täglich ihre Tipps zu sehen.",
+    loading: "Highlights der Freunde werden geladen…",
+    emptyWithFriends: "Keine frischen Freundes-Tipps im letzten Tag — schau nach dem nächsten Anpfiff wieder vorbei.",
+    emptyNoFriends: "Füge in der Community Verbindungen hinzu für einen täglichen Tipp-Überblick.",
+    findFriends: "Freunde finden",
+    close: "Schließen",
+    autoDismiss: "Dieses Recap verschwindet in wenigen Sekunden…",
+    blowingUp: "Bis morgen!"
   }
 };
