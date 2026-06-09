@@ -31,7 +31,7 @@ import {
   tournamentLabelFromKey,
   type TournamentSharePayload
 } from "@/lib/predictions/share";
-import type { CommunityDistribution } from "@/lib/predictions/community-distribution";
+import type { CommunityDistribution } from "@/lib/predictions/community-distribution-shared";
 import {
   PredictionCrowdParticipation,
   PredictionPlayerCrowdList,

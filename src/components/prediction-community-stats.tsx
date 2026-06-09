@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { CommunityDistribution } from "@/lib/predictions/community-distribution";
-import { lookupTeamCrowdPercent, outcomeCrowdPercents } from "@/lib/predictions/community-distribution";
+import type { CommunityDistribution } from "@/lib/predictions/community-distribution-shared";
+import {
+  lookupTeamCrowdPercent,
+  outcomeCrowdPercents
+} from "@/lib/predictions/community-distribution-shared";
 
 type DistributionScope = "fixture" | "tournament";
 

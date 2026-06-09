@@ -35,7 +35,7 @@ import {
   PredictionOutcomeCrowdBar,
   useCommunityDistribution
 } from "@/components/prediction-community-stats";
-import { outcomeCrowdPercents } from "@/lib/predictions/community-distribution";
+import { outcomeCrowdPercents } from "@/lib/predictions/community-distribution-shared";
 import { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
 import type { FixtureOption } from "@/lib/fixtures/fixture-key";
 import {

@@ -8,26 +8,12 @@ import {
   listApiFootballFixtureKeysForTeams,
   teamsUsableForApiFootballLookup
 } from "@/lib/fixtures/fixture-key-query";
-import { teamsMatch } from "@/lib/squads/team-names";
+import type { CommunityDistribution } from "@/lib/predictions/community-distribution-shared";
 import { DEFAULT_TOURNAMENT_KEY } from "@/lib/tournament-predictions/types";
 
+export type { CommunityDistribution, CommunityDistributionOption } from "@/lib/predictions/community-distribution-shared";
+
 const ELIGIBLE_USER_SQL = `u.deleted_at IS NULL AND u.is_child = false`;
-
-export type CommunityDistributionOption = {
-  key: string;
-  label: string | null;
-  count: number;
-  percent: number;
-};
-
-export type CommunityDistribution = {
-  scope: "fixture" | "tournament";
-  category: string;
-  totalPicks: number;
-  eligiblePredictors: number;
-  participationPercent: number;
-  options: CommunityDistributionOption[];
-};
 
 function roundPercent(count: number, total: number) {
   if (total <= 0) return 0;
@@ -248,22 +234,3 @@ export async function getTournamentPlayerDistribution(input: {
   );
 }
 
-export function lookupTeamCrowdPercent(
-  distribution: CommunityDistribution | null | undefined,
-  teamName: string
-) {
-  if (!distribution?.totalPicks) return null;
-  const match = distribution.options.find((option) => teamsMatch(option.key, teamName));
-  return match?.percent ?? 0;
-}
-
-export function outcomeCrowdPercents(distribution: CommunityDistribution | null | undefined) {
-  const byKey = new Map(distribution?.options.map((option) => [option.key, option.percent]) ?? []);
-  return {
-    home: byKey.get("home") ?? 0,
-    draw: byKey.get("draw") ?? 0,
-    away: byKey.get("away") ?? 0,
-    totalPicks: distribution?.totalPicks ?? 0,
-    participationPercent: distribution?.participationPercent ?? 0
-  };
-}
