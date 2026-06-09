@@ -217,6 +217,10 @@ export const deMessages: Messages = {
       communityLine: "Freunde hinzufügen, Boards teilen und Tipps vergleichen."
     }
   },
+  friendLiveActivity: {
+    eyebrow: "Live von deinen Verbindungen",
+    dismiss: "Schließen"
+  },
   friendsHighlights: {
     eyebrow: "Tagesüberblick",
     title: "Highlights der Freunde-Tipps",

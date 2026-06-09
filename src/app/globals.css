@@ -11592,6 +11592,139 @@ h3 {
   }
 }
 
+.friend-live-activity-layer {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: none;
+  position: fixed;
+  z-index: 10055;
+}
+
+.friend-live-activity-card {
+  animation: friend-live-activity-fly-in 0.48s cubic-bezier(0.22, 0.82, 0.32, 1) forwards;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-brand) 28%, var(--color-border));
+  border-radius: 14px;
+  box-shadow: var(--shadow-elevation-3);
+  display: grid;
+  gap: 10px;
+  max-width: min(22rem, 92vw);
+  padding: 14px 16px 12px;
+  pointer-events: auto;
+  text-align: center;
+  width: 100%;
+}
+
+.friend-live-activity-card--exit {
+  animation: friend-live-activity-blow-up 0.82s cubic-bezier(0.34, 0.82, 0.46, 1) forwards;
+  pointer-events: none;
+}
+
+.friend-live-activity-eyebrow {
+  color: var(--color-brand);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.friend-live-activity-open {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.friend-live-activity-open strong {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.friend-live-activity-open span {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.friend-live-activity-open:hover strong {
+  color: var(--color-brand);
+}
+
+.friend-live-activity-dismiss {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: color-mix(in srgb, var(--color-text-secondary) 88%, transparent);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  margin: 0 auto;
+  padding: 2px 4px;
+}
+
+.friend-live-activity-dismiss:hover {
+  color: var(--color-text-primary);
+}
+
+@keyframes friend-live-activity-fly-in {
+  0% {
+    filter: blur(4px);
+    opacity: 0;
+    transform: translateY(-24px) scale(0.9);
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes friend-live-activity-blow-up {
+  0% {
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1);
+  }
+  35% {
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    filter: blur(10px);
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .friend-live-activity-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .friend-live-activity-card--exit {
+    animation: none;
+    opacity: 0;
+    transform: none;
+  }
+}
+
 .session-checkpoint-recent-item div {
   display: grid;
   gap: 2px;

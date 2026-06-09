@@ -213,6 +213,10 @@ export const enMessages = {
       communityLine: "Add friends, share boards, and compare picks."
     }
   },
+  friendLiveActivity: {
+    eyebrow: "Live from your connections",
+    dismiss: "Dismiss"
+  },
   friendsHighlights: {
     eyebrow: "Daily pulse",
     title: "Friends' prediction highlights",

@@ -217,6 +217,10 @@ export const huMessages: Messages = {
       communityLine: "Adj hozzá barátokat, oszd meg a boardokat és hasonlítsd össze a tippeket."
     }
   },
+  friendLiveActivity: {
+    eyebrow: "Élőben a kapcsolataidtól",
+    dismiss: "Bezárás"
+  },
   friendsHighlights: {
     eyebrow: "Napi összefoglaló",
     title: "Barátok tippjeinek kiemelései",
