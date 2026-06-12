@@ -16,6 +16,7 @@ export type FanChatMessage = {
   broadcastId: string | null;
   body: string;
   createdAt: string;
+  editedAt: string | null;
   senderUsername: string;
   senderDisplayName: string | null;
   recipientUsername: string;
@@ -49,6 +50,7 @@ function mapMessage(row: {
   broadcast_id: string | null;
   body: string;
   created_at: Date;
+  edited_at: Date | null;
   sender_username: string;
   sender_display_name: string | null;
   recipient_username: string;
@@ -69,6 +71,7 @@ function mapMessage(row: {
     broadcastId: row.broadcast_id,
     body: row.body,
     createdAt: row.created_at.toISOString(),
+    editedAt: row.edited_at?.toISOString() ?? null,
     senderUsername: row.sender_username,
     senderDisplayName: row.sender_display_name,
     recipientUsername: row.recipient_username,
@@ -283,13 +286,14 @@ export async function listFanChatThread(viewerId: string, peerId: string) {
     broadcast_id: string | null;
     body: string;
     created_at: Date;
+    edited_at: Date | null;
     sender_username: string;
     sender_display_name: string | null;
     recipient_username: string;
     recipient_display_name: string | null;
     delivery_status: string | null;
   }>(
-    `SELECT m.id, m.sender_id, m.recipient_id, m.broadcast_id, m.body, m.created_at,
+    `SELECT m.id, m.sender_id, m.recipient_id, m.broadcast_id, m.body, m.created_at, m.edited_at,
             s.username AS sender_username, s.display_name AS sender_display_name,
             r.username AS recipient_username, r.display_name AS recipient_display_name,
             CASE
@@ -301,7 +305,7 @@ export async function listFanChatThread(viewerId: string, peerId: string) {
               ELSE NULL
             END AS delivery_status
      FROM (
-       SELECT m.id, m.sender_id, m.recipient_id, m.broadcast_id, m.body, m.created_at
+       SELECT m.id, m.sender_id, m.recipient_id, m.broadcast_id, m.body, m.created_at, m.edited_at
        FROM fan_chat_messages m
        WHERE m.deleted_at IS NULL
          AND ((m.sender_id = $1 AND m.recipient_id = $2)
@@ -327,6 +331,34 @@ export async function listFanChatThread(viewerId: string, peerId: string) {
   await markFanChatThreadRead(viewerId, peerId);
 
   return messages;
+}
+
+export async function updateFanChatMessage(senderId: string, messageId: string, bodyInput: string) {
+  await ensureFanChatSchema();
+  const body = normalizeFanChatBody(bodyInput);
+  if (!body) throw new Error("MESSAGE_EMPTY");
+
+  const messageIdTrimmed = messageId.trim();
+  if (!messageIdTrimmed || messageIdTrimmed.startsWith("pending-")) {
+    throw new Error("MESSAGE_NOT_FOUND");
+  }
+
+  const updated = await query<{ id: string; edited_at: Date }>(
+    `UPDATE fan_chat_messages
+     SET body = $3, edited_at = now()
+     WHERE id = $2
+       AND sender_id = $1
+       AND broadcast_id IS NULL
+       AND deleted_at IS NULL
+     RETURNING id, edited_at`,
+    [senderId, messageIdTrimmed, body]
+  );
+
+  if (!updated.rows[0]) throw new Error("MESSAGE_NOT_FOUND");
+  return {
+    messageId: updated.rows[0].id,
+    editedAt: updated.rows[0].edited_at.toISOString()
+  };
 }
 
 export async function listFanChatBroadcasts(viewerId: string) {

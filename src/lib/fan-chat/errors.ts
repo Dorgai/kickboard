@@ -15,6 +15,8 @@ export function mapFanChatError(error: unknown) {
       };
     case "SEND_FAILED":
       return { status: 500, error: "Unable to send message." };
+    case "MESSAGE_NOT_FOUND":
+      return { status: 404, error: "Message not found or cannot be edited." };
     default:
       return null;
   }

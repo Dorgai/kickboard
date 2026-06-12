@@ -2,7 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ConnectionOnlineIndicator } from "@/components/connection-online-indicator";
-import { FanChatMessageStatus } from "@/components/fan-chat-message-status";
+import { FanChatMessageItem } from "@/components/fan-chat-message-item";
 import type { FanChatBroadcastSummary, FanChatInboxThread, FanChatMessage } from "@/lib/fan-chat/store";
 import { CONNECTIONS_CHANGED_EVENT } from "@/lib/social/events";
 import { useConnectionsPresence } from "@/lib/social/use-connections-presence";
@@ -182,7 +182,8 @@ export function FanChatMessenger() {
       recipientUsername: activeThread?.peerUsername ?? "",
       recipientDisplayName: activeThread?.peerDisplayName ?? null,
       direction: "outgoing",
-      deliveryStatus: "pending"
+      deliveryStatus: "pending",
+      editedAt: null
     };
 
     setMessages((current) => [...current, optimistic]);
@@ -206,6 +207,30 @@ export function FanChatMessenger() {
       setMessages((current) => current.filter((message) => message.id !== pendingId));
       setDraft(body);
       setError(sendError instanceof Error ? sendError.message : "Unable to send.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleEditMessage(messageId: string, body: string) {
+    if (!activePeerId || viewingBroadcasts) return;
+
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const response = await fetch("/api/fan-chat/messages", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId, body })
+      });
+      const payload = (await response.json()) as { error?: string; message?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Unable to update message.");
+      setNotice(payload.message ?? "Message updated.");
+      await loadThread(activePeerId);
+      await loadInbox();
+    } catch (editError) {
+      setError(editError instanceof Error ? editError.message : "Unable to update message.");
     } finally {
       setBusy(false);
     }
@@ -322,23 +347,12 @@ export function FanChatMessenger() {
                   messages.length ? (
                     <ul className="fan-chat-message-list">
                       {messages.map((message) => (
-                        <li
-                          className={`fan-chat-message${message.direction === "outgoing" ? " fan-chat-message--outgoing" : " fan-chat-message--incoming"}`}
+                        <FanChatMessageItem
+                          busy={busy}
                           key={message.id}
-                        >
-                          <p className="fan-chat-bubble-text">{message.body}</p>
-                          <p className="fan-chat-bubble-meta">
-                            <span className="fan-chat-bubble-meta-main">
-                              {message.direction === "outgoing"
-                                ? "You"
-                                : message.senderDisplayName ?? message.senderUsername}{" "}
-                              · {new Date(message.createdAt).toLocaleString()}
-                            </span>
-                            {message.direction === "outgoing" && message.deliveryStatus ? (
-                              <FanChatMessageStatus status={message.deliveryStatus} />
-                            ) : null}
-                          </p>
-                        </li>
+                          message={message}
+                          onEdit={handleEditMessage}
+                        />
                       ))}
                     </ul>
                   ) : (

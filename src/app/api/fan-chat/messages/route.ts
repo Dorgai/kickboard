@@ -7,7 +7,8 @@ import {
   listFanChatBroadcasts,
   listFanChatInbox,
   listFanChatThread,
-  sendFanChatMessage
+  sendFanChatMessage,
+  updateFanChatMessage
 } from "@/lib/fan-chat/store";
 
 export const dynamic = "force-dynamic";
@@ -108,5 +109,33 @@ export async function POST(request: Request) {
     const db = mapDatabaseError(error);
     if (db) return NextResponse.json({ error: db.error }, { status: db.status });
     return NextResponse.json({ error: "Unable to send message." }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  const user = await requireAuthUser();
+  const blocked = authBlocked(user);
+  if (blocked) return blocked;
+
+  try {
+    const body = (await request.json()) as { messageId?: string; body?: string };
+    const messageId = body.messageId?.trim() ?? "";
+    const text = body.body ?? "";
+
+    if (!messageId) {
+      return NextResponse.json({ error: "messageId is required." }, { status: 400 });
+    }
+
+    const result = await updateFanChatMessage(user!.id, messageId, text);
+    return NextResponse.json({
+      ...result,
+      message: "Message updated."
+    });
+  } catch (error) {
+    const mapped = mapFanChatError(error);
+    if (mapped) return NextResponse.json({ error: mapped.error }, { status: mapped.status });
+    const db = mapDatabaseError(error);
+    if (db) return NextResponse.json({ error: db.error }, { status: db.status });
+    return NextResponse.json({ error: "Unable to update message." }, { status: 500 });
   }
 }

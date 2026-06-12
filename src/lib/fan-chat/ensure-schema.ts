@@ -26,6 +26,10 @@ export async function ensureFanChatSchema(): Promise<boolean> {
           ADD COLUMN IF NOT EXISTS deleted_at timestamptz
         `);
         await query(`
+          ALTER TABLE fan_chat_messages
+          ADD COLUMN IF NOT EXISTS edited_at timestamptz
+        `);
+        await query(`
           CREATE INDEX IF NOT EXISTS idx_fan_chat_recipient_created
             ON fan_chat_messages (recipient_id, created_at DESC)
         `);

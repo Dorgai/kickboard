@@ -2454,11 +2454,50 @@ h3 {
 }
 
 .fan-chat-bubble-text {
+  color: var(--color-text-primary);
   font-size: 13px;
   line-height: 1.4;
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+[data-theme="light"] .fan-chat-float-panel,
+[data-theme="light"] .fan-chat-messenger,
+:root:not([data-theme]) .fan-chat-float-panel,
+:root:not([data-theme]) .fan-chat-messenger {
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #4b5563;
+  color: #111827;
+}
+
+[data-theme="light"] .fan-chat-message--incoming,
+[data-theme="light"] .fan-chat-message--outgoing,
+[data-theme="light"] .fan-chat-broadcast-item,
+:root:not([data-theme]) .fan-chat-message--incoming,
+:root:not([data-theme]) .fan-chat-message--outgoing,
+:root:not([data-theme]) .fan-chat-broadcast-item {
+  background: color-mix(in srgb, var(--color-bg) 72%, var(--color-surface));
+}
+
+[data-theme="light"] .fan-chat-message--outgoing,
+:root:not([data-theme]) .fan-chat-message--outgoing {
+  background: color-mix(in srgb, var(--color-brand-light) 72%, var(--color-surface));
+}
+
+[data-theme="light"] .fan-chat-inbox-thread--active,
+:root:not([data-theme]) .fan-chat-inbox-thread--active {
+  background: color-mix(in srgb, var(--color-brand-light) 80%, var(--color-surface));
+}
+
+[data-theme="light"] .fan-chat-inbox-pane-title,
+[data-theme="light"] .fan-chat-inbox-thread-name,
+[data-theme="light"] .fan-chat-thread-empty,
+:root:not([data-theme]) .fan-chat-inbox-pane-title,
+:root:not([data-theme]) .fan-chat-inbox-thread-name,
+:root:not([data-theme]) .fan-chat-thread-empty {
+  color: #111827;
 }
 
 .fan-chat-bubble-meta {
@@ -2474,6 +2513,49 @@ h3 {
 
 .fan-chat-bubble-meta-main {
   min-width: 0;
+}
+
+.fan-chat-bubble-meta-actions {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.fan-chat-message-edit-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.fan-chat-message-edit-btn:hover:not(:disabled) {
+  color: var(--color-text-primary);
+}
+
+.fan-chat-message-edit {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.fan-chat-message-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.fan-chat-message-edit-input {
+  min-height: 3.5rem;
 }
 
 .fan-chat-delivery {
@@ -2531,14 +2613,24 @@ h3 {
 .fan-chat-compose-input,
 .fan-chat-messenger .feed-control-input {
   background: color-mix(in srgb, var(--color-bg) 40%, var(--color-surface));
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
   box-shadow: none;
   box-sizing: border-box;
+  color: var(--color-text-primary);
   display: block;
   max-width: 100%;
   min-height: 4.5rem;
   resize: vertical;
   width: 100%;
+}
+
+[data-theme="light"] .fan-chat-compose-input,
+[data-theme="light"] .fan-chat-messenger .feed-control-input,
+:root:not([data-theme]) .fan-chat-compose-input,
+:root:not([data-theme]) .fan-chat-messenger .feed-control-input {
+  background: var(--color-surface);
+  border-color: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  color: #111827;
 }
 
 .fan-chat-compose .button.primary {
@@ -10950,20 +11042,36 @@ h3 {
 .welcome-dialog {
   background: transparent;
   border: 0;
-  border-radius: 20px;
   max-width: min(36rem, 94vw);
-  overflow: hidden;
+  overflow: visible;
   padding: 0;
 }
 
 .welcome-dialog-panel {
+  --welcome-dialog-radius: 20px;
   background: transparent;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--welcome-dialog-radius);
   box-shadow: var(--shadow-elevation-3);
+  contain: paint;
   isolation: isolate;
-  overflow: hidden;
+  overflow: clip;
   position: relative;
+}
+
+@supports not (overflow: clip) {
+  .welcome-dialog-panel {
+    overflow: hidden;
+  }
+}
+
+[data-theme="light"] .welcome-dialog-panel,
+:root:not([data-theme]) .welcome-dialog-panel {
+  --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #4b5563;
+  color: #111827;
 }
 
 .kickboard-hero-backdrop--nico-accent {
@@ -10982,8 +11090,10 @@ h3 {
 
 .welcome-dialog-panel.kickboard-hero-backdrop::before,
 .welcome-dialog-panel.kickboard-hero-backdrop::after {
-  border-radius: inherit;
+  border-radius: var(--welcome-dialog-radius);
+  clip-path: inset(0 round var(--welcome-dialog-radius));
   inset: 0;
+  overflow: hidden;
   position: absolute;
   z-index: 0;
 }
@@ -11021,6 +11131,25 @@ h3 {
   opacity: 0.55;
 }
 
+[data-theme="light"] .welcome-dialog-panel.kickboard-hero-backdrop::after,
+:root:not([data-theme]) .welcome-dialog-panel.kickboard-hero-backdrop::after {
+  background:
+    linear-gradient(
+      125deg,
+      color-mix(in srgb, var(--color-bg) 96%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 88%, transparent) 44%,
+      color-mix(in srgb, var(--color-bg) 72%, transparent) 72%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, #16a34a 10%, transparent) 0%,
+      transparent 28%,
+      transparent 72%,
+      color-mix(in srgb, #2563eb 8%, transparent) 100%
+    );
+}
+
 .welcome-dialog-shell {
   display: grid;
   gap: 0;
@@ -11029,10 +11158,33 @@ h3 {
 }
 
 .welcome-dialog-header {
+  border-top-left-radius: var(--welcome-dialog-radius);
+  border-top-right-radius: var(--welcome-dialog-radius);
   display: grid;
   gap: 10px;
   padding: 28px 24px 16px;
   text-align: left;
+}
+
+[data-theme="light"] .welcome-dialog-header h2,
+:root:not([data-theme]) .welcome-dialog-header h2 {
+  color: #111827;
+}
+
+[data-theme="light"] .welcome-dialog-lead,
+[data-theme="light"] .welcome-dialog-footnote,
+[data-theme="light"] .welcome-dialog-action,
+[data-theme="light"] .welcome-dialog-action-copy strong,
+:root:not([data-theme]) .welcome-dialog-lead,
+:root:not([data-theme]) .welcome-dialog-footnote,
+:root:not([data-theme]) .welcome-dialog-action,
+:root:not([data-theme]) .welcome-dialog-action-copy strong {
+  color: #111827;
+}
+
+[data-theme="light"] .welcome-dialog-action-copy span,
+:root:not([data-theme]) .welcome-dialog-action-copy span {
+  color: #374151;
 }
 
 .welcome-dialog-brand {
@@ -11125,11 +11277,13 @@ h3 {
 }
 
 .welcome-dialog-footer {
-  backdrop-filter: blur(10px);
-  background: color-mix(in srgb, var(--color-bg) 72%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+  border-bottom-left-radius: var(--welcome-dialog-radius);
+  border-bottom-right-radius: var(--welcome-dialog-radius);
   border-top: none;
   display: grid;
   gap: 10px;
+  overflow: hidden;
   padding: 16px 20px 22px;
 }
 
