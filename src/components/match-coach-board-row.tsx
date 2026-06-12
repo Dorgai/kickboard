@@ -230,6 +230,8 @@ export function MatchCoachBoardRow({ groups }: MatchCoachBoardRowProps) {
               fixtureKey={selected.key}
               fixtureLabel={selected.label}
               group={selected.group}
+              elapsed={selected.elapsed}
+              goalScorers={selected.goalScorers}
               homeGoals={selected.homeGoals}
               homeTeam={selected.homeTeam}
               newBoardNonce={newBoardNonce}

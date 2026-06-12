@@ -1,27 +1,25 @@
-import { fetchApiFootball, getApiFootballConfig, type ApiFootballFixture } from "@/lib/api-football";
+import {
+  fetchApiFootball,
+  getApiFootballConfig,
+  mapApiFootballStatusShort,
+  worldCupLeagueParams,
+  type ApiFootballFixture
+} from "@/lib/api-football";
 import { getCurrentWorldCupFeedCached } from "@/lib/feeds/current-world-cup";
 import type { FixtureOption } from "@/lib/fixtures/fixture-key";
 import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
 
 function mapApiLiveFixture(fixture: ApiFootballFixture) {
   const short = fixture.fixture.status.short;
-  const isFinished = short === "FT" || short === "AET" || short === "PEN";
-  const isLive = short === "1H" || short === "2H" || short === "HT" || short === "ET" || short === "LIVE";
+  const mapped = mapApiFootballStatusShort(short);
   return {
     fixtureId: fixture.fixture.id,
     date: fixture.fixture.date,
-    status: { short: isFinished ? "FT" : isLive ? short : "NS" },
+    status: { short: mapped === "finished" ? "FT" : mapped === "live" ? short : "NS" },
     homeTeam: fixture.teams.home.name,
     awayTeam: fixture.teams.away.name,
     homeGoals: fixture.goals.home,
     awayGoals: fixture.goals.away
-  };
-}
-
-function worldCupLeagueParams() {
-  return {
-    league: process.env.API_FOOTBALL_LEAGUE_ID?.trim() || "1",
-    season: process.env.API_FOOTBALL_SEASON?.trim() || "2026"
   };
 }
 

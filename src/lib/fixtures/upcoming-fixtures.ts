@@ -1,3 +1,4 @@
+import { mapApiFootballStatusShort } from "@/lib/api-football";
 import {
   buildApiFootballFixtureKey,
   buildWorldCupFixtureKey,
@@ -60,7 +61,7 @@ export function buildFixtureOptionsFromWorldCup(groups: WorldCupGroup[], liveFix
   }
 
   for (const live of liveFixtures) {
-    const status = live.status.short === "FT" ? "finished" : "live";
+    const status = mapApiFootballStatusShort(live.status.short);
     let merged = false;
 
     for (const [existingKey, existing] of byKey) {

@@ -1,3 +1,4 @@
+import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { parseWorldCupFixtureDate } from "@/lib/feeds/current-world-cup";
 import { formatFixtureDateDivider } from "@/lib/fixtures/fixture-key";
 import type { FixtureOption } from "@/lib/fixtures/fixture-key";
@@ -5,15 +6,19 @@ import { MatchTeamsLine } from "@/components/team-label";
 
 type FixtureMatchHeaderProps = Pick<
   FixtureOption,
-  "homeTeam" | "awayTeam" | "group" | "date" | "status" | "homeGoals" | "awayGoals"
+  "homeTeam" | "awayTeam" | "group" | "date" | "status" | "homeGoals" | "awayGoals" | "elapsed" | "goalScorers"
 > & {
   className?: string;
   teamsSize?: "xs" | "sm" | "md";
   align?: "start" | "center";
 };
 
-function fixtureEyebrow(group: string | null, status: FixtureOption["status"]) {
-  if (status === "live") return "Live";
+function fixtureEyebrow(
+  group: string | null,
+  status: FixtureOption["status"],
+  elapsed: number | null | undefined
+) {
+  if (status === "live") return elapsed != null ? `Live · ${elapsed}'` : "Live";
   if (status === "finished") return "Full time";
   if (group?.trim()) return `Group ${group.trim()}`;
   return "Match";
@@ -45,6 +50,8 @@ export function FixtureMatchHeader({
   status,
   homeGoals,
   awayGoals,
+  elapsed = null,
+  goalScorers = [],
   className = "",
   teamsSize = "sm",
   align = "start"
@@ -56,7 +63,7 @@ export function FixtureMatchHeader({
     <header
       className={`match-focus-scoreline fixture-match-header fixture-match-header--${align}${className ? ` ${className}` : ""}`}
     >
-      <p className="eyebrow">{fixtureEyebrow(group, status)}</p>
+      <p className="eyebrow">{fixtureEyebrow(group, status, elapsed)}</p>
       <MatchTeamsLine
         awayScore={hasScore ? awayGoals : undefined}
         awayTeam={awayTeam}
@@ -66,6 +73,9 @@ export function FixtureMatchHeader({
         size={teamsSize}
       />
       {meta ? <p className="match-focus-meta">{meta}</p> : null}
+      {goalScorers && goalScorers.length > 0 ? (
+        <MatchGoalScorersLine awayTeam={awayTeam} goals={goalScorers} homeTeam={homeTeam} />
+      ) : null}
     </header>
   );
 }

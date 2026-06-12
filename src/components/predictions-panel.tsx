@@ -17,6 +17,7 @@ import {
   useTournamentPredictionsOverview
 } from "@/components/tournament-predictions-overview";
 import { UserPickActivityPanel } from "@/components/user-pick-activity-panel";
+import { FixtureMatchHeader } from "@/components/fixture-match-header";
 import {
   FixtureMatchPicker,
   useFixtureOptions,
@@ -296,6 +297,19 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                 </div>
 
                 <div className="predictions-match-content">
+                  <FixtureMatchHeader
+                    align="center"
+                    awayGoals={selected.awayGoals}
+                    awayTeam={selected.awayTeam}
+                    date={selected.date}
+                    elapsed={selected.elapsed}
+                    goalScorers={selected.goalScorers}
+                    group={selected.group}
+                    homeGoals={selected.homeGoals}
+                    homeTeam={selected.homeTeam}
+                    status={selected.status}
+                    teamsSize="md"
+                  />
                   <div className="predictions-match-form-points-row">
                     <FixturePredictionsForm
                       awayTeam={selected.awayTeam}

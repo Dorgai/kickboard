@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useMatchBoardOptional } from "@/components/match-board-provider";
+import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { MatchTeamsLine } from "@/components/team-label";
 import { writeFixtureDragData } from "@/lib/fixtures/drag-fixture";
 import {
@@ -12,8 +14,6 @@ import {
   buildGroupFixtureOptions,
   buildKnockoutFixtureOptions
 } from "@/lib/feeds/wc26-tournament-schedule";
-import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
-
 export type WorldCupGroupInput = {
   group: string;
   teams?: string[];
@@ -24,58 +24,21 @@ export type WorldCupGroupInput = {
   }>;
 };
 
-type RealtimeFixture = {
-  fixtureId: number;
-  date: string;
-  status: { short: string };
-  homeTeam: string;
-  awayTeam: string;
-  homeGoals?: number | null;
-  awayGoals?: number | null;
-};
-
 export function useFixtureOptions(groups: WorldCupGroupInput[]) {
-  const [liveFixtures, setLiveFixtures] = useState<RealtimeFixture[]>([]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadLive() {
-      try {
-        const response = await fetch("/api/feeds/realtime", { cache: "no-store" });
-        const payload = (await response.json()) as {
-          connected?: boolean;
-          fixtures?: RealtimeFixture[];
-        };
-        if (!cancelled && payload.connected && payload.fixtures?.length) {
-          setLiveFixtures(payload.fixtures);
-        }
-      } catch {
-        /* optional live feed */
-      }
-    }
-
-    void loadLive();
-    const interval = window.setInterval(loadLive, 60_000);
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, []);
+  const matchBoard = useMatchBoardOptional();
 
   return useMemo(() => {
     const byKey = new Map<string, FixtureOption>();
     for (const fixture of buildGroupFixtureOptions(groups)) {
       byKey.set(fixture.key, fixture);
     }
-    for (const fixture of buildFixtureOptionsFromWorldCup(groups, liveFixtures)) {
-      byKey.set(fixture.key, fixture);
-    }
     for (const fixture of buildKnockoutFixtureOptions()) {
       if (!byKey.has(fixture.key)) byKey.set(fixture.key, fixture);
     }
-    return sortFixtureOptions(Array.from(byKey.values()));
-  }, [groups, liveFixtures]);
+
+    const merged = sortFixtureOptions(Array.from(byKey.values()));
+    return merged.map((fixture) => matchBoard?.enrichFixture(fixture) ?? fixture);
+  }, [groups, matchBoard]);
 }
 
 function fixtureMatchesSearch(fixture: FixtureOption, query: string) {
@@ -237,7 +200,13 @@ export function FixturePickerButton({
       }
     >
       <span className="match-fixture-picker-status" data-status={fixture.status}>
-        {fixture.status === "live" ? "Live" : fixture.status === "finished" ? "FT" : "Upcoming"}
+        {fixture.status === "live"
+          ? fixture.elapsed != null
+            ? `Live ${fixture.elapsed}'`
+            : "Live"
+          : fixture.status === "finished"
+            ? "FT"
+            : "Upcoming"}
       </span>
       <MatchTeamsLine
         awayTeam={fixture.awayTeam}
@@ -249,6 +218,14 @@ export function FixturePickerButton({
         <span className="match-fixture-picker-score">
           {fixture.homeGoals} – {fixture.awayGoals}
         </span>
+      ) : null}
+      {fixture.goalScorers && fixture.goalScorers.length > 0 ? (
+        <MatchGoalScorersLine
+          awayTeam={fixture.awayTeam}
+          compact
+          goals={fixture.goalScorers}
+          homeTeam={fixture.homeTeam}
+        />
       ) : null}
       {showDate && fixture.date ? (
         <span className="match-fixture-picker-date">{fixture.date}</span>

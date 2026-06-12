@@ -46,6 +46,32 @@ export function getApiFootballConfig() {
   };
 }
 
+export function mapApiFootballStatusShort(short: string) {
+  if (short === "FT" || short === "AET" || short === "PEN") {
+    return "finished" as const;
+  }
+  if (
+    short === "1H" ||
+    short === "2H" ||
+    short === "HT" ||
+    short === "ET" ||
+    short === "BT" ||
+    short === "P" ||
+    short === "LIVE" ||
+    short === "INT"
+  ) {
+    return "live" as const;
+  }
+  return "upcoming" as const;
+}
+
+export function worldCupLeagueParams() {
+  return {
+    league: process.env.API_FOOTBALL_LEAGUE_ID?.trim() || "1",
+    season: process.env.API_FOOTBALL_SEASON?.trim() || "2026"
+  };
+}
+
 export async function fetchApiFootball<T>(path: string, searchParams: Record<string, string>) {
   const key = process.env.API_FOOTBALL_KEY;
 
