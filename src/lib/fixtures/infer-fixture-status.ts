@@ -21,3 +21,10 @@ export function inferFixtureStatusFromKickoff(
   if (nowMs < kickoff + MATCH_WINDOW_MS) return "live";
   return "finished";
 }
+
+/** UTC calendar day (YYYY-MM-DD) for a static schedule date string. */
+export function fixtureUtcDay(date: string | null | undefined) {
+  const kickoff = kickoffInstant(date);
+  if (kickoff == null) return null;
+  return new Date(kickoff).toISOString().slice(0, 10);
+}

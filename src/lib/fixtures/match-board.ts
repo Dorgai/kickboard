@@ -10,6 +10,7 @@ import {
 import { getCurrentWorldCupFeedCached } from "@/lib/feeds/current-world-cup";
 import {
   fetchWorldCupApiFixtures,
+  fetchWorldCupFixturesForDates,
   mergeApiFootballFixturesById
 } from "@/lib/fixtures/api-football-fixtures";
 import {
@@ -17,7 +18,11 @@ import {
   parseApiFootballFixtureId,
   type FixtureOption
 } from "@/lib/fixtures/fixture-key";
-import { inferFixtureStatusFromKickoff, kickoffInstant } from "@/lib/fixtures/infer-fixture-status";
+import {
+  fixtureUtcDay,
+  inferFixtureStatusFromKickoff,
+  kickoffInstant
+} from "@/lib/fixtures/infer-fixture-status";
 import type {
   MatchBoardCard,
   MatchBoardFixtureState,
@@ -178,8 +183,28 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
     };
   }
 
-  const apiRows = apiFixtures.map(mapApiFixtureRow);
+  let apiRows = apiFixtures.map(mapApiFixtureRow);
   const now = Date.now();
+
+  const lookupDates = new Set<string>();
+  for (const group of feed.groups) {
+    for (const fixture of group.fixtures) {
+      const kickoff = kickoffInstant(fixture.date);
+      if (kickoff == null) continue;
+      if (now - kickoff > RECENT_RESULT_MS) continue;
+      const day = fixtureUtcDay(fixture.date);
+      if (day) lookupDates.add(day);
+    }
+  }
+
+  if (lookupDates.size) {
+    const dated = await fetchWorldCupFixturesForDates([...lookupDates]);
+    if (dated.length) {
+      apiFixtures = mergeApiFootballFixturesById([...apiFixtures, ...dated]);
+      apiRows = apiFixtures.map(mapApiFixtureRow);
+    }
+  }
+
   const scorerRows = apiRows.filter((row) => {
     const status = mapApiFootballStatusShort(row.status.short);
     return status === "live" || isRecentResultRow(row, now);

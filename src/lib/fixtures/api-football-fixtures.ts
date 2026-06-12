@@ -6,6 +6,7 @@ import {
 
 const DATE_WINDOW_PAST_DAYS = 14;
 const DATE_WINDOW_FUTURE_DAYS = 21;
+const MAX_DATE_LOOKUPS = 10;
 
 function worldCupFixtureDateWindow() {
   const now = new Date();
@@ -27,30 +28,71 @@ export function mergeApiFootballFixturesById(fixtures: ApiFootballFixture[]) {
   return Array.from(byId.values());
 }
 
+function worldCupLeagueId() {
+  return Number(worldCupLeagueParams().league) || 1;
+}
+
+function filterWorldCupFixtures(fixtures: ApiFootballFixture[]) {
+  const leagueId = worldCupLeagueId();
+  return fixtures.filter((fixture) => fixture.league.id === leagueId);
+}
+
+async function fetchFixturePayload(searchParams: Record<string, string>) {
+  try {
+    const payload = await fetchApiFootball<ApiFootballFixture[]>("/fixtures", searchParams);
+    if (Array.isArray(payload.errors) && payload.errors.length > 0) return [];
+    return payload.response ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Targeted per-day lookups (used when league/season bulk calls return nothing). */
+export async function fetchWorldCupFixturesForDates(dates: string[]) {
+  const wc = worldCupLeagueParams();
+  const unique = [...new Set(dates.filter(Boolean))].slice(0, MAX_DATE_LOOKUPS);
+  if (!unique.length) return [];
+
+  const batches = await Promise.all(
+    unique.map(async (date) => {
+      const withLeague = await fetchFixturePayload({ ...wc, date });
+      if (withLeague.length) return withLeague;
+
+      const globalDay = await fetchFixturePayload({ date });
+      return filterWorldCupFixtures(globalDay);
+    })
+  );
+
+  return mergeApiFootballFixturesById(batches.flat());
+}
+
 /** Live, recently finished, upcoming, and date-window World Cup fixtures (deduped by id). */
 export async function fetchWorldCupApiFixtures(): Promise<ApiFootballFixture[]> {
   const wc = worldCupLeagueParams();
   const window = worldCupFixtureDateWindow();
 
-  const [livePayload, lastPayload, nextPayload, windowPayload, finishedPayload] = await Promise.all([
-    fetchApiFootball<ApiFootballFixture[]>("/fixtures", { live: "all" }),
-    fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc, last: "40" }),
-    fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc, next: "40" }),
-    fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc, from: window.from, to: window.to }),
-    fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc, status: "FT" })
+  const settled = await Promise.allSettled([
+    fetchFixturePayload({ live: "all" }),
+    fetchFixturePayload({ ...wc, last: "40" }),
+    fetchFixturePayload({ ...wc, next: "40" }),
+    fetchFixturePayload({ ...wc, from: window.from, to: window.to }),
+    fetchFixturePayload({ ...wc, status: "FT" }),
+    fetchFixturePayload({ ...wc })
   ]);
 
-  let merged = mergeApiFootballFixturesById([
-    ...livePayload.response,
-    ...lastPayload.response,
-    ...nextPayload.response,
-    ...windowPayload.response,
-    ...finishedPayload.response
-  ]);
+  let merged = mergeApiFootballFixturesById(
+    settled.flatMap((result) => (result.status === "fulfilled" ? result.value : []))
+  );
 
   if (!merged.length) {
-    const seasonPayload = await fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc });
-    merged = mergeApiFootballFixturesById(seasonPayload.response);
+    const rollingDates: string[] = [];
+    const now = new Date();
+    for (let offset = -DATE_WINDOW_PAST_DAYS; offset <= 3; offset++) {
+      const day = new Date(now);
+      day.setUTCDate(day.getUTCDate() + offset);
+      rollingDates.push(day.toISOString().slice(0, 10));
+    }
+    merged = await fetchWorldCupFixturesForDates(rollingDates);
   }
 
   return merged;
