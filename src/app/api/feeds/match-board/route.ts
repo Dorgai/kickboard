@@ -15,6 +15,7 @@ export async function GET() {
         updatedAt: new Date().toISOString(),
         live: [],
         startingSoon: [],
+        recentResults: [],
         byKey: {}
       },
       { status: 502 }
