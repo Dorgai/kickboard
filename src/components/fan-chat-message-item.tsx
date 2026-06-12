@@ -67,7 +67,13 @@ export function FanChatMessageItem({
         </form>
       ) : (
         <>
-          <p className="fan-chat-bubble-text">{message.body}</p>
+          <p
+            className="fan-chat-bubble-text"
+            onDoubleClick={editable ? () => setEditing(true) : undefined}
+            title={editable ? "Double-click to edit" : undefined}
+          >
+            {message.body}
+          </p>
           <p className="fan-chat-bubble-meta">
             <span className="fan-chat-bubble-meta-main">
               {message.direction === "outgoing"

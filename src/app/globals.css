@@ -2465,10 +2465,18 @@ h3 {
 [data-theme="light"] .fan-chat-float-panel,
 [data-theme="light"] .fan-chat-messenger,
 :root:not([data-theme]) .fan-chat-float-panel,
-:root:not([data-theme]) .fan-chat-messenger {
+:root:not([data-theme]) .fan-chat-messenger,
+.fan-chat-float-root[data-theme="light"] .fan-chat-float-panel,
+.fan-chat-float-root[data-theme="light"] .fan-chat-messenger {
   --color-text-primary: #111827;
   --color-text-secondary: #374151;
   --color-text-muted: #4b5563;
+  color: #111827;
+}
+
+.fan-chat-float-root[data-theme="light"] .fan-chat-float-header h2,
+[data-theme="light"] .fan-chat-float-header h2,
+:root:not([data-theme]) .fan-chat-float-header h2 {
   color: #111827;
 }
 
@@ -2525,16 +2533,16 @@ h3 {
 .fan-chat-message-edit-btn {
   -webkit-appearance: none;
   appearance: none;
-  background: transparent;
-  border: none;
-  color: var(--color-text-secondary);
+  background: color-mix(in srgb, var(--color-bg) 55%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
+  border-radius: 999px;
+  color: var(--color-text-primary);
   cursor: pointer;
   font: inherit;
   font-size: 10px;
   font-weight: 700;
-  padding: 0;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  line-height: 1;
+  padding: 4px 8px;
 }
 
 .fan-chat-message-edit-btn:hover:not(:disabled) {
@@ -11066,7 +11074,9 @@ h3 {
 }
 
 [data-theme="light"] .welcome-dialog-panel,
-:root:not([data-theme]) .welcome-dialog-panel {
+:root:not([data-theme]) .welcome-dialog-panel,
+.welcome-dialog[data-theme="light"] .welcome-dialog-panel,
+.welcome-dialog-panel[data-theme="light"] {
   --kickboard-hero-surface: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
   --color-text-primary: #111827;
   --color-text-secondary: #374151;

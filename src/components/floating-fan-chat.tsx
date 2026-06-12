@@ -4,6 +4,7 @@ import { MessageCircle, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FanChatPanel } from "@/components/fan-chat-panel";
+import { useTheme } from "@/components/theme-provider";
 import {
   useDismissOnEscape,
   useDismissOnOutsidePointerDown
@@ -15,6 +16,7 @@ type FloatingFanChatProps = {
 };
 
 export function FloatingFanChat({ open, onOpenChange }: FloatingFanChatProps) {
+  const { resolved: theme } = useTheme();
   const panelRef = useRef<HTMLElement>(null);
   const fabRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -30,7 +32,7 @@ export function FloatingFanChat({ open, onOpenChange }: FloatingFanChatProps) {
   if (!mounted) return null;
 
   return createPortal(
-    <div className="fan-chat-float-root" data-open={open ? "true" : "false"}>
+    <div className="fan-chat-float-root" data-open={open ? "true" : "false"} data-theme={theme}>
       {open ? (
         <>
           <button

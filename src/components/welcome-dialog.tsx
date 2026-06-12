@@ -6,6 +6,7 @@ import { useTranslation } from "@/components/locale-provider";
 import { useEffect, useId, useRef, useState } from "react";
 import { OPEN_WELCOME_EVENT } from "@/lib/help/events";
 import { writeLocationHash } from "@/lib/navigation/location-hash";
+import { useTheme } from "@/components/theme-provider";
 import { celebrateWelcomeStart } from "@/lib/welcome/celebrate";
 import { hasSeenWelcome, markWelcomeSeen } from "@/lib/welcome";
 import { closeDialogOnBackdropClick } from "@/lib/use-dismiss-on-outside-pointer-down";
@@ -19,6 +20,7 @@ const HIGHLIGHT_HASHES = [
 
 export function WelcomeDialog() {
   const { t } = useTranslation();
+  const { resolved: theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [forced, setForced] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -87,6 +89,7 @@ export function WelcomeDialog() {
       ref={dialogRef}
       aria-labelledby={titleId}
       className="timeline-modal welcome-dialog"
+      data-theme={theme}
       onCancel={(event) => {
         event.preventDefault();
         closeWelcome();
@@ -94,7 +97,10 @@ export function WelcomeDialog() {
       onClick={(event) => closeDialogOnBackdropClick(event, closeWelcome)}
       onClose={closeWelcome}
     >
-      <div className="welcome-dialog-panel kickboard-hero-backdrop kickboard-hero-backdrop--nico-accent">
+      <div
+        className="welcome-dialog-panel kickboard-hero-backdrop kickboard-hero-backdrop--nico-accent"
+        data-theme={theme}
+      >
         <div className="welcome-dialog-shell">
           <header className="welcome-dialog-header">
             <BrandWordmark className="welcome-dialog-brand" />
