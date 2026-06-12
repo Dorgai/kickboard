@@ -28,6 +28,7 @@ export type MatchBoardCard = {
   elapsed: number | null;
   startsInMinutes: number | null;
   goalScorers: MatchBoardGoal[];
+  segment?: "live" | "starting_soon" | "recent_result";
 };
 
 export type MatchBoardPayload = {
@@ -37,6 +38,7 @@ export type MatchBoardPayload = {
   updatedAt: string;
   live: MatchBoardCard[];
   startingSoon: MatchBoardCard[];
+  recentResults: MatchBoardCard[];
   byKey: Record<string, MatchBoardFixtureState>;
 };
 

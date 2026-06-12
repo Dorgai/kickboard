@@ -1,11 +1,6 @@
-import {
-  fetchApiFootball,
-  getApiFootballConfig,
-  mapApiFootballStatusShort,
-  worldCupLeagueParams,
-  type ApiFootballFixture
-} from "@/lib/api-football";
+import { getApiFootballConfig, mapApiFootballStatusShort, type ApiFootballFixture } from "@/lib/api-football";
 import { getCurrentWorldCupFeedCached } from "@/lib/feeds/current-world-cup";
+import { fetchWorldCupApiFixtures } from "@/lib/fixtures/api-football-fixtures";
 import type { FixtureOption } from "@/lib/fixtures/fixture-key";
 import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
 
@@ -31,12 +26,7 @@ export async function loadWorldCupFixtureOptions(): Promise<FixtureOption[]> {
   const { keyConfigured } = getApiFootballConfig();
   if (keyConfigured) {
     try {
-      const wc = worldCupLeagueParams();
-      const [upcoming, live] = await Promise.all([
-        fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc, next: "25" }),
-        fetchApiFootball<ApiFootballFixture[]>("/fixtures", { live: "all" })
-      ]);
-      liveInputs = [...upcoming.response, ...live.response].map(mapApiLiveFixture);
+      liveInputs = (await fetchWorldCupApiFixtures()).map(mapApiLiveFixture);
     } catch {
       /* optional */
     }

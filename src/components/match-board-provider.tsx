@@ -22,6 +22,7 @@ const EMPTY_PAYLOAD: MatchBoardPayload = {
   updatedAt: new Date().toISOString(),
   live: [],
   startingSoon: [],
+  recentResults: [],
   byKey: {}
 };
 

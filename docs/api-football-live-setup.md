@@ -72,8 +72,9 @@ This polls every 60s and writes `api-football:live-fixtures` in Redis. The web r
 | `connected: false`, `keyConfigured: false` | Set `API_FOOTBALL_KEY` on the **web** service and redeploy |
 | `keyConfigured: true`, `workerEnabled: false` | Set `KICKBOARD_WORKER_ENABLED=true` (exact string) |
 | `502` + rate limit message | API quota exceeded; wait or upgrade plan; add worker + cache later |
-| Connected but picker still all “Upcoming” | No live WC fixtures right now, or team names do not match static schedule (live rows use `api-football:{id}` keys) |
-| Picker works, no scores shown | Deploy build that includes score labels in the picker (after live API is connected) |
+| Connected but picker still all “Upcoming” | Match board now merges `last`, `next`, date-window, and `live` fixtures — redeploy latest `main`. If still wrong, team names may not match the static schedule. |
+| June 11 (or earlier) games still “Upcoming” after kickoff | Same as above — finished scores come from API `last` / date-window, not `next` alone. |
+| Picker works, no scores shown | Ensure `API_FOOTBALL_KEY` is set and redeploy; scores enrich via `/api/feeds/match-board` `byKey`. |
 
 ## Product note
 

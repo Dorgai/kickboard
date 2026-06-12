@@ -10768,6 +10768,19 @@ h3 {
   color: var(--color-danger);
 }
 
+.match-board-strip-card--result {
+  border-color: color-mix(in srgb, var(--color-brand) 28%, var(--color-border));
+}
+
+.match-board-strip-card--result .match-board-strip-status {
+  color: var(--color-text-secondary);
+}
+
+.current-event-fixture-live-badge--ft {
+  background: color-mix(in srgb, var(--color-brand) 12%, transparent);
+  color: var(--color-text-secondary);
+}
+
 .match-goal-scorers-line {
   display: grid;
   gap: 4px;
