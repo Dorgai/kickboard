@@ -10950,20 +10950,27 @@ h3 {
 .welcome-dialog {
   background: transparent;
   border: 0;
-  border-radius: 20px;
   max-width: min(36rem, 94vw);
-  overflow: hidden;
+  overflow: visible;
   padding: 0;
 }
 
 .welcome-dialog-panel {
+  --welcome-dialog-radius: 20px;
   background: transparent;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--welcome-dialog-radius);
   box-shadow: var(--shadow-elevation-3);
+  contain: paint;
   isolation: isolate;
-  overflow: hidden;
+  overflow: clip;
   position: relative;
+}
+
+@supports not (overflow: clip) {
+  .welcome-dialog-panel {
+    overflow: hidden;
+  }
 }
 
 .kickboard-hero-backdrop--nico-accent {
@@ -10982,8 +10989,10 @@ h3 {
 
 .welcome-dialog-panel.kickboard-hero-backdrop::before,
 .welcome-dialog-panel.kickboard-hero-backdrop::after {
-  border-radius: inherit;
+  border-radius: var(--welcome-dialog-radius);
+  clip-path: inset(0 round var(--welcome-dialog-radius));
   inset: 0;
+  overflow: hidden;
   position: absolute;
   z-index: 0;
 }
@@ -11029,6 +11038,8 @@ h3 {
 }
 
 .welcome-dialog-header {
+  border-top-left-radius: var(--welcome-dialog-radius);
+  border-top-right-radius: var(--welcome-dialog-radius);
   display: grid;
   gap: 10px;
   padding: 28px 24px 16px;
@@ -11125,11 +11136,13 @@ h3 {
 }
 
 .welcome-dialog-footer {
-  backdrop-filter: blur(10px);
-  background: color-mix(in srgb, var(--color-bg) 72%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 86%, transparent);
+  border-bottom-left-radius: var(--welcome-dialog-radius);
+  border-bottom-right-radius: var(--welcome-dialog-radius);
   border-top: none;
   display: grid;
   gap: 10px;
+  overflow: hidden;
   padding: 16px 20px 22px;
 }
 
