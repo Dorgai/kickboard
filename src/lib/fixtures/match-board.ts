@@ -1,9 +1,7 @@
 import {
-  fetchApiFootball,
   getApiFootballConfig,
   mapApiFootballStatusShort,
-  type ApiFootballFixture,
-  worldCupLeagueParams
+  type ApiFootballFixture
 } from "@/lib/api-football";
 import {
   fetchFixtureGoalEvents,
@@ -11,10 +9,15 @@ import {
 } from "@/lib/api-football-events";
 import { getCurrentWorldCupFeedCached } from "@/lib/feeds/current-world-cup";
 import {
+  fetchWorldCupApiFixtures,
+  mergeApiFootballFixturesById
+} from "@/lib/fixtures/api-football-fixtures";
+import {
   buildApiFootballFixtureKey,
   parseApiFootballFixtureId,
   type FixtureOption
 } from "@/lib/fixtures/fixture-key";
+import { inferFixtureStatusFromKickoff, kickoffInstant } from "@/lib/fixtures/infer-fixture-status";
 import type {
   MatchBoardCard,
   MatchBoardFixtureState,
@@ -23,18 +26,14 @@ import type {
 } from "@/lib/fixtures/match-board-shared";
 import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
 import { teamsMatch } from "@/lib/squads/team-names";
-import { readCachedFixtureGoalEvents, readCachedLiveFixtures } from "@/lib/redis/live-fixtures-cache";
-import { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
+import {
+  readCachedFixtureGoalEvents,
+  readCachedLiveFixtures
+} from "@/lib/redis/live-fixtures-cache";
 
 const STARTING_SOON_MS = 60 * 60 * 1000;
-
-function kickoffMs(date: string | null) {
-  if (!date?.trim()) return null;
-  const fromFeed = parseWorldCupFixtureDate(date);
-  if (fromFeed) return fromFeed.getTime();
-  const parsed = Date.parse(date);
-  return Number.isNaN(parsed) ? null : parsed;
-}
+const RECENT_RESULT_MS = 48 * 60 * 60 * 1000;
+const GOAL_SCORER_FETCH_LIMIT = 10;
 
 function mapApiFixtureRow(fixture: ApiFootballFixture) {
   const short = fixture.fixture.status.short;
@@ -66,7 +65,7 @@ function fixtureIdForOption(option: FixtureOption, apiRows: ReturnType<typeof ma
 function toCard(
   option: FixtureOption,
   state: MatchBoardFixtureState,
-  segment: "live" | "starting_soon",
+  segment: "live" | "starting_soon" | "recent_result",
   startsInMinutes: number | null
 ): MatchBoardCard {
   return {
@@ -83,21 +82,22 @@ function toCard(
     statusLong: state.statusLong,
     elapsed: state.elapsed,
     startsInMinutes,
-    goalScorers: state.goalScorers
+    goalScorers: state.goalScorers,
+    segment
   };
 }
 
 async function loadGoalScorers(
-  liveRows: ReturnType<typeof mapApiFixtureRow>[]
+  rows: ReturnType<typeof mapApiFixtureRow>[]
 ): Promise<Map<number, MatchBoardGoal[]>> {
   const map = new Map<number, MatchBoardGoal[]>();
-  if (!liveRows.length) return map;
+  if (!rows.length) return map;
 
-  const ids = liveRows.map((row) => row.fixtureId);
+  const ids = rows.map((row) => row.fixtureId);
   const cached = await readCachedFixtureGoalEvents(ids);
   const missing: ReturnType<typeof mapApiFixtureRow>[] = [];
 
-  for (const row of liveRows) {
+  for (const row of rows) {
     const events = cached.get(row.fixtureId);
     if (events) {
       map.set(row.fixtureId, parseApiFootballGoalEvents(events, row.homeTeamId, row.awayTeamId));
@@ -107,7 +107,7 @@ async function loadGoalScorers(
   }
 
   await Promise.all(
-    missing.slice(0, 6).map(async (row) => {
+    missing.slice(0, GOAL_SCORER_FETCH_LIMIT).map(async (row) => {
       try {
         const goals = await fetchFixtureGoalEvents(row.fixtureId, row.homeTeamId, row.awayTeamId);
         map.set(row.fixtureId, goals);
@@ -120,18 +120,26 @@ async function loadGoalScorers(
   return map;
 }
 
+function isRecentResultRow(row: ReturnType<typeof mapApiFixtureRow>, now: number) {
+  const status = mapApiFootballStatusShort(row.status.short);
+  if (status !== "finished") return false;
+  const kickoff = kickoffInstant(row.date);
+  if (kickoff == null) return false;
+  return now - kickoff <= RECENT_RESULT_MS;
+}
+
 export async function loadMatchBoard(): Promise<MatchBoardPayload> {
   const updatedAt = new Date().toISOString();
-  const { keyConfigured, workerEnabled } = getApiFootballConfig();
+  const { keyConfigured } = getApiFootballConfig();
 
-  if (!keyConfigured || !workerEnabled) {
+  if (!keyConfigured) {
     return {
       connected: false,
-      message:
-        "Live match board requires API_FOOTBALL_KEY and KICKBOARD_WORKER_ENABLED=true on the web service.",
+      message: "Live match board requires API_FOOTBALL_KEY on the web service.",
       updatedAt,
       live: [],
       startingSoon: [],
+      recentResults: [],
       byKey: {}
     };
   }
@@ -140,21 +148,9 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
   let apiFixtures: ApiFootballFixture[] = [];
 
   try {
-    const cachedLive = await readCachedLiveFixtures();
-    if (cachedLive?.length) {
-      apiFixtures = cachedLive;
-    } else {
-      const wc = worldCupLeagueParams();
-      const [livePayload, upcomingPayload] = await Promise.all([
-        fetchApiFootball<ApiFootballFixture[]>("/fixtures", { live: "all" }),
-        fetchApiFootball<ApiFootballFixture[]>("/fixtures", { ...wc, next: "40" })
-      ]);
-      const byId = new Map<number, ApiFootballFixture>();
-      for (const fixture of [...livePayload.response, ...upcomingPayload.response]) {
-        byId.set(fixture.fixture.id, fixture);
-      }
-      apiFixtures = Array.from(byId.values());
-    }
+    const cachedLive = (await readCachedLiveFixtures()) ?? [];
+    const fetched = await fetchWorldCupApiFixtures();
+    apiFixtures = mergeApiFootballFixturesById([...cachedLive, ...fetched]);
   } catch (error) {
     return {
       connected: false,
@@ -162,13 +158,18 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
       updatedAt,
       live: [],
       startingSoon: [],
+      recentResults: [],
       byKey: {}
     };
   }
 
   const apiRows = apiFixtures.map(mapApiFixtureRow);
-  const liveRows = apiRows.filter((row) => mapApiFootballStatusShort(row.status.short) === "live");
-  const goalScorersById = await loadGoalScorers(liveRows);
+  const now = Date.now();
+  const scorerRows = apiRows.filter((row) => {
+    const status = mapApiFootballStatusShort(row.status.short);
+    return status === "live" || isRecentResultRow(row, now);
+  });
+  const goalScorersById = await loadGoalScorers(scorerRows);
 
   const liveInputs = apiRows.map((row) => ({
     fixtureId: row.fixtureId,
@@ -182,14 +183,14 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
 
   const options = buildFixtureOptionsFromWorldCup(feed.groups, liveInputs);
   const byKey: Record<string, MatchBoardFixtureState> = {};
-  const now = Date.now();
 
   for (const option of options) {
     const fixtureId = fixtureIdForOption(option, apiRows);
     const apiRow = fixtureId ? apiRows.find((row) => row.fixtureId === fixtureId) : null;
+    const inferred = apiRow ? null : inferFixtureStatusFromKickoff(option.date, now);
     const status = apiRow
       ? mapApiFootballStatusShort(apiRow.status.short)
-      : option.status;
+      : inferred ?? option.status;
     const goalScorers =
       fixtureId && goalScorersById.has(fixtureId) ? goalScorersById.get(fixtureId)! : [];
 
@@ -223,6 +224,7 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
 
   const live: MatchBoardCard[] = [];
   const startingSoon: MatchBoardCard[] = [];
+  const recentResults: MatchBoardCard[] = [];
 
   for (const option of options) {
     const state = byKey[option.key];
@@ -233,8 +235,17 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
       continue;
     }
 
+    if (state.status === "finished") {
+      const kickoff = kickoffInstant(option.date);
+      const hasScore = state.homeGoals != null && state.awayGoals != null;
+      if (hasScore && kickoff != null && now - kickoff <= RECENT_RESULT_MS) {
+        recentResults.push(toCard(option, state, "recent_result", null));
+      }
+      continue;
+    }
+
     if (state.status !== "upcoming") continue;
-    const kickoff = kickoffMs(option.date);
+    const kickoff = kickoffInstant(option.date);
     if (kickoff == null) continue;
     const delta = kickoff - now;
     if (delta <= 0 || delta > STARTING_SOON_MS) continue;
@@ -245,6 +256,11 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
 
   live.sort((a, b) => (a.elapsed ?? 0) - (b.elapsed ?? 0));
   startingSoon.sort((a, b) => (a.startsInMinutes ?? 0) - (b.startsInMinutes ?? 0));
+  recentResults.sort((a, b) => {
+    const aKick = kickoffInstant(a.date) ?? 0;
+    const bKick = kickoffInstant(b.date) ?? 0;
+    return bKick - aKick;
+  });
 
   return {
     connected: true,
@@ -252,6 +268,7 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
     updatedAt,
     live,
     startingSoon,
+    recentResults,
     byKey
   };
 }

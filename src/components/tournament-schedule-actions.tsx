@@ -46,6 +46,10 @@ function TournamentFixtureRow({
           <span className="current-event-fixture-live-badge">
             {live.elapsed != null ? `Live · ${live.elapsed}'` : "Live"}
           </span>
+        ) : live?.status === "finished" && showScore ? (
+          <span className="current-event-fixture-live-badge current-event-fixture-live-badge--ft">
+            {live.statusShort === "FT" ? "FT" : live.statusShort || "FT"}
+          </span>
         ) : null}
         <MatchTeamsLine
           awayScore={showScore ? live.awayGoals ?? undefined : undefined}

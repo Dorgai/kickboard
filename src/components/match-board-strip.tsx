@@ -3,11 +3,15 @@
 import { useMatchBoardOptional } from "@/components/match-board-provider";
 import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { MatchTeamsLine } from "@/components/team-label";
+import type { MatchBoardCard } from "@/lib/fixtures/match-board-shared";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 
-function statusLabel(card: { status: string; elapsed: number | null; startsInMinutes: number | null }) {
+function statusLabel(card: MatchBoardCard) {
   if (card.status === "live") {
     return card.elapsed != null ? `Live · ${card.elapsed}'` : "Live";
+  }
+  if (card.status === "finished") {
+    return card.statusShort === "FT" ? "FT" : card.statusShort || "FT";
   }
   if (card.startsInMinutes != null) {
     return `Starts in ${card.startsInMinutes}m`;
@@ -21,7 +25,7 @@ export function MatchBoardStrip() {
 
   if (!payload?.connected) return null;
 
-  const cards = [...payload.live, ...payload.startingSoon];
+  const cards = [...payload.live, ...payload.recentResults ?? [], ...payload.startingSoon];
   if (!cards.length) return null;
 
   return (
@@ -29,7 +33,13 @@ export function MatchBoardStrip() {
       <div className="match-board-strip-track">
         {cards.map((card) => (
           <button
-            className={`match-board-strip-card${card.status === "live" ? " match-board-strip-card--live" : ""}`}
+            className={`match-board-strip-card${
+              card.status === "live"
+                ? " match-board-strip-card--live"
+                : card.segment === "recent_result"
+                  ? " match-board-strip-card--result"
+                  : ""
+            }`}
             key={card.fixtureKey}
             type="button"
             onClick={() => navigateToPredictFixture(card.fixtureKey, { scrollToTop: true })}
