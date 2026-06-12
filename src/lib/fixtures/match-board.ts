@@ -15,9 +15,11 @@ import {
 } from "@/lib/fixtures/api-football-fixtures";
 import {
   buildApiFootballFixtureKey,
+  buildWorldCupFixtureKey,
   parseApiFootballFixtureId,
   type FixtureOption
 } from "@/lib/fixtures/fixture-key";
+import type { WorldCupGroupFixture } from "@/lib/feeds/current-world-cup";
 import {
   fixtureUtcDay,
   inferFixtureStatusFromKickoff,
@@ -222,22 +224,41 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
   }));
 
   const options = buildFixtureOptionsFromWorldCup(feed.groups, liveInputs);
+  const feedFixtureByKey = new Map<string, WorldCupGroupFixture>();
+  for (const group of feed.groups) {
+    group.fixtures.forEach((fixture) => {
+      const key = buildWorldCupFixtureKey({
+        homeTeam: fixture.homeTeam,
+        awayTeam: fixture.awayTeam,
+        date: fixture.date,
+        group: group.group
+      });
+      if (!feedFixtureByKey.has(key)) {
+        feedFixtureByKey.set(key, fixture);
+      }
+    });
+  }
+
   const byKey: Record<string, MatchBoardFixtureState> = {};
 
   for (const option of options) {
     const fixtureId = fixtureIdForOption(option, apiRows);
     const apiRow = fixtureId ? apiRows.find((row) => row.fixtureId === fixtureId) : null;
+    const feedFixture = feedFixtureByKey.get(option.key);
+    const feedHasScore = feedFixture?.homeGoals != null && feedFixture?.awayGoals != null;
     const inferred = apiRow ? null : inferFixtureStatusFromKickoff(option.date, now);
     const status = apiRow
       ? mapApiFootballStatusShort(apiRow.status.short)
-      : inferred ?? option.status;
+      : feedHasScore
+        ? "finished"
+        : inferred ?? option.status;
     const goalScorers =
       fixtureId && goalScorersById.has(fixtureId) ? goalScorersById.get(fixtureId)! : [];
 
     byKey[option.key] = {
       fixtureId,
-      homeGoals: apiRow?.homeGoals ?? option.homeGoals ?? null,
-      awayGoals: apiRow?.awayGoals ?? option.awayGoals ?? null,
+      homeGoals: apiRow?.homeGoals ?? feedFixture?.homeGoals ?? option.homeGoals ?? null,
+      awayGoals: apiRow?.awayGoals ?? feedFixture?.awayGoals ?? option.awayGoals ?? null,
       status,
       statusShort: apiRow?.status.short ?? (status === "live" ? "LIVE" : status === "finished" ? "FT" : "NS"),
       statusLong: apiRow?.statusLong ?? status,

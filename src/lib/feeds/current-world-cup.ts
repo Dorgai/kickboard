@@ -10,6 +10,9 @@ export type WorldCupGroupFixture = {
   homeTeam: string;
   awayTeam: string;
   date: string | null;
+  /** Parsed from Wikipedia footballbox when the match has been played. */
+  homeGoals?: number | null;
+  awayGoals?: number | null;
 };
 
 export type WorldCupGroupFeed = {
@@ -154,11 +157,15 @@ export async function fetchCurrentWorldCupFeed(): Promise<CurrentWorldCupFeed> {
         const footballBox = groupPage(heading).parent().nextUntil(".mw-heading3").filter(".footballbox").first();
         const date = normaliseCell(footballBox.find(".fdate").first().text());
         const time = normaliseCell(footballBox.find(".ftime").first().text());
+        const scoreText = normaliseCell(footballBox.find(".fscore").first().text());
+        const scoreMatch = scoreText.match(/^(\d+)\s*[–-]\s*(\d+)$/);
 
         fixtures.push({
           homeTeam,
           awayTeam,
-          date: date ? `${date}${time ? ` ${time}` : ""}` : null
+          date: date ? `${date}${time ? ` ${time}` : ""}` : null,
+          homeGoals: scoreMatch ? Number(scoreMatch[1]) : null,
+          awayGoals: scoreMatch ? Number(scoreMatch[2]) : null
         });
       });
 
