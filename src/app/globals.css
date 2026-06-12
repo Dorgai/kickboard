@@ -10705,6 +10705,101 @@ h3 {
   font-size: 12px;
 }
 
+.match-board-strip {
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-bg));
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-surface);
+  overflow: hidden;
+  position: sticky;
+  top: var(--app-header-height, 56px);
+  z-index: 18;
+}
+
+.match-board-strip-track {
+  display: flex;
+  gap: 10px;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  padding: 10px max(var(--page-gutter), 12px);
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.match-board-strip-card {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-surface);
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  flex: 0 0 auto;
+  font: inherit;
+  gap: 6px;
+  min-width: min(14rem, 72vw);
+  padding: 10px 12px;
+  scroll-snap-align: start;
+  text-align: center;
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.match-board-strip-card--live {
+  border-color: color-mix(in srgb, var(--color-danger) 35%, var(--color-border));
+}
+
+.match-board-strip-card:hover {
+  background: var(--kickboard-tab-hover-bg);
+  box-shadow: var(--shadow-surface-hover);
+}
+
+.match-board-strip-status {
+  color: var(--color-brand);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.match-board-strip-card--live .match-board-strip-status {
+  color: var(--color-danger);
+}
+
+.match-goal-scorers-line {
+  display: grid;
+  gap: 4px;
+  margin-top: 4px;
+  text-align: left;
+  width: 100%;
+}
+
+.match-goal-scorers-line p {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.match-goal-scorers-line strong {
+  color: var(--color-text-primary);
+  font-size: 11px;
+}
+
+.match-goal-scorers-line--compact p {
+  font-size: 10px;
+}
+
+.current-event-fixture-live-badge {
+  color: var(--color-danger);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .live-fixtures-panel {
   margin-bottom: 20px;
 }

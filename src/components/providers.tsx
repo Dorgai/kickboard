@@ -2,6 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { GlobalOverlays } from "@/components/global-overlays";
+import { MatchBoardProvider } from "@/components/match-board-provider";
 import { ActivityTracker } from "@/components/activity-tracker";
 import { LoginCelebrationListener } from "@/components/login-celebration-listener";
 import { PredictionCelebrationListener } from "@/components/prediction-celebration-listener";
@@ -18,6 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <LocaleProvider>
       <ThemeProvider>
         <ToastProvider>
+          <MatchBoardProvider>
           <ActivityTracker />
           <LoginCelebrationListener />
           <PredictionCelebrationListener />
@@ -26,6 +28,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <PwaInstallHint />
           <GlobalOverlays />
           {children}
+          </MatchBoardProvider>
         </ToastProvider>
       </ThemeProvider>
       </LocaleProvider>

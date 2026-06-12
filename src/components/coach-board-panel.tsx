@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth-gate";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { FixtureMatchHeader } from "@/components/fixture-match-header";
-import { formatFixtureTeamsLabel, type FixtureOption } from "@/lib/fixtures/fixture-key";
+import { formatFixtureTeamsLabel, type FixtureOption, type MatchBoardGoal } from "@/lib/fixtures/fixture-key";
 import { FriendsMatchActivity } from "@/components/friends-match-activity";
 import { SquadBuilder } from "@/components/squad-builder";
 
@@ -26,6 +26,8 @@ type CoachBoardPanelProps = {
   status?: FixtureOption["status"];
   homeGoals?: number | null;
   awayGoals?: number | null;
+  elapsed?: number | null;
+  goalScorers?: MatchBoardGoal[];
   activeSquadId: string | null;
   newBoardNonce: number;
   onSquadSaved: (savedId: string) => void | Promise<void>;
@@ -41,6 +43,8 @@ export function CoachBoardPanel({
   status = "upcoming",
   homeGoals,
   awayGoals,
+  elapsed = null,
+  goalScorers = [],
   activeSquadId,
   newBoardNonce,
   onSquadSaved
@@ -82,6 +86,8 @@ export function CoachBoardPanel({
                 awayGoals={awayGoals}
                 awayTeam={awayTeam}
                 date={date}
+                elapsed={elapsed}
+                goalScorers={goalScorers}
                 group={group}
                 homeGoals={homeGoals}
                 homeTeam={homeTeam}

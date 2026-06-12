@@ -1,5 +1,7 @@
 "use client";
 
+import { useMatchBoardOptional } from "@/components/match-board-provider";
+import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 import {
   fixtureKeyForGroupMatch,
@@ -32,16 +34,35 @@ function TournamentFixtureRow({
   fixture: TournamentScheduleFixture;
   metaLabel?: string;
 }) {
+  const matchBoard = useMatchBoardOptional();
+  const live = matchBoard?.lookupByKey(fixtureKey);
+  const showScore = live?.homeGoals != null && live?.awayGoals != null;
+
   return (
     <li className="current-event-fixture-row current-event-fixture-row--with-predict">
       <div className="current-event-fixture-match">
         {metaLabel ? <span className="current-event-fixture-stage-label">{metaLabel}</span> : null}
+        {live?.status === "live" ? (
+          <span className="current-event-fixture-live-badge">
+            {live.elapsed != null ? `Live · ${live.elapsed}'` : "Live"}
+          </span>
+        ) : null}
         <MatchTeamsLine
+          awayScore={showScore ? live.awayGoals ?? undefined : undefined}
           awayTeam={fixture.awayTeam}
+          homeScore={showScore ? live.homeGoals ?? undefined : undefined}
           homeTeam={fixture.homeTeam}
           layout="stacked"
           size="xs"
         />
+        {live?.goalScorers && live.goalScorers.length > 0 ? (
+          <MatchGoalScorersLine
+            awayTeam={fixture.awayTeam}
+            compact
+            goals={live.goalScorers}
+            homeTeam={fixture.homeTeam}
+          />
+        ) : null}
         <span className="current-event-fixture-date">{formatTournamentFixtureDate(fixture.date)}</span>
       </div>
       <button

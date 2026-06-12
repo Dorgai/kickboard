@@ -1,5 +1,12 @@
 import { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
 
+export type MatchBoardGoal = {
+  playerName: string;
+  teamSide: "home" | "away";
+  minute: number | null;
+  extra: number | null;
+};
+
 export type FixtureOption = {
   key: string;
   homeTeam: string;
@@ -11,6 +18,9 @@ export type FixtureOption = {
   sortKey: string;
   homeGoals?: number | null;
   awayGoals?: number | null;
+  elapsed?: number | null;
+  statusShort?: string;
+  goalScorers?: MatchBoardGoal[];
 };
 
 export function teamNameToFixtureSlug(value: string) {

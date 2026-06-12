@@ -66,6 +66,29 @@ async function pollLiveFixtures() {
     "EX",
     120
   );
+
+  const fixtures = data.response ?? [];
+  await Promise.all(
+    fixtures.slice(0, 8).map(async (fixture) => {
+      try {
+        const eventsPayload = await fetchApiFootball("/fixtures/events", {
+          fixture: String(fixture.fixture.id)
+        });
+        await connection.set(
+          `api-football:match-events:${fixture.fixture.id}`,
+          JSON.stringify({
+            updatedAt: new Date().toISOString(),
+            events: eventsPayload.response ?? []
+          }),
+          "EX",
+          120
+        );
+      } catch {
+        /* optional per-fixture events */
+      }
+    })
+  );
+
   await connection.publish(
     "api-football:live-fixtures",
     JSON.stringify({
