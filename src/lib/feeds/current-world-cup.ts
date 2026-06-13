@@ -1,4 +1,8 @@
 import * as cheerio from "cheerio";
+import {
+  formatUtcOffsetLabel,
+  inferUtcOffsetHoursFromVenue
+} from "@/lib/fixtures/wc26-venue-timezone";
 
 export { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
 
@@ -44,6 +48,29 @@ let feedCache: { loadedAt: number; feed: CurrentWorldCupFeed | null } = {
 
 function normaliseCell(value: string) {
   return value.replace(/\[[^\]]+\]/g, "").replace(/\s+/g, " ").trim();
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function footballBoxKickoffLabel(footballBox: cheerio.Cheerio<any>) {
+  const date = normaliseCell(footballBox.find(".fdate").first().text());
+  if (!date) return null;
+
+  const ftime = footballBox.find(".ftime").first();
+  const tzFromLink = normaliseCell(ftime.find("a").first().text());
+  const time = normaliseCell(ftime.clone().children("a").remove().end().text());
+
+  let tzSuffix = "";
+  if (/UTC/i.test(tzFromLink)) {
+    tzSuffix = ` ${tzFromLink}`;
+  } else if (!/UTC/i.test(time)) {
+    const venue = normaliseCell(footballBox.find('[itemprop="location"] [itemprop="name"]').first().text());
+    const offset = inferUtcOffsetHoursFromVenue(venue);
+    if (offset !== null) {
+      tzSuffix = ` ${formatUtcOffsetLabel(offset)}`;
+    }
+  }
+
+  return `${date}${time ? ` ${time}` : ""}${tzSuffix}`;
 }
 
 /** Wikipedia infobox sometimes concatenates host names without separators. */
@@ -155,15 +182,14 @@ export async function fetchCurrentWorldCupFeed(): Promise<CurrentWorldCupFeed> {
 
         const [homeTeam, awayTeam] = title.split(" vs ").map((value) => value.trim());
         const footballBox = groupPage(heading).parent().nextUntil(".mw-heading3").filter(".footballbox").first();
-        const date = normaliseCell(footballBox.find(".fdate").first().text());
-        const time = normaliseCell(footballBox.find(".ftime").first().text());
+        const kickoffLabel = footballBoxKickoffLabel(footballBox);
         const scoreText = normaliseCell(footballBox.find(".fscore").first().text());
         const scoreMatch = scoreText.match(/^(\d+)\s*[–-]\s*(\d+)$/);
 
         fixtures.push({
           homeTeam,
           awayTeam,
-          date: date ? `${date}${time ? ` ${time}` : ""}` : null,
+          date: kickoffLabel,
           homeGoals: scoreMatch ? Number(scoreMatch[1]) : null,
           awayGoals: scoreMatch ? Number(scoreMatch[2]) : null
         });

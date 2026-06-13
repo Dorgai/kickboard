@@ -2,8 +2,15 @@
 export function parseWorldCupFixtureDate(date: string | null | undefined) {
   if (!date?.trim()) return null;
 
-  const normalized = date
-    .trim()
+  const trimmed = date.trim();
+
+  // API-Football / ISO-8601 timestamps (always UTC or include offset).
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(trimmed)) {
+    const parsed = Date.parse(trimmed);
+    if (!Number.isNaN(parsed)) return new Date(parsed);
+  }
+
+  const normalized = trimmed
     .replace(/\u2212/g, "-")
     .replace(/−/g, "-")
     .replace(/\u2013/g, "-");
@@ -32,6 +39,9 @@ export function parseWorldCupFixtureDate(date: string | null | undefined) {
   if (tzMatch) {
     const sign = tzMatch[1] === "-" ? -1 : 1;
     offsetMinutes = sign * Number(tzMatch[2]) * 60;
+  } else if (timeMatch && dayIso.startsWith("2026-")) {
+    // Wikipedia WC26 times without an explicit UTC label are US Eastern local (EDT, UTC−4).
+    offsetMinutes = -4 * 60;
   }
 
   const year = Number(dayIso.slice(0, 4));
