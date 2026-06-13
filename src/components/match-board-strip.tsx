@@ -3,12 +3,15 @@
 import { useMatchBoardOptional } from "@/components/match-board-provider";
 import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { MatchTeamsLine } from "@/components/team-label";
+import { useLiveClock } from "@/hooks/use-live-clock";
 import type { MatchBoardCard } from "@/lib/fixtures/match-board-shared";
+import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 
-function statusLabel(card: MatchBoardCard) {
+function statusLabel(card: MatchBoardCard, nowMs: number) {
   if (card.status === "live") {
-    return card.elapsed != null ? `Live · ${card.elapsed}'` : "Live";
+    const elapsed = resolveLiveElapsed(card.status, card.date, card.elapsed, nowMs);
+    return elapsed != null ? `Live · ${elapsed}'` : "Live";
   }
   if (card.status === "finished") {
     return card.statusShort === "FT" ? "FT" : card.statusShort || "FT";
@@ -22,6 +25,10 @@ function statusLabel(card: MatchBoardCard) {
 export function MatchBoardStrip() {
   const matchBoard = useMatchBoardOptional();
   const payload = matchBoard?.payload;
+  const hasLive =
+    (payload?.live?.length ?? 0) > 0 ||
+    Object.values(payload?.byKey ?? {}).some((state) => state.status === "live");
+  const liveNowMs = useLiveClock(hasLive);
 
   if (!payload?.connected) return null;
 
@@ -44,7 +51,7 @@ export function MatchBoardStrip() {
             type="button"
             onClick={() => navigateToPredictFixture(card.fixtureKey, { scrollToTop: true })}
           >
-            <span className="match-board-strip-status">{statusLabel(card)}</span>
+            <span className="match-board-strip-status">{statusLabel(card, liveNowMs)}</span>
             <MatchTeamsLine
               awayScore={card.awayGoals ?? undefined}
               awayTeam={card.awayTeam}

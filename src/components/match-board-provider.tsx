@@ -1,8 +1,16 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
+} from "react";
 import {
   enrichFixtureOption,
+  MATCH_BOARD_POLL_LIVE_MS,
   MATCH_BOARD_POLL_MS,
   type MatchBoardPayload
 } from "@/lib/fixtures/match-board-shared";
@@ -44,17 +52,26 @@ export function MatchBoardProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     void load();
-    const interval = window.setInterval(() => void load(), MATCH_BOARD_POLL_MS);
+  }, [load]);
 
+  const hasLiveMatches = useMemo(() => {
+    if ((payload?.live?.length ?? 0) > 0) return true;
+    return Object.values(payload?.byKey ?? {}).some((state) => state.status === "live");
+  }, [payload]);
+
+  useEffect(() => {
+    const pollMs = hasLiveMatches ? MATCH_BOARD_POLL_LIVE_MS : MATCH_BOARD_POLL_MS;
+    const interval = window.setInterval(() => void load(), pollMs);
+    return () => window.clearInterval(interval);
+  }, [hasLiveMatches, load]);
+
+  useEffect(() => {
     const onVisibility = () => {
       if (document.visibilityState === "visible") void load();
     };
 
     document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      window.clearInterval(interval);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
+    return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [load]);
 
   const value = useMemo((): MatchBoardContextValue => {

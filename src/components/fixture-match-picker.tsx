@@ -4,12 +4,14 @@ import { useMemo, useState } from "react";
 import { useMatchBoardOptional } from "@/components/match-board-provider";
 import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { MatchTeamsLine } from "@/components/team-label";
+import { useLiveClock } from "@/hooks/use-live-clock";
 import { writeFixtureDragData } from "@/lib/fixtures/drag-fixture";
 import {
   groupFixturesByDate,
   sortFixtureOptions,
   type FixtureOption
 } from "@/lib/fixtures/fixture-key";
+import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
 import {
   buildGroupFixtureOptions,
   buildKnockoutFixtureOptions
@@ -182,6 +184,9 @@ export function FixturePickerButton({
   showDate?: boolean;
   draggable?: boolean;
 }) {
+  const liveNowMs = useLiveClock(fixture.status === "live");
+  const liveElapsed = resolveLiveElapsed(fixture.status, fixture.date, fixture.elapsed, liveNowMs);
+
   return (
     <button
       className={`match-fixture-picker-btn${selected ? " selected" : ""}${
@@ -201,8 +206,8 @@ export function FixturePickerButton({
     >
       <span className="match-fixture-picker-status" data-status={fixture.status}>
         {fixture.status === "live"
-          ? fixture.elapsed != null
-            ? `Live ${fixture.elapsed}'`
+          ? liveElapsed != null
+            ? `Live ${liveElapsed}'`
             : "Live"
           : fixture.status === "finished"
             ? "FT"

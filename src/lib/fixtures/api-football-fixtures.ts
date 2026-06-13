@@ -66,6 +66,12 @@ export async function fetchWorldCupFixturesForDates(dates: string[]) {
   return mergeApiFootballFixturesById(batches.flat());
 }
 
+/** Live fixtures worldwide, filtered to the configured World Cup league. */
+export async function fetchLiveApiFootballFixtures() {
+  const global = await fetchFixturePayload({ live: "all" });
+  return filterWorldCupFixtures(global);
+}
+
 /** Live, recently finished, upcoming, and date-window World Cup fixtures (deduped by id). */
 export async function fetchWorldCupApiFixtures(): Promise<ApiFootballFixture[]> {
   const wc = worldCupLeagueParams();

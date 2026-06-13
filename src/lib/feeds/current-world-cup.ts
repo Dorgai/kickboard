@@ -1,5 +1,9 @@
 import * as cheerio from "cheerio";
 import {
+  isKickoffImminent,
+  isWithinLiveMatchWindow
+} from "@/lib/fixtures/infer-fixture-status";
+import {
   formatUtcOffsetLabel,
   inferUtcOffsetHoursFromVenue
 } from "@/lib/fixtures/wc26-venue-timezone";
@@ -9,6 +13,7 @@ export { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
 const SOURCE_URL = "https://en.wikipedia.org/wiki/2026_FIFA_World_Cup";
 const GROUP_LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 const CACHE_MS = 60 * 60 * 1000;
+const LIVE_CACHE_MS = 30 * 1000;
 
 export type WorldCupGroupFixture = {
   homeTeam: string;
@@ -225,10 +230,20 @@ export async function fetchCurrentWorldCupFeed(): Promise<CurrentWorldCupFeed> {
   };
 }
 
-/** Cached WC26 schedule (1h) for alerts and other server features. */
+/** Cached WC26 schedule (1h; 30s during live or imminent kickoffs). */
 export async function getCurrentWorldCupFeedCached() {
   const now = Date.now();
-  if (feedCache.feed && now - feedCache.loadedAt < CACHE_MS) {
+  const inLiveWindow =
+    feedCache.feed != null &&
+    feedCache.feed.groups.some((group) =>
+      group.fixtures.some(
+        (fixture) =>
+          isWithinLiveMatchWindow(fixture.date, now) || isKickoffImminent(fixture.date, 15 * 60 * 1000, now)
+      )
+    );
+  const cacheMs = inLiveWindow ? LIVE_CACHE_MS : CACHE_MS;
+
+  if (feedCache.feed && now - feedCache.loadedAt < cacheMs) {
     return feedCache.feed;
   }
 

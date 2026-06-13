@@ -9,6 +9,7 @@ import {
 } from "@/lib/api-football-events";
 import { getCurrentWorldCupFeedCached } from "@/lib/feeds/current-world-cup";
 import {
+  fetchLiveApiFootballFixtures,
   fetchWorldCupApiFixtures,
   fetchWorldCupFixturesForDates,
   mergeApiFootballFixturesById
@@ -22,6 +23,7 @@ import {
 import type { WorldCupGroupFixture } from "@/lib/feeds/current-world-cup";
 import {
   fixtureUtcDay,
+  inferElapsedMinutesFromKickoff,
   inferFixtureStatusFromKickoff,
   kickoffInstant
 } from "@/lib/fixtures/infer-fixture-status";
@@ -170,9 +172,12 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
   let apiFixtures: ApiFootballFixture[] = [];
 
   try {
-    const cachedLive = (await readCachedLiveFixtures()) ?? [];
-    const fetched = await fetchWorldCupApiFixtures();
-    apiFixtures = mergeApiFootballFixturesById([...cachedLive, ...fetched]);
+    const [cachedLive, liveNow, fetched] = await Promise.all([
+      readCachedLiveFixtures(),
+      fetchLiveApiFootballFixtures(),
+      fetchWorldCupApiFixtures()
+    ]);
+    apiFixtures = mergeApiFootballFixturesById([...(cachedLive ?? []), ...liveNow, ...fetched]);
   } catch (error) {
     return {
       connected: false,
@@ -262,7 +267,9 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
       status,
       statusShort: apiRow?.status.short ?? (status === "live" ? "LIVE" : status === "finished" ? "FT" : "NS"),
       statusLong: apiRow?.statusLong ?? status,
-      elapsed: apiRow?.elapsed ?? null,
+      elapsed:
+        apiRow?.elapsed ??
+        (status === "live" ? inferElapsedMinutesFromKickoff(option.date, now) : null),
       goalScorers
     };
   }

@@ -1,7 +1,9 @@
 import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
+import { useLiveClock } from "@/hooks/use-live-clock";
 import { parseWorldCupFixtureDate } from "@/lib/feeds/current-world-cup";
 import { formatFixtureDateDivider } from "@/lib/fixtures/fixture-key";
 import type { FixtureOption } from "@/lib/fixtures/fixture-key";
+import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
 import { MatchTeamsLine } from "@/components/team-label";
 
 type FixtureMatchHeaderProps = Pick<
@@ -58,12 +60,14 @@ export function FixtureMatchHeader({
 }: FixtureMatchHeaderProps) {
   const hasScore = homeGoals != null && awayGoals != null;
   const meta = fixtureMatchMeta(date);
+  const liveNowMs = useLiveClock(status === "live");
+  const liveElapsed = resolveLiveElapsed(status, date, elapsed, liveNowMs);
 
   return (
     <header
       className={`match-focus-scoreline fixture-match-header fixture-match-header--${align}${className ? ` ${className}` : ""}`}
     >
-      <p className="eyebrow">{fixtureEyebrow(group, status, elapsed)}</p>
+      <p className="eyebrow">{fixtureEyebrow(group, status, liveElapsed)}</p>
       <MatchTeamsLine
         awayScore={hasScore ? awayGoals : undefined}
         awayTeam={awayTeam}

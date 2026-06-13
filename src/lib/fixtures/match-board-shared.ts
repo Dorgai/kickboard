@@ -44,8 +44,8 @@ export type MatchBoardPayload = {
   apiFixtureCount?: number;
 };
 
-export const MATCH_BOARD_POLL_MS = 30_000;
-export const MATCH_BOARD_POLL_LIVE_MS = 20_000;
+export const MATCH_BOARD_POLL_MS = 25_000;
+export const MATCH_BOARD_POLL_LIVE_MS = 8_000;
 
 export function enrichFixtureOption(
   fixture: FixtureOption,

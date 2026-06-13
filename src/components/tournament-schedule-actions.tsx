@@ -3,6 +3,7 @@
 import { useMatchBoardOptional } from "@/components/match-board-provider";
 import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
+import { useLiveClock } from "@/hooks/use-live-clock";
 import {
   fixtureKeyForGroupMatch,
   fixturesForGroupDisplay,
@@ -10,6 +11,7 @@ import {
   knockoutPlaceholdersForStage,
   type TournamentScheduleFixture
 } from "@/lib/feeds/wc26-tournament-schedule";
+import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 
 type TournamentGroupScheduleProps = {
@@ -37,6 +39,11 @@ function TournamentFixtureRow({
   const matchBoard = useMatchBoardOptional();
   const live = matchBoard?.lookupByKey(fixtureKey);
   const showScore = live?.homeGoals != null && live?.awayGoals != null;
+  const liveNowMs = useLiveClock(live?.status === "live");
+  const liveElapsed =
+    live?.status === "live"
+      ? resolveLiveElapsed("live", fixture.date, live.elapsed, liveNowMs)
+      : null;
 
   return (
     <li className="current-event-fixture-row current-event-fixture-row--with-predict">
@@ -44,7 +51,7 @@ function TournamentFixtureRow({
         {metaLabel ? <span className="current-event-fixture-stage-label">{metaLabel}</span> : null}
         {live?.status === "live" ? (
           <span className="current-event-fixture-live-badge">
-            {live.elapsed != null ? `Live · ${live.elapsed}'` : "Live"}
+            {liveElapsed != null ? `Live · ${liveElapsed}'` : "Live"}
           </span>
         ) : live?.status === "finished" ? (
           <span className="current-event-fixture-live-badge current-event-fixture-live-badge--ft">
