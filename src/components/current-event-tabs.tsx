@@ -20,6 +20,7 @@ import {
 import { MatchCoachBoardRow } from "@/components/match-coach-board-row";
 import { PredictionsPanel } from "@/components/predictions-panel";
 import {
+  TournamentFixturePredictionsProvider,
   TournamentGroupSchedule,
   TournamentKnockoutSchedule
 } from "@/components/tournament-schedule-actions";
@@ -202,6 +203,7 @@ export function CurrentEventTabs({
 
       <div className="current-event-tab-panel" role="tabpanel">
         {activeTab === "tournament" ? (
+          <TournamentFixturePredictionsProvider>
           <section className="bracket-tree-card surface-muted current-event-bracket" id="tournament">
             <div className="section-heading compact">
               <div>
@@ -260,6 +262,7 @@ export function CurrentEventTabs({
               </div>
             )}
           </section>
+          </TournamentFixturePredictionsProvider>
         ) : null}
 
         {activeTab === "coach-board" ? (

@@ -9832,6 +9832,17 @@ h3 {
   text-align: center;
 }
 
+.current-event-fixture-prediction {
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  justify-self: end;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 14rem;
+  text-align: right;
+}
+
 @media (max-width: 640px) {
   .current-event-fixture-row--with-predict,
   .current-event-fixture-row--knockout {
@@ -9842,6 +9853,12 @@ h3 {
   .current-event-predict-action--game {
     justify-self: stretch;
     width: 100%;
+  }
+
+  .current-event-fixture-prediction {
+    justify-self: stretch;
+    max-width: none;
+    text-align: left;
   }
 }
 
