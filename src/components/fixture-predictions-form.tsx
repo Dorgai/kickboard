@@ -525,17 +525,17 @@ export function FixturePredictionsForm({
             />
             <input
               aria-label={`${homeTeam} goals`}
+              autoComplete="off"
               className="fixture-prediction-score-field"
               disabled={locked}
               inputMode="numeric"
-              max={20}
-              min={0}
-              placeholder="0"
-              type="number"
+              pattern="[0-9]*"
+              type="text"
               value={homeScore}
               onBlur={homeScoreInput.onBlur}
-              onChange={(event) => setHomeScore(event.target.value)}
+              onChange={homeScoreInput.onChange}
               onFocus={homeScoreInput.onFocus}
+              onPointerDown={homeScoreInput.onPointerDown}
             />
           </div>
           <span aria-hidden className="fixture-prediction-score-dash">
@@ -549,17 +549,17 @@ export function FixturePredictionsForm({
             />
             <input
               aria-label={`${awayTeam} goals`}
+              autoComplete="off"
               className="fixture-prediction-score-field"
               disabled={locked}
               inputMode="numeric"
-              max={20}
-              min={0}
-              placeholder="0"
-              type="number"
+              pattern="[0-9]*"
+              type="text"
               value={awayScore}
               onBlur={awayScoreInput.onBlur}
-              onChange={(event) => setAwayScore(event.target.value)}
+              onChange={awayScoreInput.onChange}
               onFocus={awayScoreInput.onFocus}
+              onPointerDown={awayScoreInput.onPointerDown}
             />
           </div>
         </div>
