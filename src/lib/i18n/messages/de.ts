@@ -124,7 +124,16 @@ export const deMessages: Messages = {
     timeJustNow: "Gerade eben",
     timeMinutesAgo: "vor {count} Min.",
     timeHoursAgo: "vor {count} Std.",
-    loadError: "Benachrichtigungen konnten nicht geladen werden."
+    loadError: "Benachrichtigungen konnten nicht geladen werden.",
+    pushEnable: "Telefon-Benachrichtigungen aktivieren",
+    pushEnabling: "Aktivieren…",
+    pushEnableHint: "Ergebnisse, Nachrichten und Freundes-Aktivität auf diesem Gerät.",
+    pushEnableFailed: "Benachrichtigungen konnten nicht aktiviert werden. Seite neu laden und erneut versuchen.",
+    pushDenied:
+      "Benachrichtigungen sind im Browser blockiert. Erlaube sie für MyPicks und lade die Seite neu.",
+    pushIosInstall:
+      "Auf dem iPhone MyPicks zum Home-Bildschirm hinzufügen (Safari → Teilen → Zum Home-Bildschirm), App öffnen und Benachrichtigungen aktivieren.",
+    pushNotConfigured: "Push-Benachrichtigungen sind auf dem Server noch nicht konfiguriert."
   },
   pwa: {
     installAria: "MyPicks installieren",

@@ -120,7 +120,16 @@ export const enMessages = {
     timeJustNow: "Just now",
     timeMinutesAgo: "{count}m ago",
     timeHoursAgo: "{count}h ago",
-    loadError: "Unable to load alerts."
+    loadError: "Unable to load alerts.",
+    pushEnable: "Enable phone notifications",
+    pushEnabling: "Enabling…",
+    pushEnableHint: "Get match results, messages, and friend activity on this device.",
+    pushEnableFailed: "Could not enable notifications. Try again after refreshing.",
+    pushDenied:
+      "Notifications are blocked in your browser settings. Allow notifications for MyPicks, then refresh.",
+    pushIosInstall:
+      "On iPhone, add MyPicks to your Home Screen (Safari → Share → Add to Home Screen), then open the app and enable notifications here.",
+    pushNotConfigured: "Push is not configured on the server yet."
   },
   pwa: {
     installAria: "Install MyPicks",
@@ -129,7 +138,7 @@ export const enMessages = {
     iosShare: "Share",
     iosAfterShare: ", then",
     iosAddToHomeScreen: "Add to Home Screen",
-    iosTail: "for a full-screen app experience.",
+    iosTail: "for a full-screen app experience and match notifications.",
     androidCopy: "Install MyPicks from your browser menu for quick access and a full-screen view.",
     notNow: "Not now",
     dismissAria: "Dismiss install hint"

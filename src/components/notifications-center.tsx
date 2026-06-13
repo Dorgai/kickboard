@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/components/locale-provider";
 import type { UserAlert } from "@/lib/alerts/types";
+import { PushNotificationsPrompt } from "@/components/push-notifications-prompt";
 import {
   useDismissOnEscape,
   useDismissOnOutsidePointerDown
@@ -136,7 +137,9 @@ export function NotificationsCenter() {
 
           {status !== "authenticated" ? (
             <p className="inline-status">{t("notifications.signInToSee")}</p>
-          ) : null}
+          ) : (
+            <PushNotificationsPrompt />
+          )}
 
           {loading ? <p className="inline-status">{t("notifications.updating")}</p> : null}
           {error ? <p className="inline-status">{error}</p> : null}

@@ -124,7 +124,16 @@ export const huMessages: Messages = {
     timeJustNow: "Épp most",
     timeMinutesAgo: "{count} perce",
     timeHoursAgo: "{count} órája",
-    loadError: "Az értesítések betöltése sikertelen."
+    loadError: "Az értesítések betöltése sikertelen.",
+    pushEnable: "Telefonos értesítések bekapcsolása",
+    pushEnabling: "Bekapcsolás…",
+    pushEnableHint: "Mérkőzéseredmények, üzenetek és baráti aktivitás ezen az eszközön.",
+    pushEnableFailed: "Nem sikerült bekapcsolni az értesítéseket. Frissíts, majd próbáld újra.",
+    pushDenied:
+      "Az értesítések le vannak tiltva a böngészőben. Engedélyezd a MyPicks számára, majd frissíts.",
+    pushIosInstall:
+      "iPhone-on add hozzá a MyPicks-et a kezdőképernyőhöz (Safari → Megosztás → Hozzáadás a kezdőképernyőhöz), majd nyisd meg az appot és kapcsold be az értesítéseket.",
+    pushNotConfigured: "A push értesítések még nincsenek beállítva a szerveren."
   },
   pwa: {
     installAria: "MyPicks telepítése",

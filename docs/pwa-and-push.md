@@ -52,4 +52,14 @@ Apply schema (includes `push_subscriptions`):
 npm run db:schema
 ```
 
-Without VAPID keys, install and in-app use still work; OS notification push does not.
+Without VAPID keys, install and in-app use still work; OS notification push does not. Production check:
+
+```bash
+curl -sS "https://mypicks.live/api/push/vapid-public-key" | jq .
+```
+
+Expect `"configured": true` and a `publicKey`. Generate keys locally with `npm run generate:vapid`, then set on Railway (`npm run railway:variables` with `VAPID_*` in env, or paste in the Railway dashboard).
+
+### iPhone / iPad
+
+Web Push on iOS **only works from the installed PWA** (Add to Home Screen in Safari), not from a regular Safari tab. After installing, open MyPicks from the home screen and tap **Enable phone notifications** in the alerts (bell) menu.

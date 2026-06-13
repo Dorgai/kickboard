@@ -77,6 +77,38 @@ else
   echo "skip API_FOOTBALL_KEY (live match picker stays on static schedule only)"
 fi
 
+if [ -n "${VAPID_PUBLIC_KEY:-}" ] && [ -n "${VAPID_PRIVATE_KEY:-}" ]; then
+  echo "Setting VAPID_PUBLIC_KEY / NEXT_PUBLIC_VAPID_PUBLIC_KEY..."
+  set_var "VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}"
+  set_var "NEXT_PUBLIC_VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}"
+  echo "Setting VAPID_PRIVATE_KEY..."
+  set_var "VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}"
+elif [ "${ALLOW_GENERATE_SECRETS:-1}" = "1" ]; then
+  echo "Generating VAPID keys for Web Push..."
+  eval "$(node scripts/generate-vapid-keys.mjs)"
+  set_var "VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}"
+  set_var "NEXT_PUBLIC_VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}"
+  set_var "VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}"
+else
+  echo "skip VAPID keys (run: npm run generate:vapid and set on Railway for mobile push)"
+fi
+
+if [ -n "${VAPID_SUBJECT:-}" ]; then
+  echo "Setting VAPID_SUBJECT..."
+  set_var "VAPID_SUBJECT=${VAPID_SUBJECT}"
+elif [ "${ALLOW_GENERATE_SECRETS:-1}" = "1" ]; then
+  set_var "VAPID_SUBJECT=mailto:support@mypicks.live"
+fi
+
+if [ -n "${CRON_SECRET:-}" ]; then
+  echo "Setting CRON_SECRET..."
+  set_var "CRON_SECRET=${CRON_SECRET}"
+elif [ "${ALLOW_GENERATE_SECRETS:-1}" = "1" ]; then
+  CRON_SECRET="$(openssl rand -hex 24)"
+  echo "Setting generated CRON_SECRET..."
+  set_var "CRON_SECRET=${CRON_SECRET}"
+fi
+
 if [ -n "${GOOGLE_CLIENT_ID:-}" ]; then
   echo "Setting GOOGLE_CLIENT_ID..."
   set_var "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}"

@@ -444,6 +444,16 @@ button:disabled {
   margin: 0;
 }
 
+.notifications-push-hint {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.notifications-push-hint .button {
+  justify-self: start;
+}
+
 .notifications-panel-list {
   display: grid;
   gap: 6px;

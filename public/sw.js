@@ -21,11 +21,10 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: "/icon",
-      badge: "/icon",
+      icon: new URL("/apple-icon", self.location.origin).href,
+      badge: new URL("/apple-icon", self.location.origin).href,
       tag: payload.tag,
-      data: { url: payload.url },
-      renotify: true
+      data: { url: payload.url }
     })
   );
 });

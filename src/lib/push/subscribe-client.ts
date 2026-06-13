@@ -1,3 +1,5 @@
+import { canSubscribeToWebPush } from "@/lib/pwa/push-support";
+
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -9,8 +11,30 @@ function urlBase64ToUint8Array(base64String: string) {
   return output;
 }
 
+export async function ensureKickboardServiceWorker() {
+  if (!("serviceWorker" in navigator)) return null;
+
+  let registration = await navigator.serviceWorker.getRegistration("/");
+  if (!registration?.active) {
+    registration = await navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" });
+  }
+
+  await navigator.serviceWorker.ready;
+  return registration;
+}
+
+export async function fetchPushSubscriptionStatus() {
+  const response = await fetch("/api/push/status", { cache: "no-store" });
+  if (!response.ok) return null;
+  return (await response.json()) as {
+    configured?: boolean;
+    pushEnabled?: boolean;
+    subscriptionCount?: number;
+  };
+}
+
 export async function subscribeToKickboardPush(): Promise<boolean> {
-  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
+  if (!canSubscribeToWebPush()) return false;
   if (Notification.permission !== "granted") return false;
 
   const keyResponse = await fetch("/api/push/vapid-public-key", { cache: "no-store" });
@@ -20,7 +44,9 @@ export async function subscribeToKickboardPush(): Promise<boolean> {
   };
   if (!keyPayload.configured || !keyPayload.publicKey) return false;
 
-  const registration = await navigator.serviceWorker.ready;
+  const registration = await ensureKickboardServiceWorker();
+  if (!registration) return false;
+
   let subscription = await registration.pushManager.getSubscription();
   if (!subscription) {
     subscription = await registration.pushManager.subscribe({
@@ -42,4 +68,16 @@ export async function subscribeToKickboardPush(): Promise<boolean> {
   });
 
   return response.ok;
+}
+
+export async function requestPushPermissionAndSubscribe(): Promise<boolean> {
+  if (!canSubscribeToWebPush()) return false;
+  if (Notification.permission === "granted") {
+    return subscribeToKickboardPush();
+  }
+  if (Notification.permission === "denied") return false;
+
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") return false;
+  return subscribeToKickboardPush();
 }

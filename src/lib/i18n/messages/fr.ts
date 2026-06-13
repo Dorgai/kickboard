@@ -124,7 +124,16 @@ export const frMessages: Messages = {
     timeJustNow: "À l'instant",
     timeMinutesAgo: "il y a {count} min",
     timeHoursAgo: "il y a {count} h",
-    loadError: "Impossible de charger les alertes."
+    loadError: "Impossible de charger les alertes.",
+    pushEnable: "Activer les notifications",
+    pushEnabling: "Activation…",
+    pushEnableHint: "Résultats, messages et activité des amis sur cet appareil.",
+    pushEnableFailed: "Impossible d’activer les notifications. Actualisez puis réessayez.",
+    pushDenied:
+      "Les notifications sont bloquées dans le navigateur. Autorisez MyPicks, puis actualisez.",
+    pushIosInstall:
+      "Sur iPhone, ajoutez MyPicks à l’écran d’accueil (Safari → Partager → Sur l’écran d’accueil), ouvrez l’app et activez les notifications.",
+    pushNotConfigured: "Les notifications push ne sont pas encore configurées sur le serveur."
   },
   pwa: {
     installAria: "Installer MyPicks",
