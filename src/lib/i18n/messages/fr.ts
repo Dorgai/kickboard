@@ -107,7 +107,14 @@ export const frMessages: Messages = {
     community: "Communauté",
     groupStage: "Phase de groupes",
     knockout: "Éliminatoires",
-    sectionAria: "Sections de l'événement en cours"
+    sectionAria: "Sections de l'événement en cours",
+    currentEvent: "Événement en cours",
+    currentEventLine1: "Événement",
+    currentEventLine2: "en cours",
+    pastEvents: "Événements passés",
+    pastEventsLine1: "Événements",
+    pastEventsLine2: "passés",
+    feedSelectorAria: "Sélecteur d'événement"
   },
   notifications: {
     title: "Alertes",

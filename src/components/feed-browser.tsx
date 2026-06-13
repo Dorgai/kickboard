@@ -8,17 +8,19 @@ import { MatchEventTimelineLauncher } from "@/components/match-event-timeline-la
 import { MatchLineupList, type MatchLineupTeam } from "@/components/match-lineup-list";
 import { PlayerStatsPanel } from "@/components/player-stats-panel";
 import { CurrentEventTabs } from "@/components/current-event-tabs";
+import { useEventTab } from "@/components/event-tab-provider";
 import { FloatingFanChat } from "@/components/floating-fan-chat";
 import { KickboardHeroLayers } from "@/components/kickboard-hero-layers";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 import {
-  readLocationHash,
-  scrollToLocationHashTarget,
-  subscribeLocationHash,
-  writeLocationHash
+  CURRENT_EVENT_HASHES,
+  PAST_EVENT_HASHES
+} from "@/lib/navigation/event-tab-hashes";
+import { OPEN_FAN_CHAT_EVENT } from "@/lib/help/events";
+import {
+  scrollToLocationHashTarget
 } from "@/lib/navigation/location-hash";
 import { useLocationHash } from "@/lib/use-location-hash";
-import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 
 type WorldCupCompetition = {
   competitionId: number;
@@ -111,21 +113,9 @@ type CurrentWorldCup = {
   note: string;
 };
 
-type EventTab = "current" | "past";
-
-const PAST_EVENT_HASHES = new Set(["bracket", "squads", "players", "analytics"]);
-const CURRENT_EVENT_HASHES = new Set([
-  "tournament",
-  "bracket",
-  "coach-board",
-  "predictions",
-  "community"
-]);
-
 export function FeedBrowser() {
-  const mobileEventTabs = useNarrowViewport(860);
   const locationHash = useLocationHash();
-  const [activeTab, setActiveTab] = useState<EventTab>("current");
+  const { activeTab } = useEventTab();
   const [currentWorldCup, setCurrentWorldCup] = useState<CurrentWorldCup | null>(null);
   const [competitions, setCompetitions] = useState<WorldCupCompetition[]>([]);
   const [selectedCompetition, setSelectedCompetition] = useState("");
@@ -142,25 +132,12 @@ export function FeedBrowser() {
   const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
-    function syncTabFromHash() {
-      const hash = readLocationHash();
-      if (hash === "fan-chat") {
-        setActiveTab("current");
-        setChatOpen(true);
-        writeLocationHash("predictions", { replace: true });
-        return;
-      }
-      if (hash && CURRENT_EVENT_HASHES.has(hash)) {
-        setActiveTab("current");
-        return;
-      }
-      if (hash && PAST_EVENT_HASHES.has(hash)) {
-        setActiveTab("past");
-      }
+    function onOpenFanChat() {
+      setChatOpen(true);
     }
 
-    syncTabFromHash();
-    return subscribeLocationHash(syncTabFromHash);
+    window.addEventListener(OPEN_FAN_CHAT_EVENT, onOpenFanChat);
+    return () => window.removeEventListener(OPEN_FAN_CHAT_EVENT, onOpenFanChat);
   }, []);
 
   useEffect(() => {
@@ -330,41 +307,6 @@ export function FeedBrowser() {
       className={`feed-browser feed-browser--hero-backdrop kickboard-hero-backdrop kickboard-hero-backdrop--dual${chatOpen ? " fan-chat-dock-open" : ""}`}
     >
       <KickboardHeroLayers dual />
-      <nav
-        className="event-tab-bar kickboard-tab-bar feed-event-selector-tabs"
-        aria-label="Tournament event selector"
-      >
-        <button
-          className={activeTab === "current" ? "active" : ""}
-          type="button"
-          onClick={() => setActiveTab("current")}
-        >
-          {mobileEventTabs ? (
-            <>
-              Current
-              <br />
-              event
-            </>
-          ) : (
-            "Current event"
-          )}
-        </button>
-        <button
-          className={activeTab === "past" ? "active" : ""}
-          type="button"
-          onClick={() => setActiveTab("past")}
-        >
-          {mobileEventTabs ? (
-            <>
-              Past
-              <br />
-              events
-            </>
-          ) : (
-            "Past events"
-          )}
-        </button>
-      </nav>
 
       {loading ? <p className="inline-status">Loading real feeds...</p> : null}
       {error ? <p className="inline-error">{error}</p> : null}

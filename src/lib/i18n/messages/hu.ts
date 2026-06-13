@@ -107,7 +107,14 @@ export const huMessages: Messages = {
     community: "Közösség",
     groupStage: "Csoportkör",
     knockout: "Egyenes kiesés",
-    sectionAria: "Aktuális verseny szekciók"
+    sectionAria: "Aktuális verseny szekciók",
+    currentEvent: "Aktuális verseny",
+    currentEventLine1: "Aktuális",
+    currentEventLine2: "verseny",
+    pastEvents: "Korábbi versenyek",
+    pastEventsLine1: "Korábbi",
+    pastEventsLine2: "versenyek",
+    feedSelectorAria: "Verseny választó"
   },
   notifications: {
     title: "Értesítések",

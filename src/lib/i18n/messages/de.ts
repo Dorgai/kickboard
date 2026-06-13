@@ -107,7 +107,14 @@ export const deMessages: Messages = {
     community: "Community",
     groupStage: "Gruppenphase",
     knockout: "K.-o.-Runde",
-    sectionAria: "Aktuelle Turnier-Bereiche"
+    sectionAria: "Aktuelle Turnier-Bereiche",
+    currentEvent: "Aktuelles Turnier",
+    currentEventLine1: "Aktuell",
+    currentEventLine2: "Turnier",
+    pastEvents: "Vergangene Turniere",
+    pastEventsLine1: "Vergangene",
+    pastEventsLine2: "Turniere",
+    feedSelectorAria: "Turnier-Auswahl"
   },
   notifications: {
     title: "Benachrichtigungen",

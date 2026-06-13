@@ -12,6 +12,7 @@ import {
 } from "@/components/tournament-summary-dialog";
 import { useTranslation } from "@/components/locale-provider";
 import { BrandWordmark } from "@/components/brand-wordmark";
+import { EventTabSelector } from "@/components/event-tab-selector";
 import { BRAND } from "@/lib/brand";
 import { navigation } from "@/lib/kickboard-data";
 import {
@@ -22,6 +23,7 @@ import { useLocationHash } from "@/lib/use-location-hash";
 
 type AppChromeProps = {
   activeNav?: "Home" | "Admin";
+  showEventSelector?: boolean;
 };
 
 function isCommunityHash(hash: string) {
@@ -40,7 +42,7 @@ function navLabel(item: (typeof navigation)[number], t: ReturnType<typeof useTra
   return item === "Home" ? t("nav.home") : t("nav.community");
 }
 
-export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
+export function AppChrome({ activeNav = "Home", showEventSelector = false }: AppChromeProps) {
   const { data: session } = useSession();
   const { t } = useTranslation();
   const hash = useLocationHash();
@@ -90,6 +92,8 @@ export function AppChrome({ activeNav = "Home" }: AppChromeProps) {
           title={eventTitle}
           triggerClassName="tournament-switcher tournament-switcher--label"
         />
+
+        {showEventSelector ? <EventTabSelector /> : null}
 
         <nav className="nav-tabs">
           {navigation.map((item) => {

@@ -103,7 +103,14 @@ export const enMessages = {
     community: "Community",
     groupStage: "Group stage",
     knockout: "Knockout",
-    sectionAria: "Current event sections"
+    sectionAria: "Current event sections",
+    currentEvent: "Current event",
+    currentEventLine1: "Current",
+    currentEventLine2: "event",
+    pastEvents: "Past events",
+    pastEventsLine1: "Past",
+    pastEventsLine2: "events",
+    feedSelectorAria: "Tournament event selector"
   },
   notifications: {
     title: "Alerts",
