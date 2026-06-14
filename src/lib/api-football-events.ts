@@ -33,9 +33,44 @@ export function parseApiFootballGoalEvents(
     }));
 }
 
-export async function fetchFixtureGoalEvents(fixtureId: number, homeTeamId: number, awayTeamId: number) {
+export type MatchBoardRedCard = {
+  playerName: string;
+  teamSide: "home" | "away";
+  minute: number | null;
+  extra: number | null;
+};
+
+export function parseApiFootballRedCardEvents(
+  events: ApiFootballFixtureEvent[],
+  homeTeamId: number,
+  awayTeamId: number
+): MatchBoardRedCard[] {
+  return events
+    .filter(
+      (event) =>
+        event.type === "Card" &&
+        (event.detail === "Red Card" || event.detail === "Second Yellow card")
+    )
+    .map((event) => ({
+      playerName: event.player?.name?.trim() || "Unknown",
+      teamSide: event.team.id === homeTeamId ? "home" : event.team.id === awayTeamId ? "away" : "home",
+      minute: event.time.elapsed,
+      extra: event.time.extra
+    }));
+}
+
+export async function fetchFixtureMatchEvents(fixtureId: number, homeTeamId: number, awayTeamId: number) {
   const payload = await fetchApiFootball<ApiFootballFixtureEvent[]>("/fixtures/events", {
     fixture: String(fixtureId)
   });
-  return parseApiFootballGoalEvents(payload.response ?? [], homeTeamId, awayTeamId);
+  const events = payload.response ?? [];
+  return {
+    goalScorers: parseApiFootballGoalEvents(events, homeTeamId, awayTeamId),
+    redCards: parseApiFootballRedCardEvents(events, homeTeamId, awayTeamId)
+  };
+}
+
+export async function fetchFixtureGoalEvents(fixtureId: number, homeTeamId: number, awayTeamId: number) {
+  const { goalScorers } = await fetchFixtureMatchEvents(fixtureId, homeTeamId, awayTeamId);
+  return goalScorers;
 }

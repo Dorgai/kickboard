@@ -2,6 +2,13 @@ import type { FixtureOption, MatchBoardGoal } from "@/lib/fixtures/fixture-key";
 
 export type { MatchBoardGoal };
 
+export type MatchBoardRedCard = {
+  playerName: string;
+  teamSide: "home" | "away";
+  minute: number | null;
+  extra: number | null;
+};
+
 export type MatchBoardFixtureState = {
   fixtureId: number | null;
   homeGoals: number | null;
@@ -11,6 +18,7 @@ export type MatchBoardFixtureState = {
   statusLong: string;
   elapsed: number | null;
   goalScorers: MatchBoardGoal[];
+  redCards: MatchBoardRedCard[];
 };
 
 export type MatchBoardCard = {
@@ -28,6 +36,7 @@ export type MatchBoardCard = {
   elapsed: number | null;
   startsInMinutes: number | null;
   goalScorers: MatchBoardGoal[];
+  redCards: MatchBoardRedCard[];
   segment?: "live" | "starting_soon" | "recent_result";
 };
 

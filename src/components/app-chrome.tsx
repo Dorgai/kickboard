@@ -93,31 +93,33 @@ export function AppChrome({ activeNav = "Home", showEventSelector = false }: App
           triggerClassName="tournament-switcher tournament-switcher--label"
         />
 
-        {showEventSelector ? <EventTabSelector /> : null}
+        <div className="header-primary-nav">
+          {showEventSelector ? <EventTabSelector /> : null}
 
-        <nav className="nav-tabs">
-          {navigation.map((item) => {
-            const isActive =
-              activeNav === "Home" &&
-              (item === "Home" ? !isCommunityHash(hash) : isCommunityHash(hash));
-            return (
-              <Link
-                key={item}
-                className={isActive ? "active" : ""}
-                href={item === "Home" ? "/#predictions" : "/#community"}
-                scroll={false}
-                onClick={item === "Home" ? handleKickboardHomeNav : handleKickboardCommunityNav}
-              >
-                {navLabel(item, t)}
+          <nav className="nav-tabs">
+            {navigation.map((item) => {
+              const isActive =
+                activeNav === "Home" &&
+                (item === "Home" ? !isCommunityHash(hash) : isCommunityHash(hash));
+              return (
+                <Link
+                  key={item}
+                  className={isActive ? "active" : ""}
+                  href={item === "Home" ? "/#predictions" : "/#community"}
+                  scroll={false}
+                  onClick={item === "Home" ? handleKickboardHomeNav : handleKickboardCommunityNav}
+                >
+                  {navLabel(item, t)}
+                </Link>
+              );
+            })}
+            {session?.user?.isAdmin ? (
+              <Link className={activeNav === "Admin" ? "active" : ""} href="/admin/data-sources">
+                {t("nav.admin")}
               </Link>
-            );
-          })}
-          {session?.user?.isAdmin ? (
-            <Link className={activeNav === "Admin" ? "active" : ""} href="/admin/data-sources">
-              {t("nav.admin")}
-            </Link>
-          ) : null}
-        </nav>
+            ) : null}
+          </nav>
+        </div>
 
         <div className="nav-actions">
           <HelpMenu />

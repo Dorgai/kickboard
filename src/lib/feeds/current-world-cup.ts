@@ -7,6 +7,7 @@ import {
   formatUtcOffsetLabel,
   inferUtcOffsetHoursFromVenue
 } from "@/lib/fixtures/wc26-venue-timezone";
+import { parseWikipediaFootballBoxEvents } from "@/lib/feeds/wikipedia-footballbox-events";
 
 export { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
 
@@ -22,6 +23,18 @@ export type WorldCupGroupFixture = {
   /** Parsed from Wikipedia footballbox when the match has been played. */
   homeGoals?: number | null;
   awayGoals?: number | null;
+  goalScorers?: Array<{
+    playerName: string;
+    teamSide: "home" | "away";
+    minute: number | null;
+    extra: number | null;
+  }>;
+  redCards?: Array<{
+    playerName: string;
+    teamSide: "home" | "away";
+    minute: number | null;
+    extra: number | null;
+  }>;
 };
 
 export type WorldCupGroupFeed = {
@@ -186,17 +199,21 @@ export async function fetchCurrentWorldCupFeed(): Promise<CurrentWorldCupFeed> {
         if (!title.includes(" vs ")) return;
 
         const [homeTeam, awayTeam] = title.split(" vs ").map((value) => value.trim());
-        const footballBox = groupPage(heading).parent().nextUntil(".mw-heading3").filter(".footballbox").first();
+        const matchSection = groupPage(heading).parent().nextUntil(".mw-heading3");
+        const footballBox = matchSection.filter(".footballbox").first();
         const kickoffLabel = footballBoxKickoffLabel(footballBox);
         const scoreText = normaliseCell(footballBox.find(".fscore").first().text());
         const scoreMatch = scoreText.match(/^(\d+)\s*[–-]\s*(\d+)$/);
+        const { goalScorers, redCards } = parseWikipediaFootballBoxEvents(groupPage, matchSection);
 
         fixtures.push({
           homeTeam,
           awayTeam,
           date: kickoffLabel,
           homeGoals: scoreMatch ? Number(scoreMatch[1]) : null,
-          awayGoals: scoreMatch ? Number(scoreMatch[2]) : null
+          awayGoals: scoreMatch ? Number(scoreMatch[2]) : null,
+          goalScorers,
+          redCards
         });
       });
 

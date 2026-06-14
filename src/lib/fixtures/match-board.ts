@@ -4,8 +4,9 @@ import {
   type ApiFootballFixture
 } from "@/lib/api-football";
 import {
-  fetchFixtureGoalEvents,
-  parseApiFootballGoalEvents
+  fetchFixtureMatchEvents,
+  parseApiFootballGoalEvents,
+  parseApiFootballRedCardEvents
 } from "@/lib/api-football-events";
 import { getCurrentWorldCupFeedCached } from "@/lib/feeds/current-world-cup";
 import {
@@ -31,7 +32,8 @@ import type {
   MatchBoardCard,
   MatchBoardFixtureState,
   MatchBoardGoal,
-  MatchBoardPayload
+  MatchBoardPayload,
+  MatchBoardRedCard
 } from "@/lib/fixtures/match-board-shared";
 import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
 import { teamsMatch } from "@/lib/squads/team-names";
@@ -107,14 +109,20 @@ function toCard(
     elapsed: state.elapsed,
     startsInMinutes,
     goalScorers: state.goalScorers,
+    redCards: state.redCards,
     segment
   };
 }
 
-async function loadGoalScorers(
+type FixtureMatchEvents = {
+  goalScorers: MatchBoardGoal[];
+  redCards: MatchBoardRedCard[];
+};
+
+async function loadMatchEvents(
   rows: ReturnType<typeof mapApiFixtureRow>[]
-): Promise<Map<number, MatchBoardGoal[]>> {
-  const map = new Map<number, MatchBoardGoal[]>();
+): Promise<Map<number, FixtureMatchEvents>> {
+  const map = new Map<number, FixtureMatchEvents>();
   if (!rows.length) return map;
 
   const ids = rows.map((row) => row.fixtureId);
@@ -124,7 +132,10 @@ async function loadGoalScorers(
   for (const row of rows) {
     const events = cached.get(row.fixtureId);
     if (events) {
-      map.set(row.fixtureId, parseApiFootballGoalEvents(events, row.homeTeamId, row.awayTeamId));
+      map.set(row.fixtureId, {
+        goalScorers: parseApiFootballGoalEvents(events, row.homeTeamId, row.awayTeamId),
+        redCards: parseApiFootballRedCardEvents(events, row.homeTeamId, row.awayTeamId)
+      });
     } else {
       missing.push(row);
     }
@@ -133,10 +144,10 @@ async function loadGoalScorers(
   await Promise.all(
     missing.slice(0, GOAL_SCORER_FETCH_LIMIT).map(async (row) => {
       try {
-        const goals = await fetchFixtureGoalEvents(row.fixtureId, row.homeTeamId, row.awayTeamId);
-        map.set(row.fixtureId, goals);
+        const events = await fetchFixtureMatchEvents(row.fixtureId, row.homeTeamId, row.awayTeamId);
+        map.set(row.fixtureId, events);
       } catch {
-        map.set(row.fixtureId, []);
+        map.set(row.fixtureId, { goalScorers: [], redCards: [] });
       }
     })
   );
@@ -216,7 +227,7 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
     const status = mapApiFootballStatusShort(row.status.short);
     return status === "live" || isRecentResultRow(row, now);
   });
-  const goalScorersById = await loadGoalScorers(scorerRows);
+  const matchEventsById = await loadMatchEvents(scorerRows);
 
   const liveInputs = apiRows.map((row) => ({
     fixtureId: row.fixtureId,
@@ -257,8 +268,14 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
       : feedHasScore
         ? "finished"
         : inferred ?? option.status;
-    const goalScorers =
-      fixtureId && goalScorersById.has(fixtureId) ? goalScorersById.get(fixtureId)! : [];
+    const matchEvents =
+      fixtureId && matchEventsById.has(fixtureId) ? matchEventsById.get(fixtureId)! : null;
+    const feedGoalScorers = feedFixture?.goalScorers ?? [];
+    const feedRedCards = feedFixture?.redCards ?? [];
+    const goalScorers = matchEvents?.goalScorers.length
+      ? matchEvents.goalScorers
+      : feedGoalScorers;
+    const redCards = matchEvents?.redCards.length ? matchEvents.redCards : feedRedCards;
 
     byKey[option.key] = {
       fixtureId,
@@ -270,7 +287,8 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
       elapsed:
         apiRow?.elapsed ??
         (status === "live" ? inferElapsedMinutesFromKickoff(option.date, now) : null),
-      goalScorers
+      goalScorers,
+      redCards
     };
   }
 
@@ -286,7 +304,8 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
       statusShort: row.status.short,
       statusLong: row.statusLong,
       elapsed: row.elapsed,
-      goalScorers: goalScorersById.get(row.fixtureId) ?? []
+      goalScorers: matchEventsById.get(row.fixtureId)?.goalScorers ?? [],
+      redCards: matchEventsById.get(row.fixtureId)?.redCards ?? []
     };
   }
 
