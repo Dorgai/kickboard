@@ -95,6 +95,8 @@ export const frMessages: Messages = {
     loadingPoints: "Chargement des points…",
     pickMatch: "Choisir un match",
     loadingFixtures: "Chargement des matchs à venir depuis le flux du tournoi.",
+    noUpcomingFixtures:
+      "Aucun match à venir dans la liste — les matchs en direct et terminés sont dans la bande de résultats en haut.",
     typeAria: "Type de pronostic",
     selectMatchAria: "Choisir un match pour votre pronostic"
   },

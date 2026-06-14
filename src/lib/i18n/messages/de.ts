@@ -95,6 +95,8 @@ export const deMessages: Messages = {
     loadingPoints: "Punkte werden geladen…",
     pickMatch: "Spiel wählen",
     loadingFixtures: "Kommende Spiele werden aus dem Turnier-Feed geladen.",
+    noUpcomingFixtures:
+      "Keine kommenden Spiele in der Liste — Live- und beendete Spiele findest du oben im Ergebnis-Streifen.",
     typeAria: "Tipp-Art",
     selectMatchAria: "Spiel für deinen Tipp wählen"
   },
