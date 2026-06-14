@@ -1,9 +1,16 @@
 "use client";
 
+import {
+  createContext,
+  useContext,
+  type ReactNode
+} from "react";
 import { useMatchBoardOptional } from "@/components/match-board-provider";
 import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { MatchTeamsLine, TeamLabel } from "@/components/team-label";
 import { useLiveClock } from "@/hooks/use-live-clock";
+import { useTournamentFixturePredictions } from "@/hooks/use-tournament-fixture-predictions";
+import { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
 import {
   fixtureKeyForGroupMatch,
   fixturesForGroupDisplay,
@@ -12,6 +19,7 @@ import {
   type TournamentScheduleFixture
 } from "@/lib/feeds/wc26-tournament-schedule";
 import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
+import { formatFixturePredictionSummary } from "@/lib/fixture-predictions/types";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 
 type TournamentGroupScheduleProps = {
@@ -22,9 +30,33 @@ type TournamentGroupScheduleProps = {
   };
 };
 
+type TournamentPredictionsLookup = ReturnType<typeof useTournamentFixturePredictions>["lookup"];
+
+const TournamentPredictionsContext = createContext<TournamentPredictionsLookup | null>(null);
+
+function useTournamentPredictionsLookup() {
+  return useContext(TournamentPredictionsContext);
+}
+
+export function TournamentFixturePredictionsProvider({ children }: { children: ReactNode }) {
+  const { lookup } = useTournamentFixturePredictions();
+  return (
+    <TournamentPredictionsContext.Provider value={lookup}>{children}</TournamentPredictionsContext.Provider>
+  );
+}
+
 function splitFixtureColumns<T>(items: T[]): [T[], T[]] {
   const splitAt = Math.ceil(items.length / 2);
   return [items.slice(0, splitAt), items.slice(splitAt)];
+}
+
+function isTournamentFixtureStarted(
+  fixture: TournamentScheduleFixture,
+  liveStatus: "upcoming" | "live" | "finished" | undefined
+) {
+  if (liveStatus === "live" || liveStatus === "finished") return true;
+  const kickoff = parseWorldCupFixtureDate(fixture.date);
+  return kickoff != null && Date.now() >= kickoff.getTime();
 }
 
 function TournamentFixtureRow({
@@ -37,6 +69,7 @@ function TournamentFixtureRow({
   metaLabel?: string;
 }) {
   const matchBoard = useMatchBoardOptional();
+  const lookupPrediction = useTournamentPredictionsLookup();
   const live = matchBoard?.lookupByKey(fixtureKey);
   const showScore = live?.homeGoals != null && live?.awayGoals != null;
   const liveNowMs = useLiveClock(live?.status === "live");
@@ -44,6 +77,17 @@ function TournamentFixtureRow({
     live?.status === "live"
       ? resolveLiveElapsed("live", fixture.date, live.elapsed, liveNowMs)
       : null;
+  const started = isTournamentFixtureStarted(fixture, live?.status);
+  const prediction = started
+    ? lookupPrediction?.({
+        fixtureKey,
+        homeTeam: fixture.homeTeam,
+        awayTeam: fixture.awayTeam
+      }) ?? null
+    : null;
+  const predictionSummary = prediction
+    ? formatFixturePredictionSummary(prediction, fixture.homeTeam, fixture.awayTeam)
+    : null;
 
   return (
     <li className="current-event-fixture-row current-event-fixture-row--with-predict">
@@ -76,14 +120,22 @@ function TournamentFixtureRow({
         ) : null}
         <span className="current-event-fixture-date">{formatTournamentFixtureDate(fixture.date)}</span>
       </div>
-      <button
-        aria-label={`Predict ${fixture.homeTeam} vs ${fixture.awayTeam}`}
-        className="button secondary current-event-predict-action current-event-predict-action--game"
-        type="button"
-        onClick={() => navigateToPredictFixture(fixtureKey, { scrollToTop: true })}
-      >
-        Predict
-      </button>
+      {started ? (
+        predictionSummary ? (
+          <p className="current-event-fixture-prediction" aria-label="Your pick for this match">
+            {predictionSummary}
+          </p>
+        ) : null
+      ) : (
+        <button
+          aria-label={`Predict ${fixture.homeTeam} vs ${fixture.awayTeam}`}
+          className="button secondary current-event-predict-action current-event-predict-action--game"
+          type="button"
+          onClick={() => navigateToPredictFixture(fixtureKey, { scrollToTop: true })}
+        >
+          Predict
+        </button>
+      )}
     </li>
   );
 }

@@ -113,6 +113,24 @@ export function formatScorerPicksSummary(picks: ScorerPick[]) {
     .join(", ");
 }
 
+export function formatFixturePredictionSummary(
+  record: Pick<FixturePredictionRecord, "predictedOutcome" | "homeScore" | "awayScore" | "scorerPicks">,
+  homeTeam: string,
+  awayTeam: string
+) {
+  const parts: string[] = [];
+  if (record.predictedOutcome) {
+    parts.push(outcomeLabel(record.predictedOutcome, homeTeam, awayTeam));
+  }
+  if (record.homeScore !== null && record.awayScore !== null) {
+    parts.push(`${record.homeScore}–${record.awayScore}`);
+  }
+  if (record.scorerPicks.length > 0) {
+    parts.push(formatScorerPicksSummary(record.scorerPicks));
+  }
+  return parts.length ? parts.join(" · ") : null;
+}
+
 export function outcomeLabel(outcome: FixtureOutcome, homeTeam: string, awayTeam: string) {
   if (outcome === "home") return `${homeTeam} win`;
   if (outcome === "away") return `${awayTeam} win`;

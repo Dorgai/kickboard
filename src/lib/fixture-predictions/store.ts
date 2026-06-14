@@ -84,6 +84,18 @@ export async function getUserFixturePrediction(userId: string, fixtureKey: strin
   return mapRow(row);
 }
 
+export async function listUserFixturePredictionsForUser(userId: string) {
+  const result = await query<PredictionRow>(
+    `${SELECT_PREDICTION}
+     FROM fixture_predictions
+     WHERE user_id = $1
+     ORDER BY updated_at DESC`,
+    [userId]
+  );
+
+  return result.rows.map(mapRow);
+}
+
 function normalizeOutcome(value: unknown): FixtureOutcome | null {
   if (value === "home" || value === "draw" || value === "away") return value;
   return null;
