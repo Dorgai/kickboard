@@ -148,6 +148,29 @@ export function sortFixtureOptions(fixtures: FixtureOption[]) {
   return [...fixtures].sort(compareFixtureOptions);
 }
 
+/** True when a fixture has kicked off, is live, or is finished (excludes from upcoming pickers). */
+export function isFixtureSchedulePast(fixture: FixtureOption, now = Date.now()) {
+  if (fixture.status === "finished" || fixture.status === "live") return true;
+  const kickoff = kickoffInstant(fixture.date);
+  return kickoff != null && now >= kickoff.getTime();
+}
+
+/** Upcoming fixtures only, earliest kickoff first (next match on top). */
+export function sortUpcomingScheduleFixtures(fixtures: FixtureOption[]) {
+  return sortFixtureOptions(fixtures.filter((fixture) => !isFixtureSchedulePast(fixture)));
+}
+
+/** Played fixtures only, most recent kickoff first. */
+export function sortPlayedScheduleFixtures(fixtures: FixtureOption[]) {
+  return fixtures
+    .filter((fixture) => isFixtureSchedulePast(fixture))
+    .sort((a, b) => {
+      const byKickoff = b.sortKey.localeCompare(a.sortKey);
+      if (byKickoff !== 0) return byKickoff;
+      return b.key.localeCompare(a.key);
+    });
+}
+
 /** Upcoming and live fixtures first, earliest kickoff on top. Finished matches last. */
 export function sortCoachBoardFixtures(fixtures: FixtureOption[]) {
   const statusRank: Record<FixtureOption["status"], number> = {

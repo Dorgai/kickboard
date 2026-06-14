@@ -95,6 +95,8 @@ export const huMessages: Messages = {
     loadingPoints: "Pontok betöltése…",
     pickMatch: "Válassz meccset",
     loadingFixtures: "Közelgő meccsek betöltése a verseny feedből.",
+    noUpcomingFixtures:
+      "Nincs közelgő meccs a listában — az élő és lejátszott meccsek fent az eredmény sávban vannak.",
     typeAria: "Tipp típusa",
     selectMatchAria: "Válassz meccset a tippedhez"
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { AuthGate } from "@/components/auth-gate";
 import { useTranslation } from "@/components/locale-provider";
@@ -23,6 +23,7 @@ import {
   useFixtureOptions,
   type WorldCupGroupInput
 } from "@/components/fixture-match-picker";
+import { sortUpcomingScheduleFixtures } from "@/lib/fixtures/fixture-key";
 import {
   scrollToPredictionOutcomeOnMobile,
   scrollToPredictionsEditor,
@@ -69,6 +70,7 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
   const { t } = useTranslation();
   const touchLayout = useNarrowViewport();
   const fixtures = useFixtureOptions(groups);
+  const upcomingFixtures = useMemo(() => sortUpcomingScheduleFixtures(fixtures), [fixtures]);
   const [subTab, setSubTab] = useState<PredictionSubTabId>("match");
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [overviewRefresh, setOverviewRefresh] = useState(0);
@@ -111,8 +113,8 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
     }
 
     if (fromGroup) {
-      const groupFixtures = fixtures.filter((fixture) => fixture.group === fromGroup);
-      const firstInGroup = groupFixtures[0]?.key ?? null;
+      const groupFixtures = upcomingFixtures.filter((fixture) => fixture.group === fromGroup);
+      const firstInGroup = groupFixtures[0]?.key ?? fixtures.find((f) => f.group === fromGroup)?.key ?? null;
       if (firstInGroup) {
         setSelectedKey(firstInGroup);
         setSubTab("match");
@@ -125,10 +127,11 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
         return;
       }
     }
-    setSelectedKey((current) =>
-      current && fixtures.some((fixture) => fixture.key === current) ? current : fixtures[0].key
-    );
-  }, [fixtures]);
+    setSelectedKey((current) => {
+      if (current && fixtures.some((fixture) => fixture.key === current)) return current;
+      return upcomingFixtures[0]?.key ?? fixtures[0]?.key ?? null;
+    });
+  }, [fixtures, upcomingFixtures]);
 
   const handleFixtureSelect = useCallback((key: string) => {
     setSelectedKey(key);
@@ -196,7 +199,9 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
       const group = detail?.group?.trim().toUpperCase();
       if (!group) return;
 
-      const firstInGroup = fixtures.find((fixture) => fixture.group === group)?.key;
+      const firstInGroup =
+        upcomingFixtures.find((fixture) => fixture.group === group)?.key ??
+        fixtures.find((fixture) => fixture.group === group)?.key;
       if (!firstInGroup) return;
 
       if (typeof window !== "undefined") {
@@ -288,7 +293,8 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
                 <div className="predictions-match-timeline">
                   <FixtureMatchPicker
                     ariaLabel={t("predictions.selectMatchAria")}
-                    fixtures={fixtures}
+                    emptyMessage={t("predictions.noUpcomingFixtures")}
+                    fixtures={upcomingFixtures}
                     rail={touchLayout}
                     selectedKey={selectedKey}
                     timeline={!touchLayout}
@@ -349,6 +355,11 @@ export function PredictionsPanel({ groups = [] }: PredictionsPanelProps) {
 
                   <UserPickActivityPanel refreshToken={activityRefresh} />
                 </div>
+              </div>
+            ) : fixtures.length > 0 && !upcomingFixtures.length ? (
+              <div className="predictions-coming-soon data-card surface-muted">
+                <h3>{t("predictions.pickMatch")}</h3>
+                <p>{t("predictions.noUpcomingFixtures")}</p>
               </div>
             ) : (
               <div className="predictions-coming-soon data-card surface-muted">

@@ -10819,10 +10819,17 @@ h3 {
   background: color-mix(in srgb, var(--color-surface) 92%, var(--color-bg));
   border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   overflow: hidden;
   position: sticky;
   top: var(--app-header-height, 56px);
   z-index: 18;
+}
+
+.match-board-strip-track + .match-board-strip-track {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
 }
 
 .match-board-strip-track {

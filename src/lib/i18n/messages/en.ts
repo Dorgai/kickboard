@@ -91,6 +91,8 @@ export const enMessages = {
     loadingPoints: "Loading points…",
     pickMatch: "Pick a match",
     loadingFixtures: "Loading upcoming fixtures from the tournament feed.",
+    noUpcomingFixtures:
+      "No upcoming matches in the picker — use the results strip above for live and finished games.",
     typeAria: "Prediction type",
     selectMatchAria: "Select a match for your prediction"
   },
