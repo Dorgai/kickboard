@@ -1,18 +1,14 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
 import { useMatchBoardOptional } from "@/components/match-board-provider";
-import { useOptionalEventTab } from "@/components/event-tab-provider";
 import { MatchGoalScorersLine } from "@/components/match-goal-scorers-line";
 import { MatchRedCardsLine } from "@/components/match-red-cards-line";
 import { MatchTeamsLine } from "@/components/team-label";
 import { useLiveClock } from "@/hooks/use-live-clock";
-import { usePlayedMatchesStripFade } from "@/hooks/use-played-matches-strip-fade";
 import { formatFixtureDateDivider } from "@/lib/fixtures/fixture-key";
 import type { MatchBoardCard } from "@/lib/fixtures/match-board-shared";
 import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
-import { useLocationHash } from "@/lib/use-location-hash";
 
 function statusLabel(card: MatchBoardCard, nowMs: number) {
   if (card.status === "live") {
@@ -36,9 +32,6 @@ function formatPlayedMatchDate(date: string | null) {
 export function MatchBoardStrip() {
   const matchBoard = useMatchBoardOptional();
   const payload = matchBoard?.payload;
-  const hash = useLocationHash();
-  const eventTab = useOptionalEventTab();
-  const fadeEnabled = eventTab?.activeTab === "current";
   const hasLive =
     (payload?.live?.length ?? 0) > 0 ||
     Object.values(payload?.byKey ?? {}).some((state) => state.status === "live");
@@ -47,11 +40,6 @@ export function MatchBoardStrip() {
   const playedCards = [...(payload?.live ?? []), ...(payload?.recentResults ?? [])];
   const upcomingCards = payload?.startingSoon ?? [];
   const stripActive = Boolean(payload?.connected && (playedCards.length > 0 || upcomingCards.length > 0));
-  const { playedTrackRef, opacity, collapsed } = usePlayedMatchesStripFade(
-    fadeEnabled,
-    hash,
-    stripActive && playedCards.length > 0
-  );
 
   if (!stripActive) return null;
 
@@ -120,17 +108,10 @@ export function MatchBoardStrip() {
     <section aria-label="Live and upcoming matches" className="match-board-strip">
       {playedCards.length > 0 ? (
         <div
-          className={`match-board-strip-played-shell${collapsed ? " match-board-strip-played-shell--collapsed" : ""}`}
-          style={{ "--played-strip-opacity": opacity } as CSSProperties}
+          aria-label="Live and recent results"
+          className="match-board-strip-track match-board-strip-track--played"
         >
-          <div
-            aria-hidden={collapsed}
-            aria-label="Live and recent results"
-            className="match-board-strip-track match-board-strip-track--played"
-            ref={playedTrackRef}
-          >
-            {playedCards.map(renderPlayedCard)}
-          </div>
+          {playedCards.map(renderPlayedCard)}
         </div>
       ) : null}
       {upcomingCards.length > 0 ? (
