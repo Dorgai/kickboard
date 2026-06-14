@@ -10899,8 +10899,11 @@ h3 {
 
 .match-board-strip-played-shell--collapsed {
   grid-template-rows: 0fr;
+  margin: 0;
+  max-height: 0;
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {

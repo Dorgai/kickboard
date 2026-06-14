@@ -8,7 +8,6 @@ import { MatchRedCardsLine } from "@/components/match-red-cards-line";
 import { MatchTeamsLine } from "@/components/team-label";
 import { useLiveClock } from "@/hooks/use-live-clock";
 import { usePlayedMatchesStripFade } from "@/hooks/use-played-matches-strip-fade";
-import { usePlayedStripScrollFadeViewport } from "@/hooks/use-played-strip-scroll-fade-viewport";
 import { formatFixtureDateDivider } from "@/lib/fixtures/fixture-key";
 import type { MatchBoardCard } from "@/lib/fixtures/match-board-shared";
 import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
@@ -39,24 +38,22 @@ export function MatchBoardStrip() {
   const payload = matchBoard?.payload;
   const hash = useLocationHash();
   const eventTab = useOptionalEventTab();
-  const fadeViewport = usePlayedStripScrollFadeViewport();
-  const playedTrackRef = useRef<HTMLDivElement>(null);
-  const fadeEnabled = fadeViewport && eventTab?.activeTab === "current";
-  const { opacity, collapsed } = usePlayedMatchesStripFade(
-    playedTrackRef,
-    fadeEnabled,
-    hash
-  );
+  const fadeEnabled = eventTab?.activeTab === "current";
   const hasLive =
     (payload?.live?.length ?? 0) > 0 ||
     Object.values(payload?.byKey ?? {}).some((state) => state.status === "live");
   const liveNowMs = useLiveClock(hasLive);
 
-  if (!payload?.connected) return null;
+  const playedCards = [...(payload?.live ?? []), ...(payload?.recentResults ?? [])];
+  const upcomingCards = payload?.startingSoon ?? [];
+  const stripActive = Boolean(payload?.connected && (playedCards.length > 0 || upcomingCards.length > 0));
+  const { playedTrackRef, opacity, collapsed } = usePlayedMatchesStripFade(
+    fadeEnabled,
+    hash,
+    stripActive && playedCards.length > 0
+  );
 
-  const playedCards = [...payload.live, ...(payload.recentResults ?? [])];
-  const upcomingCards = payload.startingSoon ?? [];
-  if (!playedCards.length && !upcomingCards.length) return null;
+  if (!stripActive) return null;
 
   const renderPlayedCard = (card: MatchBoardCard) => {
     const matchDate = formatPlayedMatchDate(card.date);
