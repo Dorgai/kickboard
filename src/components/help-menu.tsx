@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { LanguageSelector } from "@/components/language-selector";
+import { EventTabSelector } from "@/components/event-tab-selector";
 import { useTranslation } from "@/components/locale-provider";
 import { ThemeSelector } from "@/components/theme-selector";
 import {
@@ -64,6 +65,7 @@ export function HelpMenu() {
         <div className="help-menu-dropdown app-menu-dropdown" id={menuId} role="menu">
           <ThemeSelector variant="menu" />
           <LanguageSelector variant="menu" />
+          <EventTabSelector variant="menu" onSelected={() => setOpen(false)} />
           <div className="app-menu-divider" role="separator" />
           <p className="app-menu-section-label">{t("common.navigate")}</p>
           <Link

@@ -12220,6 +12220,24 @@ h3 {
   padding: 4px 4px 8px;
 }
 
+.app-menu-event-tabs {
+  display: grid;
+  gap: 8px;
+  padding: 0 4px 8px;
+}
+
+.app-menu-event-tabs-options {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 861px) {
+  .app-menu-event-tabs {
+    display: none;
+  }
+}
+
 .locale-onboarding-field {
   border: 0;
   display: grid;
@@ -13298,34 +13316,17 @@ code {
 
   .header-primary-nav {
     align-items: center;
-    flex-direction: column;
+    flex-direction: row;
     gap: 6px;
     grid-column: 1 / -1;
     grid-row: 2;
+    justify-content: center;
     justify-self: stretch;
     width: 100%;
   }
 
-  .header-event-selector-tabs {
-    justify-self: center;
-    max-width: min(24rem, calc(100% - 2 * var(--page-gutter)));
-    width: fit-content;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-    overflow: hidden;
-    padding: var(--kickboard-tab-rail-padding);
-  }
-
-  .header-event-selector-tabs button {
-    flex: 1 1 0;
-    hyphens: auto;
-    line-height: var(--kickboard-tab-item-line-height);
-    min-width: 0;
-    overflow-wrap: anywhere;
-    text-align: center;
-    white-space: normal;
-    word-break: break-word;
+  .header-primary-nav .header-event-selector-tabs {
+    display: none;
   }
 
   .header-primary-nav .nav-tabs {
