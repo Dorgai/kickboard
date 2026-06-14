@@ -13,6 +13,8 @@ export const enMessages = {
     notNow: "Not now",
     dismiss: "Dismiss",
     copyLink: "Copy link",
+    copy: "Copy",
+    copied: "Copied",
     loading: "Loading…"
   },
   nav: {

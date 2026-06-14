@@ -15,6 +15,8 @@ export const huMessages: Messages = {
     notNow: "Most nem",
     dismiss: "Bezárás",
     copyLink: "Link másolása",
+    copy: "Másolás",
+    copied: "Másolva",
     loading: "Betöltés…"
   },
   nav: {

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { CopyLinkButton } from "@/components/copy-link-button";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { useTranslation } from "@/components/locale-provider";
 import { useSession } from "next-auth/react";
@@ -201,14 +202,12 @@ export function RegistrationInvitationsPanel() {
         <div className="registration-invite-latest">
           <p className="registration-invite-latest-label">{t("invitations.latestLink")}</p>
           <code className="registration-invite-url">{lastInviteUrl}</code>
-          <button
-            className="button secondary"
+          <CopyLinkButton
             disabled={busy}
-            type="button"
-            onClick={() => void copyLink(lastInviteUrl)}
-          >
-            {t("common.copyLink")}
-          </button>
+            text={lastInviteUrl}
+            onCopied={() => setNotice(t("invitations.copiedNotice"))}
+            onError={(message) => setError(message)}
+          />
         </div>
       ) : null}
 
@@ -233,14 +232,13 @@ export function RegistrationInvitationsPanel() {
                 <div className="registration-invite-card-actions">
                   {row.status === "pending" ? (
                     <>
-                      <button
-                        className="button secondary"
+                      <CopyLinkButton
+                        compact
                         disabled={busy}
-                        type="button"
-                        onClick={() => void copyLink(row.inviteUrl)}
-                      >
-                        {t("common.copyLink")}
-                      </button>
+                        text={row.inviteUrl}
+                        onCopied={() => setNotice(t("invitations.copiedNotice"))}
+                        onError={(message) => setError(message)}
+                      />
                       <button
                         className="button secondary"
                         disabled={busy}

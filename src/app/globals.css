@@ -740,22 +740,82 @@ h3 {
 }
 
 .button {
+  -webkit-appearance: none;
+  align-items: center;
+  appearance: none;
   border-radius: 9999px;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
   font-weight: 800;
   gap: 8px;
   justify-content: center;
+  min-height: 44px;
   padding: 0 18px;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.12s ease;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .button.primary {
   background: var(--color-brand);
+  border: 1px solid transparent;
   color: white;
+}
+
+.button.primary:hover:not(:disabled) {
+  filter: brightness(1.05);
 }
 
 .button.secondary {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-surface);
   color: var(--color-text-primary);
+}
+
+.button.secondary:hover:not(:disabled) {
+  background: var(--kickboard-tab-hover-bg);
+  box-shadow: var(--shadow-surface-hover);
+}
+
+.button.secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.copy-link-button {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding-inline: 14px;
+  white-space: nowrap;
+}
+
+.copy-link-button--compact {
+  font-size: 11px;
+  min-height: 32px;
+  padding-inline: 10px;
+}
+
+.copy-link-button--copied {
+  background: color-mix(in srgb, var(--color-accent, #1a7f4b) 12%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-accent, #1a7f4b) 35%, var(--color-border));
+}
+
+.prediction-share-copy-link {
+  margin-left: 2px;
 }
 
 .live-card,
@@ -3677,9 +3737,16 @@ h3 {
 }
 
 .registration-invite-card-actions {
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
+}
+
+.registration-invite-card-actions .copy-link-button,
+.registration-invite-latest .copy-link-button {
+  justify-self: start;
+  width: fit-content;
 }
 
 .invite-registration-page {
@@ -7222,7 +7289,7 @@ h3 {
   align-items: center;
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 6px;
 }
 
 .prediction-share-icon-btn {

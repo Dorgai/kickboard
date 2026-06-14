@@ -1,7 +1,8 @@
 "use client";
 
-import { Copy, Loader2, Share2 } from "lucide-react";
+import { Loader2, Share2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { CopyLinkButton } from "@/components/copy-link-button";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { useToastOptional } from "@/components/toast-provider";
 import { recordPredictionShared } from "@/lib/onboarding-tips/record-share";
@@ -182,6 +183,8 @@ export function PredictionShareButtons({
 
   if (!canShare) return null;
 
+  const isCompact = className.includes("compact") || className.includes("inline");
+
   return (
     <div
       className={`prediction-share${className ? ` ${className}` : ""}`}
@@ -229,16 +232,17 @@ export function PredictionShareButtons({
             <Share2 size={11} />
           </button>
         ) : null}
-        <button
-          aria-label="Copy caption and link"
-          className="prediction-share-icon-btn"
+        <CopyLinkButton
+          className="prediction-share-copy-link"
+          compact={isCompact}
           disabled={buttonsDisabled}
-          title="Copy caption and link"
-          type="button"
-          onClick={() => void copyCaption()}
-        >
-          <Copy size={11} />
-        </button>
+          text={shareText}
+          onCopied={() => {
+            recordPredictionShared();
+            notify("Caption and link copied.");
+          }}
+          onError={() => notify("Could not copy.", "warning")}
+        />
         <HelpTooltip label="How sharing works" size="sm">
           {shareLink.status === "ready" && shareLink.mode === "short"
             ? "Short link ready — safe for texts and social apps. "

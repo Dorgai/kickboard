@@ -15,6 +15,8 @@ export const frMessages: Messages = {
     notNow: "Pas maintenant",
     dismiss: "Fermer",
     copyLink: "Copier le lien",
+    copy: "Copier",
+    copied: "Copié",
     loading: "Chargement…"
   },
   nav: {
