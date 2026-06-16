@@ -410,6 +410,7 @@ type UnifiedMatchGroup = {
   fixtureKey: string;
   fixtureLabel: string;
   mine: PredictionPickSummary;
+  hasMine: boolean;
   friends: ConnectionPredictionSummary[];
 };
 
@@ -451,6 +452,22 @@ function matchSortKey(pick: PredictionPickSummary, fixtureMeta: Map<string, Fixt
   return fixtureMeta.get(pick.fixtureKey)?.sortKey ?? pick.updatedAt;
 }
 
+function representativePick(group: UnifiedMatchGroup) {
+  return group.hasMine ? group.mine : (group.friends[0] ?? group.mine);
+}
+
+function groupIsPast(group: UnifiedMatchGroup, fixtureMeta: Map<string, FixturePickMeta>) {
+  return matchIsPast(representativePick(group), fixtureMeta);
+}
+
+function groupSortKey(group: UnifiedMatchGroup, fixtureMeta: Map<string, FixturePickMeta>) {
+  return matchSortKey(representativePick(group), fixtureMeta);
+}
+
+function groupUpdatedAt(group: UnifiedMatchGroup) {
+  return representativePick(group).updatedAt;
+}
+
 function sortMatchGroups(
   groups: UnifiedMatchGroup[],
   fixtureMeta: Map<string, FixturePickMeta>,
@@ -458,9 +475,9 @@ function sortMatchGroups(
 ) {
   const direction = tab === "upcoming" ? 1 : -1;
   return [...groups].sort((a, b) => {
-    const byKickoff = matchSortKey(a.mine, fixtureMeta).localeCompare(matchSortKey(b.mine, fixtureMeta));
+    const byKickoff = groupSortKey(a, fixtureMeta).localeCompare(groupSortKey(b, fixtureMeta));
     if (byKickoff !== 0) return direction * byKickoff;
-    return b.mine.updatedAt.localeCompare(a.mine.updatedAt);
+    return groupUpdatedAt(b).localeCompare(groupUpdatedAt(a));
   });
 }
 
@@ -576,23 +593,42 @@ export function PredictionsPicksSection({
   }, [fixtures]);
 
   const matchGroups = useMemo(() => {
-    const groups: UnifiedMatchGroup[] = myPredictions.map((mine) => ({
-      fixtureKey: mine.fixtureKey,
-      fixtureLabel: mine.fixtureLabel,
-      mine,
-      friends: connectionsPredictions.filter(
-        (pick) =>
-          pick.fixtureKey === mine.fixtureKey && peerMatchesNameFilter(pick, friendsNameFilter)
-      )
-    }));
+    const groups = new Map<string, UnifiedMatchGroup>();
 
-    return groups;
+    for (const mine of myPredictions) {
+      groups.set(mine.fixtureKey, {
+        fixtureKey: mine.fixtureKey,
+        fixtureLabel: mine.fixtureLabel,
+        mine,
+        hasMine: true,
+        friends: []
+      });
+    }
+
+    for (const friend of connectionsPredictions) {
+      if (!peerMatchesNameFilter(friend, friendsNameFilter)) continue;
+      const existing = groups.get(friend.fixtureKey);
+      if (existing) {
+        existing.friends.push(friend);
+        continue;
+      }
+
+      groups.set(friend.fixtureKey, {
+        fixtureKey: friend.fixtureKey,
+        fixtureLabel: friend.fixtureLabel,
+        mine: createEmptyPickSummary(friend.fixtureKey, friend.fixtureLabel),
+        hasMine: false,
+        friends: [friend]
+      });
+    }
+
+    return Array.from(groups.values());
   }, [connectionsPredictions, friendsNameFilter, myPredictions]);
 
   const upcomingGroups = useMemo(
     () =>
       sortMatchGroups(
-        matchGroups.filter((group) => !matchIsPast(group.mine, fixtureMeta)),
+        matchGroups.filter((group) => !groupIsPast(group, fixtureMeta)),
         fixtureMeta,
         "upcoming"
       ),
@@ -602,7 +638,7 @@ export function PredictionsPicksSection({
   const pastGroups = useMemo(
     () =>
       sortMatchGroups(
-        matchGroups.filter((group) => matchIsPast(group.mine, fixtureMeta)),
+        matchGroups.filter((group) => groupIsPast(group, fixtureMeta)),
         fixtureMeta,
         "past"
       ),
@@ -628,6 +664,7 @@ export function PredictionsPicksSection({
         fixtureKey,
         fixtureLabel,
         mine: createEmptyPickSummary(fixtureKey, fixtureLabel),
+        hasMine: false,
         friends: []
       }
     ];
@@ -676,9 +713,14 @@ export function PredictionsPicksSection({
         />
       </div>
 
-      {myPredictions.length === 0 ? (
+      {myPredictions.length === 0 && connectionsPredictions.length === 0 ? (
         <p className="predictions-overview-hint predictions-overview-empty--inline">
           No picks yet — choose a match above.
+        </p>
+      ) : null}
+      {myPredictions.length === 0 && connectionsPredictions.length > 0 ? (
+        <p className="predictions-overview-hint predictions-overview-empty--inline">
+          No picks from you yet — friends&apos; picks are shown below.
         </p>
       ) : null}
 
@@ -686,7 +728,7 @@ export function PredictionsPicksSection({
         <div className="predictions-picks-mobile-stack" role="tabpanel">
           {displayGroups.map((group) => {
             const isActive = activeFixtureKey === group.fixtureKey;
-            const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
+            const sharePayload = group.hasMine ? pickToSharePayload(group.mine, viewerDisplayName) : null;
             const pickLocked = fixturePickIsLocked(group.fixtureKey, fixtureMeta);
             const matchFriends = group.friends.filter((pick) =>
               peerMatchesNameFilter(pick, friendsNameFilter)
@@ -702,10 +744,12 @@ export function PredictionsPicksSection({
                 <header className="predictions-picks-mobile-card-header">
                   <span className="predictions-picks-match-label">{group.fixtureLabel}</span>
                   <div className="predictions-picks-mobile-card-actions">
-                    <PredictionShareButtons
-                      className="prediction-share--compact"
-                      payload={sharePayload}
-                    />
+                    {sharePayload ? (
+                      <PredictionShareButtons
+                        className="prediction-share--compact"
+                        payload={sharePayload}
+                      />
+                    ) : null}
                     {onEditPick && !pickLocked ? (
                       <button
                         className="text-button predictions-overview-edit"
@@ -766,7 +810,7 @@ export function PredictionsPicksSection({
             <tbody>
               {displayGroups.map((group) => {
                 const isActive = activeFixtureKey === group.fixtureKey;
-                const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
+                const sharePayload = group.hasMine ? pickToSharePayload(group.mine, viewerDisplayName) : null;
                 const pickLocked = fixturePickIsLocked(group.fixtureKey, fixtureMeta);
                 return (
                   <tr
@@ -787,10 +831,12 @@ export function PredictionsPicksSection({
                       </td>
                     ))}
                     <td className="predictions-picks-actions-cell">
-                      <PredictionShareButtons
-                        className="prediction-share--compact"
-                        payload={sharePayload}
-                      />
+                      {sharePayload ? (
+                        <PredictionShareButtons
+                          className="prediction-share--compact"
+                          payload={sharePayload}
+                        />
+                      ) : null}
                       {onEditPick && !pickLocked ? (
                         <button
                           className="text-button predictions-overview-edit"
