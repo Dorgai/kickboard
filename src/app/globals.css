@@ -6122,6 +6122,133 @@ h3 {
   margin-top: 2px;
 }
 
+.predictions-picks-aggregate-list {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.predictions-picks-aggregate-card {
+  background: color-mix(in srgb, var(--color-bg) 42%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.predictions-picks-aggregate-card--active {
+  border-color: color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 24%, transparent);
+}
+
+.predictions-picks-aggregate-card--placeholder {
+  opacity: 0.92;
+}
+
+.predictions-picks-aggregate-summary {
+  align-items: center;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(8rem, 1.15fr) minmax(16rem, 2fr) minmax(8rem, auto) auto;
+  list-style: none;
+  padding: 12px;
+}
+
+.predictions-picks-aggregate-summary::-webkit-details-marker {
+  display: none;
+}
+
+.predictions-picks-aggregate-match {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.predictions-picks-aggregate-meta {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.predictions-picks-aggregate-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.predictions-picks-aggregate-stat {
+  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 58%, transparent);
+  border-radius: 9px;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 6px 8px;
+}
+
+.predictions-picks-aggregate-label {
+  color: var(--color-text-secondary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.predictions-picks-aggregate-value {
+  color: var(--color-text-primary);
+  font-size: 11px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.predictions-picks-aggregate-status {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.predictions-picks-aggregate-toggle {
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.predictions-picks-aggregate-card[open] .predictions-picks-aggregate-toggle {
+  color: var(--color-text-secondary);
+}
+
+.predictions-picks-aggregate-card[open] .predictions-picks-aggregate-toggle::after {
+  content: " open";
+}
+
+.predictions-picks-aggregate-details {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+  display: grid;
+  gap: 10px;
+  padding: 0 12px 12px;
+}
+
+.predictions-picks-aggregate-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 10px;
+}
+
+.predictions-picks-detail-list {
+  display: grid;
+  gap: 10px;
+}
+
 .predictions-overview-hint {
   color: var(--color-text-secondary);
   font-size: 13px;
@@ -6440,6 +6567,25 @@ h3 {
 
   .predictions-unified-picks-tabs-rail .kickboard-tab-bar {
     width: 100%;
+  }
+
+  .predictions-picks-aggregate-summary {
+    align-items: stretch;
+    gap: 8px;
+    grid-template-columns: 1fr;
+  }
+
+  .predictions-picks-aggregate-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .predictions-picks-aggregate-status,
+  .predictions-picks-aggregate-actions {
+    justify-content: flex-start;
+  }
+
+  .predictions-picks-aggregate-value {
+    white-space: normal;
   }
 
   .predictions-picks-match-cell {
