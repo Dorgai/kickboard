@@ -1,6 +1,7 @@
 import { parseWorldCupFixtureDate } from "@/lib/fixtures/fixture-date";
 
 export type MatchBoardGoal = {
+  playerId?: number | null;
   playerName: string;
   teamSide: "home" | "away";
   minute: number | null;

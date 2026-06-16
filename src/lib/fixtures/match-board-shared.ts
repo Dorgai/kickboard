@@ -54,7 +54,7 @@ export type MatchBoardPayload = {
 };
 
 export const MATCH_BOARD_POLL_MS = 25_000;
-export const MATCH_BOARD_POLL_LIVE_MS = 8_000;
+export const MATCH_BOARD_POLL_LIVE_MS = 5_000;
 
 export function enrichFixtureOption(
   fixture: FixtureOption,

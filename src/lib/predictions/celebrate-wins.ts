@@ -3,6 +3,7 @@ import type { PredictionResultStatus } from "@/lib/fixture-predictions/types";
 
 export type PickForCelebration = {
   id: string;
+  fixtureKey: string;
   fixtureLabel: string;
   predictedOutcome: string | null;
   homeScore: number | null;

@@ -16,6 +16,7 @@
     "db:cleanup-predictions": "node scripts/cleanup-predictions.mjs",
     "db:schema:psql": "sh -c 'test -n \"$DATABASE_URL\" && psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f db/schema.sql -f db/community-extensions.sql'",
     "check": "npm run typecheck && npm run build",
+    "test:fixture-settlement": "tsx scripts/test-fixture-settlement.ts",
     "push:daily": "npx tsx scripts/push-daily-digest.ts",
     "push:match-results": "npx tsx scripts/push-match-results.ts",
     "generate:vapid": "node scripts/generate-vapid-keys.mjs",

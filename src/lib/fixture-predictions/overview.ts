@@ -272,7 +272,7 @@ export async function listConnectionsFixturePredictions(
   const peerIds = await listAcceptedPeerIds(userId);
   if (!peerIds.length) return [];
 
-  const limit = options?.limit ?? 30;
+  const limit = options?.limit ?? 500;
   const match = resolveFixtureKeyMatchParams({
     fixtureKey: options?.fixtureKey,
     homeTeam: options?.homeTeam,

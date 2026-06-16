@@ -25,6 +25,7 @@ Push covers:
 
 - Daily match-day digest (scheduled cron)
 - Full-time match results (scheduled cron every 30 minutes when API-Football is configured)
+- Fixture prediction settlement and point aggregation (scheduled cron after result sync)
 - Upcoming matches within 72 hours (first time each fixture is seen)
 - Connection requests and acceptances
 - Fan Chat messages (direct and broadcast)
@@ -41,7 +42,8 @@ Set:
 - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
 - `VAPID_PRIVATE_KEY`
 - `VAPID_SUBJECT` (mailto: or https URL)
-- `CRON_SECRET` for `POST /api/cron/push-daily`, `POST /api/cron/push-match-results`, and GitHub Actions
+- `CRON_SECRET` for `POST /api/cron/push-daily`, `POST /api/cron/push-match-results`,
+  `POST /api/cron/settle-fixture-predictions`, and GitHub Actions
 - `API_FOOTBALL_KEY` (optional but required for live match-result push)
 
 Generate keys: `npx web-push generate-vapid-keys`

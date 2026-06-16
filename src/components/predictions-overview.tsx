@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import {
   formatScorerPicksSummary,
   outcomeShort,
@@ -410,7 +409,27 @@ type UnifiedMatchGroup = {
   fixtureKey: string;
   fixtureLabel: string;
   mine: PredictionPickSummary;
+  hasMine: boolean;
   friends: ConnectionPredictionSummary[];
+};
+
+type PickParticipant = {
+  key: string;
+  label: string;
+  username?: string;
+  pick: PredictionPickSummary;
+  isMine: boolean;
+};
+
+type FriendCorrectnessRow = {
+  userId: string;
+  label: string;
+  username: string | null;
+  isMine: boolean;
+  won: number;
+  lost: number;
+  pending: number;
+  points: number;
 };
 
 const PICKS_TIME_TABS = [
@@ -451,6 +470,22 @@ function matchSortKey(pick: PredictionPickSummary, fixtureMeta: Map<string, Fixt
   return fixtureMeta.get(pick.fixtureKey)?.sortKey ?? pick.updatedAt;
 }
 
+function representativePick(group: UnifiedMatchGroup) {
+  return group.hasMine ? group.mine : (group.friends[0] ?? group.mine);
+}
+
+function groupIsPast(group: UnifiedMatchGroup, fixtureMeta: Map<string, FixturePickMeta>) {
+  return matchIsPast(representativePick(group), fixtureMeta);
+}
+
+function groupSortKey(group: UnifiedMatchGroup, fixtureMeta: Map<string, FixturePickMeta>) {
+  return matchSortKey(representativePick(group), fixtureMeta);
+}
+
+function groupUpdatedAt(group: UnifiedMatchGroup) {
+  return representativePick(group).updatedAt;
+}
+
 function sortMatchGroups(
   groups: UnifiedMatchGroup[],
   fixtureMeta: Map<string, FixturePickMeta>,
@@ -458,55 +493,10 @@ function sortMatchGroups(
 ) {
   const direction = tab === "upcoming" ? 1 : -1;
   return [...groups].sort((a, b) => {
-    const byKickoff = matchSortKey(a.mine, fixtureMeta).localeCompare(matchSortKey(b.mine, fixtureMeta));
+    const byKickoff = groupSortKey(a, fixtureMeta).localeCompare(groupSortKey(b, fixtureMeta));
     if (byKickoff !== 0) return direction * byKickoff;
-    return b.mine.updatedAt.localeCompare(a.mine.updatedAt);
+    return groupUpdatedAt(b).localeCompare(groupUpdatedAt(a));
   });
-}
-
-const MIN_FRIEND_COLUMNS = 3;
-
-type FriendTableColumn = {
-  key: string;
-  label: string;
-  userId: string | null;
-  username?: string;
-};
-
-function buildFriendColumns(
-  connectionsPredictions: ConnectionPredictionSummary[],
-  friendsNameFilter: string,
-  options?: { placeholders?: boolean }
-): FriendTableColumn[] {
-  const peers = new Map<string, FriendTableColumn>();
-
-  for (const pick of connectionsPredictions) {
-    if (!peerMatchesNameFilter(pick, friendsNameFilter)) continue;
-    if (peers.has(pick.userId)) continue;
-    peers.set(pick.userId, {
-      key: pick.userId,
-      userId: pick.userId,
-      username: pick.username,
-      label: pick.displayName?.trim() || pick.username
-    });
-  }
-
-  const columns = Array.from(peers.values()).sort((a, b) => a.label.localeCompare(b.label));
-  if (options?.placeholders === false) {
-    return columns;
-  }
-
-  const targetCount = Math.max(MIN_FRIEND_COLUMNS, columns.length);
-  while (columns.length < targetCount) {
-    const index = columns.length + 1;
-    columns.push({
-      key: `placeholder-${index}`,
-      userId: null,
-      label: `Friend ${index}`
-    });
-  }
-
-  return columns;
 }
 
 function createEmptyPickSummary(fixtureKey: string, fixtureLabel: string): PredictionPickSummary {
@@ -528,16 +518,311 @@ function createEmptyPickSummary(fixtureKey: string, fixtureLabel: string): Predi
   };
 }
 
-function friendPickForColumn(
-  friends: ConnectionPredictionSummary[],
-  column: FriendTableColumn
-): ConnectionPredictionSummary | null {
-  if (!column.userId) return null;
-  return friends.find((pick) => pick.userId === column.userId) ?? null;
-}
-
 function TablePickCell({ pick }: { pick: PredictionPickSummary | null }) {
   return <CompactPickLines pick={pick} />;
+}
+
+function participantsForGroup(group: UnifiedMatchGroup): PickParticipant[] {
+  const participants: PickParticipant[] = [];
+  if (group.hasMine) {
+    participants.push({
+      key: "you",
+      label: "You",
+      pick: group.mine,
+      isMine: true
+    });
+  }
+
+  for (const friend of group.friends) {
+    participants.push({
+      key: friend.userId,
+      label: friend.displayName?.trim() || friend.username,
+      username: friend.username,
+      pick: friend,
+      isMine: false
+    });
+  }
+
+  return participants;
+}
+
+function aggregateCategorySummary(participants: PickParticipant[], category: PredictionCategory) {
+  const counts = new Map<string, number>();
+  for (const participant of participants) {
+    const value = pickCategoryValue(participant.pick, category);
+    if (!value) continue;
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+
+  if (counts.size === 0) return "No picks";
+
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 3)
+    .map(([value, count]) => (count > 1 ? `${value} ×${count}` : value))
+    .join(" · ");
+}
+
+function statusCounts(participants: PickParticipant[]) {
+  let won = 0;
+  let lost = 0;
+  let pending = 0;
+
+  for (const participant of participants) {
+    const pick = participant.pick;
+    const statuses = [
+      pick.predictedOutcome ? pick.outcomeStatus : null,
+      pick.homeScore !== null && pick.awayScore !== null ? pick.scoreStatus : null,
+      pick.scorerPicks.length > 0 ? pick.scorersStatus : null
+    ].filter(Boolean) as string[];
+
+    for (const status of statuses) {
+      if (status === "won" || status === "partial") won += 1;
+      else if (status === "lost") lost += 1;
+      else if (status !== "void") pending += 1;
+    }
+  }
+
+  return { won, lost, pending };
+}
+
+function addPickCorrectness(row: FriendCorrectnessRow, pick: PredictionPickSummary) {
+  const entries = [
+    pick.predictedOutcome
+      ? { status: pick.outcomeStatus, points: pick.outcomePointsAwarded }
+      : null,
+    pick.homeScore !== null && pick.awayScore !== null
+      ? { status: pick.scoreStatus, points: pick.scorePointsAwarded }
+      : null,
+    pick.scorerPicks.length > 0
+      ? { status: pick.scorersStatus, points: pick.scorersPointsAwarded }
+      : null
+  ].filter(Boolean) as { status: string; points: number }[];
+
+  for (const entry of entries) {
+    if (entry.status === "won" || entry.status === "partial") {
+      row.won += 1;
+      row.points += entry.points;
+    } else if (entry.status === "lost") {
+      row.lost += 1;
+    } else if (entry.status !== "void") {
+      row.pending += 1;
+    }
+  }
+}
+
+function buildCorrectnessRows(
+  myPredictions: PredictionPickSummary[],
+  friendPredictions: ConnectionPredictionSummary[]
+) {
+  const byFriend = new Map<string, FriendCorrectnessRow>();
+
+  if (myPredictions.length > 0) {
+    const me: FriendCorrectnessRow = {
+      userId: "you",
+      label: "You",
+      username: null,
+      isMine: true,
+      won: 0,
+      lost: 0,
+      pending: 0,
+      points: 0
+    };
+    for (const pick of myPredictions) {
+      addPickCorrectness(me, pick);
+    }
+    byFriend.set(me.userId, me);
+  }
+
+  for (const pick of friendPredictions) {
+    let row = byFriend.get(pick.userId);
+    if (!row) {
+      row = {
+        userId: pick.userId,
+        label: pick.displayName?.trim() || pick.username,
+        username: pick.username,
+        isMine: false,
+        won: 0,
+        lost: 0,
+        pending: 0,
+        points: 0
+      };
+      byFriend.set(pick.userId, row);
+    }
+    addPickCorrectness(row, pick);
+  }
+
+  return Array.from(byFriend.values()).sort(
+    (a, b) =>
+      Number(b.isMine) - Number(a.isMine) ||
+      b.points - a.points ||
+      b.won - a.won ||
+      a.label.localeCompare(b.label)
+  );
+}
+
+function accuracyLabel(row: FriendCorrectnessRow) {
+  const decided = row.won + row.lost;
+  if (decided === 0) return "—";
+  return `${Math.round((row.won / decided) * 100)}%`;
+}
+
+function FriendsCorrectnessSummary({ rows }: { rows: FriendCorrectnessRow[] }) {
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="predictions-friends-correctness">
+      <div className="predictions-friends-correctness-header">
+        <h4>Prediction correctness</h4>
+        <span>Aggregate by pick category</span>
+      </div>
+      <div className="predictions-friends-correctness-table-wrap">
+        <table className="predictions-results-table predictions-friends-correctness-table">
+          <thead>
+            <tr>
+              <th>Friend</th>
+              <th>Won</th>
+              <th>Lost</th>
+              <th>Pending</th>
+              <th>Accuracy</th>
+              <th>Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.userId}>
+                <td>
+                  <span className="predictions-picks-col-label">{row.label}</span>
+                  {row.username ? (
+                    <span className="predictions-picks-col-meta">@{row.username}</span>
+                  ) : null}
+                </td>
+                <td><span className="predictions-result-badge predictions-result--won">{row.won}</span></td>
+                <td><span className="predictions-result-badge predictions-result--lost">{row.lost}</span></td>
+                <td><span className="predictions-result-badge predictions-result--pending">{row.pending}</span></td>
+                <td>{accuracyLabel(row)}</td>
+                <td><strong>{row.points}</strong></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function AggregateMatchCard({
+  group,
+  fixtureMeta,
+  activeFixtureKey,
+  viewerDisplayName,
+  onEditPick,
+  showingPlaceholderRow
+}: {
+  group: UnifiedMatchGroup;
+  fixtureMeta: Map<string, FixturePickMeta>;
+  activeFixtureKey: string | null;
+  viewerDisplayName: string | null;
+  onEditPick?: (fixtureKey: string) => void;
+  showingPlaceholderRow: boolean;
+}) {
+  const isActive = activeFixtureKey === group.fixtureKey;
+  const sharePayload = group.hasMine ? pickToSharePayload(group.mine, viewerDisplayName) : null;
+  const pickLocked = fixturePickIsLocked(group.fixtureKey, fixtureMeta);
+  const participants = participantsForGroup(group);
+  const counts = statusCounts(participants);
+  const friendCount = group.friends.length;
+  const participantLabel =
+    participants.length === 1 ? "1 pick" : `${participants.length} picks`;
+  const detailCount = [
+    group.hasMine ? "you" : null,
+    friendCount > 0 ? `${friendCount} friend${friendCount === 1 ? "" : "s"}` : null
+  ]
+    .filter(Boolean)
+    .join(" + ");
+
+  return (
+    <details
+      className={`predictions-picks-aggregate-card${isActive ? " predictions-picks-aggregate-card--active" : ""}${
+        showingPlaceholderRow ? " predictions-picks-aggregate-card--placeholder" : ""
+      }`}
+      open={isActive}
+    >
+      <summary className="predictions-picks-aggregate-summary">
+        <span className="predictions-picks-aggregate-match">
+          <span className="predictions-picks-match-label">{group.fixtureLabel}</span>
+          <span className="predictions-picks-aggregate-meta">
+            {participantLabel}
+            {detailCount ? ` · ${detailCount}` : ""}
+          </span>
+        </span>
+        <span className="predictions-picks-aggregate-grid">
+          {PICK_CATEGORY_ROWS.map((row) => (
+            <span className="predictions-picks-aggregate-stat" key={row.category}>
+              <span className="predictions-picks-aggregate-label">{row.label}</span>
+              <span className="predictions-picks-aggregate-value">
+                {aggregateCategorySummary(participants, row.category)}
+              </span>
+            </span>
+          ))}
+        </span>
+        <span className="predictions-picks-aggregate-status">
+          {counts.won > 0 ? <span className="predictions-result-badge predictions-result--won">{counts.won} won</span> : null}
+          {counts.lost > 0 ? <span className="predictions-result-badge predictions-result--lost">{counts.lost} lost</span> : null}
+          {counts.pending > 0 ? (
+            <span className="predictions-result-badge predictions-result--pending">{counts.pending} pending</span>
+          ) : null}
+        </span>
+        <span className="predictions-picks-aggregate-toggle">Details</span>
+      </summary>
+
+      <div className="predictions-picks-aggregate-details">
+        <div className="predictions-picks-aggregate-actions">
+          {sharePayload ? (
+            <PredictionShareButtons className="prediction-share--compact" payload={sharePayload} />
+          ) : null}
+          {onEditPick && !pickLocked ? (
+            <button
+              className="text-button predictions-overview-edit"
+              type="button"
+              onClick={() => {
+                dismissSessionCheckpoint();
+                onEditPick(group.fixtureKey);
+              }}
+            >
+              {group.hasMine ? "Edit your pick" : "Add your pick"}
+            </button>
+          ) : null}
+        </div>
+
+        <div className="predictions-picks-detail-list">
+          {participants.length > 0 ? (
+            participants.map((participant) => (
+              <div
+                className={`predictions-picks-mobile-peer${participant.isMine ? " predictions-picks-mobile-peer--you" : ""}`}
+                key={participant.key}
+              >
+                <div className="predictions-picks-mobile-peer-head">
+                  <span className="predictions-picks-mobile-peer-label">{participant.label}</span>
+                  {participant.username ? (
+                    <span className="predictions-picks-col-meta">@{participant.username}</span>
+                  ) : null}
+                </div>
+                <TablePickCell pick={participant.pick} />
+              </div>
+            ))
+          ) : (
+            <div className="predictions-picks-mobile-peer predictions-picks-mobile-peer--you">
+              <div className="predictions-picks-mobile-peer-head">
+                <span className="predictions-picks-mobile-peer-label">You</span>
+              </div>
+              <TablePickCell pick={group.mine} />
+            </div>
+          )}
+        </div>
+      </div>
+    </details>
+  );
 }
 
 export function PredictionsPicksSection({
@@ -555,13 +840,20 @@ export function PredictionsPicksSection({
 }) {
   const [friendsNameFilter, setFriendsNameFilter] = useState("");
   const [picksTab, setPicksTab] = useState<PicksTimeTabId>("upcoming");
-  const mobileLayout = useNarrowViewport(720);
 
   useEffect(() => {
     setFriendsNameFilter("");
   }, [activeFixtureKey]);
 
   const { myPredictions, connectionsPredictions } = data;
+  const filteredConnectionsPredictions = useMemo(
+    () => connectionsPredictions.filter((pick) => peerMatchesNameFilter(pick, friendsNameFilter)),
+    [connectionsPredictions, friendsNameFilter]
+  );
+  const friendCorrectnessRows = useMemo(
+    () => buildCorrectnessRows(myPredictions, filteredConnectionsPredictions),
+    [filteredConnectionsPredictions, myPredictions]
+  );
 
   const fixtureMeta = useMemo(() => {
     const map = new Map<string, FixturePickMeta>();
@@ -576,23 +868,41 @@ export function PredictionsPicksSection({
   }, [fixtures]);
 
   const matchGroups = useMemo(() => {
-    const groups: UnifiedMatchGroup[] = myPredictions.map((mine) => ({
-      fixtureKey: mine.fixtureKey,
-      fixtureLabel: mine.fixtureLabel,
-      mine,
-      friends: connectionsPredictions.filter(
-        (pick) =>
-          pick.fixtureKey === mine.fixtureKey && peerMatchesNameFilter(pick, friendsNameFilter)
-      )
-    }));
+    const groups = new Map<string, UnifiedMatchGroup>();
 
-    return groups;
-  }, [connectionsPredictions, friendsNameFilter, myPredictions]);
+    for (const mine of myPredictions) {
+      groups.set(mine.fixtureKey, {
+        fixtureKey: mine.fixtureKey,
+        fixtureLabel: mine.fixtureLabel,
+        mine,
+        hasMine: true,
+        friends: []
+      });
+    }
+
+    for (const friend of filteredConnectionsPredictions) {
+      const existing = groups.get(friend.fixtureKey);
+      if (existing) {
+        existing.friends.push(friend);
+        continue;
+      }
+
+      groups.set(friend.fixtureKey, {
+        fixtureKey: friend.fixtureKey,
+        fixtureLabel: friend.fixtureLabel,
+        mine: createEmptyPickSummary(friend.fixtureKey, friend.fixtureLabel),
+        hasMine: false,
+        friends: [friend]
+      });
+    }
+
+    return Array.from(groups.values());
+  }, [filteredConnectionsPredictions, myPredictions]);
 
   const upcomingGroups = useMemo(
     () =>
       sortMatchGroups(
-        matchGroups.filter((group) => !matchIsPast(group.mine, fixtureMeta)),
+        matchGroups.filter((group) => !groupIsPast(group, fixtureMeta)),
         fixtureMeta,
         "upcoming"
       ),
@@ -602,7 +912,7 @@ export function PredictionsPicksSection({
   const pastGroups = useMemo(
     () =>
       sortMatchGroups(
-        matchGroups.filter((group) => matchIsPast(group.mine, fixtureMeta)),
+        matchGroups.filter((group) => groupIsPast(group, fixtureMeta)),
         fixtureMeta,
         "past"
       ),
@@ -628,18 +938,12 @@ export function PredictionsPicksSection({
         fixtureKey,
         fixtureLabel,
         mine: createEmptyPickSummary(fixtureKey, fixtureLabel),
+        hasMine: false,
         friends: []
       }
     ];
   }, [activeFixtureKey, fixtures, picksTab, visibleGroups]);
   const showingPlaceholderRow = visibleGroups.length === 0;
-  const friendColumns = useMemo(
-    () =>
-      buildFriendColumns(connectionsPredictions, friendsNameFilter, {
-        placeholders: !mobileLayout
-      }),
-    [connectionsPredictions, friendsNameFilter, mobileLayout]
-  );
   const friendPickCount = visibleGroups.reduce((sum, group) => sum + group.friends.length, 0);
 
   return (
@@ -676,141 +980,32 @@ export function PredictionsPicksSection({
         />
       </div>
 
-      {myPredictions.length === 0 ? (
+      {myPredictions.length === 0 && connectionsPredictions.length === 0 ? (
         <p className="predictions-overview-hint predictions-overview-empty--inline">
           No picks yet — choose a match above.
         </p>
       ) : null}
+      {myPredictions.length === 0 && connectionsPredictions.length > 0 ? (
+        <p className="predictions-overview-hint predictions-overview-empty--inline">
+          No picks from you yet — friends&apos; picks are shown below.
+        </p>
+      ) : null}
 
-      {mobileLayout ? (
-        <div className="predictions-picks-mobile-stack" role="tabpanel">
-          {displayGroups.map((group) => {
-            const isActive = activeFixtureKey === group.fixtureKey;
-            const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
-            const pickLocked = fixturePickIsLocked(group.fixtureKey, fixtureMeta);
-            const matchFriends = group.friends.filter((pick) =>
-              peerMatchesNameFilter(pick, friendsNameFilter)
-            );
+      <FriendsCorrectnessSummary rows={friendCorrectnessRows} />
 
-            return (
-              <article
-                key={group.fixtureKey}
-                className={`predictions-picks-mobile-card${isActive ? " predictions-picks-mobile-card--active" : ""}${
-                  showingPlaceholderRow ? " predictions-picks-mobile-card--placeholder" : ""
-                }`}
-              >
-                <header className="predictions-picks-mobile-card-header">
-                  <span className="predictions-picks-match-label">{group.fixtureLabel}</span>
-                  <div className="predictions-picks-mobile-card-actions">
-                    <PredictionShareButtons
-                      className="prediction-share--compact"
-                      payload={sharePayload}
-                    />
-                    {onEditPick && !pickLocked ? (
-                      <button
-                        className="text-button predictions-overview-edit"
-                        type="button"
-                        onClick={() => {
-                          dismissSessionCheckpoint();
-                          onEditPick(group.fixtureKey);
-                        }}
-                      >
-                        Edit
-                      </button>
-                    ) : null}
-                  </div>
-                </header>
-                <div className="predictions-picks-mobile-peer predictions-picks-mobile-peer--you">
-                  <div className="predictions-picks-mobile-peer-head">
-                    <span className="predictions-picks-mobile-peer-label">You</span>
-                  </div>
-                  <TablePickCell pick={group.mine} />
-                </div>
-                {matchFriends.map((friend) => (
-                  <div className="predictions-picks-mobile-peer" key={`${group.fixtureKey}-${friend.userId}`}>
-                    <div className="predictions-picks-mobile-peer-head">
-                      <span className="predictions-picks-mobile-peer-label">
-                        {friend.displayName?.trim() || friend.username}
-                      </span>
-                      <span className="predictions-picks-col-meta">@{friend.username}</span>
-                    </div>
-                    <TablePickCell pick={friend} />
-                  </div>
-                ))}
-              </article>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="predictions-picks-table-wrap" role="tabpanel">
-          <table className="predictions-results-table predictions-results-table--compact predictions-picks-table">
-            <thead>
-              <tr>
-                <th>Match</th>
-                <th>You</th>
-                {friendColumns.map((column) => (
-                  <th key={column.key}>
-                    <span className="predictions-picks-col-label">{column.label}</span>
-                    {column.username ? (
-                      <span className="predictions-picks-col-meta">@{column.username}</span>
-                    ) : (
-                      <span className="predictions-picks-col-meta predictions-picks-col-meta--placeholder">
-                        Open slot
-                      </span>
-                    )}
-                  </th>
-                ))}
-                <th className="predictions-picks-actions-head"> </th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayGroups.map((group) => {
-                const isActive = activeFixtureKey === group.fixtureKey;
-                const sharePayload = pickToSharePayload(group.mine, viewerDisplayName);
-                const pickLocked = fixturePickIsLocked(group.fixtureKey, fixtureMeta);
-                return (
-                  <tr
-                    key={group.fixtureKey}
-                    className={`${isActive ? "predictions-picks-row--active" : ""}${
-                      showingPlaceholderRow ? " predictions-picks-row--placeholder" : ""
-                    }`.trim()}
-                  >
-                    <td className="predictions-picks-match-cell">
-                      <span className="predictions-picks-match-label">{group.fixtureLabel}</span>
-                    </td>
-                    <td className="predictions-results-cell">
-                      <TablePickCell pick={group.mine} />
-                    </td>
-                    {friendColumns.map((column) => (
-                      <td className="predictions-results-cell" key={`${group.fixtureKey}-${column.key}`}>
-                        <TablePickCell pick={friendPickForColumn(group.friends, column)} />
-                      </td>
-                    ))}
-                    <td className="predictions-picks-actions-cell">
-                      <PredictionShareButtons
-                        className="prediction-share--compact"
-                        payload={sharePayload}
-                      />
-                      {onEditPick && !pickLocked ? (
-                        <button
-                          className="text-button predictions-overview-edit"
-                          type="button"
-                          onClick={() => {
-                            dismissSessionCheckpoint();
-                            onEditPick(group.fixtureKey);
-                          }}
-                        >
-                          Edit
-                        </button>
-                      ) : null}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className="predictions-picks-aggregate-list" role="tabpanel">
+        {displayGroups.map((group) => (
+          <AggregateMatchCard
+            activeFixtureKey={activeFixtureKey}
+            fixtureMeta={fixtureMeta}
+            group={group}
+            key={group.fixtureKey}
+            showingPlaceholderRow={showingPlaceholderRow}
+            viewerDisplayName={viewerDisplayName}
+            onEditPick={onEditPick}
+          />
+        ))}
+      </div>
 
       {showingPlaceholderRow && myPredictions.length > 0 ? (
         <p className="predictions-overview-hint predictions-unified-filter-empty">
