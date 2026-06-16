@@ -6128,6 +6128,51 @@ h3 {
   width: 100%;
 }
 
+.predictions-friends-correctness {
+  background: color-mix(in srgb, var(--color-bg) 30%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.predictions-friends-correctness-header {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  justify-content: space-between;
+}
+
+.predictions-friends-correctness-header h4 {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.predictions-friends-correctness-header span {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.predictions-friends-correctness-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+}
+
+.predictions-friends-correctness-table {
+  min-width: 34rem;
+}
+
+.predictions-friends-correctness-table th:not(:first-child),
+.predictions-friends-correctness-table td:not(:first-child) {
+  text-align: center;
+}
+
 .predictions-picks-aggregate-card {
   background: color-mix(in srgb, var(--color-bg) 42%, var(--color-surface));
   border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);

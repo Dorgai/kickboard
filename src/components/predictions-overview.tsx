@@ -421,6 +421,16 @@ type PickParticipant = {
   isMine: boolean;
 };
 
+type FriendCorrectnessRow = {
+  userId: string;
+  label: string;
+  username: string;
+  won: number;
+  lost: number;
+  pending: number;
+  points: number;
+};
+
 const PICKS_TIME_TABS = [
   { id: "upcoming", label: "Upcoming" },
   { id: "past", label: "Past" }
@@ -575,6 +585,107 @@ function statusCounts(participants: PickParticipant[]) {
   return { won, lost, pending };
 }
 
+function addPickCorrectness(row: FriendCorrectnessRow, pick: PredictionPickSummary) {
+  const entries = [
+    pick.predictedOutcome
+      ? { status: pick.outcomeStatus, points: pick.outcomePointsAwarded }
+      : null,
+    pick.homeScore !== null && pick.awayScore !== null
+      ? { status: pick.scoreStatus, points: pick.scorePointsAwarded }
+      : null,
+    pick.scorerPicks.length > 0
+      ? { status: pick.scorersStatus, points: pick.scorersPointsAwarded }
+      : null
+  ].filter(Boolean) as { status: string; points: number }[];
+
+  for (const entry of entries) {
+    if (entry.status === "won" || entry.status === "partial") {
+      row.won += 1;
+      row.points += entry.points;
+    } else if (entry.status === "lost") {
+      row.lost += 1;
+    } else if (entry.status !== "void") {
+      row.pending += 1;
+    }
+  }
+}
+
+function buildFriendCorrectnessRows(predictions: ConnectionPredictionSummary[]) {
+  const byFriend = new Map<string, FriendCorrectnessRow>();
+
+  for (const pick of predictions) {
+    let row = byFriend.get(pick.userId);
+    if (!row) {
+      row = {
+        userId: pick.userId,
+        label: pick.displayName?.trim() || pick.username,
+        username: pick.username,
+        won: 0,
+        lost: 0,
+        pending: 0,
+        points: 0
+      };
+      byFriend.set(pick.userId, row);
+    }
+    addPickCorrectness(row, pick);
+  }
+
+  return Array.from(byFriend.values()).sort(
+    (a, b) =>
+      b.points - a.points ||
+      b.won - a.won ||
+      a.label.localeCompare(b.label)
+  );
+}
+
+function accuracyLabel(row: FriendCorrectnessRow) {
+  const decided = row.won + row.lost;
+  if (decided === 0) return "—";
+  return `${Math.round((row.won / decided) * 100)}%`;
+}
+
+function FriendsCorrectnessSummary({ rows }: { rows: FriendCorrectnessRow[] }) {
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="predictions-friends-correctness">
+      <div className="predictions-friends-correctness-header">
+        <h4>Friends correctness</h4>
+        <span>Aggregate by pick category</span>
+      </div>
+      <div className="predictions-friends-correctness-table-wrap">
+        <table className="predictions-results-table predictions-friends-correctness-table">
+          <thead>
+            <tr>
+              <th>Friend</th>
+              <th>Won</th>
+              <th>Lost</th>
+              <th>Pending</th>
+              <th>Accuracy</th>
+              <th>Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.userId}>
+                <td>
+                  <span className="predictions-picks-col-label">{row.label}</span>
+                  <span className="predictions-picks-col-meta">@{row.username}</span>
+                </td>
+                <td><span className="predictions-result-badge predictions-result--won">{row.won}</span></td>
+                <td><span className="predictions-result-badge predictions-result--lost">{row.lost}</span></td>
+                <td><span className="predictions-result-badge predictions-result--pending">{row.pending}</span></td>
+                <td>{accuracyLabel(row)}</td>
+                <td><strong>{row.points}</strong></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function AggregateMatchCard({
   group,
   fixtureMeta,
@@ -710,6 +821,14 @@ export function PredictionsPicksSection({
   }, [activeFixtureKey]);
 
   const { myPredictions, connectionsPredictions } = data;
+  const filteredConnectionsPredictions = useMemo(
+    () => connectionsPredictions.filter((pick) => peerMatchesNameFilter(pick, friendsNameFilter)),
+    [connectionsPredictions, friendsNameFilter]
+  );
+  const friendCorrectnessRows = useMemo(
+    () => buildFriendCorrectnessRows(filteredConnectionsPredictions),
+    [filteredConnectionsPredictions]
+  );
 
   const fixtureMeta = useMemo(() => {
     const map = new Map<string, FixturePickMeta>();
@@ -736,8 +855,7 @@ export function PredictionsPicksSection({
       });
     }
 
-    for (const friend of connectionsPredictions) {
-      if (!peerMatchesNameFilter(friend, friendsNameFilter)) continue;
+    for (const friend of filteredConnectionsPredictions) {
       const existing = groups.get(friend.fixtureKey);
       if (existing) {
         existing.friends.push(friend);
@@ -754,7 +872,7 @@ export function PredictionsPicksSection({
     }
 
     return Array.from(groups.values());
-  }, [connectionsPredictions, friendsNameFilter, myPredictions]);
+  }, [filteredConnectionsPredictions, myPredictions]);
 
   const upcomingGroups = useMemo(
     () =>
@@ -847,6 +965,8 @@ export function PredictionsPicksSection({
           No picks from you yet — friends&apos; picks are shown below.
         </p>
       ) : null}
+
+      <FriendsCorrectnessSummary rows={friendCorrectnessRows} />
 
       <div className="predictions-picks-aggregate-list" role="tabpanel">
         {displayGroups.map((group) => (
