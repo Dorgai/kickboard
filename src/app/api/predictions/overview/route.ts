@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuthUser } from "@/lib/auth/require-user";
 import { mapDatabaseError } from "@/lib/community/health";
 import { getPredictionsOverview } from "@/lib/fixture-predictions/overview";
+import { settleRecentFinishedFixturePredictions } from "@/lib/fixture-predictions/settlement";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,12 @@ export async function GET(request: Request) {
   const awayTeam = params.get("awayTeam")?.trim() ?? "";
 
   try {
+    try {
+      await settleRecentFinishedFixturePredictions();
+    } catch {
+      // Overview should still render existing picks if the live result feed is temporarily unavailable.
+    }
+
     const overview = await getPredictionsOverview(user.id, {
       fixtureKey: fixtureKey || undefined,
       homeTeam: homeTeam || undefined,

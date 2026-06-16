@@ -26,6 +26,7 @@ export function parseApiFootballGoalEvents(
   return events
     .filter((event) => event.type === "Goal" && event.detail !== "Missed Penalty")
     .map((event) => ({
+      playerId: event.player?.id ?? null,
       playerName: event.player?.name?.trim() || "Unknown",
       teamSide: event.team.id === homeTeamId ? "home" : event.team.id === awayTeamId ? "away" : "home",
       minute: event.time.elapsed,

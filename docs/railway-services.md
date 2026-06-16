@@ -12,11 +12,14 @@ separation. The first deploy can be run with one web service plus managed Postgr
 - **Start:** `npm run start -- --hostname 0.0.0.0 --port ${PORT:-3000}`
 - **Health check:** `/api/health`
 - **Purpose:** SSR/PWA frontend, route handlers, early backend-for-frontend endpoints
+- **Scheduled endpoints:** call protected cron routes with `Authorization: Bearer $CRON_SECRET`,
+  including `POST /api/cron/settle-fixture-predictions` after match results are synced.
 - **Variables:**
   - `NEXT_PUBLIC_APP_URL`
   - `DATABASE_URL`
   - `REDIS_URL`
   - `JWT_SECRET`
+  - `CRON_SECRET`
   - provider secrets as features are added: Stripe, OAuth, API-Football
 
 ### 2. PostgreSQL
@@ -41,7 +44,7 @@ separation. The first deploy can be run with one web service plus managed Postgr
 
 - **Railway type:** second service from the same repository
 - **Runtime:** Node.js worker using BullMQ on Redis
-- **Purpose:** API-Football adaptive polling, prediction settlement, wallet credits, moderation
+- **Purpose:** API-Football adaptive polling, high-volume prediction settlement, wallet credits, moderation
   processing, GDPR deletion jobs and notification delivery
 - **Why separate:** these jobs should not block Next.js request/response paths and will need independent
   restart/scale settings.
