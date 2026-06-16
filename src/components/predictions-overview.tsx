@@ -424,7 +424,8 @@ type PickParticipant = {
 type FriendCorrectnessRow = {
   userId: string;
   label: string;
-  username: string;
+  username: string | null;
+  isMine: boolean;
   won: number;
   lost: number;
   pending: number;
@@ -610,16 +611,37 @@ function addPickCorrectness(row: FriendCorrectnessRow, pick: PredictionPickSumma
   }
 }
 
-function buildFriendCorrectnessRows(predictions: ConnectionPredictionSummary[]) {
+function buildCorrectnessRows(
+  myPredictions: PredictionPickSummary[],
+  friendPredictions: ConnectionPredictionSummary[]
+) {
   const byFriend = new Map<string, FriendCorrectnessRow>();
 
-  for (const pick of predictions) {
+  if (myPredictions.length > 0) {
+    const me: FriendCorrectnessRow = {
+      userId: "you",
+      label: "You",
+      username: null,
+      isMine: true,
+      won: 0,
+      lost: 0,
+      pending: 0,
+      points: 0
+    };
+    for (const pick of myPredictions) {
+      addPickCorrectness(me, pick);
+    }
+    byFriend.set(me.userId, me);
+  }
+
+  for (const pick of friendPredictions) {
     let row = byFriend.get(pick.userId);
     if (!row) {
       row = {
         userId: pick.userId,
         label: pick.displayName?.trim() || pick.username,
         username: pick.username,
+        isMine: false,
         won: 0,
         lost: 0,
         pending: 0,
@@ -632,6 +654,7 @@ function buildFriendCorrectnessRows(predictions: ConnectionPredictionSummary[]) 
 
   return Array.from(byFriend.values()).sort(
     (a, b) =>
+      Number(b.isMine) - Number(a.isMine) ||
       b.points - a.points ||
       b.won - a.won ||
       a.label.localeCompare(b.label)
@@ -650,7 +673,7 @@ function FriendsCorrectnessSummary({ rows }: { rows: FriendCorrectnessRow[] }) {
   return (
     <div className="predictions-friends-correctness">
       <div className="predictions-friends-correctness-header">
-        <h4>Friends correctness</h4>
+        <h4>Prediction correctness</h4>
         <span>Aggregate by pick category</span>
       </div>
       <div className="predictions-friends-correctness-table-wrap">
@@ -670,7 +693,9 @@ function FriendsCorrectnessSummary({ rows }: { rows: FriendCorrectnessRow[] }) {
               <tr key={row.userId}>
                 <td>
                   <span className="predictions-picks-col-label">{row.label}</span>
-                  <span className="predictions-picks-col-meta">@{row.username}</span>
+                  {row.username ? (
+                    <span className="predictions-picks-col-meta">@{row.username}</span>
+                  ) : null}
                 </td>
                 <td><span className="predictions-result-badge predictions-result--won">{row.won}</span></td>
                 <td><span className="predictions-result-badge predictions-result--lost">{row.lost}</span></td>
@@ -826,8 +851,8 @@ export function PredictionsPicksSection({
     [connectionsPredictions, friendsNameFilter]
   );
   const friendCorrectnessRows = useMemo(
-    () => buildFriendCorrectnessRows(filteredConnectionsPredictions),
-    [filteredConnectionsPredictions]
+    () => buildCorrectnessRows(myPredictions, filteredConnectionsPredictions),
+    [filteredConnectionsPredictions, myPredictions]
   );
 
   const fixtureMeta = useMemo(() => {
