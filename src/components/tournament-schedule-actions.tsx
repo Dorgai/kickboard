@@ -19,6 +19,7 @@ import {
   type TournamentScheduleFixture
 } from "@/lib/feeds/wc26-tournament-schedule";
 import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
+import { matchScoresForDisplay, shouldShowMatchScore } from "@/lib/fixtures/display-match-score";
 import { formatFixturePredictionSummary } from "@/lib/fixture-predictions/types";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
 
@@ -71,7 +72,8 @@ function TournamentFixtureRow({
   const matchBoard = useMatchBoardOptional();
   const lookupPrediction = useTournamentPredictionsLookup();
   const live = matchBoard?.lookupByKey(fixtureKey);
-  const showScore = live?.homeGoals != null && live?.awayGoals != null;
+  const showScore = shouldShowMatchScore(live?.homeGoals, live?.awayGoals, live?.status);
+  const scores = matchScoresForDisplay(live?.homeGoals, live?.awayGoals, live?.status);
   const liveNowMs = useLiveClock(live?.status === "live");
   const liveElapsed =
     live?.status === "live"
@@ -103,9 +105,9 @@ function TournamentFixtureRow({
           </span>
         ) : null}
         <MatchTeamsLine
-          awayScore={showScore ? live.awayGoals ?? undefined : undefined}
+          awayScore={showScore ? scores.awayScore : undefined}
           awayTeam={fixture.awayTeam}
-          homeScore={showScore ? live.homeGoals ?? undefined : undefined}
+          homeScore={showScore ? scores.homeScore : undefined}
           homeTeam={fixture.homeTeam}
           layout="stacked"
           size="xs"

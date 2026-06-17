@@ -36,6 +36,7 @@ import type {
   MatchBoardRedCard
 } from "@/lib/fixtures/match-board-shared";
 import { buildFixtureOptionsFromWorldCup } from "@/lib/fixtures/upcoming-fixtures";
+import { normalizeMatchGoals } from "@/lib/fixtures/display-match-score";
 import { teamsMatch } from "@/lib/squads/team-names";
 import {
   readCachedFixtureGoalEvents,
@@ -276,11 +277,14 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
       ? matchEvents.goalScorers
       : feedGoalScorers;
     const redCards = matchEvents?.redCards.length ? matchEvents.redCards : feedRedCards;
+    const rawHomeGoals = apiRow?.homeGoals ?? feedFixture?.homeGoals ?? option.homeGoals ?? null;
+    const rawAwayGoals = apiRow?.awayGoals ?? feedFixture?.awayGoals ?? option.awayGoals ?? null;
+    const goals = normalizeMatchGoals(rawHomeGoals, rawAwayGoals, status);
 
     byKey[option.key] = {
       fixtureId,
-      homeGoals: apiRow?.homeGoals ?? feedFixture?.homeGoals ?? option.homeGoals ?? null,
-      awayGoals: apiRow?.awayGoals ?? feedFixture?.awayGoals ?? option.awayGoals ?? null,
+      homeGoals: goals.homeGoals,
+      awayGoals: goals.awayGoals,
       status,
       statusShort: apiRow?.status.short ?? (status === "live" ? "LIVE" : status === "finished" ? "FT" : "NS"),
       statusLong: apiRow?.statusLong ?? status,
@@ -296,10 +300,11 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
     const key = buildApiFootballFixtureKey(row.fixtureId);
     if (byKey[key]) continue;
     const status = mapApiFootballStatusShort(row.status.short);
+    const goals = normalizeMatchGoals(row.homeGoals, row.awayGoals, status);
     byKey[key] = {
       fixtureId: row.fixtureId,
-      homeGoals: row.homeGoals,
-      awayGoals: row.awayGoals,
+      homeGoals: goals.homeGoals,
+      awayGoals: goals.awayGoals,
       status,
       statusShort: row.status.short,
       statusLong: row.statusLong,

@@ -18,11 +18,14 @@
   --shadow-elevation-1: var(--shadow-surface);
   --shadow-elevation-2: var(--shadow-surface);
   --shadow-elevation-3: 0 4px 10px rgba(15, 23, 42, 0.11), 0 18px 42px rgba(15, 23, 42, 0.16);
-  --radius-card: 12px;
-  --radius-modal: 16px;
+  --radius-card: 2px;
+  --radius-modal: 8px;
+  --radius-tile: 2px;
   --max-page: 1280px;
-  --page-gutter: 24px;
-  --page-padding-y: 64px;
+  --page-gutter: 14px;
+  --page-padding-y: 32px;
+  --card-padding: 12px;
+  --compact-gap: 8px;
   --color-button-fill: #4b5563;
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
@@ -40,10 +43,10 @@
   /* Match header Menu / nav action pill shadow */
   --kickboard-tab-rail-shadow: var(--shadow-surface);
   --kickboard-tab-chrome-border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-  --kickboard-tab-item-min-height: 36px;
-  --kickboard-tab-item-font-size: 12px;
+  --kickboard-tab-item-min-height: 30px;
+  --kickboard-tab-item-font-size: 11px;
   --kickboard-tab-item-font-weight: 500;
-  --kickboard-tab-item-padding-x: 14px;
+  --kickboard-tab-item-padding-x: 10px;
   --brand-wordmark-primary: #14213d;
   --brand-wordmark-live: #6b7280;
 }
@@ -67,8 +70,8 @@
   --shadow-elevation-1: var(--shadow-surface);
   --shadow-elevation-2: var(--shadow-surface);
   --shadow-elevation-3: 0 8px 20px rgba(0, 0, 0, 0.35), 0 20px 48px rgba(0, 0, 0, 0.45);
-  --page-gutter: 24px;
-  --page-padding-y: 64px;
+  --page-gutter: 14px;
+  --page-padding-y: 32px;
   /* Active pills must read darker than --color-surface tiles and transparent buttons on --color-bg */
   --kickboard-tab-active-bg: color-mix(in srgb, var(--color-bg) 82%, #000000 18%);
   --color-button-fill: var(--kickboard-tab-active-bg);
@@ -88,10 +91,10 @@
   /* Match header Menu / nav action pill shadow */
   --kickboard-tab-rail-shadow: var(--shadow-surface);
   --kickboard-tab-chrome-border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-  --kickboard-tab-item-min-height: 36px;
-  --kickboard-tab-item-font-size: 12px;
+  --kickboard-tab-item-min-height: 30px;
+  --kickboard-tab-item-font-size: 11px;
   --kickboard-tab-item-font-weight: 500;
-  --kickboard-tab-item-padding-x: 14px;
+  --kickboard-tab-item-padding-x: 10px;
   --brand-wordmark-primary: #f9fafb;
   --brand-wordmark-live: #d1d5db;
 }
@@ -116,8 +119,8 @@ body {
   color: var(--color-text-primary);
   font-family:
     Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 a {
@@ -175,7 +178,7 @@ button:disabled {
   grid-template-columns: auto auto 1fr auto;
   margin: 0 auto;
   max-width: var(--max-page);
-  min-height: 72px;
+  min-height: 60px;
   padding-inline: var(--page-gutter);
 }
 
@@ -229,7 +232,7 @@ button:disabled {
 .button {
   align-items: center;
   display: inline-flex;
-  min-height: 44px;
+  min-height: 38px;
 }
 
 .brand {
@@ -750,8 +753,8 @@ h3 {
   font-weight: 800;
   gap: 8px;
   justify-content: center;
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 38px;
+  padding: 0 16px;
   text-decoration: none;
   transition:
     background 0.15s ease,
@@ -798,15 +801,15 @@ h3 {
 
 .copy-link-button {
   flex-shrink: 0;
-  min-height: 40px;
-  padding-inline: 14px;
+  min-height: 34px;
+  padding-inline: 12px;
   white-space: nowrap;
 }
 
 .copy-link-button--compact {
-  font-size: 11px;
-  min-height: 32px;
-  padding-inline: 10px;
+  font-size: 10px;
+  min-height: 28px;
+  padding-inline: 8px;
 }
 
 .copy-link-button--copied {
@@ -1136,7 +1139,7 @@ h3 {
   border: none;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-surface);
-  padding: 18px;
+  padding: var(--card-padding);
 }
 
 .surface-flat {
@@ -1160,12 +1163,13 @@ h3 {
 
 .country-flag {
   align-items: center;
-  border-radius: 3px;
+  border-radius: 0;
   display: inline-flex;
   flex-shrink: 0;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  box-shadow: none;
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
 }
 
 .country-flag-xs {
@@ -1197,21 +1201,21 @@ h3 {
 .team-label {
   align-items: center;
   display: inline-flex;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .team-label-xs .team-label-text {
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .team-label-sm .team-label-text {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .team-label-md .team-label-text {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -1250,24 +1254,24 @@ h3 {
   align-items: center;
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .match-teams-line-stacked {
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 4px;
 }
 
 .match-score-pill {
   background: color-mix(in srgb, var(--color-brand) 12%, var(--color-bg));
-  border-radius: 9999px;
+  border-radius: var(--radius-tile);
   color: var(--color-text-primary);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  padding: 2px 10px;
+  padding: 1px 6px;
 }
 
 .match-title-line {
@@ -1375,9 +1379,9 @@ h3 {
 }
 
 .feed-browser {
-  --feed-control-height: 40px;
-  --feed-control-gap: 8px;
-  --feed-control-radius: 10px;
+  --feed-control-height: 34px;
+  --feed-control-gap: 6px;
+  --feed-control-radius: 2px;
   margin: 0 auto;
   max-width: var(--max-page);
   min-width: 0;
@@ -3069,15 +3073,15 @@ h3 {
   appearance: none;
   background: var(--color-surface);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-tile);
   box-shadow: var(--shadow-surface);
   color: var(--color-text-primary);
   cursor: pointer;
   display: grid;
   font: inherit;
-  gap: 4px;
+  gap: 3px;
   margin: 0;
-  padding: 8px 10px;
+  padding: 6px 8px;
   text-align: left;
   width: 100%;
 }
@@ -3145,7 +3149,7 @@ h3 {
 
 .match-coach-board-panel--fixture-drag-over {
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-accent) 40%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-tile);
 }
 
 .match-coach-board-panel-empty {
@@ -3935,17 +3939,17 @@ h3 {
 .fixture-prediction-pick {
   background: var(--color-surface);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-tile);
   box-shadow: var(--shadow-surface);
   display: grid;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 8px;
+  padding: 8px 10px;
 }
 
 .fixture-prediction-pick--inline {
   align-content: start;
   min-width: 12.5rem;
-  padding: 10px 12px;
+  padding: 8px 10px;
 }
 
 .fixture-prediction-pick-label {
@@ -9793,13 +9797,13 @@ h3 {
   align-items: center;
   background: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg));
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-tile);
   box-shadow: none;
   display: inline-flex;
   flex: 0 0 auto;
   justify-content: center;
   min-width: min(9.5rem, 42vw);
-  padding: 10px 14px;
+  padding: 8px 10px;
   scroll-snap-align: start;
   transition:
     background 0.15s ease,
@@ -9836,7 +9840,7 @@ h3 {
 .bracket-tbd-slot {
   background: transparent;
   border: 1px dashed var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius-tile);
   color: var(--color-text-secondary);
   cursor: not-allowed;
   display: grid;
@@ -9986,13 +9990,13 @@ h3 {
 .feed-list button {
   background: transparent;
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-tile);
   box-shadow: none;
   color: var(--color-text-primary);
   cursor: pointer;
   display: grid;
-  gap: 4px;
-  padding: 12px;
+  gap: 3px;
+  padding: 8px 10px;
   text-align: left;
 }
 
@@ -10018,11 +10022,11 @@ h3 {
   align-items: center;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-tile);
   display: grid;
-  gap: 8px;
+  gap: 6px;
   grid-template-columns: 64px 1fr 1fr;
-  padding: 10px 12px;
+  padding: 8px 10px;
 }
 
 .team-stat-grid {
@@ -10966,10 +10970,10 @@ h3 {
 
 .match-board-strip-track {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
-  padding: 10px max(var(--page-gutter), 12px);
+  padding: 8px max(var(--page-gutter), 10px);
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
 }
@@ -10979,16 +10983,16 @@ h3 {
   appearance: none;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius-tile);
   box-shadow: var(--shadow-surface);
   color: inherit;
   cursor: pointer;
   display: grid;
   flex: 0 0 auto;
   font: inherit;
-  gap: 6px;
-  min-width: min(14rem, 72vw);
-  padding: 10px 12px;
+  gap: 4px;
+  min-width: min(12.5rem, 68vw);
+  padding: 8px 10px;
   scroll-snap-align: start;
   text-align: center;
   transition:
@@ -11007,7 +11011,7 @@ h3 {
 
 .match-board-strip-status {
   color: var(--color-brand);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -11027,8 +11031,8 @@ h3 {
 
 .match-board-strip-date {
   color: var(--color-text-secondary);
-  font-size: 11px;
-  line-height: 1.3;
+  font-size: 10px;
+  line-height: 1.25;
 }
 
 .match-red-cards-line {
@@ -11102,10 +11106,10 @@ h3 {
 .live-fixture-card {
   background: transparent;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius-tile);
   display: grid;
-  gap: 8px;
-  padding: 12px 14px;
+  gap: 6px;
+  padding: 8px 10px;
 }
 
 .live-fixture-league {

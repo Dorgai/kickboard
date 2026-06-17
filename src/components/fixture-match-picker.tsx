@@ -12,6 +12,7 @@ import {
   type FixtureOption
 } from "@/lib/fixtures/fixture-key";
 import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
+import { matchScoresForDisplay, shouldShowMatchScore } from "@/lib/fixtures/display-match-score";
 import {
   buildGroupFixtureOptions,
   buildKnockoutFixtureOptions
@@ -186,6 +187,8 @@ export function FixturePickerButton({
 }) {
   const liveNowMs = useLiveClock(fixture.status === "live");
   const liveElapsed = resolveLiveElapsed(fixture.status, fixture.date, fixture.elapsed, liveNowMs);
+  const showScore = shouldShowMatchScore(fixture.homeGoals, fixture.awayGoals, fixture.status);
+  const scores = matchScoresForDisplay(fixture.homeGoals, fixture.awayGoals, fixture.status);
 
   return (
     <button
@@ -219,9 +222,9 @@ export function FixturePickerButton({
         layout="stacked"
         size="xs"
       />
-      {fixture.homeGoals != null && fixture.awayGoals != null ? (
+      {showScore ? (
         <span className="match-fixture-picker-score">
-          {fixture.homeGoals} – {fixture.awayGoals}
+          {scores.homeScore} – {scores.awayScore}
         </span>
       ) : null}
       {fixture.goalScorers && fixture.goalScorers.length > 0 ? (

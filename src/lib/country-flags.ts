@@ -86,6 +86,8 @@ const COUNTRY_CODES: Record<string, string> = {
   togo: "TG",
   tunisia: "TN",
   turkey: "TR",
+  turkiye: "TR",
+  türkiye: "TR",
   ukraine: "UA",
   "united arab emirates": "AE",
   "united states": "US",
@@ -237,4 +239,15 @@ export function flagImageUrl(code: string, displaySize: FlagDisplaySize = "sm") 
   const normalized = code.toLowerCase().replace(/_/g, "-");
   const dimensions = FLAGCDN_DIMENSIONS[displaySize];
   return `https://flagcdn.com/${dimensions}/${normalized}.png`;
+}
+
+/** Try subdivision codes first, then parent ISO (e.g. GB-ENG → GB). */
+export function flagCodeFallbackChain(code: string) {
+  const normalized = code.toUpperCase().replace(/_/g, "-");
+  const chain = [normalized];
+  if (normalized.includes("-")) {
+    const parent = normalized.split("-")[0]!;
+    if (!chain.includes(parent)) chain.push(parent);
+  }
+  return chain;
 }

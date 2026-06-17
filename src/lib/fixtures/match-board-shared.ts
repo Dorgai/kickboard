@@ -1,4 +1,5 @@
 import type { FixtureOption, MatchBoardGoal } from "@/lib/fixtures/fixture-key";
+import { normalizeMatchGoals } from "@/lib/fixtures/display-match-score";
 
 export type { MatchBoardGoal };
 
@@ -62,11 +63,12 @@ export function enrichFixtureOption(
 ): FixtureOption {
   const state = byKey[fixture.key];
   if (!state) return fixture;
+  const goals = normalizeMatchGoals(state.homeGoals, state.awayGoals, state.status);
   return {
     ...fixture,
     status: state.status,
-    homeGoals: state.homeGoals,
-    awayGoals: state.awayGoals,
+    homeGoals: goals.homeGoals,
+    awayGoals: goals.awayGoals,
     elapsed: state.elapsed,
     statusShort: state.statusShort,
     goalScorers: state.goalScorers

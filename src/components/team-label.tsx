@@ -1,6 +1,7 @@
 "use client";
 
-import { flagImageUrl, resolveCountryCode } from "@/lib/country-flags";
+import { useEffect, useMemo, useState } from "react";
+import { flagCodeFallbackChain, flagImageUrl, resolveCountryCode } from "@/lib/country-flags";
 
 type CountryFlagProps = {
   code?: string | null;
@@ -15,29 +16,40 @@ const FLAG_SIZES = {
 } as const;
 
 export function CountryFlag({ code, label, size = "sm" }: CountryFlagProps) {
-  if (!code) {
-    return <span aria-hidden="true" className={`country-flag country-flag-${size} country-flag-fallback`} />;
+  const fallbackCodes = useMemo(() => (code ? flagCodeFallbackChain(code) : []), [code]);
+  const [codeIndex, setCodeIndex] = useState(0);
+
+  useEffect(() => {
+    setCodeIndex(0);
+  }, [code]);
+
+  if (!code || codeIndex >= fallbackCodes.length) {
+    return (
+      <span
+        aria-hidden={label ? undefined : true}
+        aria-label={label ? `Flag of ${label}` : undefined}
+        className={`country-flag country-flag-${size} country-flag-fallback`}
+        title={label}
+      />
+    );
   }
 
   const dimensions = FLAG_SIZES[size];
-  const src = flagImageUrl(code, size);
+  const activeCode = fallbackCodes[codeIndex]!;
+  const src = flagImageUrl(activeCode, size);
 
   return (
     <span className={`country-flag country-flag-${size}`}>
-      {/* Native img: external flag CDN; avoids Next image optimizer 400s on Railway */}
       <img
         alt={label ? `Flag of ${label}` : ""}
         className="country-flag-img"
         decoding="async"
         height={dimensions.height}
-        loading="lazy"
+        loading="eager"
+        referrerPolicy="no-referrer"
         src={src}
         width={dimensions.width}
-        onError={(event) => {
-          const wrapper = event.currentTarget.parentElement;
-          event.currentTarget.remove();
-          wrapper?.classList.add("country-flag-fallback");
-        }}
+        onError={() => setCodeIndex((index) => index + 1)}
       />
     </span>
   );

@@ -6,6 +6,7 @@ import { MatchRedCardsLine } from "@/components/match-red-cards-line";
 import { MatchTeamsLine } from "@/components/team-label";
 import { useLiveClock } from "@/hooks/use-live-clock";
 import { formatFixtureDateDivider } from "@/lib/fixtures/fixture-key";
+import { matchScoresForDisplay } from "@/lib/fixtures/display-match-score";
 import type { MatchBoardCard } from "@/lib/fixtures/match-board-shared";
 import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
 import { navigateToPredictFixture } from "@/lib/session-checkpoint/navigate";
@@ -45,6 +46,7 @@ export function MatchBoardStrip() {
 
   const renderPlayedCard = (card: MatchBoardCard) => {
     const matchDate = formatPlayedMatchDate(card.date);
+    const scores = matchScoresForDisplay(card.homeGoals, card.awayGoals, card.status);
 
     return (
       <button
@@ -60,9 +62,9 @@ export function MatchBoardStrip() {
         <span className="match-board-strip-status">{statusLabel(card, liveNowMs)}</span>
         {matchDate ? <span className="match-board-strip-date">{matchDate}</span> : null}
         <MatchTeamsLine
-          awayScore={card.awayGoals ?? undefined}
+          awayScore={scores.awayScore}
           awayTeam={card.awayTeam}
-          homeScore={card.homeGoals ?? undefined}
+          homeScore={scores.homeScore}
           homeTeam={card.homeTeam}
           layout="stacked"
           size="xs"
