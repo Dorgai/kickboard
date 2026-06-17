@@ -35,10 +35,12 @@ export type TournamentPredictionRecord = {
   finalistsStatus: PredictionResultStatus;
   topScorerStatus: PredictionResultStatus;
   bestPlayerStatus: PredictionResultStatus;
+  topScorerBoardStatus: PredictionResultStatus;
   championPointsAwarded: number;
   finalistsPointsAwarded: number;
   topScorerPointsAwarded: number;
   bestPlayerPointsAwarded: number;
+  topScorerBoardPointsAwarded: number;
   createdAt: string;
   updatedAt: string;
 };

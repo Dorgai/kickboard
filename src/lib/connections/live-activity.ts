@@ -52,10 +52,12 @@ function mapTournamentRow(row: {
     finalistsStatus: "pending",
     topScorerStatus: "pending",
     bestPlayerStatus: "pending",
+    topScorerBoardStatus: "pending",
     championPointsAwarded: 0,
     finalistsPointsAwarded: 0,
     topScorerPointsAwarded: 0,
     bestPlayerPointsAwarded: 0,
+    topScorerBoardPointsAwarded: 0,
     createdAt: row.updated_at.toISOString(),
     updatedAt: row.updated_at.toISOString()
   };

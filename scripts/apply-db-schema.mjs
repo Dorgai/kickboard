@@ -44,6 +44,7 @@ const files = [
   "db/prediction-share-links-extensions.sql",
   "db/tournament-predictions-extensions.sql",
   "db/tournament-predictions-top-scorer-board.sql",
+  "db/tournament-predictions-board-settlement.sql",
   "db/push-notifications-extensions.sql",
   "db/profile-discoverability-extensions.sql"
 ];

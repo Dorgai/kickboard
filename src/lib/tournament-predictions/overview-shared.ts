@@ -1,6 +1,6 @@
 import { finalOpponentFromRecord, type TournamentPredictionRecord } from "@/lib/tournament-predictions/types";
 
-export type TournamentCategory = "champion" | "finalists" | "topScorer" | "bestPlayer";
+export type TournamentCategory = "champion" | "finalists" | "topScorer" | "bestPlayer" | "topScorerBoard";
 
 export type TournamentCategoryStats = {
   won: number;
@@ -34,6 +34,7 @@ function recordHasCategory(record: TournamentPredictionRecord, category: Tournam
   if (category === "champion") return Boolean(record.predictedChampion);
   if (category === "finalists") return record.predictedFinalists.length > 0;
   if (category === "topScorer") return Boolean(record.predictedTopScorer);
+  if (category === "topScorerBoard") return Boolean(record.predictedTopScorerBoard?.picks.length);
   return Boolean(record.predictedBestPlayer);
 }
 
@@ -41,6 +42,7 @@ function categoryStatus(record: TournamentPredictionRecord, category: Tournament
   if (category === "champion") return record.championStatus;
   if (category === "finalists") return record.finalistsStatus;
   if (category === "topScorer") return record.topScorerStatus;
+  if (category === "topScorerBoard") return record.topScorerBoardStatus;
   return record.bestPlayerStatus;
 }
 
@@ -48,6 +50,7 @@ function categoryPoints(record: TournamentPredictionRecord, category: Tournament
   if (category === "champion") return record.championPointsAwarded;
   if (category === "finalists") return record.finalistsPointsAwarded;
   if (category === "topScorer") return record.topScorerPointsAwarded;
+  if (category === "topScorerBoard") return record.topScorerBoardPointsAwarded;
   return record.bestPlayerPointsAwarded;
 }
 
@@ -99,15 +102,22 @@ export function tournamentCategoryResultStatus(
   category: TournamentCategory | "topScorerBoard"
 ) {
   if (!record) return "pending";
-  if (category === "topScorerBoard") return "pending";
+  if (category === "topScorerBoard") {
+    if (!record.predictedTopScorerBoard?.picks.length) return "pending";
+    return record.topScorerBoardStatus;
+  }
   if (!tournamentCategoryValue(record, category)) return "pending";
   return categoryStatus(record, category);
 }
 
 export function tournamentCategoryPoints(
   record: TournamentPredictionRecord | null,
-  category: TournamentCategory
+  category: TournamentCategory | "topScorerBoard"
 ) {
-  if (!record || !recordHasCategory(record, category)) return 0;
+  if (!record) return 0;
+  if (category === "topScorerBoard") {
+    return record.predictedTopScorerBoard?.picks.length ? record.topScorerBoardPointsAwarded : 0;
+  }
+  if (!recordHasCategory(record, category)) return 0;
   return categoryPoints(record, category);
 }

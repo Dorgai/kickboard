@@ -345,9 +345,10 @@ export function PredictionsPointsBoard({
         <h3 className="panel-help-row">
           Your points
           <HelpTooltip label="How points settle" size="sm">
-            Points update after each match finishes. Until then, picks show as <strong>Pending</strong>.
-            Earned <strong>{wallet.pointsWon}</strong> pts so far · <strong>{wallet.picksPending}</strong>{" "}
-            picks still waiting on results.
+            Each pick type grades separately: <strong>Result</strong> (who wins or draws),{" "}
+            <strong>Score</strong> (exact goals), and <strong>Scorers</strong> (goal scorers). Tournament
+            picks (champion, finalists, awards) settle independently when results are final. Points update
+            after each match finishes; until then, picks show as <strong>Pending</strong>.
           </HelpTooltip>
         </h3>
         <p className="predictions-wallet-balance">

@@ -18,6 +18,7 @@
     "check": "npm run typecheck && npm run build",
     "push:daily": "npx tsx scripts/push-daily-digest.ts",
     "push:match-results": "npx tsx scripts/push-match-results.ts",
+    "settle:predictions": "npx tsx scripts/settle-predictions.ts",
     "generate:vapid": "node scripts/generate-vapid-keys.mjs",
     "railway:connect": "bash scripts/railway-connect.sh",
     "railway:deploy": "bash scripts/deploy-production.sh",

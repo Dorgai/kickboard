@@ -24,10 +24,12 @@ type TournamentPredictionRow = {
   finalists_status: string;
   top_scorer_status: string;
   best_player_status: string;
+  top_scorer_board_status: string;
   champion_points_awarded: number;
   finalists_points_awarded: number;
   top_scorer_points_awarded: number;
   best_player_points_awarded: number;
+  top_scorer_board_points_awarded: number;
   created_at: Date;
   updated_at: Date;
 };
@@ -38,10 +40,12 @@ const SELECT_TOURNAMENT_PREDICTION = `SELECT id, tournament_key, predicted_champ
   COALESCE(finalists_status, 'pending') AS finalists_status,
   COALESCE(top_scorer_status, 'pending') AS top_scorer_status,
   COALESCE(best_player_status, 'pending') AS best_player_status,
+  COALESCE(top_scorer_board_status, 'pending') AS top_scorer_board_status,
   COALESCE(champion_points_awarded, 0) AS champion_points_awarded,
   COALESCE(finalists_points_awarded, 0) AS finalists_points_awarded,
   COALESCE(top_scorer_points_awarded, 0) AS top_scorer_points_awarded,
   COALESCE(best_player_points_awarded, 0) AS best_player_points_awarded,
+  COALESCE(top_scorer_board_points_awarded, 0) AS top_scorer_board_points_awarded,
   created_at, updated_at`;
 
 function mapRow(row: TournamentPredictionRow): TournamentPredictionRecord {
@@ -57,10 +61,12 @@ function mapRow(row: TournamentPredictionRow): TournamentPredictionRecord {
     finalistsStatus: normalizeResultStatus(row.finalists_status),
     topScorerStatus: normalizeResultStatus(row.top_scorer_status),
     bestPlayerStatus: normalizeResultStatus(row.best_player_status),
+    topScorerBoardStatus: normalizeResultStatus(row.top_scorer_board_status),
     championPointsAwarded: row.champion_points_awarded ?? 0,
     finalistsPointsAwarded: row.finalists_points_awarded ?? 0,
     topScorerPointsAwarded: row.top_scorer_points_awarded ?? 0,
     bestPlayerPointsAwarded: row.best_player_points_awarded ?? 0,
+    topScorerBoardPointsAwarded: row.top_scorer_board_points_awarded ?? 0,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString()
   };

@@ -47,10 +47,12 @@ type TournamentPredictionRow = {
   finalists_status: string;
   top_scorer_status: string;
   best_player_status: string;
+  top_scorer_board_status: string;
   champion_points_awarded: number;
   finalists_points_awarded: number;
   top_scorer_points_awarded: number;
   best_player_points_awarded: number;
+  top_scorer_board_points_awarded: number;
   created_at: Date;
   updated_at: Date;
   user_id?: string;
@@ -64,10 +66,12 @@ const SELECT_TOURNAMENT_PREDICTION = `tp.id, tp.tournament_key, tp.predicted_cha
   COALESCE(tp.finalists_status, 'pending') AS finalists_status,
   COALESCE(tp.top_scorer_status, 'pending') AS top_scorer_status,
   COALESCE(tp.best_player_status, 'pending') AS best_player_status,
+  COALESCE(tp.top_scorer_board_status, 'pending') AS top_scorer_board_status,
   COALESCE(tp.champion_points_awarded, 0) AS champion_points_awarded,
   COALESCE(tp.finalists_points_awarded, 0) AS finalists_points_awarded,
   COALESCE(tp.top_scorer_points_awarded, 0) AS top_scorer_points_awarded,
   COALESCE(tp.best_player_points_awarded, 0) AS best_player_points_awarded,
+  COALESCE(tp.top_scorer_board_points_awarded, 0) AS top_scorer_board_points_awarded,
   tp.created_at, tp.updated_at`;
 
 function mapRow(row: TournamentPredictionRow): TournamentPredictionRecord {
@@ -83,10 +87,12 @@ function mapRow(row: TournamentPredictionRow): TournamentPredictionRecord {
     finalistsStatus: normalizeResultStatus(row.finalists_status),
     topScorerStatus: normalizeResultStatus(row.top_scorer_status),
     bestPlayerStatus: normalizeResultStatus(row.best_player_status),
+    topScorerBoardStatus: normalizeResultStatus(row.top_scorer_board_status),
     championPointsAwarded: row.champion_points_awarded ?? 0,
     finalistsPointsAwarded: row.finalists_points_awarded ?? 0,
     topScorerPointsAwarded: row.top_scorer_points_awarded ?? 0,
     bestPlayerPointsAwarded: row.best_player_points_awarded ?? 0,
+    topScorerBoardPointsAwarded: row.top_scorer_board_points_awarded ?? 0,
     createdAt: row.created_at.toISOString(),
     updatedAt: row.updated_at.toISOString()
   };
@@ -111,6 +117,7 @@ function recordHasCategory(record: TournamentPredictionRecord, category: Tournam
   if (category === "champion") return Boolean(record.predictedChampion);
   if (category === "finalists") return record.predictedFinalists.length > 0;
   if (category === "topScorer") return Boolean(record.predictedTopScorer);
+  if (category === "topScorerBoard") return Boolean(record.predictedTopScorerBoard?.picks.length);
   return Boolean(record.predictedBestPlayer);
 }
 
@@ -118,6 +125,7 @@ function categoryStatus(record: TournamentPredictionRecord, category: Tournament
   if (category === "champion") return record.championStatus;
   if (category === "finalists") return record.finalistsStatus;
   if (category === "topScorer") return record.topScorerStatus;
+  if (category === "topScorerBoard") return record.topScorerBoardStatus;
   return record.bestPlayerStatus;
 }
 
@@ -125,6 +133,7 @@ function categoryPoints(record: TournamentPredictionRecord, category: Tournament
   if (category === "champion") return record.championPointsAwarded;
   if (category === "finalists") return record.finalistsPointsAwarded;
   if (category === "topScorer") return record.topScorerPointsAwarded;
+  if (category === "topScorerBoard") return record.topScorerBoardPointsAwarded;
   return record.bestPlayerPointsAwarded;
 }
 
@@ -133,7 +142,8 @@ function walletFromRecord(record: TournamentPredictionRecord | null, balance: nu
     champion: emptyCategoryStats(),
     finalists: emptyCategoryStats(),
     topScorer: emptyCategoryStats(),
-    bestPlayer: emptyCategoryStats()
+    bestPlayer: emptyCategoryStats(),
+    topScorerBoard: emptyCategoryStats()
   };
 
   let picksWon = 0;
@@ -141,7 +151,13 @@ function walletFromRecord(record: TournamentPredictionRecord | null, balance: nu
   let picksPending = 0;
 
   if (record) {
-    const categories: TournamentCategory[] = ["champion", "finalists", "topScorer", "bestPlayer"];
+    const categories: TournamentCategory[] = [
+      "champion",
+      "finalists",
+      "topScorer",
+      "bestPlayer",
+      "topScorerBoard"
+    ];
     for (const category of categories) {
       if (!recordHasCategory(record, category)) continue;
       const status = categoryStatus(record, category);
@@ -157,7 +173,8 @@ function walletFromRecord(record: TournamentPredictionRecord | null, balance: nu
     byCategory.champion.points +
     byCategory.finalists.points +
     byCategory.topScorer.points +
-    byCategory.bestPlayer.points;
+    byCategory.bestPlayer.points +
+    byCategory.topScorerBoard.points;
 
   return {
     balance,

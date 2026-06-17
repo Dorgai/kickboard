@@ -1,4 +1,6 @@
 import { query } from "@/lib/db";
+import { enrichPredictionPickWithFinishedMatch } from "@/lib/fixture-predictions/enrich-picks";
+import { buildFinishedMatchIndex } from "@/lib/fixture-predictions/finished-match-index";
 import { listAcceptedPeerIds } from "@/lib/connections/store";
 import {
   listApiFootballFixtureKeysForTeams,
@@ -331,11 +333,19 @@ export async function getPredictionsOverview(
   userId: string,
   options?: { fixtureKey?: string; homeTeam?: string; awayTeam?: string }
 ) {
-  const [wallet, myPredictions, connectionsPredictions] = await Promise.all([
+  const [wallet, myPredictions, connectionsPredictions, matchIndex] = await Promise.all([
     getPredictionsWalletSummary(userId),
     listUserFixturePredictions(userId),
-    listConnectionsFixturePredictions(userId, options)
+    listConnectionsFixturePredictions(userId, options),
+    buildFinishedMatchIndex()
   ]);
 
-  return { wallet, myPredictions, connectionsPredictions };
+  const enrichedMine = myPredictions.map((pick) =>
+    enrichPredictionPickWithFinishedMatch(pick, matchIndex)
+  );
+  const enrichedConnections = connectionsPredictions.map((pick) =>
+    enrichPredictionPickWithFinishedMatch(pick, matchIndex)
+  );
+
+  return { wallet, myPredictions: enrichedMine, connectionsPredictions: enrichedConnections };
 }
