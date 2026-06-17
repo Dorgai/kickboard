@@ -40,13 +40,43 @@ import { normalizeMatchGoals } from "@/lib/fixtures/display-match-score";
 import { teamsMatch } from "@/lib/squads/team-names";
 import {
   readCachedFixtureGoalEvents,
-  readCachedLiveFixtures
+  readCachedLiveFixtures,
+  readCachedLiveFixturesWithMeta
 } from "@/lib/redis/live-fixtures-cache";
 
 const STARTING_SOON_MS = 60 * 60 * 1000;
 const RECENT_RESULT_MS = 7 * 24 * 60 * 60 * 1000;
 const GOAL_SCORER_FETCH_LIMIT = 12;
 const KICKOFF_MATCH_TOLERANCE_MS = 18 * 60 * 60 * 1000;
+const LIVE_CACHE_FRESH_MS = 25_000;
+
+function recentLookupDates(now: number) {
+  const dates: string[] = [];
+  for (let offset = -1; offset <= 0; offset += 1) {
+    const day = new Date(now);
+    day.setUTCDate(day.getUTCDate() + offset);
+    dates.push(day.toISOString().slice(0, 10));
+  }
+  return dates;
+}
+
+async function loadApiFixtures(now: number): Promise<ApiFootballFixture[]> {
+  const cached = await readCachedLiveFixturesWithMeta();
+  const cacheAge = cached ? now - Date.parse(cached.updatedAt) : Number.POSITIVE_INFINITY;
+  const cacheFresh = cached != null && cacheAge < LIVE_CACHE_FRESH_MS;
+
+  if (cacheFresh) {
+    const dated = await fetchWorldCupFixturesForDates(recentLookupDates(now));
+    return mergeApiFootballFixturesById([...cached.fixtures, ...dated]);
+  }
+
+  const [cachedLive, liveNow, fetched] = await Promise.all([
+    readCachedLiveFixtures(),
+    fetchLiveApiFootballFixtures(),
+    fetchWorldCupApiFixtures()
+  ]);
+  return mergeApiFootballFixturesById([...(cachedLive ?? []), ...liveNow, ...fetched]);
+}
 
 function mapApiFixtureRow(fixture: ApiFootballFixture) {
   const short = fixture.fixture.status.short;
@@ -184,12 +214,7 @@ export async function loadMatchBoard(): Promise<MatchBoardPayload> {
   let apiFixtures: ApiFootballFixture[] = [];
 
   try {
-    const [cachedLive, liveNow, fetched] = await Promise.all([
-      readCachedLiveFixtures(),
-      fetchLiveApiFootballFixtures(),
-      fetchWorldCupApiFixtures()
-    ]);
-    apiFixtures = mergeApiFootballFixturesById([...(cachedLive ?? []), ...liveNow, ...fetched]);
+    apiFixtures = await loadApiFixtures(Date.now());
   } catch (error) {
     return {
       connected: false,

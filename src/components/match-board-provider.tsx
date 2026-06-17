@@ -12,6 +12,7 @@ import {
   enrichFixtureOption,
   MATCH_BOARD_POLL_LIVE_MS,
   MATCH_BOARD_POLL_MS,
+  MATCH_BOARD_STREAM_URL,
   type MatchBoardPayload
 } from "@/lib/fixtures/match-board-shared";
 import type { FixtureOption } from "@/lib/fixtures/fixture-key";
@@ -34,25 +35,29 @@ const EMPTY_PAYLOAD: MatchBoardPayload = {
   byKey: {}
 };
 
+const STREAM_RETRY_MS = 30_000;
+
 export function MatchBoardProvider({ children }: { children: React.ReactNode }) {
   const [payload, setPayload] = useState<MatchBoardPayload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [streaming, setStreaming] = useState(false);
+
+  const applyPayload = useCallback((data: MatchBoardPayload) => {
+    setPayload(data);
+    setLoading(false);
+  }, []);
 
   const load = useCallback(async () => {
     try {
       const response = await fetch("/api/feeds/match-board", { cache: "no-store" });
       const data = (await response.json()) as MatchBoardPayload;
-      setPayload(data);
+      applyPayload(data);
     } catch {
       setPayload((current) => current ?? { ...EMPTY_PAYLOAD, message: "Unable to reach match board." });
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+  }, [applyPayload]);
 
   const hasLiveMatches = useMemo(() => {
     if ((payload?.live?.length ?? 0) > 0) return true;
@@ -60,10 +65,63 @@ export function MatchBoardProvider({ children }: { children: React.ReactNode }) 
   }, [payload]);
 
   useEffect(() => {
+    void load();
+  }, [load]);
+
+  useEffect(() => {
+    if (typeof EventSource === "undefined") return;
+
+    let disposed = false;
+    let eventSource: EventSource | null = null;
+    let retryTimeout: number | null = null;
+
+    const connectStream = () => {
+      if (disposed) return;
+      eventSource?.close();
+      eventSource = new EventSource(MATCH_BOARD_STREAM_URL);
+
+      eventSource.onopen = () => {
+        if (!disposed) setStreaming(true);
+      };
+
+      eventSource.onmessage = (event) => {
+        try {
+          applyPayload(JSON.parse(event.data) as MatchBoardPayload);
+        } catch {
+          /* ignore malformed chunk */
+        }
+      };
+
+      eventSource.onerror = () => {
+        setStreaming(false);
+        eventSource?.close();
+        eventSource = null;
+        void load();
+        if (!disposed) {
+          retryTimeout = window.setTimeout(() => {
+            retryTimeout = null;
+            connectStream();
+          }, STREAM_RETRY_MS);
+        }
+      };
+    };
+
+    connectStream();
+
+    return () => {
+      disposed = true;
+      setStreaming(false);
+      eventSource?.close();
+      if (retryTimeout) clearTimeout(retryTimeout);
+    };
+  }, [applyPayload, load]);
+
+  useEffect(() => {
+    if (streaming) return;
     const pollMs = hasLiveMatches ? MATCH_BOARD_POLL_LIVE_MS : MATCH_BOARD_POLL_MS;
     const interval = window.setInterval(() => void load(), pollMs);
     return () => window.clearInterval(interval);
-  }, [hasLiveMatches, load]);
+  }, [hasLiveMatches, load, streaming]);
 
   useEffect(() => {
     const onVisibility = () => {
