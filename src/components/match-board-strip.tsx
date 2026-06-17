@@ -105,7 +105,9 @@ export function MatchBoardStrip() {
       type="button"
       onClick={() => navigateToPredictFixture(card.fixtureKey, { scrollToTop: true })}
     >
-      <span className="match-board-strip-status">{statusLabel(card, liveNowMs)}</span>
+      <div className="match-board-strip-meta">
+        <span className="match-board-strip-status">{statusLabel(card, liveNowMs)}</span>
+      </div>
       <MatchTeamsLine
         awayTeam={card.awayTeam}
         className="match-teams-line--tile"

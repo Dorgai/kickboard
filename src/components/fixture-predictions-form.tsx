@@ -452,9 +452,11 @@ export function FixturePredictionsForm({
                   onChange={() => setPredictedOutcome(option.value)}
                 />
                 <span className="fixture-prediction-outcome-body">
-                  {teamName ? (
-                    <TeamLabel layout="stacked" name={teamName} size={compact ? "xs" : "md"} />
-                  ) : null}
+                  <span className="fixture-prediction-outcome-emblem">
+                    {teamName ? (
+                      <TeamLabel layout="stacked" name={teamName} size={compact ? "xs" : "md"} />
+                    ) : null}
+                  </span>
                   <span className="fixture-prediction-outcome-text">
                     {teamName ? option.label : outcomeShort(option.value)}
                   </span>
