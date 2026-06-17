@@ -25,7 +25,7 @@
   --page-gutter: 14px;
   --page-padding-y: 32px;
   --card-padding: 12px;
-  --compact-gap: 8px;
+  --compact-gap: 10px;
   --color-button-fill: #4b5563;
   --color-button-fill-fg: #f9fafb;
   --kickboard-tab-rail-bg: color-mix(in srgb, var(--color-surface) 88%, var(--color-bg));
@@ -1266,24 +1266,30 @@ h3 {
 
 .match-teams-line--tile {
   align-items: center;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 4px;
-  justify-content: flex-start;
+  display: grid;
+  gap: 4px 6px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   width: 100%;
 }
 
 .match-teams-line--tile .team-label {
-  flex: 1 1 0;
   gap: 3px;
   min-width: 0;
+}
+
+.match-teams-line--tile .team-label:first-of-type {
+  justify-self: start;
+}
+
+.match-teams-line--tile .team-label:last-of-type {
+  justify-self: end;
 }
 
 .match-teams-line--tile .team-label-text {
   font-size: 10px;
   font-weight: 600;
   line-height: 1.2;
-  max-width: 4.5rem;
+  max-width: 5rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1294,9 +1300,10 @@ h3 {
   flex-shrink: 0;
   font-size: 11px;
   font-weight: 800;
+  justify-self: center;
   letter-spacing: 0;
   line-height: 1;
-  padding: 0 2px;
+  padding: 0 4px;
 }
 
 .match-score-pill {
@@ -6540,8 +6547,8 @@ h3 {
 }
 
 .fixture-predictions-form--compact {
-  gap: 14px;
-  padding: 12px 14px;
+  gap: 16px;
+  padding: 14px 16px;
 }
 
 .fixture-prediction-field {
@@ -6762,7 +6769,7 @@ h3 {
 .fixture-prediction-outcome-list {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-tile);
   box-shadow: var(--shadow-surface);
   display: flex;
   flex-direction: row;
@@ -6795,7 +6802,7 @@ h3 {
   cursor: pointer;
   display: flex;
   flex: 0 0 auto;
-  min-width: min(42vw, 11.5rem);
+  min-width: min(38vw, 11rem);
   scroll-snap-align: start;
 }
 
@@ -6810,7 +6817,7 @@ h3 {
   }
 
   .fixture-prediction-outcome-option {
-    min-width: min(40vw, 10.5rem);
+    min-width: min(44vw, 10.75rem);
   }
 }
 
@@ -6841,14 +6848,22 @@ h3 {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   justify-content: center;
-  min-height: 3.5rem;
-  padding: 10px 12px;
+  min-height: 4rem;
+  padding: 12px 14px;
   text-align: center;
   transition:
     background 0.12s ease,
     box-shadow 0.12s ease;
+}
+
+.fixture-prediction-outcome-emblem {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 2.5rem;
+  width: 100%;
 }
 
 .fixture-prediction-outcome-option.is-disabled {
@@ -6875,10 +6890,24 @@ h3 {
   line-height: 1.25;
 }
 
+.fixture-predictions-form--compact .fixture-prediction-outcome-body {
+  gap: 6px;
+  min-height: 3.75rem;
+  padding: 10px 12px;
+}
+
+.fixture-predictions-form--compact .fixture-prediction-outcome-emblem {
+  min-height: 2.25rem;
+}
+
 .fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-outcome-body {
   gap: 8px;
-  min-height: 4.5rem;
+  min-height: 4.25rem;
   padding: 12px 14px;
+}
+
+.fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-outcome-emblem {
+  min-height: 2.75rem;
 }
 
 .fixture-predictions-form:not(.fixture-predictions-form--compact) .fixture-prediction-outcome-text {
@@ -8464,10 +8493,10 @@ h3 {
   align-items: stretch;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
   justify-content: flex-start;
-  min-height: 34px;
-  padding: 8px 10px;
+  min-height: 36px;
+  padding: 9px 11px;
   width: 100%;
 }
 
@@ -8478,8 +8507,8 @@ h3 {
   flex-wrap: nowrap;
   gap: 6px 8px;
   justify-content: space-between;
-  min-height: 32px;
-  padding: 5px 10px;
+  min-height: 34px;
+  padding: 7px 11px;
   width: 100%;
 }
 
@@ -8648,12 +8677,12 @@ h3 {
   display: flex;
   flex: 0 1 auto;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   justify-content: center;
   max-width: 14rem;
-  min-height: 36px;
-  min-width: 9.75rem;
-  padding: 6px 8px;
+  min-height: 38px;
+  min-width: 10rem;
+  padding: 8px 10px;
   text-align: left;
   width: auto;
 }
@@ -10554,7 +10583,7 @@ h3 {
   overflow: visible;
 }
 
-.feed-list.compact-list button {
+.feed-list.compact-list button:not(.match-fixture-btn--compact) {
   padding: 10px 12px;
 }
 
@@ -11005,10 +11034,10 @@ h3 {
 
 .match-board-strip-track {
   display: flex;
-  gap: 6px;
+  gap: var(--compact-gap);
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
-  padding: 6px max(var(--page-gutter), 10px);
+  padding: 8px max(var(--page-gutter), 10px);
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
 }
@@ -11025,9 +11054,9 @@ h3 {
   display: grid;
   flex: 0 0 auto;
   font: inherit;
-  gap: 3px;
-  min-width: min(10.5rem, 62vw);
-  padding: 6px 8px;
+  gap: 5px;
+  min-width: min(11rem, 64vw);
+  padding: 8px 10px;
   scroll-snap-align: start;
   text-align: left;
   transition:
@@ -11103,6 +11132,7 @@ h3 {
 .match-board-strip-card .match-red-cards-line {
   font-size: 10px;
   line-height: 1.25;
+  margin-top: 0;
   text-align: left;
   width: 100%;
 }
@@ -13912,7 +13942,8 @@ code {
 
   .fixture-prediction-outcome-body,
   .fixture-prediction-outcome-body .team-label,
-  .fixture-prediction-outcome-body .team-label-stacked {
+  .fixture-prediction-outcome-body .team-label-stacked,
+  .fixture-prediction-outcome-emblem {
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -13987,12 +14018,12 @@ code {
   }
 
   .fixture-prediction-outcome-option {
-    min-width: min(76vw, 10rem);
+    min-width: min(56vw, 10.75rem);
   }
 
   .fixture-prediction-outcome-body {
     min-width: 0;
-    padding: 10px 8px;
+    padding: 12px 10px;
   }
 
   .fixture-prediction-outcome-body .team-label,
