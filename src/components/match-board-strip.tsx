@@ -59,14 +59,23 @@ export function MatchBoardStrip() {
         type="button"
         onClick={() => navigateToPredictFixture(card.fixtureKey, { scrollToTop: true })}
       >
-        <span className="match-board-strip-status">{statusLabel(card, liveNowMs)}</span>
-        {matchDate ? <span className="match-board-strip-date">{matchDate}</span> : null}
+        <div className="match-board-strip-meta">
+          <span className="match-board-strip-status">{statusLabel(card, liveNowMs)}</span>
+          {matchDate ? (
+            <>
+              <span aria-hidden className="match-board-strip-meta-sep">
+                ·
+              </span>
+              <span className="match-board-strip-date">{matchDate}</span>
+            </>
+          ) : null}
+        </div>
         <MatchTeamsLine
           awayScore={scores.awayScore}
           awayTeam={card.awayTeam}
+          className="match-teams-line--tile"
           homeScore={scores.homeScore}
           homeTeam={card.homeTeam}
-          layout="stacked"
           size="xs"
         />
         {card.goalScorers.length > 0 ? (
@@ -99,8 +108,8 @@ export function MatchBoardStrip() {
       <span className="match-board-strip-status">{statusLabel(card, liveNowMs)}</span>
       <MatchTeamsLine
         awayTeam={card.awayTeam}
+        className="match-teams-line--tile"
         homeTeam={card.homeTeam}
-        layout="stacked"
         size="xs"
       />
     </button>

@@ -107,9 +107,9 @@ function TournamentFixtureRow({
         <MatchTeamsLine
           awayScore={showScore ? scores.awayScore : undefined}
           awayTeam={fixture.awayTeam}
+          className="match-teams-line--tile"
           homeScore={showScore ? scores.homeScore : undefined}
           homeTeam={fixture.homeTeam}
-          layout="stacked"
           size="xs"
         />
         {live?.goalScorers && live.goalScorers.length > 0 ? (

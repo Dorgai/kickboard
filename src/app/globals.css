@@ -18,9 +18,9 @@
   --shadow-elevation-1: var(--shadow-surface);
   --shadow-elevation-2: var(--shadow-surface);
   --shadow-elevation-3: 0 4px 10px rgba(15, 23, 42, 0.11), 0 18px 42px rgba(15, 23, 42, 0.16);
-  --radius-card: 2px;
+  --radius-card: 0;
   --radius-modal: 8px;
-  --radius-tile: 2px;
+  --radius-tile: 0;
   --max-page: 1280px;
   --page-gutter: 14px;
   --page-padding-y: 32px;
@@ -1262,6 +1262,41 @@ h3 {
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+}
+
+.match-teams-line--tile {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.match-teams-line--tile .team-label {
+  flex: 1 1 0;
+  gap: 3px;
+  min-width: 0;
+}
+
+.match-teams-line--tile .team-label-text {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  max-width: 4.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-teams-line--tile .match-score-pill {
+  background: none;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+  padding: 0 2px;
 }
 
 .match-score-pill {
@@ -3079,9 +3114,9 @@ h3 {
   cursor: pointer;
   display: grid;
   font: inherit;
-  gap: 3px;
+  gap: 2px;
   margin: 0;
-  padding: 6px 8px;
+  padding: 5px 7px;
   text-align: left;
   width: 100%;
 }
@@ -8406,7 +8441,7 @@ h3 {
 .group-stage-match-list button {
   background: transparent;
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius-tile);
   box-shadow: none;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -9907,7 +9942,7 @@ h3 {
 
 .current-event-fixture-match {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -10039,8 +10074,8 @@ h3 {
 .lineup-card {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: var(--radius-card);
+  padding: 10px;
 }
 
 .stat-line {
@@ -10970,10 +11005,10 @@ h3 {
 
 .match-board-strip-track {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
-  padding: 8px max(var(--page-gutter), 10px);
+  padding: 6px max(var(--page-gutter), 10px);
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
 }
@@ -10990,14 +11025,28 @@ h3 {
   display: grid;
   flex: 0 0 auto;
   font: inherit;
-  gap: 4px;
-  min-width: min(12.5rem, 68vw);
-  padding: 8px 10px;
+  gap: 3px;
+  min-width: min(10.5rem, 62vw);
+  padding: 6px 8px;
   scroll-snap-align: start;
-  text-align: center;
+  text-align: left;
   transition:
     background 0.12s ease,
     box-shadow 0.12s ease;
+}
+
+.match-board-strip-meta {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  line-height: 1.2;
+}
+
+.match-board-strip-meta-sep {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .match-board-strip-card--live {
@@ -11052,8 +11101,14 @@ h3 {
 
 .match-board-strip-card .match-goal-scorers-line,
 .match-board-strip-card .match-red-cards-line {
+  font-size: 10px;
+  line-height: 1.25;
   text-align: left;
   width: 100%;
+}
+
+.match-board-strip-card .match-goal-scorers-line p {
+  font-size: 10px;
 }
 
 .current-event-fixture-live-badge--ft {

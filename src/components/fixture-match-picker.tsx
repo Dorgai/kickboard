@@ -9,6 +9,7 @@ import { writeFixtureDragData } from "@/lib/fixtures/drag-fixture";
 import {
   groupFixturesByDate,
   sortFixtureOptions,
+  formatFixtureDateDivider,
   type FixtureOption
 } from "@/lib/fixtures/fixture-key";
 import { resolveLiveElapsed } from "@/lib/fixtures/live-elapsed";
@@ -189,6 +190,18 @@ export function FixturePickerButton({
   const liveElapsed = resolveLiveElapsed(fixture.status, fixture.date, fixture.elapsed, liveNowMs);
   const showScore = shouldShowMatchScore(fixture.homeGoals, fixture.awayGoals, fixture.status);
   const scores = matchScoresForDisplay(fixture.homeGoals, fixture.awayGoals, fixture.status);
+  const statusText =
+    fixture.status === "live"
+      ? liveElapsed != null
+        ? `Live ${liveElapsed}'`
+        : "Live"
+      : fixture.status === "finished"
+        ? showDate && fixture.date
+          ? `FT · ${formatFixtureDateDivider(fixture.date)}`
+          : "FT"
+        : "Upcoming";
+  const showSeparateDate =
+    showDate && fixture.date && fixture.status !== "finished" && fixture.status !== "live";
 
   return (
     <button
@@ -208,25 +221,16 @@ export function FixturePickerButton({
       }
     >
       <span className="match-fixture-picker-status" data-status={fixture.status}>
-        {fixture.status === "live"
-          ? liveElapsed != null
-            ? `Live ${liveElapsed}'`
-            : "Live"
-          : fixture.status === "finished"
-            ? "FT"
-            : "Upcoming"}
+        {statusText}
       </span>
       <MatchTeamsLine
+        awayScore={showScore ? scores.awayScore : undefined}
         awayTeam={fixture.awayTeam}
+        className="match-teams-line--tile"
+        homeScore={showScore ? scores.homeScore : undefined}
         homeTeam={fixture.homeTeam}
-        layout="stacked"
         size="xs"
       />
-      {showScore ? (
-        <span className="match-fixture-picker-score">
-          {scores.homeScore} – {scores.awayScore}
-        </span>
-      ) : null}
       {fixture.goalScorers && fixture.goalScorers.length > 0 ? (
         <MatchGoalScorersLine
           awayTeam={fixture.awayTeam}
@@ -235,7 +239,7 @@ export function FixturePickerButton({
           homeTeam={fixture.homeTeam}
         />
       ) : null}
-      {showDate && fixture.date ? (
+      {showSeparateDate ? (
         <span className="match-fixture-picker-date">{fixture.date}</span>
       ) : null}
     </button>
