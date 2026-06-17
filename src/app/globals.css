@@ -2801,8 +2801,12 @@ h3 {
 @media (max-width: 860px) {
   .fan-chat-float-panel {
     bottom: calc(
-      var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) + var(--kickboard-mobile-dock-gap) +
-        12px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-mobile-dock-stack, 58px) + var(--kickboard-mobile-dock-clearance, 14px) +
+        env(safe-area-inset-bottom, 0px)
+    );
+    max-height: calc(
+      100vh - var(--kickboard-mobile-dock-stack, 58px) - var(--kickboard-mobile-dock-clearance, 14px) - 24px -
+        env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
     );
     right: var(--kickboard-mobile-dock-inset, 12px);
     width: min(calc(100vw - 2 * var(--kickboard-mobile-dock-inset, 12px)), 28rem);
@@ -13428,12 +13432,19 @@ code {
   }
 
   :root {
-    --kickboard-event-tabs-dock: 0px;
-    --kickboard-site-nav-dock: 0px;
-    --kickboard-mobile-dock-bottom: 8px;
-    --kickboard-mobile-dock-gap: 8px;
+    --kickboard-mobile-dock-bottom: 4px;
+    --kickboard-mobile-dock-gap: 10px;
     /* Breathing room from screen edges (safe-area aware); inner rail fills this width. */
     --kickboard-mobile-dock-inset: 12px;
+    --kickboard-mobile-dock-clearance: 14px;
+    --kickboard-mobile-dock-height: calc(
+      var(--kickboard-tab-rail-padding) * 2 + var(--kickboard-tab-item-min-height)
+    );
+    --kickboard-event-tabs-dock: var(--kickboard-mobile-dock-height);
+    --kickboard-site-nav-dock: 0px;
+    --kickboard-mobile-dock-stack: calc(
+      var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-bottom) + var(--kickboard-mobile-dock-gap)
+    );
   }
 
   .app-header,
@@ -13754,24 +13765,15 @@ code {
 
   main,
   .feed-browser {
-    padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) +
-        var(--kickboard-mobile-dock-bottom) + 28px + env(safe-area-inset-bottom, 0px)
-    );
+    padding-bottom: calc(var(--kickboard-mobile-dock-stack) + 16px + env(safe-area-inset-bottom, 0px));
   }
 
   .current-event-tabs-layout {
-    padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) +
-        var(--kickboard-mobile-dock-bottom) + 24px + env(safe-area-inset-bottom, 0px)
-    );
+    padding-bottom: calc(var(--kickboard-mobile-dock-stack) + 16px + env(safe-area-inset-bottom, 0px));
   }
 
   .current-event-tabs-layout:has(.current-event-predictions-tab) {
-    padding-bottom: calc(
-      var(--kickboard-site-nav-dock) + var(--kickboard-event-tabs-dock) + var(--kickboard-mobile-dock-gap) +
-        var(--kickboard-mobile-dock-bottom) + 24px + env(safe-area-inset-bottom, 0px)
-    );
+    padding-bottom: calc(var(--kickboard-mobile-dock-stack) + 16px + env(safe-area-inset-bottom, 0px));
   }
 
   .kickboard-mobile-dock-event {
@@ -14030,9 +14032,10 @@ code {
 
   .fan-chat-float-root {
     bottom: calc(
-      var(--kickboard-event-tabs-dock) + var(--kickboard-site-nav-dock) + var(--kickboard-mobile-dock-gap) +
-        var(--kickboard-mobile-dock-bottom) + 18px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-mobile-dock-stack) + var(--kickboard-mobile-dock-clearance) +
+        env(safe-area-inset-bottom, 0px)
     );
+    right: max(var(--kickboard-mobile-dock-inset), env(safe-area-inset-right, 0px));
   }
 
   .feed-browser > .event-tab-bar:not(.feed-event-selector-tabs) {
@@ -14204,8 +14207,8 @@ code {
 @media (max-width: 860px) {
   .onboarding-tip-floater {
     bottom: calc(
-      var(--kickboard-event-tabs-dock, 58px) + var(--kickboard-mobile-dock-bottom, 8px) +
-        var(--kickboard-mobile-dock-gap, 8px) + 10px + env(safe-area-inset-bottom, 0px)
+      var(--kickboard-mobile-dock-stack, 58px) + var(--kickboard-mobile-dock-clearance, 14px) +
+        env(safe-area-inset-bottom, 0px)
     );
     left: max(var(--kickboard-mobile-dock-inset, 12px), env(safe-area-inset-left, 0px));
     max-width: none;
