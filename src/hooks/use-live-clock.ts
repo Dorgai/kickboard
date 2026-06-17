@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 /** Ticks during live matches so elapsed minutes update without waiting for the next poll. */
-export function useLiveClock(active: boolean, intervalMs = 15_000) {
+export function useLiveClock(active: boolean, intervalMs = 10_000) {
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {

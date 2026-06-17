@@ -69,7 +69,7 @@ async function pollLiveFixtures() {
 
   const fixtures = data.response ?? [];
   await Promise.all(
-    fixtures.slice(0, 8).map(async (fixture) => {
+    fixtures.slice(0, 16).map(async (fixture) => {
       try {
         const eventsPayload = await fetchApiFootball("/fixtures/events", {
           fixture: String(fixture.fixture.id)
@@ -110,12 +110,12 @@ new Worker(
 );
 
 await queue.upsertJobScheduler(
-  "poll-live-fixtures-every-60s",
-  { every: 60000 },
+  "poll-live-fixtures-every-20s",
+  { every: 20000 },
   {
     name: "poll-live-fixtures",
     data: {}
   }
 );
 
-console.log("API-Football worker started. Polling live fixtures every 60 seconds.");
+console.log("API-Football worker started. Polling live fixtures every 20 seconds.");
