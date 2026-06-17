@@ -61,6 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (user) {
           token.onboardingComplete = user.onboardingComplete;
           token.pointsBalance = user.pointsBalance;
+          token.isChild = user.isChild;
           if (session && typeof session === "object" && "locale" in session) {
             token.locale = normalizeAppLocale(String((session as { locale?: string }).locale));
           } else {
@@ -85,6 +86,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             token.sub = user.id;
             token.onboardingComplete = user.onboardingComplete;
             token.pointsBalance = user.pointsBalance;
+            token.isChild = user.isChild;
             token.locale = user.locale;
             token.email = profile.email;
             token.isAdmin = isAdminEmail(profile.email);
@@ -106,6 +108,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (user) {
           token.onboardingComplete = user.onboardingComplete;
           token.pointsBalance = user.pointsBalance;
+          token.isChild = user.isChild;
           token.locale = user.locale;
           token.email = user.email;
           token.isAdmin = isAdminEmail(user.email);
@@ -120,6 +123,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = String(token.sub);
         session.user.onboardingComplete = Boolean(token.onboardingComplete);
         session.user.pointsBalance = Number(token.pointsBalance ?? 0);
+        session.user.isChild = Boolean(token.isChild);
         session.user.locale = normalizeAppLocale(
           typeof token.locale === "string" ? token.locale : undefined
         );

@@ -12,6 +12,7 @@ declare module "next-auth" {
       pointsBalance: number;
       locale: AppLocale;
       isAdmin?: boolean;
+      isChild?: boolean;
     };
   }
 }
@@ -22,6 +23,7 @@ declare module "next-auth/jwt" {
     pointsBalance?: number;
     locale?: AppLocale;
     isAdmin?: boolean;
+    isChild?: boolean;
     email?: string;
   }
 }

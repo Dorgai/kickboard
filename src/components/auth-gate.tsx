@@ -110,6 +110,15 @@ export function AuthGate({
     );
   }
 
+  if (session.user.isChild) {
+    return (
+      <div className="auth-gate auth-gate--fan-mode">
+        <h3>{t("auth.fanModeTitle")}</h3>
+        <p className="inline-status">{t("auth.fanModeBody")}</p>
+      </div>
+    );
+  }
+
   if (!session.user.onboardingComplete) {
     async function handleOnboarding(event: FormEvent) {
       event.preventDefault();
@@ -126,7 +135,10 @@ export function AuthGate({
           })
         });
         const payload = (await response.json()) as { error?: string };
-        if (!response.ok) throw new Error(payload.error ?? t("auth.onboardingFailed"));
+        if (!response.ok) {
+          await update();
+          throw new Error(payload.error ?? t("auth.onboardingFailed"));
+        }
         writeLocaleCookie(selectedLocale);
         await update({ locale: selectedLocale });
       } catch (onboardingError) {

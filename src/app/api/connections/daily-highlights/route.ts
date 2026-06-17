@@ -13,6 +13,9 @@ export async function GET() {
   if (!user.onboardingComplete) {
     return NextResponse.json({ error: "Complete onboarding first." }, { status: 403 });
   }
+  if (user.isChild) {
+    return NextResponse.json({ error: "Fan Mode accounts cannot use connections." }, { status: 403 });
+  }
 
   try {
     const payload = await getFriendsDailyHighlights(user.id);

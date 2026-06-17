@@ -16,6 +16,9 @@ export async function DELETE(_request: Request, context: RouteContext) {
   if (!user.onboardingComplete) {
     return NextResponse.json({ error: "Complete onboarding first." }, { status: 403 });
   }
+  if (user.isChild) {
+    return NextResponse.json({ error: "Fan Mode accounts cannot send invites." }, { status: 403 });
+  }
 
   const { invitationId } = await context.params;
 

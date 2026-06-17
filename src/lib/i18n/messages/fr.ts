@@ -51,7 +51,10 @@ export const frMessages: Messages = {
     logOut: "Déconnexion",
     completeOnboarding: "Terminer l'inscription",
     points: "{count} pts",
-    onboardingFailed: "Échec de l'inscription."
+    onboardingFailed: "Échec de l'inscription.",
+    fanModeTitle: "Mode fan",
+    fanModeBody:
+      "Les comptes de moins de 13 ans peuvent consulter les matchs et les scores en direct, mais pas les connexions, invitations, Fan Chat ni les publications publiques."
   },
   helpMenu: {
     eventOverview: "Aperçu du tournoi",
@@ -204,6 +207,7 @@ export const frMessages: Messages = {
     discoverableFansEmpty: "Aucun fan découvrable pour le moment. Essayez de chercher par nom d'utilisateur.",
     searching: "Recherche…",
     loading: "Chargement des connexions…",
+    unavailable: "Les connexions communautaires ne sont pas disponibles pour ce compte.",
     connectByUsername: "Se connecter par nom d'utilisateur",
     searchPlaceholder: "Rechercher ou @nom",
     sendRequest: "Envoyer la demande",

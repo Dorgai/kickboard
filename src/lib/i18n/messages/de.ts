@@ -51,7 +51,10 @@ export const deMessages: Messages = {
     logOut: "Abmelden",
     completeOnboarding: "Onboarding abschließen",
     points: "{count} Pkt.",
-    onboardingFailed: "Onboarding fehlgeschlagen."
+    onboardingFailed: "Onboarding fehlgeschlagen.",
+    fanModeTitle: "Fan-Modus",
+    fanModeBody:
+      "Konten unter 13 Jahren können Spiele und Live-Ergebnisse ansehen, aber keine Community-Verbindungen, Einladungen, Fan-Chat oder öffentliche Beiträge nutzen."
   },
   helpMenu: {
     eventOverview: "Turnierübersicht",
@@ -204,6 +207,7 @@ export const deMessages: Messages = {
     discoverableFansEmpty: "Derzeit keine auffindbaren Fans. Versuche die Suche nach Benutzernamen.",
     searching: "Suche…",
     loading: "Verbindungen werden geladen…",
+    unavailable: "Community-Verbindungen sind für dieses Konto nicht verfügbar.",
     connectByUsername: "Per Benutzername verbinden",
     searchPlaceholder: "Suchen oder @benutzername",
     sendRequest: "Anfrage senden",

@@ -72,7 +72,9 @@ export async function findAuthUserById(userId: string): Promise<AuthUser | null>
     birthYear: row.birth_year,
     isChild: row.is_child,
     pointsBalance: row.points_balance,
-    onboardingComplete: Boolean(row.onboarding_completed_at && row.birth_year !== null),
+    onboardingComplete: Boolean(
+      !row.is_child && row.onboarding_completed_at !== null && row.birth_year !== null
+    ),
     locale: normalizeAppLocale(row.locale)
   };
 }
@@ -245,20 +247,30 @@ export async function completeUserOnboarding(
 
   const child = isChildAccount(birthYear);
   const locale = options?.locale && isAppLocale(options.locale) ? options.locale : null;
+
+  if (child) {
+    await query(
+      `UPDATE users
+       SET birth_year = $2,
+           is_child = true,
+           locale = COALESCE($3, locale),
+           updated_at = now()
+       WHERE id = $1 AND deleted_at IS NULL`,
+      [userId, birthYear, locale]
+    );
+    throw new Error("CHILD_ACCOUNT_BLOCKED");
+  }
+
   await query(
     `UPDATE users
      SET birth_year = $2,
-         is_child = $3,
-         locale = COALESCE($4, locale),
+         is_child = false,
+         locale = COALESCE($3, locale),
          onboarding_completed_at = now(),
          updated_at = now()
      WHERE id = $1 AND deleted_at IS NULL`,
-    [userId, birthYear, child, locale]
+    [userId, birthYear, locale]
   );
-
-  if (child) {
-    throw new Error("CHILD_ACCOUNT_BLOCKED");
-  }
 
   if (options?.registrationInviteToken) {
     const { redeemRegistrationInvitation } = await import("@/lib/invitations/store");

@@ -51,7 +51,10 @@ export const huMessages: Messages = {
     logOut: "Kilépés",
     completeOnboarding: "Bevezetés befejezése",
     points: "{count} pont",
-    onboardingFailed: "A bevezetés sikertelen."
+    onboardingFailed: "A bevezetés sikertelen.",
+    fanModeTitle: "Fan mód",
+    fanModeBody:
+      "A 13 év alatti fiókok meccseket és élő eredményeket nézhetnek, de nem használhatják a közösségi kapcsolatokat, meghívókat, Fan Chatet vagy nyilvános posztolást."
   },
   helpMenu: {
     eventOverview: "Verseny áttekintése",
@@ -204,6 +207,7 @@ export const huMessages: Messages = {
     discoverableFansEmpty: "Jelenleg nincs felfedezhető szurkoló. Próbálj felhasználónévre keresni.",
     searching: "Keresés…",
     loading: "Kapcsolatok betöltése…",
+    unavailable: "A közösségi kapcsolatok nem érhetők el ezzel a fiókkal.",
     connectByUsername: "Kapcsolódás felhasználónévvel",
     searchPlaceholder: "Keresés vagy @felhasználónév",
     sendRequest: "Kérelem küldése",

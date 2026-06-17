@@ -15,6 +15,9 @@ export async function GET(request: Request) {
   if (!user.onboardingComplete) {
     return NextResponse.json({ error: "Complete onboarding first." }, { status: 403 });
   }
+  if (user.isChild) {
+    return NextResponse.json({ error: "Fan Mode accounts cannot use connections." }, { status: 403 });
+  }
 
   const limit = Number(new URL(request.url).searchParams.get("limit") ?? "60");
 

@@ -61,17 +61,26 @@ function ConnectionsPanelInner() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch("/api/connections", { cache: "no-store" });
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
       if (!response.ok) {
         setData(null);
+        if (response.status === 403 && payload.error) {
+          setError(payload.error);
+        } else if (response.status === 401) {
+          setError(t("connections.unavailable"));
+        }
         return;
       }
-      setData((await response.json()) as ConnectionsPayload);
+      setData(payload as ConnectionsPayload);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const refreshDiscoverable = useCallback(async () => {
     setDiscoverableLoading(true);

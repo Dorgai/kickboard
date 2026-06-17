@@ -48,7 +48,10 @@ export const enMessages = {
     logOut: "Log out",
     completeOnboarding: "Complete onboarding",
     points: "{count} pts",
-    onboardingFailed: "Onboarding failed."
+    onboardingFailed: "Onboarding failed.",
+    fanModeTitle: "Fan Mode",
+    fanModeBody:
+      "Accounts under 13 can browse matches and live scores, but cannot use Community connections, registration invites, Fan Chat, or public posting."
   },
   helpMenu: {
     eventOverview: "Event overview",
@@ -200,6 +203,7 @@ export const enMessages = {
     discoverableFansEmpty: "No discoverable fans right now. Try searching by username.",
     searching: "Searching…",
     loading: "Loading connections…",
+    unavailable: "Community connections are unavailable for this account.",
     connectByUsername: "Connect by username",
     searchPlaceholder: "Search or type @username",
     sendRequest: "Send request",
